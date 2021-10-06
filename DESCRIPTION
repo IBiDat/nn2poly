@@ -1,0 +1,33 @@
+Package: nn2pr
+Title: Transoform Neural Network Weigths into Polynomial Regression Coefficients
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Pablo",
+           family = "Morala",
+           role = c("aut", "cre"),
+           email = "pablo.morala@uc3m.es",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: This package implements a method that builds the coefficients of a polynomial regression that performs almost equivalently as a given neural network (densely connected). This is achieved using Taylor expansion at the activation functions.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.2
+Imports: 
+    cowplot,
+    future.apply,
+    ggplot2,
+    polyreg,
+    pracma,
+    Rcpp,
+    reticulate,
+    stats,
+    stringr
+Suggests: 
+    nn2prtools,
+    rmarkdown,
+    knitr,
+    keras,
+    tensorflow
+    
+    
