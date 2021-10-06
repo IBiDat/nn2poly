@@ -2,11 +2,11 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 concat <- function(my_vector) {
-    .Call(`_nn2prPKG_concat`, my_vector)
+    .Call(`_nn2pr_concat`, my_vector)
 }
 
 rm_null <- function(x) {
-    .Call(`_nn2prPKG_rm_null`, x)
+    .Call(`_nn2pr_rm_null`, x)
 }
 
 #' Select the allowed partitions at a given layer computation
@@ -19,6 +19,6 @@ rm_null <- function(x) {
 #'
 #'
 select_allowed_partitions <- function(coeff_label, q_previous_layer, all_partitions) {
-    .Call(`_nn2prPKG_select_allowed_partitions`, coeff_label, q_previous_layer, all_partitions)
+    .Call(`_nn2pr_select_allowed_partitions`, coeff_label, q_previous_layer, all_partitions)
 }
 

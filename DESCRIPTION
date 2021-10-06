@@ -1,5 +1,5 @@
 Package: nn2pr
-Title: Transoform Neural Network Weigths into Polynomial Regression Coefficients
+Title: Transform Neural Network Weigths into Polynomial Regression Coefficients
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Pablo",
@@ -29,5 +29,6 @@ Suggests:
     knitr,
     keras,
     tensorflow
-    
-    
+LinkingTo: 
+    Rcpp
+VignetteBuilder: knitr
