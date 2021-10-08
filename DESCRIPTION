@@ -17,6 +17,7 @@ Imports:
     cowplot,
     future.apply,
     ggplot2,
+    gtools,
     polyreg,
     pracma,
     Rcpp,
