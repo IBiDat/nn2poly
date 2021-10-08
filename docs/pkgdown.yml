@@ -3,5 +3,6 @@ pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
   nn2pr-01-introduction: nn2pr-01-introduction.html
-last_built: 2021-10-06T11:01Z
+  nn2pr-02-using-some-tools: nn2pr-02-using-some-tools.html
+last_built: 2021-10-08T10:55Z
 
