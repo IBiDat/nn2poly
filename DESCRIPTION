@@ -6,7 +6,7 @@ Authors@R:
            family = "Morala",
            role = c("aut", "cre"),
            email = "pablo.morala@uc3m.es",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
+           comment = c(ORCID = "0000-0002-4109-2330"))
 Description: This package implements a method that builds the coefficients of a polynomial regression that performs almost equivalently as a given neural network (densely connected). This is achieved using Taylor expansion at the activation functions.
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -24,7 +24,7 @@ Imports:
     stats,
     stringr
 Suggests: 
-    nn2prtools,
+    nn2pr.tools,
     rmarkdown,
     knitr,
     keras,
