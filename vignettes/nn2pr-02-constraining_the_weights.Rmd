@@ -1,8 +1,13 @@
 ---
-title: "nn2pr-02-using-some-tools"
-output: rmarkdown::html_vignette
+title: "02 - Constraining the weights in the NN"
+author: "Pablo Morala"
+output:
+  rmarkdown::html_vignette:
+    toc: yes
+    fig_width: 6
+date: "`r Sys.Date()`"
 vignette: >
-  %\VignetteIndexEntry{nn2pr-02-using-some-tools}
+  %\VignetteIndexEntry{02 - Constraining the weights in the NN}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

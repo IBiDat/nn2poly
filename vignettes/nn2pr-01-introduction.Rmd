@@ -1,5 +1,5 @@
 ---
-title: "Introduction to nn2pr"
+title: "01 - Introduction to nn2pr"
 author: "Pablo Morala"
 output:
   rmarkdown::html_vignette:
@@ -7,7 +7,7 @@ output:
     fig_width: 6
 date: "`r Sys.Date()`"
 vignette: >
-  %\VignetteIndexEntry{Introduction to nn2pr}
+  %\VignetteIndexEntry{01 - Introduction to nn2pr}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -33,7 +33,7 @@ The main objective of this package is obtaining a representation of a feed forwa
 
 The main insights about the mathematical process to build this relationship can be found in this [article](https://doi.org/10.1016/j.neunet.2021.04.036) or its free access option through the orginal [arXiv version](https://arxiv.org/abs/2102.03865.).
 
-This vignette presents the direct usage of the package with a simple case. For additional tools to build neural networks with the needed conditions that ensure the correct theoretical behavior (constraining the weights and biases), check the VIGNETTE 2 that also uses the extension package `nn2prtools`.
+This vignette presents the direct usage of the package with a simple case. For additional tools to build neural networks with the needed conditions that ensure the correct theoretical behavior (constraining the weights and biases), check the VIGNETTE 2 that also uses the extension package `nn2pr.tools`.
 
 
 # Data preparation
