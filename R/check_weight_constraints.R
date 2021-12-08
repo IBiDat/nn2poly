@@ -36,14 +36,13 @@ check_weight_constraints <- function(weights, maxnorm) {
       } else if (maxnorm[[1]] == "l2_norm") {
         norm <- pracma::Norm(weights[[i]][, j], 2)
         weights_norms[[i]][j] <- norm
-      } else if (maxnorm[[1]] == "my_l2_norm") {
-        norm <- pracma::Norm(weights[[i]][, j], 2)
-        weights_norms[[i]][j] <- norm
       } else if (maxnorm[[1]] == "unit") {
         norm <- pracma::Norm(weights[[i]][, j], 2)
         weights_norms[[i]][j] <- norm
       } else {
-        weights_norms[[i]][j] <- 0
+        print("Checking the l1_norm in case of no chosen norm")
+        norm <- pracma::Norm(weights[[i]][, j], 1)
+        weights_norms[[i]][j] <- norm
       }
 
       # Name the list item
