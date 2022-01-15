@@ -4,7 +4,7 @@ The **nn2poly** package implements the NN2Poly method that allows to transform a
 
 ## Documentation
 
-Vignettes: Links need to be added
+Vignettes: Links need to be added later
   
 - [Introduction]
 - [Constraining the weights]
