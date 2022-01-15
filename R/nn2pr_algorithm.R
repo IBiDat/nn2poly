@@ -11,7 +11,7 @@
 #' @return list
 #' @export
 #'
-nn2pr_algorithm <- function(weights_list, af_string_list, q_taylor_vector) {
+nn2pr_algorithm <- function(weights_list, af_string_list, q_taylor_vector, all_partitions) {
 
   # Obtain number of variables (dimension p)
   p <- dim(weights_list[[1]])[1] - 1
@@ -42,19 +42,21 @@ nn2pr_algorithm <- function(weights_list, af_string_list, q_taylor_vector) {
     q_taylor_vector = q_taylor_vector
   )
 
-
-
-
-  ###### Using Python to obtain all the partitions needed later:
-
-  # First obtain the maximum degree of the polynomial that we will obtain with the method:
+  # Obtain the maximum degree of the polynomial that we will obtain with the method:
   q_max <- prod(q_taylor_vector)
-  # Generate all partitions with Python script:
-  all_partitions <- generate_partitions(as.integer(p), as.integer(q_max))
-  # Obtain a label for each of the coefficients partitioned in the list:
-  all_partitions <- label_partitions_from_python(all_partitions = all_partitions)
-  # These are now stored to be used when needed in all the loops.
-  print("partitions obtained")
+
+  # Check if partitions have not been given as an input
+  if (missing(all_partitions)){
+    # Compute multiset partitions if missing, using Python
+
+    # Generate all partitions with Python script:
+    all_partitions <- generate_partitions(as.integer(p), as.integer(q_max))
+    # Obtain a label for each of the coefficients partitioned in the list:
+    all_partitions <- label_partitions_from_python(all_partitions = all_partitions)
+    # These are now stored to be used when needed in all the loops.
+    print("partitions obtained")
+  }
+
 
   ############################ WHEN L = 2 ##############################
 
