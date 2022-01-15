@@ -7,11 +7,12 @@
 #' at each layer
 #' @param q_taylor_vector List containing the degree up to which Taylor
 #' expansion should be performed at each layer.
+#' @param all_partitions Optional argument containing the needed multipartitions
 #'
 #' @return list
 #' @export
 #'
-nn2pr_algorithm <- function(weights_list, af_string_list, q_taylor_vector, all_partitions) {
+nn2poly_algorithm <- function(weights_list, af_string_list, q_taylor_vector, all_partitions) {
 
   # Obtain number of variables (dimension p)
   p <- dim(weights_list[[1]])[1] - 1

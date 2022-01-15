@@ -1,5 +1,5 @@
 ---
-title: "01 - Introduction to nn2pr"
+title: "02 - Constraining the weights in the NN"
 author: "Pablo Morala"
 output:
   rmarkdown::html_vignette:
@@ -7,7 +7,7 @@ output:
     fig_width: 6
 date: "`r Sys.Date()`"
 vignette: >
-  %\VignetteIndexEntry{01 - Introduction to nn2pr}
+  %\VignetteIndexEntry{02 - Constraining the weights in the NN}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -20,12 +20,17 @@ knitr::opts_chunk$set(
 ```
 
 Initial setup:
+
 ```{r setup}
-library(nn2pr)
+library(nn2pr.tools)
+library(nn2poly)
 library(keras)
+library(tensorflow)
 tensorflow::set_random_seed(42)
 ```
 
+
+# NN with weight constraints
 
 # Overall Goal
 
@@ -33,12 +38,12 @@ The main objective of this package is obtaining a representation of a feed forwa
 
 The main insights about the mathematical process to build this relationship can be found in this [article](https://doi.org/10.1016/j.neunet.2021.04.036) or its free access option through the orginal [arXiv version](https://arxiv.org/abs/2102.03865.).
 
-This vignette presents the direct usage of the package with a simple case. For additional tools to build neural networks with the needed conditions that ensure the correct theoretical behavior (constraining the weights and biases), check the VIGNETTE 2 that also uses the extension package `nn2pr.tools`.
+This vignette presents the direct usage of the package with a simple case. For additional tools to build neural networks with the needed conditions that ensure the correct theoretical behavior (constraining the weights and biases), check the VIGNETTE 2 that also uses the extension package `nn2polytools`.
 
 
 # Data preparation
 
-In order to show the most common application of `nn2pr`, we will be solving a regression problem on the Boston dataset, included in the `keras`package.
+In order to show the most common application of `nn2poly`, we will be solving a regression problem on the Boston dataset, included in the `keras`package.
 
 ```{r}
 boston_housing <- dataset_boston_housing()
@@ -47,7 +52,7 @@ c(train_x, train_y) %<-% boston_housing$train
 c(test_x, test_y) %<-% boston_housing$test
 ```
 
-The data needs to be scaled, both for training the NN and for the `nn2pr` algorithm to work properly. In the theoretical foundation of this method, the scaling assumed is to the $[-1,1]$ interval, so we will use it: 
+The data needs to be scaled, both for training the NN and for the `nn2polyPKG` algorithm to work properly. In the theoretical foundation of this method, the scaling assumed is to the $[-1,1]$ interval, so we will use it: 
 
 ```{r}
 # Join the predictor variables (x) and the response (y)
@@ -93,50 +98,61 @@ In order to present an example, here we will create and train a NN. Our choice w
 
 First, we build the model
 
-```{r}
-nn <- keras_model_sequential()
 
-nn %>% layer_dense(units = 30,
-                  activation = "softplus",
-                  input_shape = p)
+```{r}
+
+# keras hyperparameters 
+  my_loss <- "mse"
+  my_metrics <- "mse"
+  my_optimizer <- optimizer_rmsprop()
+  my_epochs <- 500
+  my_validation_split <- 0.3
+  my_verbose <- 0
+
+  # Parameters:
+af_string_list <- list("softplus", "softplus", "linear")
+
+q_taylor_vector <- c(2, 2, 1) # If the output is linear, the last value should be 1 so it doesnt affect the product
+
+h_neurons_vector <- c(40, 40, 1) # If the output is linear, the last value should be 1
+
+my_max_norm <- list("l2_norm",1)
   
-nn %>% layer_dense(units = 30,
-                  activation = "softplus")
-
-nn %>% layer_dense(units = 1,
-                  activation = "linear")
-
-nn
 ```
 
-Compile the model:
+
 ```{r}
-compile(nn,
-        loss = "mse",
-        optimizer = optimizer_adam(),
-        metrics = "mse")
+nn <- build_keras_model(p,
+    af_string_list,
+    h_neurons_vector,
+    my_max_norm)
 ```
 
-And train it:
 ```{r}
-history <- fit(nn,
-               train_x,
-               train_y,
-               verbose = 0,
-               epochs = 50,
-               validation_split = 0.3
-)
+# Compile the model
+	compile(nn,
+					loss = my_loss,
+					optimizer = my_optimizer,
+					metrics = my_metrics
+	)
+
+	# Fit the model
+	history <- fit(nn,
+								 train_x,
+								 train_y,
+								 verbose = my_verbose,
+								 epochs = my_epochs,
+								 validation_split = my_validation_split,
+								 batch_size = 500
+	)
 ```
+
+
 
 We can visualize the training process:
 ```{r}
 plot(history)
 ```
-
-----
-Visualización de la NN, cambiar la funcion:
-----
-
 
 ```{r}
 # Obtain the predicted values with the NN to compare them
@@ -145,10 +161,9 @@ prediction_NN <- predict(nn, test_x)
 plot_NN_PR_comparison(test_y, prediction_NN)
 ```
 
-
 # Obtaining the polynomial regression
 
-After the NN has been trained, using any chosen method by the user, the parameters have to be extracted and reshaped, if needed, to match the expected input of the function `nn2pr_algorithm()`. This input consists in the following objects:
+After the NN has been trained, using any chosen method by the user, the parameters have to be extracted and reshaped, if needed, to match the expected input of the function `nn2poly_algorithm()`. This input consists in the following objects:
 
 * `weights_list` A list of matrices with a weight matrix at each layer. The weights matrices should be of dimension ((1+input) * output) where the first row corresponds to the bias vector, and the rest of the rows correspond to each of the ordered vector weights associated to each input.
 * `af_string_list` A list of strings with the names of the activation functions at each layer.
@@ -160,32 +175,21 @@ Following the example of the NN that we created previously, we need to extract i
 ```{r}
 keras_weights <- keras::get_weights(nn)
 
-# Due to keras giving weights separated from the bias, we have twice the 
-# elements that we want:
-n <- length(keras_weights)/2
-nn_weights <- vector(mode = "list", length = n)
-for (i in 1:n){
-  nn_weights[[i]] <- rbind(keras_weights[[2*i]], keras_weights[[2*i-1]])
-}
-```
+# En este caso solo hace falta cambiar lo de la ultima capa
+# ARREGLAR ESTO PARA QUE SEA CONSISTENTE
+n <- length(keras_weights)
+
+nn_weights <- keras_weights[1:(n-2)]
+
+nn_weights[[n-1]] <- rbind(keras_weights[[n]], keras_weights[[n-1]])
 
 
-The activation functions that we used can be stored as:
-```{r}
-af_string_list <- list("softplus","softplus", "linear")
-```
-
-
-And finally the order of the Taylor approximation that we are going to choose is 3 at each hidden layer.
-
-```{r}
-q_taylor_vector <- c(2, 2,  1) 
 ```
 
 When the input is in the desired shape, the method can be applied finally:
 
 ```{r}
-historical_coeffs <- nn2pr_algorithm(
+historical_coeffs <- nn2poly_algorithm(
   weights_list = nn_weights,
   af_string_list = af_string_list,
   q_taylor_vector = q_taylor_vector
@@ -194,9 +198,9 @@ historical_coeffs <- nn2pr_algorithm(
 coeffs <- historical_coeffs[[length(historical_coeffs)]][[1]]
 ```
 
----
+----
 TODO: Poner opción para que la función no guarde los coeficientes intermedios
----
+----
 
 We can have a glimpse at how the coefficients of the pollynomial regression (PR) are stored.
 ```{r}
@@ -218,9 +222,6 @@ prediction_PR <- rep(0, n_test)
 for (i in 1:n_test) {
   prediction_PR[i] <- evaluate_PR(test[i, seq(p)], coeffs)
 }
-
-# Obtain the predicted values with the NN to compare them
-prediction_NN <- predict(nn, test_x)
 ```
 
 
@@ -234,7 +235,7 @@ plot_NN_PR_comparison(prediction_PR, prediction_NN)
 Finally, a convenient plot to show how the algorithm is affected by each layer can be obtained with `plot_taylor_and_synpatic_potentials()`, where the synaptic potentials at each neuron are computed and presented over the Taylor expansion approximation of the activation function at each layer:
 
 ```{r}
-plot_taylor_and_synpatic_potentials(data = train,
+plot <- plot_taylor_and_synpatic_potentials(data = train,
                                     weights_list = nn_weights,
                                     af_string_list = af_string_list,
                                     q_taylor_vector = q_taylor_vector)
@@ -243,15 +244,10 @@ plot_taylor_and_synpatic_potentials(data = train,
 
 
 
+```{r}
+plot
 
-
-
-
-
-
-
-
-
+```
 
 
 

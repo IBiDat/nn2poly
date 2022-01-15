@@ -1,5 +1,5 @@
-Package: nn2pr
-Title: Transform Neural Network Weigths into Polynomial Regression Coefficients
+Package: nn2poly
+Title: Neural Network Weights transformation into Polynomial Coefficients
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Pablo",

@@ -1,7 +1,7 @@
 #' Function that implements the formula that obtains the PR coefficients
 #' for a classification problem (multiple outputs) based on the regression solution.
 #' However, this function implements the formula for a single node, the multiple outputs
-#' are obtained in the loop inside nn2pr_algorithm.
+#' are obtained in the loop inside nn2poly_algorithm.
 
 #' Note that this step does not need the NN weights as they have been included already
 #' in the previous layer coefficients.
