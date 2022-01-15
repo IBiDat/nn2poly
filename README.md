@@ -4,7 +4,7 @@ The **nn2poly** package implements the NN2Poly method that allows to transform a
 
 ## Documentation
 
-Vignettes:
+Vignettes: Links need to be added
   
 - [Introduction]
 - [Constraining the weights]
@@ -26,3 +26,5 @@ The installation from GitHub requires the [remotes](https://cran.r-project.org/p
 # install.packages("remotes")
 remotes::install_github(paste("IBiDat", c("nn2poly", "nn2poly.tools"), sep="/"))
 ```
+
+
