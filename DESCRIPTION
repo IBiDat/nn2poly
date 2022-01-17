@@ -25,7 +25,7 @@ Imports:
     stats,
     stringr
 Suggests: 
-    nn2pr.tools,
+    nn2poly.tools,
     rmarkdown,
     knitr,
     keras,

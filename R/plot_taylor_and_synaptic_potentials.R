@@ -1,9 +1,3 @@
-################################
-## Function that allows to take a NN and the data input values
-
-## Author: Pablo Morala
-###############################
-
 #' Function that allows to take a NN and the data input values
 #' and plot the distribution of data synaptic potentials
 #' (sum of input values * weights) at all neurons together AT EACH HIDDEN LAYER

@@ -1,3 +1,5 @@
+#' Labels generation for
+#'
 #' Generates the labels and indexes used to determine each term of a polynomial
 #' regression for a given number of variables p and order t.
 #'

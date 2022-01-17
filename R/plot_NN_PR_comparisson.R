@@ -1,5 +1,3 @@
-
-
 #' Plots a comparison between NN and PR predictions.
 #' If the method doesn't present asymptotic behavior, the point should fall
 #' in the red line.
