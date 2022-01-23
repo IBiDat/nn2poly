@@ -77,10 +77,21 @@ obtain_PR_coefficients_classification <- function(output_index,
       # Obtain a vector containing the indexes, l_1,l_2,...,l_t in our notation:
       l_values <- indexes[combination_index, ]
 
-      # Obtain all allowed partitions of the desired term
+      # Find the equivalence between l_values and a the ones needed for the
+      # reduced partitions list
+      table_l_values <- sort(table(l_values),decreasing=T)
+
+      new<-1:length(table_l_values)
+      old<-as.integer(names(table_l_values))
+      equivalent_combination_indexes <- sort(c(new, l_values)[match(l_values, c(old, l_values))])
+
+      # Create the label as a string of the form "l_1 l_2 ... l_t"
+      equivalent_combination_label <- paste(as.character(equivalent_combination_indexes), collapse = ",")
+
+      # Obtain all allowed partitions of the equivalent term
       partition_list <-
         select_allowed_partitions(
-          coeff_label = labels_t[combination_index],
+          coeff_label = equivalent_combination_label,
           q_previous_layer = q_previous_layer,
           all_partitions = all_partitions
         )
@@ -88,6 +99,17 @@ obtain_PR_coefficients_classification <- function(output_index,
       # Number of partitions
       n_partition_list <- length(partition_list)
 
+      # Replace again all the partitions to match the original indexes
+      for (partition_index in 1:n_partition_list){
+        aux <- partition_list[[partition_index]]
+        for (i in 1:length(aux)){
+          aux_vec <- as.numeric(strsplit(aux[i],split=",",fixed=TRUE)[[1]])
+          aux_vec_reverted_equivalence <- sort(c(old, aux_vec)[match(aux_vec, c(new, aux_vec))])
+          partition_list[[partition_index]][i] <- paste(as.character(aux_vec_reverted_equivalence), collapse = ",")
+        }
+      }
+
+      # Now, use the correctly renamed partitions
       for (n in 1:q_layer) {
         aux <- 0
 
