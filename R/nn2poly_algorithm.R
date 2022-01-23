@@ -1,18 +1,49 @@
-#' Performs the full algorithm of obtaining polynomial regression coefficients
-#' from the  weights of a given neural network.
+#' Computes one or several polynomials to represent a given neural network
+#' using the NN2Poly algorithm.
 #'
-#' @param weights_list List containing a matrix of weights and bias for each
-#' layer
-#' @param af_string_list List with the names of the activation fucntion used
-#' at each layer
-#' @param q_taylor_vector List containing the degree up to which Taylor
-#' expansion should be performed at each layer.
+#' Performs the full NN2Poly algorithm that obtains polynomial coefficients
+#' for a model that performs closely as a given already trained neural network
+#' using its weights and a Taylor approximation of its activation functions.
+#'
+#' @param weights_list \code{list} of length L ( number of hidden layers + 1)
+#' containing the weights matrix for each layer.
+#' The expected shape of such matrices at any layer L is of the form
+#' $(h_(l-1) + 1)*(h_l)$, that is, the number of rows is the number of neurons
+#' in the previous layer plus the bias vector, and the number of columns is the
+#' number of neurons in the current layer L. Therefore, each column
+#' corresponds to the weight vector affecting each neuron in that layer.
+#'
+#' @param af_string_list \code{list} of length L containing \code{character}
+#' strings with the names of the activation function used at each layer.
+#' The last element should be "linear" if the output layer has a single linear
+#' output neuron, i.e., when solving a regression problem.
+#'
+#' @param q_taylor_vector \code{vector} of length L containing the degree
+#' (\code{numeric}) up to which Taylor expansion should be performed at each
+#' layer.
+#'
 #' @param all_partitions Optional argument containing the needed multipartitions
+#' as list of lists of lists. If missing, the function computes it first. This
+#' step can be computationally expensive and it is encouraged that the
+#' multipartitions are stored and reused when possible.
 #'
-#' @return list
+#' @return If \code{historical_coeffs = FALSE} (default case), it returns a list
+#' with a vector containing the coefficients of a polynomial associated with
+#' each output unit, i.e., one vector in a regression NN and C vectors in
+#' a classification NN with C possible classes. If
+#' \code{historical_coeffs = TRUE}, it returns a list of length L that for each
+#' layer contains a list with a vector of the coefficients of a polynomial
+#' associated with each unit at that layer. The polynomials obtained at the
+#' hidden layers are not needed to represent the NN but can be used to explore
+#' how the method works.
+#'
 #' @export
 #'
-nn2poly_algorithm <- function(weights_list, af_string_list, q_taylor_vector, all_partitions) {
+nn2poly_algorithm <- function(weights_list,
+                              af_string_list,
+                              q_taylor_vector,
+                              all_partitions,
+                              historical_coeffs = FALSE) {
 
   # Obtain number of variables (dimension p)
   p <- dim(weights_list[[1]])[1] - 1
@@ -47,7 +78,7 @@ nn2poly_algorithm <- function(weights_list, af_string_list, q_taylor_vector, all
   q_max <- prod(q_taylor_vector)
 
   # Check if partitions have not been given as an input
-  if (missing(all_partitions)){
+  if (missing(all_partitions)) {
     # Compute multiset partitions if missing, using Python
 
     # Generate all partitions with Python script:
@@ -65,22 +96,6 @@ nn2poly_algorithm <- function(weights_list, af_string_list, q_taylor_vector, all
 
   # Obtain the number of nodes after the first hidden layer
   output_dimension <- dim(weights_list[[2]])[2]
-
-  # # Initialize list to contain the coefficients vector for each node.
-  # coeffs_list_output <- vector(mode = "list", length = output_dimension)
-  #
-  # # Loop over all the output nodes
-  # for (output_index in 1:output_dimension) {
-  #
-  #   # Obtain the regression coefficients of a regression at each output node
-  #   coeffs_list_output[[output_index]] <-
-  #     obtainPRCoefficientsRegressionSingleLayer(
-  #       weights_list = weights_list,
-  #       g = af_derivatives_list[[1]],
-  #       output_index = output_index
-  #     )
-  # }
-  # PASAMOS LO DE ARRIBA A LAPPLY:
 
   output_indexes <- 1:output_dimension
   coeffs_list_output <- future.apply::future_lapply(output_indexes,
@@ -108,24 +123,6 @@ nn2poly_algorithm <- function(weights_list, af_string_list, q_taylor_vector, all
 
   # Set up layer index:
   layer_index <- 2
-
-  # # Loop over all the output nodes
-  # for (output_index in 1:output_dimension) {
-  #
-  #   # Get the input vector of coeffs for that node.
-  #   coeffs_input <- coeffs_list_input[[output_index]]
-  #
-  #   # Obtain the new coefficients for the classification at each output node
-  #   coeffs_list_output[[output_index]] <-
-  #     obtainPRCoefficientsClassification(
-  #       coeffs_input,
-  #       layer_index,
-  #       af_derivatives_list,
-  #       q_taylor_vector,
-  #       p,
-  #       all_partitions
-  #     )
-  # }
 
   coeffs_list_output <- future.apply::future_lapply(output_indexes,
     obtain_PR_coefficients_classification,

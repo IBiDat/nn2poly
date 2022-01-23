@@ -2,8 +2,8 @@
 % Please edit documentation in R/nn2poly_algorithm.R
 \name{nn2poly_algorithm}
 \alias{nn2poly_algorithm}
-\title{Performs the full algorithm of obtaining polynomial regression coefficients
-from the  weights of a given neural network.}
+\title{Computes one or several polynomials from a  neural network using the NN2Poly
+algorithm}
 \usage{
 nn2poly_algorithm(
   weights_list,
@@ -13,21 +13,33 @@ nn2poly_algorithm(
 )
 }
 \arguments{
-\item{weights_list}{List containing a matrix of weights and bias for each
-layer}
+\item{weights_list}{\code{list} of length $L$ ( number of hidden layers + 1)
+containing the weights matrix for each layer.
+The expected shape of such matrices at any layer $l$ is of the form
+$(h_(l-1) + 1)*(h_l)$, that is, the number of rows is the number of neurons
+in the previous layer plus the bias vector, and the number of columns is the
+number of neurons in the current layer $l$. Therefore, each column
+corresponds to the weight vector affecting each neuron in that layer.}
 
-\item{af_string_list}{List with the names of the activation fucntion used
-at each layer}
+\item{af_string_list}{\code{list} of length $L$ containing \code{character}
+strings with the names of the activation function used at each layer.
+The last element should be "linear" if the output layer has a single linear
+output neuron, i.e., when solving a regression problem.}
 
-\item{q_taylor_vector}{List containing the degree up to which Taylor
-expansion should be performed at each layer.}
+\item{q_taylor_vector}{\code{vector} of length $L$ containing the degree
+(\code{numeric}) up to which Taylor expansion should be performed at each
+layer.}
 
-\item{all_partitions}{Optional argument containing the needed multipartitions}
+\item{all_partitions}{Optional argument containing the needed multipartitions
+as list of lists of lists. If missing, the function computes it first. This
+step can be computationally expensive and it is encouraged that the
+multipartitions are stored and resused when possible.}
 }
 \value{
-list
+Returns a list of length $L$
 }
 \description{
-Performs the full algorithm of obtaining polynomial regression coefficients
-from the  weights of a given neural network.
+Performs the full NN2Poly algorithm that obtains polynomial coefficients
+for a model that performs closely as a given already trained neural network
+using its weights and a Taylor approximation of its activation functions.
 }

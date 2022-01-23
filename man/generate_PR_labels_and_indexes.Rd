@@ -2,8 +2,7 @@
 % Please edit documentation in R/generate_PR_labels_and_indexes.R
 \name{generate_PR_labels_and_indexes}
 \alias{generate_PR_labels_and_indexes}
-\title{Generates the labels and indexes used to determine each term of a polynomial
-regression for a given number of variables p and order t.}
+\title{Labels generation for}
 \usage{
 generate_PR_labels_and_indexes(p, t)
 }
