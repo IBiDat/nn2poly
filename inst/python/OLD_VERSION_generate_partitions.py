@@ -6,7 +6,7 @@ from sympy.utilities.iterables import multiset_partitions
 from itertools import combinations_with_replacement
 
 #Define the function
-def generate_partitions(p,q_max):
+def OLD_VERSION_generate_partitions(p,q_max):
   # List from 1 to p and 1 to q_max to iterate
   variables_list  = list(range(1,p+1))
   degrees_list = list(range(1,q_max+1))
