@@ -42,8 +42,7 @@
 OLD_VERSION_nn2poly_algorithm <- function(weights_list,
                               af_string_list,
                               q_taylor_vector,
-                              all_partitions,
-                              historical_coeffs = FALSE) {
+                              all_partitions) {
 
   # Obtain number of variables (dimension p)
   p <- dim(weights_list[[1]])[1] - 1
@@ -82,7 +81,7 @@ OLD_VERSION_nn2poly_algorithm <- function(weights_list,
     # Compute multiset partitions if missing, using Python
 
     # Generate all partitions with Python script:
-    all_partitions <- generate_partitions(as.integer(p), as.integer(q_max))
+    all_partitions <- OLD_VERSION_generate_partitions(as.integer(p), as.integer(q_max))
     # Obtain a label for each of the coefficients partitioned in the list:
     all_partitions <- label_partitions_from_python(all_partitions = all_partitions)
     # These are now stored to be used when needed in all the loops.

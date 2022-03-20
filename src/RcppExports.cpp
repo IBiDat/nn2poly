@@ -10,6 +10,18 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// mreplace
+std::string mreplace(std::string str, CharacterVector rep);
+RcppExport SEXP _nn2poly_mreplace(SEXP strSEXP, SEXP repSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type str(strSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type rep(repSEXP);
+    rcpp_result_gen = Rcpp::wrap(mreplace(str, rep));
+    return rcpp_result_gen;
+END_RCPP
+}
 // concat
 String concat(IntegerVector my_vector);
 RcppExport SEXP _nn2poly_concat(SEXP my_vectorSEXP) {
@@ -47,6 +59,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_nn2poly_mreplace", (DL_FUNC) &_nn2poly_mreplace, 2},
     {"_nn2poly_concat", (DL_FUNC) &_nn2poly_concat, 1},
     {"_nn2poly_rm_null", (DL_FUNC) &_nn2poly_rm_null, 1},
     {"_nn2poly_select_allowed_partitions", (DL_FUNC) &_nn2poly_select_allowed_partitions, 3},

@@ -41,7 +41,7 @@
 #'
 #' @export
 #'
-nn2poly_algorithm <- function(weights_list,
+mreplace_nn2poly_algorithm <- function(weights_list,
                               af_string_list,
                               q_taylor_vector,
                               all_partitions,
@@ -127,7 +127,7 @@ nn2poly_algorithm <- function(weights_list,
   layer_index <- 2
 
   coeffs_list_output <- future.apply::future_lapply(output_indexes,
-    obtain_PR_coefficients_classification,
+    mreplace_obtain_PR_coefficients_classification,
     coeffs_list_input = coeffs_list_input,
     layer_index = layer_index,
     af_derivatives_list = af_derivatives_list,
@@ -190,7 +190,7 @@ nn2poly_algorithm <- function(weights_list,
 
     # Parallel lapply
     coeffs_list_output <- future.apply::future_lapply(output_indexes,
-      obtain_PR_coefficients_classification,
+      mreplace_obtain_PR_coefficients_classification,
       coeffs_list_input = coeffs_list_input,
       layer_index = layer_index,
       af_derivatives_list = af_derivatives_list,
