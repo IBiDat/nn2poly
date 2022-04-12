@@ -67,12 +67,9 @@ nn2poly_algorithm <- function(weights_list,
   }
 
 
-  # Obtain the activation function list as R functions:
-  af_function_list <- change_string_to_function(af_string_list = af_string_list)
-
   # Obtain now all the derivatives up to the desired Taylor degree at each layer
   af_derivatives_list <- obtain_derivatives_list(
-    af_function_list = af_function_list,
+    af_string_list = af_string_list,
     q_taylor_vector = q_taylor_vector
   )
 
