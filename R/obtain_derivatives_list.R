@@ -1,15 +1,31 @@
 #' Title
 #'
-#' @param af_function_list List with the names of the activation fucntion used
-#' at each layer
+#' @param af_string_list List with the names of the activation function used
+#' at each layer as a string. Currently accepted values: "softplus", "linear",
+#' "tanh" and "sigmoid.
 #' @param q_taylor_vector List containing the degree up to which Taylor
 #' expansion should be performed at each layer.
 #'
-#' @return
-#' @noRd
+#' @return list of vectors with the derivatives
+#' @export
 #'
-obtain_derivatives_list <- function(af_function_list, q_taylor_vector) {
-  n <- length(af_function_list)
+obtain_derivatives_list <- function(af_string_list, q_taylor_vector) {
+
+  n <- length(af_string_list)
+
+  af_function_list <- vector(mode = "list", length = n)
+
+  for (i in 1:n) {
+    if (af_string_list[[i]] == "softplus") {
+      af_function_list[[i]] <- function(x) log(1 + exp(x)) # Softplus
+    } else if (af_string_list[[i]] == "tanh") {
+      af_function_list[[i]] <- function(x) tanh(x) # Hyperbolic Tangent
+    } else if (af_string_list[[i]] == "sigmoid") {
+      af_function_list[[i]] <- function(x) 1 / (1 + exp(-x)) # Sigmoid
+    } else if (af_string_list[[i]] == "linear") {
+      af_function_list[[i]] <- function(x) x # Linear
+    }
+  }
 
   af_derivatives_list <- vector(mode = "list", length = n)
 
