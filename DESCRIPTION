@@ -29,7 +29,11 @@ Suggests:
     rmarkdown,
     knitr,
     keras,
-    tensorflow
+    tensorflow,
+    testthat (>= 3.0.0)
 LinkingTo: 
     Rcpp
 VignetteBuilder: knitr
+Depends: 
+    R (>= 2.10)
+Config/testthat/edition: 3

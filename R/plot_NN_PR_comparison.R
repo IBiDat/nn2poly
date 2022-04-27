@@ -11,9 +11,11 @@
 #'
 
 plot_NN_PR_comparison <- function(prediction_PR, prediction_NN) {
+  prediction_PR <- prediction_PR
+  prediction_NN <- prediction_NN
 
   # Join the data in a data frame
-  df.plot <- data.frame(prediction_PR, prediction_NN)
+  df.plot <- data.frame("prediction_PR" = prediction_PR, "prediction_NN" = prediction_NN)
 
 
   plot <- ggplot2::ggplot(df.plot, ggplot2::aes(x = .data$prediction_PR, y = .data$prediction_NN)) +
