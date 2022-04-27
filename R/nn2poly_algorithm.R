@@ -50,164 +50,225 @@ nn2poly_algorithm <- function(weights_list,
   # Obtain number of variables (dimension p)
   p <- dim(weights_list[[1]])[1] - 1
 
-  # Obtain number of layers L
+  # Obtain number of layers L (hidden + output, input is dentoed by 0)
   L <- length(af_string_list)
+
+  # Initialize current layer in algorithm:
+  current_layer <- 1
 
   # Check if the problem is a regression or classification problem
   # If it is regression, the last activation function must be "linear"
   regression <- (af_string_list[[L]] == "linear")
 
-  # The list of lists of coefficients at each layer, will be of size
-  # 2(L-1) - 1 if it is a regression problem
-  # or 2(L-1) if not:
+  # The list with the results of coefficients at each layer,
+  # depending on being a regression problem or not
   if (regression == TRUE) {
-    historical_list <- vector(mode = "list", length = 2 * (L - 1) - 1)
+    results <- vector(mode = "list", length = 2 * L - 1)
   } else {
-    historical_list <- vector(mode = "list", length = 2 * (L - 1))
+    results <- vector(mode = "list", length = 2 * L)
   }
 
-
-  # Obtain now all the derivatives up to the desired Taylor degree at each layer
+  # Obtain all the derivatives up to the desired Taylor degree at each layer
   af_derivatives_list <- obtain_derivatives_list(
     af_string_list = af_string_list,
     q_taylor_vector = q_taylor_vector
   )
 
-  # Obtain the maximum degree of the polynomial that we will obtain with the method:
+  # Obtain the maximum degree of the final polynomial:
   q_max <- prod(q_taylor_vector)
 
   # Check if partitions have not been given as an input
   if (missing(all_partitions)) {
-    # Compute multiset partitions if missing, using Python
+    # all_partitions will be a list with 2 elements:
+    # the "total partitions" obtained with Knuth's algo
+    # and then the actual coefficient's "labels" for which the partitions are
+    # obtained
 
-    # Generate all partitions with Python script:
-    all_partitions <- generate_partitions(as.integer(p), as.integer(q_max))
-    # Obtain a label for each of the coefficients partitioned in the list:
-    all_partitions <- label_partitions_from_python(all_partitions = all_partitions)
-    # These are now stored to be used when needed in all the loops.
+    # Generate partitions with Python script:
+    partitions <- generate_partitions(as.integer(p), as.integer(q_max))
+
+    labels <- vector(mode = "list", length = length(partitions))
+    # Obtain labels:
+    for (i in 1:length(partitions)){
+      # Here it is used that the first partition of the multiset is always
+      # the multiset itself. This could be generalized in case we change the
+      # generation order. #REVISETHISLATER
+      labels[[i]] <- partitions[[i]][[1]][[1]]
+    }
+
+    all_partitions <- list("labels" = labels, "partitions" = partitions)
+
     print("partitions obtained")
   }
 
+  ################# current_layer = 1, linear #################
 
-  ############################ WHEN L = 2 ##############################
+  # Starting point for the algorithm: Set weights as coefficients
+  # of an order 1 polynomial.
+  # Extract the weights:
+  W1 <- weights_list[[1]]
+  h1 <- dim(W1)[2]
 
-  ########## First layer, Regression case ##########
+  # The labels for each coefficient vector at the same layer and linear or
+  # same layer and non linear case will have be the same, so they can be
+  # stored only once as the first element of the coeffs_list_output,
+  # so we define length h+1
+  coeffs_list_output <- vector(mode = "list", length = h1+1)
 
-  # Obtain the number of nodes after the first hidden layer
-  output_dimension <- dim(weights_list[[2]])[2]
+  # generate and store the labels (as a list of integer vectors)
+  # In this case the integer vectors are of length 1.
+  labels_output<- vector(mode = "list", length = p+1)
+  for (i in 0:p){
+    labels_output[[i+1]] <- c(i)
+  }
+  coeffs_list_output[[1]] <- labels_output
 
-  output_indexes <- 1:output_dimension
-  coeffs_list_output <- future.apply::future_lapply(output_indexes,
-    obtain_PR_coefficients_regression_first_layer,
-    weights_list = weights_list,
-    g = af_derivatives_list[[1]]
-  )
+  for (i in 1:h1){
+    # For each neuron in the first hidden layer, when computing th synaptic
+    # potentials (u_j), each column of the weight matrix represents the
+    # coefficients of an order 1 polynomial for that neuron potential.
+    # The first element will be the bias, and the rest the coefficient
+    # associated with each variable from x_1 to x_p.
+    coeffs_list_output[[i+1]] <- W1[,i]
+  }
 
-  # Save historical coefficients:
-  historical_list[[1]] <- coeffs_list_output
+  results[[1]] <- coeffs_list_output
 
-  # We now check if we only need these computations to stop here and return the values:
-  if (L == 2) {
+  # Stop if last layer and regression
+  if (current_layer == L) {
     if (regression == TRUE) {
-      return(historical_list)
+      return(results)
     }
   }
 
-  ##### First layer: Clasification case ######
-  # The output dimension remains the same as we have the same nodes
-  # as in the regression but need now to include the effect of their activation function
+  ################# Loop over all layers #################
 
-  # Treat now the previous coeffs_list output as input
-  coeffs_list_input <- coeffs_list_output
+  # Note that the loop will iterate the current layer from 1 to L
+  # and compute the linear and then non linear situation.
+  # The linear case at layer 1 has been computed outside so we skip it
 
-  # Set up layer index:
-  layer_index <- 2
+  for (current_layer in 1:L) {
 
-  coeffs_list_output <- future.apply::future_lapply(output_indexes,
-    obtain_PR_coefficients_classification,
-    coeffs_list_input = coeffs_list_input,
-    layer_index = layer_index,
-    af_derivatives_list = af_derivatives_list,
-    q_taylor_vector = q_taylor_vector,
-    p = p,
-    all_partitions = all_partitions
-  )
+    ########## Linear case ##########
+    if (current_layer != 1){
 
-  # Save historical coefficients:
-  historical_list[[2]] <- coeffs_list_output
+      # Treat the previous coefficients output as input
+      coeffs_list_input <- coeffs_list_output
 
-  if (L == 2) {
-    if (regression == FALSE) {
-      return(historical_list)
+      # Note that the polynomial in this case does not increase its order
+      # from the one in the non linear previous layer, so the labels
+      # will be the same:
+      labels_output <- coeffs_list_input[[1]]
+
+      # Obtain the number of nodes after the current layer
+      output_dimension <- dim(weights_list[[current_layer]])[2]
+
+      # Parallel lapply
+      output_indexes <- 1:output_dimension
+      only_coeffs_output <- future.apply::future_lapply(output_indexes,
+                                                        alg_linear,
+                                                        coeffs_list_input = coeffs_list_input,
+                                                        weights_list = weights_list,
+                                                        current_layer = current_layer
+      )
+
+      # Join the coefficients with the labels as first list element:
+      coeffs_list_output <- c(list(labels_output), only_coeffs_output)
+
+      # Save results from this layer:
+      results[[2 * (current_layer) - 1]] <- coeffs_list_output
+
+      # Stop if last layer and regression
+      if (current_layer == L) {
+        if (regression == TRUE) {
+          return(results)
+        }
+      }
+
     }
-  }
 
-  ############################ LOOP WHEN L > 2 ##############################
 
-  # we have already checked that L>2, because if not, return has already been called.
-  # Inside each iteration of the loop we will compute first regression then classification
-  # and check if it is the last computation to return the value.
+    ########## Non linear case ##########
+    # The output dimension remains the same as in the previous linear case,
+    # because the same number of neurons is considered
 
-  for (layer_index in 3:L) {
-
-    ########## Regression case ##########
-
-    # Treat now the previous coeff output as input
+    # Treat the previous coeff output as input
     coeffs_list_input <- coeffs_list_output
 
-    # Obtain the number of nodes after the hidden layer "layer_index"
-    output_dimension <- dim(weights_list[[layer_index]])[2]
+    # In the non linear case the polynomial order increases, so the new labels
+    # need to be computed. However, the previous ones can be reused.
+    # The new labels will be for monomials of orders between the total order
+    # of the previous polynomial and the total order of the new polynomial:
+    if (current_layer==1){
+      previous_total_order <- 1
+    } else {
+      previous_total_order <- prod(q_taylor_vector[1:(current_layer-1)])
+    }
+    new_total_order <- previous_total_order*q_taylor_vector[current_layer]
+
+
+    # Loop over each of the new orders up to the maximum one
+    for (order in (previous_total_order+1):new_total_order){
+      combinations_indexes <- gtools::combinations(p, order, repeats.allowed = TRUE)
+
+      # Number of different combinations
+      n_combinations <- nrow(combinations_indexes)
+
+      # Intialize list with new labels for the given order
+      new_labels <- vector(mode = "list", length = n_combinations)
+
+      for (i in 1:n_combinations){
+        new_labels[[i]] <- combinations_indexes[i, ]
+      }
+
+      # update labels with the new ones
+      labels_output <- c(labels_output, new_labels)
+
+    }
+
+    # Parallel lapply
+    # The output index is already computed in the linear case
+    # but not for l=1 #REVISETHISLATER
+    # Obtain the number of nodes after the current layer
+    output_dimension <- dim(weights_list[[current_layer]])[2]
 
     # Parallel lapply
     output_indexes <- 1:output_dimension
-    coeffs_list_output <- future.apply::future_lapply(output_indexes,
-      obtain_PR_coefficients_regression_deep_layer,
-      coeffs_list_input = coeffs_list_input,
-      weights_list = weights_list,
-      layer_index = layer_index
+    only_coeffs_output <- future.apply::future_lapply(output_indexes,
+                                                      alg_non_linear,
+                                                      coeffs_list_input = coeffs_list_input,
+                                                      labels_output = labels_output,
+                                                      current_layer = current_layer,
+                                                      af_derivatives_list = af_derivatives_list,
+                                                      q_taylor_vector = q_taylor_vector,
+                                                      p = p,
+                                                      all_partitions = all_partitions
     )
+    # print("salimos del future")
 
+    # Join the coefficients with the labels as first list element:
+    coeffs_list_output <- c(list(labels_output), only_coeffs_output)
 
-    # Save historical coefficients:
-    historical_list[[2 * (layer_index - 1) - 1]] <- coeffs_list_output
-
-    # Check if this is the last layer and if it is a regression problem
-    if (layer_index == L) {
-      if (regression == TRUE) {
-        return(historical_list)
-      }
-    }
-
-    ##### First layer: Clasification case ######
-    # The output dimension remains the same as we have the same nodes
-    # as in the regression but need now to include the effect of their activation function
-
-    # Treat now the previous coeff output as input
-    coeffs_list_input <- coeffs_list_output
-
-    # Parallel lapply
-    coeffs_list_output <- future.apply::future_lapply(output_indexes,
-      obtain_PR_coefficients_classification,
-      coeffs_list_input = coeffs_list_input,
-      layer_index = layer_index,
-      af_derivatives_list = af_derivatives_list,
-      q_taylor_vector = q_taylor_vector,
-      p = p,
-      all_partitions = all_partitions
-    )
-
-
-    # Save historical coefficients:
-    historical_list[[2 * (layer_index - 1)]] <- coeffs_list_output
+    # Save results from this layer:
+    results[[2 * (current_layer)]] <- coeffs_list_output
 
     # Check if this is the last layer and if it is a classification problem
-    # Actually this could be ommited as at the end of the loop we would be in this
-    # situation if a return has not been called yet.
-
-    if (layer_index == L) {
+    if (current_layer == L) {
       if (regression == FALSE) {
-        return(historical_list)
+        return(results)
       }
     }
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
