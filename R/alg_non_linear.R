@@ -82,7 +82,7 @@ alg_non_linear <- function(output_index,
 
     # Obtain all allowed partitions of the equivalent term
     allowed_partitions <-
-      test_select_allowed_partitions(
+      select_allowed_partitions(
         equivalent_label = equivalent_label,
         q_previous_layer = q_previous_layer,
         all_partitions = all_partitions

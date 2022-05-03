@@ -10,7 +10,7 @@
 #' @examples
 #'
 #'
-test_select_allowed_partitions <- function(equivalent_label, q_previous_layer, all_partitions){
+select_allowed_partitions <- function(equivalent_label, q_previous_layer, all_partitions){
 
   #REVISETHISLATER This function could be ommitted if we already include it when
   # generating the partitions.
