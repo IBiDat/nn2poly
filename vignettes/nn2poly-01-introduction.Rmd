@@ -23,7 +23,7 @@ Initial setup:
 ```{r setup}
 library(nn2poly)
 library(keras)
-tensorflow::set_random_seed(42)
+tensorflow::tf$random$set_seed(42)
 ```
 
 
@@ -123,7 +123,7 @@ history <- fit(nn,
                train_x,
                train_y,
                verbose = 0,
-               epochs = 50,
+               epochs = 200,
                validation_split = 0.3
 )
 ```
@@ -191,7 +191,8 @@ historical_coeffs <- nn2poly_algorithm(
   q_taylor_vector = q_taylor_vector
 )
 
-coeffs <- historical_coeffs[[length(historical_coeffs)]][[1]]
+labels <- historical_coeffs[[length(historical_coeffs)]][[1]]
+coeffs <- historical_coeffs[[length(historical_coeffs)]][[2]]
 ```
 
 ---
@@ -200,7 +201,7 @@ TODO: Poner opción para que la función no guarde los coeficientes intermedios
 
 We can have a glimpse at how the coefficients of the pollynomial regression (PR) are stored.
 ```{r}
-coeffs[,1:7]
+coeffs[1:7]
 ```
 
 
@@ -216,7 +217,7 @@ n_test <- length(test_y)
 prediction_PR <- rep(0, n_test)
 
 for (i in 1:n_test) {
-  prediction_PR[i] <- evaluate_PR(test[i, seq(p)], coeffs)
+  prediction_PR[i] <- eval_poly(test[i, seq(p)], labels = labels, coeffs = coeffs)
 }
 
 # Obtain the predicted values with the NN to compare them

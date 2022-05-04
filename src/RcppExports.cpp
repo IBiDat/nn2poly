@@ -10,59 +10,36 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// mreplace
-std::string mreplace(std::string str, CharacterVector rep);
-RcppExport SEXP _nn2poly_mreplace(SEXP strSEXP, SEXP repSEXP) {
+// alg_linear_cpp
+NumericVector alg_linear_cpp(List coeffs_list_input, int current_layer, List weights_list, int output_index);
+RcppExport SEXP _nn2poly_alg_linear_cpp(SEXP coeffs_list_inputSEXP, SEXP current_layerSEXP, SEXP weights_listSEXP, SEXP output_indexSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::string >::type str(strSEXP);
-    Rcpp::traits::input_parameter< CharacterVector >::type rep(repSEXP);
-    rcpp_result_gen = Rcpp::wrap(mreplace(str, rep));
+    Rcpp::traits::input_parameter< List >::type coeffs_list_input(coeffs_list_inputSEXP);
+    Rcpp::traits::input_parameter< int >::type current_layer(current_layerSEXP);
+    Rcpp::traits::input_parameter< List >::type weights_list(weights_listSEXP);
+    Rcpp::traits::input_parameter< int >::type output_index(output_indexSEXP);
+    rcpp_result_gen = Rcpp::wrap(alg_linear_cpp(coeffs_list_input, current_layer, weights_list, output_index));
     return rcpp_result_gen;
 END_RCPP
 }
-// concat
-String concat(IntegerVector my_vector);
-RcppExport SEXP _nn2poly_concat(SEXP my_vectorSEXP) {
+// select_allowed_partitions_loop
+List select_allowed_partitions_loop(List all_partitions_for_this_label, int q_previous_layer);
+RcppExport SEXP _nn2poly_select_allowed_partitions_loop(SEXP all_partitions_for_this_labelSEXP, SEXP q_previous_layerSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< IntegerVector >::type my_vector(my_vectorSEXP);
-    rcpp_result_gen = Rcpp::wrap(concat(my_vector));
-    return rcpp_result_gen;
-END_RCPP
-}
-// rm_null
-List rm_null(List x);
-RcppExport SEXP _nn2poly_rm_null(SEXP xSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< List >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(rm_null(x));
-    return rcpp_result_gen;
-END_RCPP
-}
-// select_allowed_partitions
-List select_allowed_partitions(std::string coeff_label, double q_previous_layer, List all_partitions);
-RcppExport SEXP _nn2poly_select_allowed_partitions(SEXP coeff_labelSEXP, SEXP q_previous_layerSEXP, SEXP all_partitionsSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::string >::type coeff_label(coeff_labelSEXP);
-    Rcpp::traits::input_parameter< double >::type q_previous_layer(q_previous_layerSEXP);
-    Rcpp::traits::input_parameter< List >::type all_partitions(all_partitionsSEXP);
-    rcpp_result_gen = Rcpp::wrap(select_allowed_partitions(coeff_label, q_previous_layer, all_partitions));
+    Rcpp::traits::input_parameter< List >::type all_partitions_for_this_label(all_partitions_for_this_labelSEXP);
+    Rcpp::traits::input_parameter< int >::type q_previous_layer(q_previous_layerSEXP);
+    rcpp_result_gen = Rcpp::wrap(select_allowed_partitions_loop(all_partitions_for_this_label, q_previous_layer));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_nn2poly_mreplace", (DL_FUNC) &_nn2poly_mreplace, 2},
-    {"_nn2poly_concat", (DL_FUNC) &_nn2poly_concat, 1},
-    {"_nn2poly_rm_null", (DL_FUNC) &_nn2poly_rm_null, 1},
-    {"_nn2poly_select_allowed_partitions", (DL_FUNC) &_nn2poly_select_allowed_partitions, 3},
+    {"_nn2poly_alg_linear_cpp", (DL_FUNC) &_nn2poly_alg_linear_cpp, 4},
+    {"_nn2poly_select_allowed_partitions_loop", (DL_FUNC) &_nn2poly_select_allowed_partitions_loop, 2},
     {NULL, NULL, 0}
 };
 

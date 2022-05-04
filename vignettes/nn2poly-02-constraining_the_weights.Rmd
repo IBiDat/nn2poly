@@ -26,7 +26,7 @@ library(nn2poly.tools)
 library(nn2poly)
 library(keras)
 library(tensorflow)
-tensorflow::set_random_seed(42)
+tensorflow::tf$random$set_seed(42)
 ```
 
 
@@ -195,7 +195,8 @@ historical_coeffs <- nn2poly_algorithm(
   q_taylor_vector = q_taylor_vector
 )
 
-coeffs <- historical_coeffs[[length(historical_coeffs)]][[1]]
+labels <- historical_coeffs[[length(historical_coeffs)]][[1]]
+coeffs <- historical_coeffs[[length(historical_coeffs)]][[2]]
 ```
 
 ----
@@ -204,7 +205,7 @@ TODO: Poner opción para que la función no guarde los coeficientes intermedios
 
 We can have a glimpse at how the coefficients of the pollynomial regression (PR) are stored.
 ```{r}
-coeffs[,1:7]
+coeffs[1:7]
 ```
 
 
@@ -212,7 +213,7 @@ coeffs[,1:7]
 
 After using the algorithm, it is advisable to always check that the predictions obtained with the new polynomial regression do not differ too much from the original neural network predictions (and in case they differ, we can also try to find why by checking the Taylor expansions).To help with that, a couple of functions are included that allow us to plot the results.
 
-First of all, after obtaining the PR coefficients, we want to use them to predict the response variable $Y$, which can be done with the function `evaluate_PR()`:
+First of all, after obtaining the PR coefficients, we want to use them to predict the response variable $Y$, which can be done with the function `eval_poly()`:
 
 ```{r}
 # Obtain the predicted values for the test data with our Polynomial Regression
@@ -220,8 +221,11 @@ n_test <- length(test_y)
 prediction_PR <- rep(0, n_test)
 
 for (i in 1:n_test) {
-  prediction_PR[i] <- evaluate_PR(test[i, seq(p)], coeffs)
+  prediction_PR[i] <- eval_poly(test[i, seq(p)], labels = labels, coeffs = coeffs)
 }
+
+# Obtain the predicted values with the NN to compare them
+prediction_NN <- predict(nn, test_x)
 ```
 
 

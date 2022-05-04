@@ -1,0 +1,19 @@
+---
+title: "nn2poly-04-testing_the_implementation_with_generated_data"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{nn2poly-04-testing_the_implementation_with_generated_data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(nn2poly)
+```
