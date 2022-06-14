@@ -203,11 +203,15 @@ nn2poly_algorithm <- function(weights_list,
       previous_total_order <- 1
     } else {
       previous_total_order <- prod(q_taylor_vector[1:(current_layer-1)])
+      # Este paso previo se puede cambiar por previous <- new
     }
     new_total_order <- previous_total_order*q_taylor_vector[current_layer]
+    # Aqui se puede cambiar a new_total_order <- min(previous_total_order*q_taylor_vector[current_layer],maximum_total_order)
 
 
     # Loop over each of the new orders up to the maximum one
+    #AQUÍ ESTÁ EL QUID DE LA CUESTIÓN, SI PASAMOS A TENER PREVIOUS = NEW, QUE PASA?
+    # coMO HAY UN +1 TENDRÍA QUE PONER UN IF POR AHI.
     for (order in (previous_total_order+1):new_total_order){
       combinations_indexes <- gtools::combinations(p, order, repeats.allowed = TRUE)
 
