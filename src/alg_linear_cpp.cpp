@@ -57,7 +57,7 @@ coeffs_list_input <- list(labels,coeffs,coeffs,coeffs)
 
 weights_list <- list(matrix(1.000,4,4),matrix(1.000,4,4),matrix(1.000,4,4))
 
-output_index <- 5
+output_index <- 1
 
 current_layer <- 2
 
