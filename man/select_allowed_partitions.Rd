@@ -13,13 +13,6 @@ select_allowed_partitions(equivalent_label, q_previous_layer, all_partitions)
 
 \item{label}{a}
 }
-\value{
-
-}
 \description{
 Title
-}
-\examples{
-
-
 }

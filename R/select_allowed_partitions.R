@@ -4,10 +4,7 @@
 #' @param q_previous_layer a
 #' @param all_partitions a
 #'
-#' @return
 #' @export
-#'
-#' @examples
 #'
 #'
 select_allowed_partitions <- function(equivalent_label, q_previous_layer, all_partitions){
