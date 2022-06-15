@@ -1,7 +1,7 @@
 Package: nn2poly
 Title: Neural Network Weights Transformation into Polynomial Coefficients
 Version: 0.0.0.9000
-Authors@R: 
+Authors@R:
     person(given = "Pablo",
            family = "Morala",
            role = c("aut", "cre"),
@@ -14,21 +14,19 @@ Description: This package implements a method that builds the coefficients of a
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-Imports: 
+Imports:
+    Rcpp,
     future.apply,
     gtools,
     pracma,
-    Rcpp,
     reticulate
-Suggests: 
+Suggests:
     nn2poly.tools,
     ggplot2,
     rmarkdown,
     knitr,
-    keras,
-    tensorflow,
     testthat (>= 3.0.0)
-LinkingTo: 
+LinkingTo:
     Rcpp
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
