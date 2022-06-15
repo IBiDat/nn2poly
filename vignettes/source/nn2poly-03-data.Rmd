@@ -11,7 +11,8 @@ vignette: >
 knitr::opts_chunk$set(
   eval = FALSE,
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  fig.path = "figure/nn2poly-03-"
 )
 ```
 
@@ -79,7 +80,7 @@ nn2poly_example0$q_taylor_vector <- q_taylor_vector
 
 2 variables, original order 2, 2 hidden layers, taylor order 2, LINEAR (so using Taylor should be exact), 2 hidden neurons per layer. 
 
-```{r}
+```{r example-1}
 
 # Main parameters
 p <- 2
@@ -212,7 +213,7 @@ nn2poly_example1$test_x <- test_x
 
 2 variables, original order 2, 2 hidden layers, taylor order 2, softplus, 2 hidden neurons per layer
 
-```{r}
+```{r example-2}
 
 # Main parameters
 p <- 2
@@ -346,7 +347,7 @@ nn2poly_example2$test_x <- test_x
 
 3 variables, original order 3, 3 hidden layers, taylor order 3, tanh, 50 neurons per layer
 
-```{r}
+```{r example-3}
 
 # Main parameters
 p <- 3
