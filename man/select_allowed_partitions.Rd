@@ -7,11 +7,11 @@
 select_allowed_partitions(equivalent_label, q_previous_layer, all_partitions)
 }
 \arguments{
+\item{equivalent_label}{a}
+
 \item{q_previous_layer}{a}
 
 \item{all_partitions}{a}
-
-\item{label}{a}
 }
 \description{
 Title

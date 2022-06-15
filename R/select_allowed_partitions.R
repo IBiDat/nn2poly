@@ -1,6 +1,6 @@
 #' Title
 #'
-#' @param label a
+#' @param equivalent_label a
 #' @param q_previous_layer a
 #' @param all_partitions a
 #'
