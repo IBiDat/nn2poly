@@ -14,16 +14,12 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
 Imports: 
-    cowplot,
     future.apply,
     ggplot2,
     gtools,
-    polyreg,
     pracma,
     Rcpp,
-    reticulate,
-    stats,
-    stringr
+    reticulate
 Suggests: 
     nn2poly.tools,
     rmarkdown,
@@ -34,6 +30,4 @@ Suggests:
 LinkingTo: 
     Rcpp
 VignetteBuilder: knitr
-Depends: 
-    R (>= 2.10)
 Config/testthat/edition: 3
