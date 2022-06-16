@@ -27,13 +27,19 @@
 #' step can be computationally expensive and it is encouraged that the
 #' multipartitions are stored and reused when possible.
 #'
-#' @param historical_coeffs a
+#' @param store_coeffs Boolean that determines if all polynomials computed in
+#' the internal layers have to be stored and given in the output (TRUE), or if
+#' only the last layer is needed (FALSE).
 #'
-#' @return If \code{historical_coeffs = FALSE} (default case), it returns a list
+#' @param forced_max_Q Optional argument: integer that determines the maximum order
+#' that we will force in the final polynomial, discarding terms of higher order
+#' that would naturally arise using all the orders in `q_taylor_vector`.
+#'
+#' @return If \code{store_coeffs = FALSE} (default case), it returns a list
 #' with a vector containing the coefficients of a polynomial associated with
 #' each output unit, i.e., one vector in a regression NN and C vectors in
 #' a classification NN with C possible classes. If
-#' \code{historical_coeffs = TRUE}, it returns a list of length L that for each
+#' \code{store_coeffs = TRUE}, it returns a list of length L that for each
 #' layer contains a list with a vector of the coefficients of a polynomial
 #' associated with each unit at that layer. The polynomials obtained at the
 #' hidden layers are not needed to represent the NN but can be used to explore
@@ -45,7 +51,8 @@ nn2poly_algorithm <- function(weights_list,
                               af_string_list,
                               q_taylor_vector,
                               all_partitions,
-                              historical_coeffs = FALSE) {
+                              store_coeffs = FALSE,
+                              forced_max_Q) {
 
   # Obtain number of variables (dimension p)
   p <- dim(weights_list[[1]])[1] - 1
@@ -75,7 +82,12 @@ nn2poly_algorithm <- function(weights_list,
   )
 
   # Obtain the maximum degree of the final polynomial:
-  q_max <- prod(q_taylor_vector)
+  if(missing(forced_max_Q)){
+    q_max <- prod(q_taylor_vector)
+  } else {
+    q_max <- min(prod(q_taylor_vector),forced_max_Q)
+  }
+
 
   # Check if partitions have not been given as an input
   if (missing(all_partitions)) {
@@ -195,40 +207,52 @@ nn2poly_algorithm <- function(weights_list,
     # Treat the previous coeff output as input
     coeffs_list_input <- coeffs_list_output
 
-    # In the non linear case the polynomial order increases, so the new labels
-    # need to be computed. However, the previous ones can be reused.
+    # In the non linear case the polynomial order increases (unless forced_max_Q is
+    # reached), so the new labels need to be computed. However, the previous
+    # ones can be reused.
     # The new labels will be for monomials of orders between the total order
     # of the previous polynomial and the total order of the new polynomial:
     if (current_layer==1){
       previous_total_order <- 1
     } else {
-      previous_total_order <- prod(q_taylor_vector[1:(current_layer-1)])
-      # Este paso previo se puede cambiar por previous <- new
+      # Get the total order used in the previous iteration
+      previous_total_order <- new_total_order
     }
-    new_total_order <- previous_total_order*q_taylor_vector[current_layer]
-    # Aqui se puede cambiar a new_total_order <- min(previous_total_order*q_taylor_vector[current_layer],maximum_total_order)
+
+    # Compute the new total order with the product of q_taylor_vector.
+    # If a forced_max_Q value is used, its taken as the minimum between both.
+    if (missing(forced_max_Q)){
+      new_total_order <- previous_total_order*q_taylor_vector[current_layer]
+    } else {
+      new_total_order <- min(previous_total_order*q_taylor_vector[current_layer],forced_max_Q)
+    }
 
 
-    # Loop over each of the new orders up to the maximum one
-    #AQUÍ ESTÁ EL QUID DE LA CUESTIÓN, SI PASAMOS A TENER PREVIOUS = NEW, QUE PASA?
-    # coMO HAY UN +1 TENDRÍA QUE PONER UN IF POR AHI.
-    for (order in (previous_total_order+1):new_total_order){
-      combinations_indexes <- gtools::combinations(p, order, repeats.allowed = TRUE)
+    # If the order has increased, created new needed labels.
+    # If not, forced_max_Q has been reached and no new labels are needed.
+    if (previous_total_order != new_total_order){
+      # Loop over each of the new orders up to the maximum one
+      for (order in (previous_total_order+1):new_total_order){
+        combinations_indexes <- gtools::combinations(p, order, repeats.allowed = TRUE)
 
-      # Number of different combinations
-      n_combinations <- nrow(combinations_indexes)
+        # Number of different combinations
+        n_combinations <- nrow(combinations_indexes)
 
-      # Intialize list with new labels for the given order
-      new_labels <- vector(mode = "list", length = n_combinations)
+        # Intialize list with new labels for the given order
+        new_labels <- vector(mode = "list", length = n_combinations)
 
-      for (i in 1:n_combinations){
-        new_labels[[i]] <- combinations_indexes[i, ]
+        for (i in 1:n_combinations){
+          new_labels[[i]] <- combinations_indexes[i, ]
+        }
+
+        # update labels with the new ones
+        labels_output <- c(labels_output, new_labels)
+
       }
-
-      # update labels with the new ones
-      labels_output <- c(labels_output, new_labels)
-
     }
+
+
+
 
     # Parallel lapply
     # The output index is already computed in the linear case
