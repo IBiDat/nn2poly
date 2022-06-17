@@ -23,7 +23,6 @@ Imports:
     pracma,
     reticulate
 Suggests:
-    nn2poly.tools,
     ggplot2,
     rmarkdown,
     knitr,
