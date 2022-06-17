@@ -8,7 +8,6 @@
 #' @param output_index An index denoting which of the neurons (or outputs) in
 #' the layer we are computing.
 #'
-#' @return
 #' @noRd
 #'
 alg_linear <- function(coeffs_list_input,

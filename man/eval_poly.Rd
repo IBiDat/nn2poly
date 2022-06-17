@@ -15,7 +15,7 @@ The number of columns should be the number of variables in the polynomial
 each one represents the combination of variables associated with that
 coefficient. The variables are numbered from 1 to p.}
 
-\item{coefficients}{The vector of numeric coefficients for the polynomial.}
+\item{coeffs}{The vector of numeric coefficients for the polynomial.}
 }
 \value{
 Numerical value with the polynomial evaluated at x.

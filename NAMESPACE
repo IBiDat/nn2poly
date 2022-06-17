@@ -3,7 +3,6 @@
 export(change_string_to_function)
 export(check_weight_constraints)
 export(eval_poly)
-export(my_test)
 export(nn2poly_algorithm)
 export(obtain_derivatives_list)
 export(plot_NN_PR_comparison)

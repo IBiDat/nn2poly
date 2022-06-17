@@ -1,39 +1,35 @@
 Package: nn2poly
-Title: Neural Network Weights transformation into Polynomial Coefficients
+Title: Neural Network Weights Transformation into Polynomial Coefficients
 Version: 0.0.0.9000
-Authors@R: 
+Authors@R:
     person(given = "Pablo",
            family = "Morala",
            role = c("aut", "cre"),
            email = "pablo.morala@uc3m.es",
            comment = c(ORCID = "0000-0002-4109-2330"))
-Description: This package implements a method that builds the coefficients of a polynomial regression that performs almost equivalently as a given neural network (densely connected). This is achieved using Taylor expansion at the activation functions.
+Description: This package implements a method that builds the coefficients of a
+    polynomial regression that performs almost equivalently as a given neural
+    network (densely connected). This is achieved using Taylor expansion at the
+    activation functions.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
-Imports: 
-    cowplot,
-    future.apply,
-    ggplot2,
-    gtools,
-    polyreg,
-    pracma,
+Depends: R (>= 3.5.0)
+Imports:
     Rcpp,
-    reticulate,
-    stats,
-    stringr
-Suggests: 
+    future.apply,
+    gtools,
+    pracma,
+    reticulate
+Suggests:
     nn2poly.tools,
+    ggplot2,
     rmarkdown,
     knitr,
-    keras,
-    tensorflow,
     testthat (>= 3.0.0)
-LinkingTo: 
+LinkingTo:
     Rcpp
 VignetteBuilder: knitr
-Depends: 
-    R (>= 2.10)
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.0
 Config/testthat/edition: 3
