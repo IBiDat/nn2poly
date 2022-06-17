@@ -8,9 +8,9 @@ Authors@R: c(
     person(given = "Iñaki", family = "Ucar", role = c("aut"),
            email = "iucar@fedoraproject.org",
            comment = c(ORCID = "0000-0001-6403-5550")))
-Description: This package implements a method that builds the coefficients of a
-    polynomial regression that performs almost equivalently as a given neural
-    network (densely connected). This is achieved using Taylor expansion at the
+Description: Implements a method that builds the coefficients of a polynomial
+    regression that performs almost equivalently as a given neural network
+    (densely connected). This is achieved using Taylor expansion at the
     activation functions.
 License: MIT + file LICENSE
 Encoding: UTF-8
