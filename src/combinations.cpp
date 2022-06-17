@@ -3,13 +3,13 @@ using namespace Rcpp;
 
 // [[Rcpp::export]]
 IntegerMatrix combinations_with_repetition(int n, int k) {
-  IntegerMatrix out(Rf_choose(n + k - 1, k), k);
+  int n_row = Rf_choose(n + k - 1, k);
+  IntegerMatrix out(n_row, k);
   IntegerVector pos(k, 1);
 
-  for (int row = 0; true; row++) {
+  for (int row = 0; row < n_row; row++) {
     for (int i = k - 1; i >= 0; i--) {
       if (pos[i] > n) {
-        if (i == 0) goto end;
         pos[i - 1]++;
         for (int j = i; j < k; j++)
           pos[j] = pos[j - 1];
@@ -19,6 +19,5 @@ IntegerMatrix combinations_with_repetition(int n, int k) {
     pos[k - 1]++;
   }
 
-end:
   return out;
 }
