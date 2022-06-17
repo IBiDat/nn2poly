@@ -1,12 +1,13 @@
 Package: nn2poly
 Title: Neural Network Weights Transformation into Polynomial Coefficients
 Version: 0.0.0.9000
-Authors@R:
-    person(given = "Pablo",
-           family = "Morala",
-           role = c("aut", "cre"),
+Authors@R: c(
+    person(given = "Pablo", family = "Morala", role = c("aut", "cre"),
            email = "pablo.morala@uc3m.es",
-           comment = c(ORCID = "0000-0002-4109-2330"))
+           comment = c(ORCID = "0000-0002-4109-2330")),
+    person(given = "Iñaki", family = "Ucar", role = c("aut"),
+           email = "iucar@fedoraproject.org",
+           comment = c(ORCID = "0000-0001-6403-5550")))
 Description: This package implements a method that builds the coefficients of a
     polynomial regression that performs almost equivalently as a given neural
     network (densely connected). This is achieved using Taylor expansion at the
