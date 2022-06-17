@@ -24,6 +24,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// combinations_with_repetition
+IntegerMatrix combinations_with_repetition(int n, int k);
+RcppExport SEXP _nn2poly_combinations_with_repetition(SEXP nSEXP, SEXP kSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    rcpp_result_gen = Rcpp::wrap(combinations_with_repetition(n, k));
+    return rcpp_result_gen;
+END_RCPP
+}
 // select_allowed_partitions_loop
 List select_allowed_partitions_loop(List all_partitions_for_this_label, int q_previous_layer);
 RcppExport SEXP _nn2poly_select_allowed_partitions_loop(SEXP all_partitions_for_this_labelSEXP, SEXP q_previous_layerSEXP) {
@@ -39,6 +51,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_nn2poly_alg_linear_cpp", (DL_FUNC) &_nn2poly_alg_linear_cpp, 4},
+    {"_nn2poly_combinations_with_repetition", (DL_FUNC) &_nn2poly_combinations_with_repetition, 2},
     {"_nn2poly_select_allowed_partitions_loop", (DL_FUNC) &_nn2poly_select_allowed_partitions_loop, 2},
     {NULL, NULL, 0}
 };
