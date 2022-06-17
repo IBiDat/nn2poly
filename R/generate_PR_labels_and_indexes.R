@@ -10,7 +10,7 @@
 #'
 generate_PR_labels_and_indexes <- function(p, t) {
   # Obtain all possible combinations with repetition and non ordered:
-  combinations_indexes <- gtools::combinations(p, t, repeats.allowed = TRUE)
+  combinations_indexes <- combinations(p, t, repeats.allowed = TRUE)
   # Number of different combinations
   n_combinations <- nrow(combinations_indexes)
 

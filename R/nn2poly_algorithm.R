@@ -209,7 +209,7 @@ nn2poly_algorithm <- function(weights_list,
 
     # Loop over each of the new orders up to the maximum one
     for (order in (previous_total_order+1):new_total_order){
-      combinations_indexes <- gtools::combinations(p, order, repeats.allowed = TRUE)
+      combinations_indexes <- combinations(p, order, repeats.allowed = TRUE)
 
       # Number of different combinations
       n_combinations <- nrow(combinations_indexes)
