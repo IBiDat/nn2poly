@@ -5,6 +5,10 @@ alg_linear_cpp <- function(coeffs_list_input, current_layer, weights_list, outpu
     .Call(`_nn2poly_alg_linear_cpp`, coeffs_list_input, current_layer, weights_list, output_index)
 }
 
+combinations_with_repetition <- function(n, k) {
+    .Call(`_nn2poly_combinations_with_repetition`, n, k)
+}
+
 select_allowed_partitions_loop <- function(all_partitions_for_this_label, q_previous_layer) {
     .Call(`_nn2poly_select_allowed_partitions_loop`, all_partitions_for_this_label, q_previous_layer)
 }
