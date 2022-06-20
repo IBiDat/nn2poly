@@ -27,6 +27,7 @@ Suggests:
     testthat (>= 3.0.0)
 LinkingTo:
     Rcpp
+SystemRequirements: C++11
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.0

@@ -89,10 +89,10 @@ public:
   }
 
   explicit operator bool() const { return !done; }
-  auto operator*() const { return s; }
-  auto operator->() const { return &s; }
+  reference operator*() const { return s; }
+  pointer operator->() const { return &s; }
 
-  auto operator++() {
+  multiset_partitions<T>& operator++() {
   M5: // decrease v
     j = s.b - 1;
     while (s.v[j] == 0)
@@ -119,14 +119,14 @@ public:
     return *this;
   }
 
-  auto operator++(int) {
+  multiset_partitions<T> operator++(int) {
     auto it = *this;
     ++*this;
     return it;
   }
 
-  auto begin() const { return *this; }
-  auto end() { done = true; return *this; }
+  multiset_partitions<T>& begin() { return *this; }
+  multiset_partitions<T>& end() { done = true; return *this; }
   friend bool operator==<>(const multiset_partitions<T>& lhs,
                            const multiset_partitions<T>& rhs);
 
