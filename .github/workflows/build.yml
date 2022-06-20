@@ -36,7 +36,6 @@ jobs:
 
     - name: Check
       run: |
-        reticulate::py_install("sympy")
         rcmdcheck::rcmdcheck(args=c("--no-manual", "--as-cran"),
           build_args="--compact-vignettes=both", error_on="warning", check_dir="check")
       shell: Rscript {0}

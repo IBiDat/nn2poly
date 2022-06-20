@@ -19,8 +19,7 @@ Depends: R (>= 3.5.0)
 Imports:
     Rcpp,
     future.apply,
-    pracma,
-    reticulate
+    pracma
 Suggests:
     ggplot2,
     rmarkdown,

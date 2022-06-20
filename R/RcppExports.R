@@ -9,6 +9,10 @@ combinations_with_repetition <- function(n, k) {
     .Call(`_nn2poly_combinations_with_repetition`, n, k)
 }
 
+generate_partitions <- function(p, q_max) {
+    .Call(`_nn2poly_generate_partitions`, p, q_max)
+}
+
 select_allowed_partitions_loop <- function(all_partitions_for_this_label, q_previous_layer) {
     .Call(`_nn2poly_select_allowed_partitions_loop`, all_partitions_for_this_label, q_previous_layer)
 }
