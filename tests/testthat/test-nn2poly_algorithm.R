@@ -1,7 +1,4 @@
 test_that("Check algorithm against precomputed example", {
-  if (!reticulate::py_module_available("sympy"))
-    skip("sympy not available for testing")
-
   # Load the example:
   nn2poly_example <- nn2poly_example0
 
