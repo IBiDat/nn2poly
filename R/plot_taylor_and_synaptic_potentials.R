@@ -15,6 +15,8 @@ plot_taylor_and_synpatic_potentials <- function(data,
                                                 weights_list,
                                                 af_string_list,
                                                 q_taylor_vector) {
+  if (!requireNamespace("ggplot2", quietly = TRUE))
+    stop("package 'ggplot2' is required for this functionality", call.=FALSE)
 
   # This function is currently only prepared for regression cases:
   if (af_string_list[[length(af_string_list)]] != "linear") {

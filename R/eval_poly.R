@@ -6,7 +6,7 @@
 #' @param labels Labels of the coefficients, that is, a list of vectors where
 #' each one represents the combination of variables associated with that
 #' coefficient. The variables are numbered from 1 to p.
-#' @param coefficients The vector of numeric coefficients for the polynomial.
+#' @param coeffs The vector of numeric coefficients for the polynomial.
 #'
 #' @return Numerical value with the polynomial evaluated at x.
 #' @export

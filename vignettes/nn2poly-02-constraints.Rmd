@@ -1,5 +1,5 @@
 ---
-title: "01 - Introduction to nn2poly"
+title: "02 - Constraining the weights in the NN"
 author: "Pablo Morala"
 output:
   rmarkdown::html_vignette:
@@ -7,7 +7,7 @@ output:
     fig_width: 6
 date: "2022-06-17"
 vignette: >
-  %\VignetteIndexEntry{01 - Introduction to nn2poly}
+  %\VignetteIndexEntry{02 - Constraining the weights in the NN}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

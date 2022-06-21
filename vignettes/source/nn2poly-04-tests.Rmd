@@ -10,7 +10,8 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  fig.path = "figure/nn2poly-04-"
 )
 ```
 
@@ -63,7 +64,7 @@ This vignette contains several usecases of the `nn2poly` package applied to some
 
 ## Example 1
 
-```{r}
+```{r example-1}
 
   nn2poly_example <- nn2poly_example1
 

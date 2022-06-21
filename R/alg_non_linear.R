@@ -17,7 +17,6 @@
 #' @param p The dimension p
 #' @param all_partitions List of lists containing all the needed partitions.
 #'
-#' @return
 #' @noRd
 #'
 
