@@ -51,8 +51,8 @@ List generate_partitions(int p, int q_max) {
 
       // Add the list of partitions for that combination to the output
       std::list<Partition<int>> tmp;
-      for (auto state: multiset_partitions<int>(mset))
-        tmp.push_back(state.get());
+      for (auto partition: multiset_partitions<int>(mset))
+        tmp.push_back(partition);
       output.push_back(tmp);
     }
   }
