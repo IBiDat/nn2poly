@@ -10,7 +10,8 @@ nn2poly_algorithm(
   af_string_list,
   q_taylor_vector,
   all_partitions,
-  historical_coeffs = FALSE
+  store_coeffs = FALSE,
+  forced_max_Q
 )
 }
 \arguments{
@@ -36,14 +37,20 @@ as list of lists of lists. If missing, the function computes it first. This
 step can be computationally expensive and it is encouraged that the
 multipartitions are stored and reused when possible.}
 
-\item{historical_coeffs}{a}
+\item{store_coeffs}{Boolean that determines if all polynomials computed in
+the internal layers have to be stored and given in the output (TRUE), or if
+only the last layer is needed (FALSE).}
+
+\item{forced_max_Q}{Optional argument: integer that determines the maximum order
+that we will force in the final polynomial, discarding terms of higher order
+that would naturally arise using all the orders in \code{q_taylor_vector}.}
 }
 \value{
-If \code{historical_coeffs = FALSE} (default case), it returns a list
+If \code{store_coeffs = FALSE} (default case), it returns a list
 with a vector containing the coefficients of a polynomial associated with
 each output unit, i.e., one vector in a regression NN and C vectors in
 a classification NN with C possible classes. If
-\code{historical_coeffs = TRUE}, it returns a list of length L that for each
+\code{store_coeffs = TRUE}, it returns a list of length L that for each
 layer contains a list with a vector of the coefficients of a polynomial
 associated with each unit at that layer. The polynomials obtained at the
 hidden layers are not needed to represent the NN but can be used to explore
