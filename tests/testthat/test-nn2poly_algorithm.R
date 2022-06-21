@@ -31,7 +31,7 @@ test_that("Check algorithm against precomputed example", {
   expect_equal(label,c(1,1))
   expect_equal(coeff,0.63351833)
 
-
+})
 
 
 test_that("Check that the algortihm provides a correct value for a certain
