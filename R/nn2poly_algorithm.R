@@ -227,13 +227,12 @@ nn2poly_algorithm <- function(weights_list,
       new_total_order <- min(previous_total_order*q_taylor_vector[current_layer],forced_max_Q)
     }
 
-
     # If the order has increased, created new needed labels.
     # If not, forced_max_Q has been reached and no new labels are needed.
     if (previous_total_order != new_total_order){
       # Loop over each of the new orders up to the maximum one
       for (order in (previous_total_order+1):new_total_order){
-        combinations_indexes <- gtools::combinations(p, order, repeats.allowed = TRUE)
+        combinations_indexes <- combinations_with_repetition(p, order)
 
         # Number of different combinations
         n_combinations <- nrow(combinations_indexes)

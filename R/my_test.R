@@ -1,8 +1,3 @@
-#' Title
-#'
-#' @return
-#' @export
-#'
 my_test <- function(nn2poly_example){
 
 
@@ -16,14 +11,14 @@ my_test <- function(nn2poly_example){
 
 
 
-  tictoc::tic()
-  result <- nn2poly_algorithm(
-    weights_list = weights_list,
-    af_string_list = af_string_list,
-    q_taylor_vector = q_taylor_vector,
-    historical_coeffs = TRUE
-  )
-  tictoc::toc()
+  print(system.time({
+    result <- nn2poly_algorithm(
+      weights_list = weights_list,
+      af_string_list = af_string_list,
+      q_taylor_vector = q_taylor_vector,
+      historical_coeffs = TRUE
+    )
+  }))
 
   comparison <- vector(mode = "list", length = 0)
 

@@ -11,6 +11,9 @@
 #'
 
 plot_NN_PR_comparison <- function(prediction_PR, prediction_NN) {
+  if (!requireNamespace("ggplot2", quietly = TRUE))
+    stop("package 'ggplot2' is required for this functionality", call.=FALSE)
+
   prediction_PR <- prediction_PR
   prediction_NN <- prediction_NN
 

@@ -15,7 +15,8 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  fig.path = "figure/nn2poly-02-"
 )
 ```
 
@@ -150,11 +151,11 @@ nn <- build_keras_model(p,
 
 
 We can visualize the training process:
-```{r}
+```{r history}
 plot(history)
 ```
 
-```{r}
+```{r comparison-y-nn}
 # Obtain the predicted values with the NN to compare them
 prediction_NN <- predict(nn, test_x)
 
@@ -232,7 +233,7 @@ prediction_NN <- predict(nn, test_x)
 A simple plot comparing the PR and NN predictions can be obtained with `plot_NN_PR_comparison()`, where the red diagonal line represents where a perfect relationship between the NN and the PR would be obtained. In this example, as the theoretical weights constraints have not been imposed, we can observe how the approximation is not perfect:
 
 
-```{r}
+```{r comparison-pr-nn}
 plot_NN_PR_comparison(prediction_PR, prediction_NN)
 ```
 
