@@ -172,16 +172,11 @@ nn2poly_algorithm <- function(weights_list,
       # will be the same:
       labels_output <- coeffs_list_input[[1]]
 
-      # Obtain the number of nodes after the current layer
-      output_dimension <- dim(weights_list[[current_layer]])[2]
-
-      # Parallel lapply
-      output_indexes <- 1:output_dimension
-      only_coeffs_output <- future.apply::future_lapply(output_indexes,
-                                                        alg_linear,
-                                                        coeffs_list_input = coeffs_list_input,
-                                                        weights_list = weights_list,
-                                                        current_layer = current_layer
+      # Parallel apply
+      only_coeffs_output <- future.apply::future_apply(
+        weights_list[[current_layer]], 2, alg_linear,
+        coeffs_list_input = coeffs_list_input[-1],
+        simplify = FALSE
       )
 
       # Join the coefficients with the labels as first list element:
