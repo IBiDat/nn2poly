@@ -1,5 +1,5 @@
-#ifndef multiset_h
-#define multiset_h
+#ifndef nn2poly__multiset_h
+#define nn2poly__multiset_h
 
 #include <iterator>
 #include <vector>
@@ -21,8 +21,7 @@ public:
   using reference = value_type&;
 
   MultisetPartitions(std::multiset<T>& mset) {
-    std::set<T> s(mset.begin(), mset.end());
-    for (auto i: s) {
+    for (auto i: std::set<T>(mset.begin(), mset.end())) {
       comp.push_back(i);
       mult.push_back(mset.count(i));
     }

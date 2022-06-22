@@ -2,7 +2,6 @@ test_that("Check algorithm against precomputed example", {
   # Load the example:
   nn2poly_example <- nn2poly_example0
 
-
   # Get the needed data
   weights_list <- nn2poly_example$weights_list
   af_string_list <- nn2poly_example$af_string_list

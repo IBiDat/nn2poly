@@ -5,15 +5,19 @@ alg_linear <- function(weights_layer, coeffs_list_input) {
     .Call(`_nn2poly_alg_linear`, weights_layer, coeffs_list_input)
 }
 
+select_allowed_partitions <- function(equivalent_label, q_previous_layer, labels, partitions) {
+    .Call(`_nn2poly_select_allowed_partitions`, equivalent_label, q_previous_layer, labels, partitions)
+}
+
+alg_non_linear <- function(coeffs_input, labels_input, labels_output, q_taylor_vector, current_layer, g, labels, partitions) {
+    .Call(`_nn2poly_alg_non_linear`, coeffs_input, labels_input, labels_output, q_taylor_vector, current_layer, g, labels, partitions)
+}
+
 combinations_with_repetition <- function(n, k) {
     .Call(`_nn2poly_combinations_with_repetition`, n, k)
 }
 
 generate_partitions <- function(p, q_max) {
     .Call(`_nn2poly_generate_partitions`, p, q_max)
-}
-
-select_allowed_partitions_loop <- function(all_partitions_for_this_label, q_previous_layer) {
-    .Call(`_nn2poly_select_allowed_partitions_loop`, all_partitions_for_this_label, q_previous_layer)
 }
 
