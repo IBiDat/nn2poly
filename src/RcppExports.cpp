@@ -10,17 +10,15 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// alg_linear_cpp
-NumericVector alg_linear_cpp(List coeffs_list_input, int current_layer, List weights_list, int output_index);
-RcppExport SEXP _nn2poly_alg_linear_cpp(SEXP coeffs_list_inputSEXP, SEXP current_layerSEXP, SEXP weights_listSEXP, SEXP output_indexSEXP) {
+// alg_linear
+NumericVector alg_linear(NumericVector weights_layer, ListOf<NumericVector> coeffs_list_input);
+RcppExport SEXP _nn2poly_alg_linear(SEXP weights_layerSEXP, SEXP coeffs_list_inputSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< List >::type coeffs_list_input(coeffs_list_inputSEXP);
-    Rcpp::traits::input_parameter< int >::type current_layer(current_layerSEXP);
-    Rcpp::traits::input_parameter< List >::type weights_list(weights_listSEXP);
-    Rcpp::traits::input_parameter< int >::type output_index(output_indexSEXP);
-    rcpp_result_gen = Rcpp::wrap(alg_linear_cpp(coeffs_list_input, current_layer, weights_list, output_index));
+    Rcpp::traits::input_parameter< NumericVector >::type weights_layer(weights_layerSEXP);
+    Rcpp::traits::input_parameter< ListOf<NumericVector> >::type coeffs_list_input(coeffs_list_inputSEXP);
+    rcpp_result_gen = Rcpp::wrap(alg_linear(weights_layer, coeffs_list_input));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -62,7 +60,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_nn2poly_alg_linear_cpp", (DL_FUNC) &_nn2poly_alg_linear_cpp, 4},
+    {"_nn2poly_alg_linear", (DL_FUNC) &_nn2poly_alg_linear, 2},
     {"_nn2poly_combinations_with_repetition", (DL_FUNC) &_nn2poly_combinations_with_repetition, 2},
     {"_nn2poly_generate_partitions", (DL_FUNC) &_nn2poly_generate_partitions, 2},
     {"_nn2poly_select_allowed_partitions_loop", (DL_FUNC) &_nn2poly_select_allowed_partitions_loop, 2},
