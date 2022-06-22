@@ -183,8 +183,8 @@ NumericVector alg_non_linear(NumericVector coeffs_input,
         // Now we need to use the labels to get the needed coefficients:
         LogicalVector needed = Function("%in%")(labels_input, partition);
         NumericVector coeffs_input_needed = coeffs_input[needed];
-        std::transform(coeffs_input_needed.begin(), coeffs_input_needed.end(),
-                       m.begin() + 1, coeffs_input_needed.begin(), ::pow);
+        for (int i = 0; i < coeffs_input_needed.size(); i++)
+          coeffs_input_needed[i] = std::pow(coeffs_input_needed[i], m[i + 1]);
 
         // Finally compute the product of coefficients according to multinomial
         // theorem and add it to the summatory
