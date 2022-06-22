@@ -18,14 +18,14 @@ NumericVector alg_linear(NumericVector weights_layer,
   // Special case: the intercept:
   coeffs_output[0] = weights_layer[0];
   for (int j = 0; j < h_layer; j++) {
-    coeffs_output[0] = coeffs_output(0) +
+    coeffs_output[0] = coeffs_output[0] +
       weights_layer[j + 1] * coeffs_list_input[j][0];
   }
 
   // Rest of the coeffs (start from the 2nd postion (1))
   for (int i = 1; i < length_coeffs; i++) {
     for (int j = 0; j < h_layer; j++) {
-      coeffs_output(i) = coeffs_output(i) +
+      coeffs_output[i] = coeffs_output[i] +
         weights_layer[j + 1] * coeffs_list_input[j][i];
     }
   }
