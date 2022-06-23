@@ -67,7 +67,7 @@ std::vector<ListOf<IntegerVector>> select_allowed_partitions(
     // With sapply we sum the lengths of the vectors associated with each partition and see if
     // they are less or equal than q_previous_layer.
     if (is_true(all(sapply(partition, Rf_length) <= q_previous_layer)))
-      output.push_back(partition);
+      output.push_back(clone(partition));
   }
 
   return output;
@@ -133,10 +133,9 @@ NumericVector alg_non_linear(NumericVector coeffs_input,
     for (int p_index = 0; p_index < n_allowed_partitions; p_index++) {
       ListOf<IntegerVector> aux = allowed_partitions[p_index];
       for (int i = 0; i < aux.size(); i++) {
-        IntegerVector aux_vec = aux[i];
-        IntegerVector aux_vec_reverted_equivalence =
-          concat(comp, aux_vec)[match(aux_vec, concat(seq, aux_vec)) - 1];
-        allowed_partitions[p_index][i] = aux_vec_reverted_equivalence.sort();
+        IntegerVector auxv = aux[i];
+        aux[i] = concat(comp, auxv)[match(auxv, concat(seq, auxv)) - 1];
+        aux[i].sort();
       }
     }
 
