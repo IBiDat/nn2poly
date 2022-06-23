@@ -116,7 +116,11 @@ NumericVector alg_non_linear(NumericVector coeffs_input,
     for (int i = 0; i < comp.size(); i++)
       mult[i] = mset.count(comp[i]);
     comp = comp[order(mult, true)]; //decreasing
-    IntegerVector equivalent_label = match(label, comp).sort();
+    IntegerVector seq = Range(1, comp.size());
+    // IntegerVector equivalent_label =
+    //   concat(seq, label)[match(label, concat(comp, label)) - 1];
+    IntegerVector equivalent_label = match(label, comp);
+    equivalent_label.sort();
 
     // Obtain all allowed partitions of the equivalent term
     auto allowed_partitions = select_allowed_partitions(
@@ -130,7 +134,6 @@ NumericVector alg_non_linear(NumericVector coeffs_input,
       ListOf<IntegerVector> aux = allowed_partitions[p_index];
       for (int i = 0; i < aux.size(); i++) {
         IntegerVector aux_vec = aux[i];
-        IntegerVector seq = Range(1, comp.size());
         IntegerVector aux_vec_reverted_equivalence =
           concat(comp, aux_vec)[match(aux_vec, concat(seq, aux_vec)) - 1];
         allowed_partitions[p_index][i] = aux_vec_reverted_equivalence.sort();

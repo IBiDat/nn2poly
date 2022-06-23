@@ -249,11 +249,6 @@ nn2poly_algorithm <- function(weights_list,
     # Parallel lapply
     # The output index is already computed in the linear case
     # but not for l=1 #REVISETHISLATER
-    # Obtain the number of nodes after the current layer
-    output_dimension <- dim(weights_list[[current_layer]])[2]
-
-    # Parallel lapply
-    output_indexes <- 1:output_dimension
     only_coeffs_output <- future.apply::future_lapply(
       coeffs_list_input[-1], alg_non_linear,
       labels_input = coeffs_list_input[[1]],
