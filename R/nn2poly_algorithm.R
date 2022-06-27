@@ -95,8 +95,6 @@ nn2poly_algorithm <- function(weights_list,
     # the "total partitions" obtained with Knuth's algo
     # and then the actual coefficient's "labels" for which the partitions are
     # obtained
-
-    # Generate partitions with Python script:
     partitions <- generate_partitions(as.integer(p), as.integer(q_max))
 
     labels <- vector(mode = "list", length = length(partitions))
@@ -251,20 +249,15 @@ nn2poly_algorithm <- function(weights_list,
     # Parallel lapply
     # The output index is already computed in the linear case
     # but not for l=1 #REVISETHISLATER
-    # Obtain the number of nodes after the current layer
-    output_dimension <- dim(weights_list[[current_layer]])[2]
-
-    # Parallel lapply
-    output_indexes <- 1:output_dimension
-    only_coeffs_output <- future.apply::future_lapply(output_indexes,
-                                                      alg_non_linear,
-                                                      coeffs_list_input = coeffs_list_input,
-                                                      labels_output = labels_output,
-                                                      current_layer = current_layer,
-                                                      af_derivatives_list = af_derivatives_list,
-                                                      q_taylor_vector = q_taylor_vector,
-                                                      p = p,
-                                                      all_partitions = all_partitions
+    only_coeffs_output <- future.apply::future_lapply(
+      coeffs_list_input[-1], alg_non_linear,
+      labels_input = coeffs_list_input[[1]],
+      labels_output = labels_output,
+      q_taylor_vector = q_taylor_vector,
+      current_layer = current_layer,
+      g = af_derivatives_list[[current_layer]],
+      labels = all_partitions$labels,
+      partitions = all_partitions$partitions
     )
     # print("salimos del future")
 

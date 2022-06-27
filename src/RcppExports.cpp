@@ -22,6 +22,38 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// select_allowed_partitions
+std::vector<ListOf<IntegerVector>> select_allowed_partitions(IntegerVector equivalent_label, int q_previous_layer, ListOf<IntegerVector> labels, List partitions);
+RcppExport SEXP _nn2poly_select_allowed_partitions(SEXP equivalent_labelSEXP, SEXP q_previous_layerSEXP, SEXP labelsSEXP, SEXP partitionsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerVector >::type equivalent_label(equivalent_labelSEXP);
+    Rcpp::traits::input_parameter< int >::type q_previous_layer(q_previous_layerSEXP);
+    Rcpp::traits::input_parameter< ListOf<IntegerVector> >::type labels(labelsSEXP);
+    Rcpp::traits::input_parameter< List >::type partitions(partitionsSEXP);
+    rcpp_result_gen = Rcpp::wrap(select_allowed_partitions(equivalent_label, q_previous_layer, labels, partitions));
+    return rcpp_result_gen;
+END_RCPP
+}
+// alg_non_linear
+NumericVector alg_non_linear(NumericVector coeffs_input, ListOf<IntegerVector> labels_input, ListOf<IntegerVector> labels_output, IntegerVector q_taylor_vector, int current_layer, NumericVector g, ListOf<IntegerVector> labels, List partitions);
+RcppExport SEXP _nn2poly_alg_non_linear(SEXP coeffs_inputSEXP, SEXP labels_inputSEXP, SEXP labels_outputSEXP, SEXP q_taylor_vectorSEXP, SEXP current_layerSEXP, SEXP gSEXP, SEXP labelsSEXP, SEXP partitionsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type coeffs_input(coeffs_inputSEXP);
+    Rcpp::traits::input_parameter< ListOf<IntegerVector> >::type labels_input(labels_inputSEXP);
+    Rcpp::traits::input_parameter< ListOf<IntegerVector> >::type labels_output(labels_outputSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type q_taylor_vector(q_taylor_vectorSEXP);
+    Rcpp::traits::input_parameter< int >::type current_layer(current_layerSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type g(gSEXP);
+    Rcpp::traits::input_parameter< ListOf<IntegerVector> >::type labels(labelsSEXP);
+    Rcpp::traits::input_parameter< List >::type partitions(partitionsSEXP);
+    rcpp_result_gen = Rcpp::wrap(alg_non_linear(coeffs_input, labels_input, labels_output, q_taylor_vector, current_layer, g, labels, partitions));
+    return rcpp_result_gen;
+END_RCPP
+}
 // combinations_with_repetition
 IntegerMatrix combinations_with_repetition(int n, int k);
 RcppExport SEXP _nn2poly_combinations_with_repetition(SEXP nSEXP, SEXP kSEXP) {
@@ -46,24 +78,13 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// select_allowed_partitions_loop
-List select_allowed_partitions_loop(List all_partitions_for_this_label, int q_previous_layer);
-RcppExport SEXP _nn2poly_select_allowed_partitions_loop(SEXP all_partitions_for_this_labelSEXP, SEXP q_previous_layerSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< List >::type all_partitions_for_this_label(all_partitions_for_this_labelSEXP);
-    Rcpp::traits::input_parameter< int >::type q_previous_layer(q_previous_layerSEXP);
-    rcpp_result_gen = Rcpp::wrap(select_allowed_partitions_loop(all_partitions_for_this_label, q_previous_layer));
-    return rcpp_result_gen;
-END_RCPP
-}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_nn2poly_alg_linear", (DL_FUNC) &_nn2poly_alg_linear, 2},
+    {"_nn2poly_select_allowed_partitions", (DL_FUNC) &_nn2poly_select_allowed_partitions, 4},
+    {"_nn2poly_alg_non_linear", (DL_FUNC) &_nn2poly_alg_non_linear, 8},
     {"_nn2poly_combinations_with_repetition", (DL_FUNC) &_nn2poly_combinations_with_repetition, 2},
     {"_nn2poly_generate_partitions", (DL_FUNC) &_nn2poly_generate_partitions, 2},
-    {"_nn2poly_select_allowed_partitions_loop", (DL_FUNC) &_nn2poly_select_allowed_partitions_loop, 2},
     {NULL, NULL, 0}
 };
 
