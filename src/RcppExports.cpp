@@ -78,6 +78,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// generate_partitions_full
+List generate_partitions_full(int p, int q_max);
+RcppExport SEXP _nn2poly_generate_partitions_full(SEXP pSEXP, SEXP q_maxSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type p(pSEXP);
+    Rcpp::traits::input_parameter< int >::type q_max(q_maxSEXP);
+    rcpp_result_gen = Rcpp::wrap(generate_partitions_full(p, q_max));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_nn2poly_alg_linear", (DL_FUNC) &_nn2poly_alg_linear, 2},
@@ -85,6 +97,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_nn2poly_alg_non_linear", (DL_FUNC) &_nn2poly_alg_non_linear, 8},
     {"_nn2poly_combinations_with_repetition", (DL_FUNC) &_nn2poly_combinations_with_repetition, 2},
     {"_nn2poly_generate_partitions", (DL_FUNC) &_nn2poly_generate_partitions, 2},
+    {"_nn2poly_generate_partitions_full", (DL_FUNC) &_nn2poly_generate_partitions_full, 2},
     {NULL, NULL, 0}
 };
 

@@ -59,3 +59,30 @@ List generate_partitions(int p, int q_max) {
 
   return wrap(output);
 }
+
+
+// [[Rcpp::export]]
+List generate_partitions_full(int p, int q_max) {
+  // Initialize the output
+  std::list<std::list<Partition<int>>> output;
+
+  // Iterate over the degrees
+  for (int i = 1; i <= q_max; i++) {
+    // Generate all the combinations for the coeffs of the given order
+    IntegerMatrix comb = combinations_with_repetition(p, i);
+
+    // Iterate over those combinations obtaining its partitions
+    for (int j = 0; j < comb.nrow(); j++) {
+      // Count the occurences of each variable in the combination
+      std::multiset<int> mset(comb(j, _).begin(), comb(j, _).end());
+
+      // Add the list of partitions for that combination to the output
+      std::list<Partition<int>> tmp;
+      for (auto partition: multiset_partitions<int>(mset))
+        tmp.push_back(partition);
+      output.push_back(tmp);
+    }
+  }
+
+  return wrap(output);
+}

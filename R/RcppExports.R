@@ -21,3 +21,7 @@ generate_partitions <- function(p, q_max) {
     .Call(`_nn2poly_generate_partitions`, p, q_max)
 }
 
+generate_partitions_full <- function(p, q_max) {
+    .Call(`_nn2poly_generate_partitions_full`, p, q_max)
+}
+
