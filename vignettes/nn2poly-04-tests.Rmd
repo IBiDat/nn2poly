@@ -88,7 +88,9 @@ This vignette contains several usecases of the `nn2poly` package applied to some
 #> [1] "partitions obtained"
 
   labels <- result[[length(historical_coeffs)]][[1]]
+#> Error in eval(expr, envir, enclos): object 'historical_coeffs' not found
   coeffs <- result[[length(historical_coeffs)]][[2]]
+#> Error in eval(expr, envir, enclos): object 'historical_coeffs' not found
   
   # Obtain the predicted values for the test data with our Polynomial Regression
   n_test <- length(test_y)
@@ -97,22 +99,16 @@ This vignette contains several usecases of the `nn2poly` package applied to some
   for (i in 1:n_test) {
     prediction_PR[i] <- eval_poly(test_x, labels = labels, coeffs = coeffs)
   }
+#> Error in eval_poly(test_x, labels = labels, coeffs = coeffs): object 'coeffs' not found
   
   # FALTA AÑADIR LA NN A LOS DATA PARA PODER USAR PREDICT
   
   # Obtain the predicted values with the NN to compare them
   prediction_NN <- predict(nn, test_x)
-#> Error in py_call_impl(callable, dots$args, dots$keywords): RuntimeError: in user code:
-#> 
-#>     C:\Users\pablo\AppData\Local\R-MINI~1\envs\R-RETI~1\lib\site-packages\keras\engine\training.py:1586 predict_function  *
-#>         return step_function(self, iterator)
-#>     C:\Users\pablo\Documents\R\win-library\4.1\reticulate\python\rpytools\call.py:21 python_function  *
-#>         raise RuntimeError(res[kErrorKey])
-#> 
-#>     RuntimeError: Evaluation error: ValueError: Dimensions must be equal, but are 2 and 13 for '{{node sequential_2/layer__combined__l2/MatMul}} = MatMul[T=DT_FLOAT, transpose_a=false, transpose_b=false](IteratorGetNext, sequential_2/layer__combined__l2/strided_slice_1)' with input shapes: [?,2], [13,40]..
+#> Error in predict(nn, test_x): object 'nn' not found
 
   plot_NN_PR_comparison(prediction_PR, prediction_NN)
-#> Error in data.frame(prediction_PR = prediction_PR, prediction_NN = prediction_NN): arguments imply differing number of rows: 100, 102
+#> Error in plot_NN_PR_comparison(prediction_PR, prediction_NN): object 'prediction_NN' not found
 ```
 
 
