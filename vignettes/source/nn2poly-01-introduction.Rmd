@@ -5,6 +5,7 @@ output:
   rmarkdown::html_vignette:
     toc: yes
     fig_width: 6
+    check_title: FALSE
 date: "`r Sys.Date()`"
 vignette: >
   %\VignetteIndexEntry{01 - Introduction to nn2poly}
@@ -30,7 +31,7 @@ tensorflow::tf$random$set_seed(42)
 
 # Overall Goal
 
-The main objective of this package is obtaining a representation of a feed forward neural network in terms of a polynomial regression. This is achieved by applying a Taylor extension at each activation function in the neural network, and combining that with its trained weights, the coefficients of a polynomial regression are obtained.
+The main objective of this package is to obtain a representation of a feed forward neural network in terms of a polynomial representation. This is achieved by applying a Taylor extension at each activation function in the neural network, and combining that with its trained weights, the coefficients of a polynomial regression are obtained.
 
 The main insights about the mathematical process to build this relationship can be found in this [article](https://doi.org/10.1016/j.neunet.2021.04.036) or its free access option through the orginal [arXiv version](https://arxiv.org/abs/2102.03865.).
 
@@ -186,14 +187,14 @@ q_taylor_vector <- c(2, 2,  1)
 When the input is in the desired shape, the method can be applied finally:
 
 ```{r}
-historical_coeffs <- nn2poly_algorithm(
+all_layers_coeffs <- nn2poly_algorithm(
   weights_list = nn_weights,
   af_string_list = af_string_list,
   q_taylor_vector = q_taylor_vector
 )
 
-labels <- historical_coeffs[[length(historical_coeffs)]][[1]]
-coeffs <- historical_coeffs[[length(historical_coeffs)]][[2]]
+labels <- all_layers_coeffs[[length(all_layers_coeffs)]][[1]]
+coeffs <- all_layers_coeffs[[length(all_layers_coeffs)]][[2]]
 ```
 
 ---

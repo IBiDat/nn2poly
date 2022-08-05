@@ -39,7 +39,7 @@ This vignette contains several usecases of the `nn2poly` package applied to some
     weights_list = weights_list,
     af_string_list = af_string_list,
     q_taylor_vector = q_taylor_vector,
-    historical_coeffs = TRUE
+    store_coeffs = TRUE
   )
 
   # Comparamos el potencial en la segunda capa para neurona 1
@@ -80,7 +80,7 @@ This vignette contains several usecases of the `nn2poly` package applied to some
     weights_list = weights_list,
     af_string_list = af_string_list,
     q_taylor_vector = q_taylor_vector,
-    historical_coeffs = TRUE
+    store_coeffs = TRUE
   )
 
   labels <- result[[length(historical_coeffs)]][[1]]
