@@ -6,7 +6,7 @@ output:
     toc: yes
     fig_width: 6
     check_title: FALSE
-date: "2022-08-05"
+date: "2022-08-06"
 vignette: >
   %\VignetteIndexEntry{01 - Introduction to nn2poly}
   %\VignetteEngine{knitr::rmarkdown}
@@ -20,7 +20,9 @@ Initial setup:
 ```r
 library(nn2poly)
 library(keras)
+#> Warning: package 'keras' was built under R version 4.1.2
 tensorflow::tf$random$set_seed(42)
+#> Loaded Tensorflow version 2.6.0
 ```
 
 
@@ -108,15 +110,15 @@ nn %>% layer_dense(units = 1,
 
 nn
 #> Model
-#> Model: "sequential_1"
+#> Model: "sequential"
 #> ______________________________________________________________________________________________
 #> Layer (type)                              Output Shape                         Param #        
 #> ==============================================================================================
-#> dense_3 (Dense)                           (None, 30)                           420            
+#> dense (Dense)                             (None, 30)                           420            
 #> ______________________________________________________________________________________________
-#> dense_4 (Dense)                           (None, 30)                           930            
+#> dense_1 (Dense)                           (None, 30)                           930            
 #> ______________________________________________________________________________________________
-#> dense_5 (Dense)                           (None, 1)                            31             
+#> dense_2 (Dense)                           (None, 1)                            31             
 #> ==============================================================================================
 #> Total params: 1,381
 #> Trainable params: 1,381
