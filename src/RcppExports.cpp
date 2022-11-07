@@ -10,18 +10,6 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// alg_linear
-NumericVector alg_linear(NumericVector weights_layer, ListOf<NumericVector> coeffs_list_input);
-RcppExport SEXP _nn2poly_alg_linear(SEXP weights_layerSEXP, SEXP coeffs_list_inputSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type weights_layer(weights_layerSEXP);
-    Rcpp::traits::input_parameter< ListOf<NumericVector> >::type coeffs_list_input(coeffs_list_inputSEXP);
-    rcpp_result_gen = Rcpp::wrap(alg_linear(weights_layer, coeffs_list_input));
-    return rcpp_result_gen;
-END_RCPP
-}
 // select_allowed_partitions
 std::vector<ListOf<IntegerVector>> select_allowed_partitions(IntegerVector equivalent_label, int q_previous_layer, ListOf<IntegerVector> labels, List partitions);
 RcppExport SEXP _nn2poly_select_allowed_partitions(SEXP equivalent_labelSEXP, SEXP q_previous_layerSEXP, SEXP labelsSEXP, SEXP partitionsSEXP) {
@@ -37,20 +25,20 @@ BEGIN_RCPP
 END_RCPP
 }
 // alg_non_linear
-NumericVector alg_non_linear(NumericVector coeffs_input, ListOf<IntegerVector> labels_input, ListOf<IntegerVector> labels_output, IntegerVector q_taylor_vector, int current_layer, NumericVector g, ListOf<IntegerVector> labels, List partitions);
-RcppExport SEXP _nn2poly_alg_non_linear(SEXP coeffs_inputSEXP, SEXP labels_inputSEXP, SEXP labels_outputSEXP, SEXP q_taylor_vectorSEXP, SEXP current_layerSEXP, SEXP gSEXP, SEXP labelsSEXP, SEXP partitionsSEXP) {
+NumericVector alg_non_linear(NumericMatrix coeffs_input, ListOf<IntegerVector> labels_input, ListOf<IntegerVector> labels_output, IntegerVector q_taylor_vector, int current_layer, NumericVector g, ListOf<IntegerVector> partitions_labels, List partitions);
+RcppExport SEXP _nn2poly_alg_non_linear(SEXP coeffs_inputSEXP, SEXP labels_inputSEXP, SEXP labels_outputSEXP, SEXP q_taylor_vectorSEXP, SEXP current_layerSEXP, SEXP gSEXP, SEXP partitions_labelsSEXP, SEXP partitionsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type coeffs_input(coeffs_inputSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type coeffs_input(coeffs_inputSEXP);
     Rcpp::traits::input_parameter< ListOf<IntegerVector> >::type labels_input(labels_inputSEXP);
     Rcpp::traits::input_parameter< ListOf<IntegerVector> >::type labels_output(labels_outputSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type q_taylor_vector(q_taylor_vectorSEXP);
     Rcpp::traits::input_parameter< int >::type current_layer(current_layerSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type g(gSEXP);
-    Rcpp::traits::input_parameter< ListOf<IntegerVector> >::type labels(labelsSEXP);
+    Rcpp::traits::input_parameter< ListOf<IntegerVector> >::type partitions_labels(partitions_labelsSEXP);
     Rcpp::traits::input_parameter< List >::type partitions(partitionsSEXP);
-    rcpp_result_gen = Rcpp::wrap(alg_non_linear(coeffs_input, labels_input, labels_output, q_taylor_vector, current_layer, g, labels, partitions));
+    rcpp_result_gen = Rcpp::wrap(alg_non_linear(coeffs_input, labels_input, labels_output, q_taylor_vector, current_layer, g, partitions_labels, partitions));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -90,14 +78,25 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// timesTwo
+NumericVector timesTwo(NumericMatrix x);
+RcppExport SEXP _nn2poly_timesTwo(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(timesTwo(x));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_nn2poly_alg_linear", (DL_FUNC) &_nn2poly_alg_linear, 2},
     {"_nn2poly_select_allowed_partitions", (DL_FUNC) &_nn2poly_select_allowed_partitions, 4},
     {"_nn2poly_alg_non_linear", (DL_FUNC) &_nn2poly_alg_non_linear, 8},
     {"_nn2poly_combinations_with_repetition", (DL_FUNC) &_nn2poly_combinations_with_repetition, 2},
     {"_nn2poly_generate_partitions", (DL_FUNC) &_nn2poly_generate_partitions, 2},
     {"_nn2poly_generate_partitions_full", (DL_FUNC) &_nn2poly_generate_partitions_full, 2},
+    {"_nn2poly_timesTwo", (DL_FUNC) &_nn2poly_timesTwo, 1},
     {NULL, NULL, 0}
 };
 

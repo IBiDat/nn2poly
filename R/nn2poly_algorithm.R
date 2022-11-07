@@ -36,12 +36,13 @@
 #' that would naturally arise using all the orders in `q_taylor_vector`.
 #'
 #' @return If \code{store_coeffs = FALSE} (default case), it returns a list
-#' with a vector containing the coefficients of a polynomial associated with
-#' each output unit, i.e., one vector in a regression NN and C vectors in
-#' a classification NN with C possible classes. If
-#' \code{store_coeffs = TRUE}, it returns a list of length L that for each
-#' layer contains a list with a vector of the coefficients of a polynomial
-#' associated with each unit at that layer. The polynomials obtained at the
+#' with an item named `labels` that is a list of integer vectors with each the
+#' variables index associated to each polynomial term, and a item named `values`
+#' which contains a matrix where each row are the coefficients of the polynomial
+#' associated with an output neuron.
+#'
+#' If \code{store_coeffs = TRUE}, it returns a list of length L that for each
+#' layer contains an item as explained before. The polynomials obtained at the
 #' hidden layers are not needed to represent the NN but can be used to explore
 #' how the method works.
 #'
@@ -57,7 +58,7 @@ nn2poly_algorithm <- function(weights_list,
   # Obtain number of variables (dimension p)
   p <- dim(weights_list[[1]])[1] - 1
 
-  # Obtain number of layers L (hidden + output, input is dentoed by 0)
+  # Obtain number of layers L (hidden + output, input is denoted by 0)
   L <- length(af_string_list)
 
   # Initialize current layer in algorithm:
@@ -115,15 +116,12 @@ nn2poly_algorithm <- function(weights_list,
 
   # Starting point for the algorithm: Set weights as coefficients
   # of an order 1 polynomial.
-  # Extract the weights:
-  W1 <- weights_list[[1]]
-  h1 <- dim(W1)[2]
 
   # The labels for each coefficient vector at the same layer and linear or
   # same layer and non linear case will have be the same, so they can be
-  # stored only once as the first element of the coeffs_list_output,
+  # stored only once as the element `labels` of the coeffs_list_output,
   # so we define length h+1
-  coeffs_list_output <- vector(mode = "list", length = h1+1)
+  coeffs_list_output <- vector(mode = "list", length = 0)
 
   # generate and store the labels (as a list of integer vectors)
   # In this case the integer vectors are of length 1.
@@ -131,17 +129,16 @@ nn2poly_algorithm <- function(weights_list,
   for (i in 0:p){
     labels_output[[i+1]] <- c(i)
   }
-  coeffs_list_output[[1]] <- labels_output
+  coeffs_list_output$labels <- labels_output
 
-  for (i in 1:h1){
-    # For each neuron in the first hidden layer, when computing th synaptic
-    # potentials (u_j), each column of the weight matrix represents the
-    # coefficients of an order 1 polynomial for that neuron potential.
-    # The first element will be the bias, and the rest the coefficient
-    # associated with each variable from x_1 to x_p.
-    coeffs_list_output[[i+1]] <- W1[,i]
-  }
+  # For each neuron in the first hidden layer, when computing th synaptic
+  # potentials (u_j), each column of the weight matrix represents the
+  # coefficients of an order 1 polynomial for that neuron potential.
+  # The first element will be the bias, and the rest the coefficient
+  # associated with each variable from x_1 to x_p.
+  coeffs_list_output$values <- weights_list[[1]]
 
+  # Store the results
   results[[1]] <- coeffs_list_output
 
   # Stop if last layer and regression
@@ -167,18 +164,19 @@ nn2poly_algorithm <- function(weights_list,
 
       # Note that the polynomial in this case does not increase its order
       # from the one in the non linear previous layer, so the labels
-      # will be the same:
-      labels_output <- coeffs_list_input[[1]]
+      # will be the same and are already stored in $labels output.
+      # Only the matrix of $values will change its number of rows
 
-      # Parallel apply
-      only_coeffs_output <- future.apply::future_apply(
-        weights_list[[current_layer]], 2, alg_linear,
-        coeffs_list_input = coeffs_list_input[-1],
-        simplify = FALSE
-      )
 
-      # Join the coefficients with the labels as first list element:
-      coeffs_list_output <- c(list(labels_output), only_coeffs_output)
+      ####### New  version alg linear START  ----------------------------------
+      # apply the linear algorithm:
+
+      values <- coeffs_list_input$values
+      coeffs_list_output$values <- t(weights_list[[current_layer]]) %*%
+        rbind(c(1,rep(0,ncol(values)-1)),values)
+
+
+      ####### New  version alg linear END  ----------------------------------
 
       # Save results from this layer:
       results[[2 * (current_layer) - 1]] <- coeffs_list_output
@@ -220,7 +218,7 @@ nn2poly_algorithm <- function(weights_list,
       new_total_order <- min(previous_total_order*q_taylor_vector[current_layer],forced_max_Q)
     }
 
-    # If the order has increased, created new needed labels.
+    # If the order has increased, create new needed labels.
     # If not, forced_max_Q has been reached and no new labels are needed.
     if (previous_total_order != new_total_order){
       # Loop over each of the new orders up to the maximum one
@@ -238,7 +236,7 @@ nn2poly_algorithm <- function(weights_list,
         }
 
         # update labels with the new ones
-        labels_output <- c(labels_output, new_labels)
+        coeffs_list_output$labels <- c(coeffs_list_output$labels, new_labels)
 
       }
     }
@@ -249,20 +247,19 @@ nn2poly_algorithm <- function(weights_list,
     # Parallel lapply
     # The output index is already computed in the linear case
     # but not for l=1 #REVISETHISLATER
-    only_coeffs_output <- future.apply::future_lapply(
-      coeffs_list_input[-1], alg_non_linear,
-      labels_input = coeffs_list_input[[1]],
-      labels_output = labels_output,
+    values <- alg_non_linear(
+      coeffs_list_input$values,
+      labels_input = coeffs_list_input$labels,
+      labels_output = coeffs_list_output$labels,
       q_taylor_vector = q_taylor_vector,
       current_layer = current_layer,
       g = af_derivatives_list[[current_layer]],
-      labels = all_partitions$labels,
+      partitions_labels = all_partitions$labels,
       partitions = all_partitions$partitions
     )
-    # print("salimos del future")
 
     # Join the coefficients with the labels as first list element:
-    coeffs_list_output <- c(list(labels_output), only_coeffs_output)
+    coeffs_list_output$values <- values
 
     # Save results from this layer:
     results[[2 * (current_layer)]] <- coeffs_list_output
