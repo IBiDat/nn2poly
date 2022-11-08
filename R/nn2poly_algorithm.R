@@ -136,7 +136,7 @@ nn2poly_algorithm <- function(weights_list,
   # coefficients of an order 1 polynomial for that neuron potential.
   # The first element will be the bias, and the rest the coefficient
   # associated with each variable from x_1 to x_p.
-  coeffs_list_output$values <- weights_list[[1]]
+  coeffs_list_output$values <- t(weights_list[[1]])
 
   # Store the results
   results[[1]] <- coeffs_list_output

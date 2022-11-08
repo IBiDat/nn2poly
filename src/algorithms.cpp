@@ -1,4 +1,5 @@
-#include <Rcpp.h>
+// [[Rcpp::depends(RcppArmadillo)]]
+#include <RcppArmadillo.h>
 #include "utils.h"
 using namespace Rcpp;
 
@@ -44,12 +45,14 @@ std::vector<ListOf<IntegerVector>> select_allowed_partitions(
   return output;
 }
 
+
+
 // [[Rcpp::export]]
-NumericVector alg_non_linear(NumericMatrix coeffs_input,
+arma::vec alg_non_linear(arma::mat coeffs_input,
                              ListOf<IntegerVector> labels_input,
                              ListOf<IntegerVector> labels_output,
                              IntegerVector q_taylor_vector,
-                             int current_layer, NumericVector g,
+                             int current_layer, arma::vec g,
                              ListOf<IntegerVector> partitions_labels, List partitions)
 {
   // Extract the needed parameters and values:
@@ -62,15 +65,15 @@ NumericVector alg_non_linear(NumericMatrix coeffs_input,
   int n_poly_terms = labels_output.size();
 
   // Obtain number of neurons
-  int h_l = coeffs_input.nrow();
+  int h_l = coeffs_input.n_rows;
 
   // We define the vector that will contain all the output coefficients
-  NumericMatrix coeffs_output(h_l,n_poly_terms);
+  arma::mat coeffs_output(h_l,n_poly_terms);
 
   ////////// Intercept //////////
 
   for (int n = 0; n <= q_layer; n++) {
-    coeffs_output(_,0) = coeffs_output(_,0) + g[n] * Rcpp::pow(coeffs_input(_,0), n);
+    coeffs_output.col(0) = coeffs_output.col(0) + g[n] * arma::pow(coeffs_input.col(0), n);
     // we have to use g[n] to obtain g^(n)/n!,
     // because the function taylor already includes the term 1/n!
   }
@@ -115,7 +118,7 @@ NumericVector alg_non_linear(NumericMatrix coeffs_input,
 
     // Now, use the correctly renamed partitions
     for (int n = 1; n <= q_layer; n++) {
-      NumericVector summatory(h_l);
+      arma::vec summatory(h_l);
 
       for (int p_index = 0; p_index < n_allowed_partitions; p_index++) {
         // Extract the chosen partition (a list) from the allowed partitions
@@ -125,7 +128,7 @@ NumericVector alg_non_linear(NumericMatrix coeffs_input,
         // so we have the condition m_0 + ... + m_C = n satisfied.
         // We also need the difference between the n_terms_in_partition
         // with respect to n, so we can add that difference as the exponent
-        // of the intercep term. Then we compute this diff:
+        // of the intercept term. Then we compute this diff:
         int difference = n - partition.size();
 
         // If this diff is <0, we skip the partition
@@ -158,9 +161,9 @@ NumericVector alg_non_linear(NumericMatrix coeffs_input,
 
         // Now we need to use the labels to get the needed coefficients:
         LogicalVector needed = Function("%in%")(labels_input, partition);
-        NumericMatrix coeffs_input_needed = coeffs_input(_,needed);
+        arma::mat coeffs_input_needed = coeffs_input.cols(find(as<arma::vec>(needed) == 1));
         for (int i = 0; i < needed.size(); i++)
-          coeffs_input_needed(_,i) = Rcpp::pow(coeffs_input_needed(_,i), m[i + 1]);
+          coeffs_input_needed.col(i) = arma::pow(coeffs_input_needed.col(i), m[i + 1]);
 
         // Finally compute the product of coefficients according to multinomial
         // theorem and add it to the summatory
@@ -169,15 +172,15 @@ NumericVector alg_non_linear(NumericMatrix coeffs_input,
         // each coefficient as many times as its exponent would indicate.
         // REVISETHISLATER esto debería poder hacerse sin bucle con row product
 
-        summatory[j] += multinomial_coef *
-          ROWprod(coeffs_input_needed) * Rcpp::pow(coeffs_input(_,0), difference);
+        summatory += multinomial_coef *
+          arma::prod(coeffs_input_needed,1) * arma::pow(coeffs_input.col(0), difference);
         // Note that coeffs_input[0] is the intercept
       }
       // After the summatory over the partitions has been computed, we need to
       // get its result and multiply by the correspondent derivative value, and
       // add to the already stored values, here we are computing the summatory
       // over n.
-      coeffs_output(_,coeff_index) =  coeffs_output(_,coeff_index) +  g[n] * summatory;
+      coeffs_output.col(coeff_index) =  coeffs_output.col(coeff_index) +  g[n] * summatory;
     }
   }
 

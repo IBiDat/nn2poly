@@ -47,12 +47,13 @@ that would naturally arise using all the orders in \code{q_taylor_vector}.}
 }
 \value{
 If \code{store_coeffs = FALSE} (default case), it returns a list
-with a vector containing the coefficients of a polynomial associated with
-each output unit, i.e., one vector in a regression NN and C vectors in
-a classification NN with C possible classes. If
-\code{store_coeffs = TRUE}, it returns a list of length L that for each
-layer contains a list with a vector of the coefficients of a polynomial
-associated with each unit at that layer. The polynomials obtained at the
+with an item named \code{labels} that is a list of integer vectors with each the
+variables index associated to each polynomial term, and a item named \code{values}
+which contains a matrix where each row are the coefficients of the polynomial
+associated with an output neuron.
+
+If \code{store_coeffs = TRUE}, it returns a list of length L that for each
+layer contains an item as explained before. The polynomials obtained at the
 hidden layers are not needed to represent the NN but can be used to explore
 how the method works.
 }

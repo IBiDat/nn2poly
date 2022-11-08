@@ -21,7 +21,3 @@ generate_partitions_full <- function(p, q_max) {
     .Call(`_nn2poly_generate_partitions_full`, p, q_max)
 }
 
-timesTwo <- function(x) {
-    .Call(`_nn2poly_timesTwo`, x)
-}
-
