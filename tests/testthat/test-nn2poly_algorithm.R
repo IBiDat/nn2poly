@@ -16,14 +16,14 @@ test_that("Check algorithm against precomputed example", {
 
   # Output polynomial order is 4, as no order is forced and taylor
   # vector is 2,2,1, so the product is 4:
-  n_terms <- length(result[[length(result)]][[1]])
-  order <- length(result[[length(result)]][[1]][[n_terms]])
+  n_terms <- length(result[[length(result)]]$labels)
+  order <- length(result[[length(result)]]$labels[[n_terms]])
   expect_equal(order, 4)
 
   # Desired coeffcient is  output y at layer 2, neuron 1,
   # coefficient "1,1"
-  label <- result[[4]][[1]][[4]]
-  coeff <- result[[4]][[2]][4]
+  label <- result[[4]]$labels[[4]]
+  coeff <- result[[4]]$values[1,4]
   expect_equal(label,c(1,1))
   expect_equal(coeff,0.63351833)
 
@@ -58,7 +58,7 @@ test_that("Check that the algortihm provides a correct value for a certain
   # Desired coeffcient is  output y at layer 2, neuron 1,
   # coefficient "1,1"
   label <- result[[4]][[1]][[4]]
-  coeff <- result[[4]][[2]][4]
+  coeff <- result[[4]]$values[1,4]
   expect_equal(label,c(1,1))
   expect_equal(coeff,0.63351833)
 
