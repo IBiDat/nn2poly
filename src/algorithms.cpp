@@ -48,7 +48,7 @@ std::vector<ListOf<IntegerVector>> select_allowed_partitions(
 
 
 // [[Rcpp::export]]
-arma::vec alg_non_linear(arma::mat coeffs_input,
+arma::mat alg_non_linear(arma::mat coeffs_input,
                              ListOf<IntegerVector> labels_input,
                              ListOf<IntegerVector> labels_output,
                              IntegerVector q_taylor_vector,
@@ -118,6 +118,7 @@ arma::vec alg_non_linear(arma::mat coeffs_input,
 
     // Now, use the correctly renamed partitions
     for (int n = 1; n <= q_layer; n++) {
+
       arma::vec summatory(h_l);
 
       for (int p_index = 0; p_index < n_allowed_partitions; p_index++) {
@@ -159,11 +160,13 @@ arma::vec alg_non_linear(arma::mat coeffs_input,
         NumericVector fm = factorial(m);
         double multinomial_coef = std::tgamma(n + 1) / prod(fm);
 
+
         // Now we need to use the labels to get the needed coefficients:
         LogicalVector needed = Function("%in%")(labels_input, partition);
         arma::mat coeffs_input_needed = coeffs_input.cols(find(as<arma::vec>(needed) == 1));
-        for (int i = 0; i < needed.size(); i++)
+        for (int i = 0; i < coeffs_input_needed.n_cols; i++)
           coeffs_input_needed.col(i) = arma::pow(coeffs_input_needed.col(i), m[i + 1]);
+
 
         // Finally compute the product of coefficients according to multinomial
         // theorem and add it to the summatory
@@ -171,10 +174,11 @@ arma::vec alg_non_linear(arma::mat coeffs_input,
         // without including the exponent m, as this vector will contain
         // each coefficient as many times as its exponent would indicate.
         // REVISETHISLATER esto debería poder hacerse sin bucle con row product
-
         summatory += multinomial_coef *
-          arma::prod(coeffs_input_needed,1) * arma::pow(coeffs_input.col(0), difference);
+          arma::prod(coeffs_input_needed,1) % arma::pow(coeffs_input.col(0), difference);
         // Note that coeffs_input[0] is the intercept
+
+
       }
       // After the summatory over the partitions has been computed, we need to
       // get its result and multiply by the correspondent derivative value, and
@@ -183,6 +187,5 @@ arma::vec alg_non_linear(arma::mat coeffs_input,
       coeffs_output.col(coeff_index) =  coeffs_output.col(coeff_index) +  g[n] * summatory;
     }
   }
-
   return coeffs_output;
 }

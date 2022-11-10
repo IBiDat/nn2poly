@@ -26,7 +26,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // alg_non_linear
-arma::vec alg_non_linear(arma::mat coeffs_input, ListOf<IntegerVector> labels_input, ListOf<IntegerVector> labels_output, IntegerVector q_taylor_vector, int current_layer, arma::vec g, ListOf<IntegerVector> partitions_labels, List partitions);
+arma::mat alg_non_linear(arma::mat coeffs_input, ListOf<IntegerVector> labels_input, ListOf<IntegerVector> labels_output, IntegerVector q_taylor_vector, int current_layer, arma::vec g, ListOf<IntegerVector> partitions_labels, List partitions);
 RcppExport SEXP _nn2poly_alg_non_linear(SEXP coeffs_inputSEXP, SEXP labels_inputSEXP, SEXP labels_outputSEXP, SEXP q_taylor_vectorSEXP, SEXP current_layerSEXP, SEXP gSEXP, SEXP partitions_labelsSEXP, SEXP partitionsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;

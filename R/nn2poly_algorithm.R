@@ -155,6 +155,8 @@ nn2poly_algorithm <- function(weights_list,
   # The linear case at layer 1 has been computed outside so we skip it
 
   for (current_layer in 1:L) {
+    cat("LAYER CHANGED -------------------------------------- ", current_layer,
+        "\n -------------------------------------")
 
     ########## Linear case ##########
     if (current_layer != 1){
@@ -169,12 +171,10 @@ nn2poly_algorithm <- function(weights_list,
 
 
       ####### New  version alg linear START  ----------------------------------
-      # apply the linear algorithm:
-
+      # apply the linear algorithm
       values <- coeffs_list_input$values
       coeffs_list_output$values <- t(weights_list[[current_layer]]) %*%
         rbind(c(1,rep(0,ncol(values)-1)),values)
-
 
       ####### New  version alg linear END  ----------------------------------
 
