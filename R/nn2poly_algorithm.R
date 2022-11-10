@@ -155,8 +155,6 @@ nn2poly_algorithm <- function(weights_list,
   # The linear case at layer 1 has been computed outside so we skip it
 
   for (current_layer in 1:L) {
-    cat("LAYER CHANGED -------------------------------------- ", current_layer,
-        "\n -------------------------------------")
 
     ########## Linear case ##########
     if (current_layer != 1){
