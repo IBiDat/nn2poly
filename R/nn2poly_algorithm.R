@@ -57,7 +57,7 @@ nn2poly_algorithm <- function(weights_list,
   # Obtain number of variables (dimension p)
   p <- dim(weights_list[[1]])[1] - 1
 
-  # Obtain number of layers L (hidden + output, input is dentoed by 0)
+  # Obtain number of layers L (L-1 hidden + 1 output, input is denoted by 0)
   L <- length(af_string_list)
 
   # Initialize current layer in algorithm:
