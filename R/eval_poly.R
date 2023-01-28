@@ -24,24 +24,55 @@
 
 eval_poly <- function(x, coeffs) {
 
-  # Remove names and transform into matrix
+  # Remove names and transform into matrix (variables as columns)
   x <- unname(as.matrix(x))
+
+  # If x is a single vector, transpose to have it as row vector:
+  if(ncol(x)==1){
+    x = t(x)
+  }
 
   # If values is a single vector, transform into matrix
   if (!is.matrix(coeffs$values)){
-    coeffs$values <- as.matrix(coeffs$values)
+    coeffs$values <- t(as.matrix(coeffs$values))
   }
 
-  # Initialize list which will contain results for each desired polynomial,
-  # with length equal to the rows of `coeffs$values`
+  # If there is intercept and it is not the first element, reorder the
+  # polynomial labels and values
+  if (c(0) %in% coeffs$labels){
+    intercept_position <- which(sapply(coeffs$labels, function(x) c(0) %in% x))
+    if (intercept_position != 1){
+
+      # Divide again in single observation or matrix form:
+
+
+      # Store the value
+      intercept_value <- coeffs$values[,intercept_position]
+
+      # Remove label and value
+      coeffs$labels <- coeffs$labels[-intercept_position]
+      coeffs$values <- coeffs$values[,-intercept_position, drop = FALSE]
+
+      # Add label and value back at start of list
+      coeffs$labels <- append(coeffs$labels, c(0), after=0)
+      coeffs$values <- unname(cbind(intercept_value, coeffs$values))
+    }
+  }
+
+
+
+  # Initialize matrix which will contain results for each desired polynomial,
+  # with rows equal to the rows of `coeffs$values`, that is, the number of polynomias
+  # and columns equal to the number of observations evaluated.
   n_polynomials <- nrow(coeffs$values)
-  response <- vector(mode = "list", length = n_polynomials)
+  response <- matrix(0, nrow = n_polynomials, ncol = nrow(x))
   for (j in 1:n_polynomials){
 
     # Select the desired polynomial values (row of coeffs$values)
     values_j <- coeffs$values[j,]
 
-    # Intercept (label = 0). should always be the first element of labels.
+    # Intercept (label = 0) should always be the first element of labels at this
+    # point of the function (labels reordered previously)
     if (coeffs$labels[[1]] == c(0)){
       response_j <- rep(values_j[1], nrow(x))
       start_loop <- 2
@@ -55,20 +86,29 @@ eval_poly <- function(x, coeffs) {
 
       label_i <- coeffs$labels[[i]]
 
-      # Need to differenciate between 1 single label or more to use rowProds
+      # Need to differentiate between 1 single label or more to use rowProds
       if(length(label_i) == 1){
-        product <- x[,label_i]
+        # When single variable, it is included in 1:p, that are also the
+        # number of columns in x
+        var_prod <- x[,label_i]
       } else {
-        # Obtain the product of each variable as many times as label_i indicates
-        product <- matrixStats::rowProds(x[,label_i])
+        # Special case if x is a single observation.
+        # Selecting the vars in x returns a column instead of row in this case
+        if(nrow(x)==1){
+          var_prod <- matrixStats::colProds(as.matrix(x[,label_i]))
+        } else {
+          # Obtain the product of each variable as many times as label_i indicates
+          var_prod <- matrixStats::rowProds(x[,label_i])
+        }
+
       }
 
 
       # We add to the response the product of those variables
       # with their associated coefficient value
-      response_j <- response_j + values_j[i] * product
+      response_j <- response_j + values_j[i] * var_prod
     }
-    response[[j]] <- response_j
+    response[j,] <- response_j
   }
 
   return(response)
