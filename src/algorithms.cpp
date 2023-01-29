@@ -1,36 +1,8 @@
-#include <Rcpp.h>
+// [[Rcpp::depends(RcppArmadillo)]]
+#include <RcppArmadillo.h>
 #include "utils.h"
 using namespace Rcpp;
 
-// [[Rcpp::export]]
-NumericVector alg_linear(NumericVector weights_layer,
-                         ListOf<NumericVector> coeffs_list_input)
-{
-  // Number of neurons from layer previous to current layer:
-  int h_layer = coeffs_list_input.size();
-
-  // The number of coefficients is the same as the obtained in the previous
-  // non linear case:
-  int length_coeffs = coeffs_list_input[0].size();
-
-  // Initialize output
-  NumericVector coeffs_output(length_coeffs);
-
-  // Special case: the intercept:
-  coeffs_output[0] = weights_layer[0];
-  for (int j = 0; j < h_layer; j++) {
-    coeffs_output[0] += weights_layer[j + 1] * coeffs_list_input[j][0];
-  }
-
-  // Rest of the coeffs (start from the 2nd postion (1))
-  for (int i = 1; i < length_coeffs; i++) {
-    for (int j = 0; j < h_layer; j++) {
-      coeffs_output[i] += weights_layer[j + 1] * coeffs_list_input[j][i];
-    }
-  }
-
-  return coeffs_output;
-}
 
 // [[Rcpp::export]]
 std::vector<ListOf<IntegerVector>> select_allowed_partitions(
@@ -73,13 +45,15 @@ std::vector<ListOf<IntegerVector>> select_allowed_partitions(
   return output;
 }
 
+
+
 // [[Rcpp::export]]
-NumericVector alg_non_linear(NumericVector coeffs_input,
+arma::mat alg_non_linear(arma::mat coeffs_input,
                              ListOf<IntegerVector> labels_input,
                              ListOf<IntegerVector> labels_output,
                              IntegerVector q_taylor_vector,
-                             int current_layer, NumericVector g,
-                             ListOf<IntegerVector> labels, List partitions)
+                             int current_layer, arma::vec g,
+                             ListOf<IntegerVector> partitions_labels, List partitions)
 {
   // Extract the needed parameters and values:
   int q_layer = q_taylor_vector[current_layer - 1];
@@ -90,13 +64,16 @@ NumericVector alg_non_linear(NumericVector coeffs_input,
   // Obtain total number of terms in the polynomial from labels
   int n_poly_terms = labels_output.size();
 
-  // We define the vector that will contain all the coefficients
-  NumericVector coeffs_output(n_poly_terms);
+  // Obtain number of neurons
+  int h_l = coeffs_input.n_rows;
+
+  // We define the vector that will contain all the output coefficients
+  arma::mat coeffs_output(h_l,n_poly_terms);
 
   ////////// Intercept //////////
 
   for (int n = 0; n <= q_layer; n++) {
-    coeffs_output[0] += g[n] * std::pow(coeffs_input[0], n);
+    coeffs_output.col(0) = coeffs_output.col(0) + g[n] * arma::pow(coeffs_input.col(0), n);
     // we have to use g[n] to obtain g^(n)/n!,
     // because the function taylor already includes the term 1/n!
   }
@@ -124,7 +101,7 @@ NumericVector alg_non_linear(NumericVector coeffs_input,
 
     // Obtain all allowed partitions of the equivalent term
     auto allowed_partitions = select_allowed_partitions(
-      equivalent_label, q_previous_layer, labels, partitions);
+      equivalent_label, q_previous_layer, partitions_labels, partitions);
 
     // Number of partitions
     int n_allowed_partitions = allowed_partitions.size();
@@ -141,7 +118,8 @@ NumericVector alg_non_linear(NumericVector coeffs_input,
 
     // Now, use the correctly renamed partitions
     for (int n = 1; n <= q_layer; n++) {
-      double summatory = 0;
+
+      arma::vec summatory(h_l);
 
       for (int p_index = 0; p_index < n_allowed_partitions; p_index++) {
         // Extract the chosen partition (a list) from the allowed partitions
@@ -151,7 +129,7 @@ NumericVector alg_non_linear(NumericVector coeffs_input,
         // so we have the condition m_0 + ... + m_C = n satisfied.
         // We also need the difference between the n_terms_in_partition
         // with respect to n, so we can add that difference as the exponent
-        // of the intercep term. Then we compute this diff:
+        // of the intercept term. Then we compute this diff:
         int difference = n - partition.size();
 
         // If this diff is <0, we skip the partition
@@ -182,28 +160,32 @@ NumericVector alg_non_linear(NumericVector coeffs_input,
         NumericVector fm = factorial(m);
         double multinomial_coef = std::tgamma(n + 1) / prod(fm);
 
+
         // Now we need to use the labels to get the needed coefficients:
         LogicalVector needed = Function("%in%")(labels_input, partition);
-        NumericVector coeffs_input_needed = coeffs_input[needed];
-        for (int i = 0; i < coeffs_input_needed.size(); i++)
-          coeffs_input_needed[i] = std::pow(coeffs_input_needed[i], m[i + 1]);
+        arma::mat coeffs_input_needed = coeffs_input.cols(find(as<arma::vec>(needed) == 1));
+        for (int i = 0; i < coeffs_input_needed.n_cols; i++)
+          coeffs_input_needed.col(i) = arma::pow(coeffs_input_needed.col(i), m[i + 1]);
+
 
         // Finally compute the product of coefficients according to multinomial
         // theorem and add it to the summatory
         // For the product, it is sufficient to call prod(coeffs_input_needed)
         // without including the exponent m, as this vector will contain
         // each coefficient as many times as its exponent would indicate.
+        // REVISETHISLATER esto debería poder hacerse sin bucle con row product
         summatory += multinomial_coef *
-          prod(coeffs_input_needed) * std::pow(coeffs_input[0], difference);
+          arma::prod(coeffs_input_needed,1) % arma::pow(coeffs_input.col(0), difference);
         // Note that coeffs_input[0] is the intercept
+
+
       }
       // After the summatory over the partitions has been computed, we need to
       // get its result and multiply by the correspondent derivative value, and
       // add to the already stored values, here we are computing the summatory
       // over n.
-      coeffs_output[coeff_index] += g[n] * summatory;
+      coeffs_output.col(coeff_index) =  coeffs_output.col(coeff_index) +  g[n] * summatory;
     }
   }
-
   return coeffs_output;
 }

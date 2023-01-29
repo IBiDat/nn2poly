@@ -18,8 +18,8 @@ LazyData: true
 Depends: R (>= 3.5.0)
 Imports:
     Rcpp,
-    future.apply,
     pracma,
+    RcppArmadillo,
     matrixStats
 Suggests:
     ggplot2,
@@ -27,7 +27,8 @@ Suggests:
     knitr,
     testthat (>= 3.0.0)
 LinkingTo:
-    Rcpp
+    Rcpp,
+    RcppArmadillo
 SystemRequirements: C++11
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
