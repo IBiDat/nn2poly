@@ -19,7 +19,8 @@ Depends: R (>= 3.5.0)
 Imports:
     Rcpp,
     future.apply,
-    pracma
+    pracma,
+    matrixStats
 Suggests:
     ggplot2,
     rmarkdown,
