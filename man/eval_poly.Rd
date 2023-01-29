@@ -2,24 +2,50 @@
 % Please edit documentation in R/eval_poly.R
 \name{eval_poly}
 \alias{eval_poly}
-\title{Evaluates a polynomial on a single observation of variables.}
+\title{Evaluates one or several polynomials over one or more data points in the
+desired variables.}
 \usage{
-eval_poly(x, labels, coeffs)
+eval_poly(x, poly)
 }
 \arguments{
-\item{x}{Input data as matrix row, vector or dataframe row.
+\item{x}{Input data as matrix, vector or dataframe.
 The number of columns should be the number of variables in the polynomial
-(the dimension p).}
+(the dimension p). Response variable to be predicted should not be included.}
 
-\item{labels}{Labels of the coefficients, that is, a list of vectors where
-each one represents the combination of variables associated with that
-coefficient. The variables are numbered from 1 to p.}
+\item{poly}{List containing 2 items: \code{labels} and \code{values}.
+\itemize{
+\item \code{labels} List of integer vectors with same length (or number of rows)
+as \code{values}, where each integer vector denotes the combination of
+variables associated to the coefficient value stored at the same position in
+\code{values}. Note that the variables are numbered from 1 to p.
+\item \code{values} Matrix (or also a vector if single polynomial), where each
+row represents a polynomial, with same number of columns as the length of
+\code{labels}, containing at each column the value of the coefficient
+given by the equivalent label in that same position.
+}
 
-\item{coeffs}{The vector of numeric coefficients for the polynomial.}
+Example: If \code{labels} contains the integer vector c(1L,1L,3L) at position
+5, then the value stored in \code{values} at position 5 is the coefficient
+associated with the term $x_1^2*x_3$.}
 }
 \value{
-Numerical value with the polynomial evaluated at x.
+Matrix containing the evaluation of the polynomials. Each row
+corresponds to each polynomial used and each column to each observation,
+meaning that each row vector corresponds to the results of evaluating all the
+given data for each polynomial.
 }
 \description{
-Evaluates a polynomial on a single observation of variables.
+Evaluates one or several polynomials over one or more data points in the
+desired variables.
+}
+\examples{
+# Create the polynomial 1 + (-1)·x_1 + 1·x_2 + 0.5·(x_1)^2 as a list
+poly <- list()
+poly$values <- c(1,-1,1,0.5)
+poly$labels <- list(c(0),c(1),c(2),c(1,1))
+# Create two observations, (x_1,x_2) = (1,2) and (x_1,x_2) = (3,1)
+x <- rbind(c(1,2), c(3,1))
+# Evaluate the polynomial on both observations
+eval_poly(x,poly)
+
 }
