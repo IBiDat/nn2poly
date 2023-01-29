@@ -39,7 +39,7 @@ test_that("multiple polynomial evaluation and single observation works", {
 })
 
 
-test_that("singele polynomial evaluation and multiple observations  works", {
+test_that("singele polynomial evaluation and multiple observations (matrix) works", {
 
   # Without intercept
   poly <- list()
@@ -50,7 +50,7 @@ test_that("singele polynomial evaluation and multiple observations  works", {
   expect_equal(eval_poly(x,poly), t(as.matrix(c(0,1))))
 })
 
-test_that("multiple polynomial evaluation and multiple observations  works", {
+test_that("multiple polynomial evaluation and multiple observations (matrix) works", {
 
   # Without intercept
   poly <- list()
@@ -69,4 +69,28 @@ test_that("multiple polynomial evaluation and multiple observations  works", {
 
   x <- rbind(c(2,-1), c(1,1))
   expect_equal(eval_poly(x,poly), cbind(c(-4,5),c(1,3)))
+})
+
+
+test_that("Observation as dataframe works", {
+  # Single Observations
+  poly <- list()
+  poly$values <- matrix(c(1,-1,1,
+                          2,3,-2), nrow = 2, byrow = TRUE)
+  poly$labels <- list(c(1),c(2),c(1,1))
+
+  x <- c(1,2)
+  x <- as.data.frame(x)
+  expect_equal(eval_poly(x,poly), as.matrix(c(0,6)))
+
+
+  # Multiple Observations
+  poly <- list()
+  poly$values <- matrix(c(1,-1,1,
+                          2,3,-2), nrow = 2, byrow = TRUE)
+  poly$labels <- list(c(1),c(2),c(1,1))
+
+  x <- rbind(c(1,2), c(1,1))
+  x <- as.data.frame(x)
+  expect_equal(eval_poly(x,poly), cbind(c(0,6),c(1,3)))
 })
