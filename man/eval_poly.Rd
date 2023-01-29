@@ -24,9 +24,9 @@ row represents a polynomial, with same number of columns as the length of
 given by the equivalent label in that same position.
 }
 
-Example: If \code{labels} contains the integer vector c(1L,1L,3L) at position
+Example: If \code{labels} contains the integer vector c(1,1,3) at position
 5, then the value stored in \code{values} at position 5 is the coefficient
-associated with the term $x_1^2*x_3$.}
+associated with the term x_1^2*x_3.}
 }
 \value{
 Matrix containing the evaluation of the polynomials. Each row
