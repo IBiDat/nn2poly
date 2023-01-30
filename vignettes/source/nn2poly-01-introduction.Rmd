@@ -1,12 +1,9 @@
 ---
 title: "01 - Introduction to nn2poly"
-author: "Pablo Morala"
 output:
   rmarkdown::html_vignette:
     toc: yes
     fig_width: 6
-    check_title: FALSE
-date: "`r Sys.Date()`"
 vignette: >
   %\VignetteIndexEntry{01 - Introduction to nn2poly}
   %\VignetteEngine{knitr::rmarkdown}
@@ -21,7 +18,26 @@ knitr::opts_chunk$set(
 )
 ```
 
-Initial setup:
+
+
+# Overall package goal
+
+The main objective of `nn2poly` is to obtain a representation of a feed forward artificial neural network (like a multilayered perceptron) in terms of a polynomial representation. The coefficients of such polynomials are obtained by applying a Taylor expansion at each activation function in the neural network, and combining that with its trained weights and combinatorial properties. More information with the theoretical insights about the underlying mathematical process used to build this relationship can be found in the following references:
+* Initial development of the idea for a single hidden layer neural network in this [article](https://doi.org/10.1016/j.neunet.2021.04.036) or its free access [arXiv preprint](https://doi.org/10.48550/arXiv.2102.03865).
+* Extension to deeper layers and proper formulation of the NN2Poly method in this [arXiv preprint](https://doi.org/10.48550/arXiv.2112.11397).
+
+
+# Simple example
+
+This vignette presents the basic usage of the package with a simple regression case, using `tensorflow` to train a simple neural network on simulated polynomial data and then using `nn2poly` to obtain the desired polynomial that approximately represents the neural network.
+
+Please note that the approximations employed by NN2Poly require that some constraints are imposed on the neural network. In this example we will not delve into this matter, but further information and tools regarding this step can be found in `vignette("nn2poly-02-constraints")`, where also uses the auxiliary package `nn2poly.tools` is also introduced.
+
+Furthermore, note that `nn2poly` is not limited to a special deep learning framework (like `tensorflow` or `pytorch`), asthe only requisite is to be able to get the neural networks weights in the desired matrix (or list of matrices) form to be used as input.
+
+
+
+
 ```{r setup}
 library(nn2poly)
 library(keras)
@@ -29,16 +45,8 @@ tensorflow::tf$random$set_seed(42)
 ```
 
 
-# Overall Goal
 
-The main objective of this package is to obtain a representation of a feed forward neural network in terms of a polynomial representation. This is achieved by applying a Taylor extension at each activation function in the neural network, and combining that with its trained weights, the coefficients of a polynomial regression are obtained.
-
-The main insights about the mathematical process to build this relationship can be found in this [article](https://doi.org/10.1016/j.neunet.2021.04.036) or its free access option through the orginal [arXiv version](https://arxiv.org/abs/2102.03865.).
-
-This vignette presents the direct usage of the package with a simple case. For additional tools to build neural networks with the needed conditions that ensure the correct theoretical behavior (constraining the weights and biases), check the VIGNETTE 2 that also uses the extension package `nn2poly.tools`.
-
-
-# Data preparation
+## Data generation
 
 In order to show the most common application of `nn2poly`, we will be solving a regression problem on the Boston dataset, included in the `keras`package.
 
