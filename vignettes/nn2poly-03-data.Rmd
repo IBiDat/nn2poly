@@ -2,7 +2,7 @@
 title: "03 - Generating data to test the implementation"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{nn2poly-03-generating_data_to_test_the_implementation}
+  %\VignetteIndexEntry{03 - Generating data to test the implementation}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
