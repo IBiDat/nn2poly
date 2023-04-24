@@ -93,24 +93,7 @@ nn2poly_algorithm <- function(weights_list,
 
   # Check if partitions have not been given as an input
   if (missing(all_partitions)) {
-    # all_partitions will be a list with 2 elements:
-    # the "total partitions" obtained with Knuth's algo
-    # and then the actual coefficient's "labels" for which the partitions are
-    # obtained
-    partitions <- generate_partitions(as.integer(p), as.integer(q_max))
-
-    labels <- vector(mode = "list", length = length(partitions))
-    # Obtain labels:
-    for (i in 1:length(partitions)){
-      # Here it is used that the first partition of the multiset is always
-      # the multiset itself. This could be generalized in case we change the
-      # generation order. #REVISETHISLATER
-      labels[[i]] <- partitions[[i]][[1]][[1]]
-    }
-
-    all_partitions <- list("labels" = labels, "partitions" = partitions)
-
-    print("partitions obtained")
+    all_partitions <- obtain_partitions_with_labels(p, q_max)
   }
 
   ################# current_layer = 1, linear #################
@@ -272,14 +255,25 @@ nn2poly_algorithm <- function(weights_list,
   }
 }
 
+obtain_partitions_with_labels <- function(p, q_max) {
+  # This function will return a list with 2 elements:
+  #
+  # - The "total partitions" obtained with Knuth's algorithm
+  # - The actual coefficient's "labels" for which the partitions are obtained
+  #
 
+  partitions <- generate_partitions(as.integer(p), as.integer(q_max))
 
+  labels <- vector(mode = "list", length = length(partitions))
+  # Obtain labels:
+  for (i in 1:length(partitions)){
+    # Here it is used that the first partition of the multiset is always
+    # the multiset itself. This could be generalized in case we change the
+    # generation order. #REVISETHISLATER
+    labels[[i]] <- partitions[[i]][[1]][[1]]
+  }
 
+  print("Partitions obtained")
 
-
-
-
-
-
-
-
+  return(list("labels" = labels, "partitions" = partitions))
+}
