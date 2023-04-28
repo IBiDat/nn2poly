@@ -255,12 +255,43 @@ nn2poly_algorithm <- function(weights_list,
   }
 }
 
+
+
+
+#' This functions will generate the partitions obtained with Knuth's algorithm,
+#' compute their labels and store both things in a list of length 2.
+#'
+#'
+#' @param p number of variables.
+#'
+#' @param q_max the maximum degree of the final polynomial.
+#'
+#' @return List with 2 elements:
+#'
+#' It returns a list of length 2 where the first element is a list with the labels
+#' and the second element is a list with the partitions.
+#'
+#' @examples
+#' obtain_partitions_with_labels(2, 3)
+#'
+#' @export
+#'
+
 obtain_partitions_with_labels <- function(p, q_max) {
   # This function will return a list with 2 elements:
   #
-  # - The "total partitions" obtained with Knuth's algorithm
+  # - The partitions obtained with Knuth's algorithm
   # - The actual coefficient's "labels" for which the partitions are obtained
   #
+
+  if (missing(p) & missing(q_max)) {
+    stop("Missing both arguments p and q_max.", call. = FALSE)
+  } else if (missing(p)) {
+      stop("Missing argument p.", call. = FALSE)
+  } else if (missing(q_max)) {
+      stop("Missing argument q_max.", call. = FALSE)
+  }
+
 
   partitions <- generate_partitions(as.integer(p), as.integer(q_max))
 
@@ -272,8 +303,6 @@ obtain_partitions_with_labels <- function(p, q_max) {
     # generation order. #REVISETHISLATER
     labels[[i]] <- partitions[[i]][[1]][[1]]
   }
-
-  print("Partitions obtained")
 
   return(list("labels" = labels, "partitions" = partitions))
 }
