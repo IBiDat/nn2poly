@@ -93,24 +93,7 @@ nn2poly_algorithm <- function(weights_list,
 
   # Check if partitions have not been given as an input
   if (missing(all_partitions)) {
-    # all_partitions will be a list with 2 elements:
-    # the "total partitions" obtained with Knuth's algo
-    # and then the actual coefficient's "labels" for which the partitions are
-    # obtained
-    partitions <- generate_partitions(as.integer(p), as.integer(q_max))
-
-    labels <- vector(mode = "list", length = length(partitions))
-    # Obtain labels:
-    for (i in 1:length(partitions)){
-      # Here it is used that the first partition of the multiset is always
-      # the multiset itself. This could be generalized in case we change the
-      # generation order. #REVISETHISLATER
-      labels[[i]] <- partitions[[i]][[1]][[1]]
-    }
-
-    all_partitions <- list("labels" = labels, "partitions" = partitions)
-
-    print("partitions obtained")
+    all_partitions <- obtain_partitions_with_labels(p, q_max)
   }
 
   ################# current_layer = 1, linear #################
@@ -275,11 +258,51 @@ nn2poly_algorithm <- function(weights_list,
 
 
 
+#' This functions will generate the partitions obtained with Knuth's algorithm,
+#' compute their labels and store both things in a list of length 2.
+#'
+#'
+#' @param p number of variables.
+#'
+#' @param q_max the maximum degree of the final polynomial.
+#'
+#' @return List with 2 elements:
+#'
+#' It returns a list of length 2 where the first element is a list with the labels
+#' and the second element is a list with the partitions.
+#'
+#' @examples
+#' obtain_partitions_with_labels(2, 3)
+#'
+#' @export
+#'
+
+obtain_partitions_with_labels <- function(p, q_max) {
+  # This function will return a list with 2 elements:
+  #
+  # - The partitions obtained with Knuth's algorithm
+  # - The actual coefficient's "labels" for which the partitions are obtained
+  #
+
+  if (missing(p) & missing(q_max)) {
+    stop("Missing both arguments p and q_max.", call. = FALSE)
+  } else if (missing(p)) {
+      stop("Missing argument p.", call. = FALSE)
+  } else if (missing(q_max)) {
+      stop("Missing argument q_max.", call. = FALSE)
+  }
 
 
+  partitions <- generate_partitions(as.integer(p), as.integer(q_max))
 
+  labels <- vector(mode = "list", length = length(partitions))
+  # Obtain labels:
+  for (i in 1:length(partitions)){
+    # Here it is used that the first partition of the multiset is always
+    # the multiset itself. This could be generalized in case we change the
+    # generation order. #REVISETHISLATER
+    labels[[i]] <- partitions[[i]][[1]][[1]]
+  }
 
-
-
-
-
+  return(list("labels" = labels, "partitions" = partitions))
+}
