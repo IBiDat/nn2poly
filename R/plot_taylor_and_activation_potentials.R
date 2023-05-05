@@ -1,5 +1,5 @@
 #' Function that allows to take a NN and the data input values
-#' and plot the distribution of data synaptic potentials
+#' and plot the distribution of data activation potentials
 #' (sum of input values * weights) at all neurons together AT EACH HIDDEN LAYER
 #' with the Taylor expansion used in the activation functions.
 #' @param data a
@@ -11,7 +11,7 @@
 #' @export
 #'
 
-plot_taylor_and_synpatic_potentials <- function(data,
+plot_taylor_and_activation_potentials <- function(data,
                                                 weights_list,
                                                 af_string_list,
                                                 q_taylor_vector) {
@@ -38,7 +38,7 @@ plot_taylor_and_synpatic_potentials <- function(data,
 
 
   # We have to store the output of each layer to use it as input in the next one
-  # and use it to compute the synaptic potentials.
+  # and use it to compute the activation potentials.
   # Therefore, we initialize the variable "output" with data so the loop starts correctly.
   output <- data[, -(p + 1)]
   # The number of inputs is then:
@@ -58,22 +58,22 @@ plot_taylor_and_synpatic_potentials <- function(data,
     # Obtain number of neurons h at the desired layer
     h <- dim(weights)[2]
 
-    # Compute the synaptic potentials first as a matrix, to compute each neuron separately
-    synaptic_potentials <- matrix(0, n_input, h)
+    # Compute the activation potentials first as a matrix, to compute each neuron separately
+    activation_potentials <- matrix(0, n_input, h)
     for (j in 1:h) {
       for (i in 1:n_input) {
-        synaptic_potentials[i, j] <- sum(weights[, j] * input[i, ])
+        activation_potentials[i, j] <- sum(weights[, j] * input[i, ])
       }
     }
 
     # Now join all the values in a vector to plot the density because
     # we don't care in which neuron we have the problems as long as there is one.
-    synaptic_potentials_vectorized <- as.vector(synaptic_potentials)
+    activation_potentials_vectorized <- as.vector(activation_potentials)
 
     # However, we still need to use the matrix to compute the AF, so we obtain the
     # output to use in the next layer:
     fun <- af_function_list[[k]]
-    output <- fun(synaptic_potentials)
+    output <- fun(activation_potentials)
 
 
     ################## Plot creation ########################
@@ -95,7 +95,7 @@ plot_taylor_and_synpatic_potentials <- function(data,
     tol <- 0.1
 
     # create data frame and create an empty plot with only the density of those values
-    df.density <- as.data.frame(synaptic_potentials_vectorized)
+    df.density <- as.data.frame(activation_potentials_vectorized)
     names(df.density) <- c("x")
 
     plot.density <- ggplot2::ggplot(df.density) +

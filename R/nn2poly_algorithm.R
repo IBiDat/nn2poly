@@ -115,7 +115,7 @@ nn2poly_algorithm <- function(weights_list,
   }
   coeffs_list_output$labels <- labels_output
 
-  # For each neuron in the first hidden layer, when computing th synaptic
+  # For each neuron in the first hidden layer, when computing the activation
   # potentials (u_j), each column of the weight matrix represents the
   # coefficients of an order 1 polynomial for that neuron potential.
   # The first element will be the bias, and the rest the coefficient
