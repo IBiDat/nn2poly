@@ -15,9 +15,8 @@ obtain_partitions_with_labels(p, q_max)
 \value{
 List with 2 elements:
 
-If \code{store_coeffs = TRUE}, it returns a list of length 2 where the first
-element is a list with the labels and the second element is the list a list
-of the partitions.
+It returns a list of length 2 where the first element is a list with the labels
+and the second element is a list with the partitions.
 }
 \description{
 This functions will generate the partitions obtained with Knuth's algorithm,
