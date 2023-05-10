@@ -20,7 +20,7 @@ test_that("Check algorithm against precomputed example", {
   order <- length(result[[length(result)]]$labels[[n_terms]])
   expect_equal(order, 4)
 
-  # Desired coeffcient is  output y at layer 2, neuron 1,
+  # Desired coefficient is  output y at layer 2, neuron 1,
   # coefficient "1,1"
   label <- result[[4]]$labels[[4]]
   coeff <- result[[4]]$values[1,4]
