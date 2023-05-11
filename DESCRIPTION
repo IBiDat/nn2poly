@@ -19,8 +19,7 @@ Depends: R (>= 3.5.0)
 Imports:
     matrixStats,
     pracma,
-    Rcpp,
-    RcppArmadillo
+    Rcpp
 Suggests:
     ggplot2,
     knitr,
