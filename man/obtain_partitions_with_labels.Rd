@@ -8,16 +8,13 @@ compute their labels and store both things in a list of length 2.}
 obtain_partitions_with_labels(p, q_max)
 }
 \arguments{
-\item{p}{number of variables.}
+\item{p}{Number of variables.}
 
-\item{q_max}{the maximum degree of the final polynomial.}
+\item{q_max}{Maximum degree of the final polynomial.}
 }
 \value{
-List with 2 elements:
-
-If \code{store_coeffs = TRUE}, it returns a list of length 2 where the first
-element is a list with the labels and the second element is the list a list
-of the partitions.
+List of length 2 where the first element is a list with the labels
+and the second element is a list with the partitions.
 }
 \description{
 This functions will generate the partitions obtained with Knuth's algorithm,

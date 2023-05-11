@@ -15,8 +15,6 @@
 #'
 #' @param af_string_list \code{list} of length L containing \code{character}
 #' strings with the names of the activation function used at each layer.
-#' The last element should be "linear" if the output layer has a single linear
-#' output neuron, i.e., when solving a regression problem.
 #'
 #' @param q_taylor_vector \code{vector} of length L containing the degree
 #' (\code{numeric}) up to which Taylor expansion should be performed at each
@@ -65,13 +63,12 @@ nn2poly_algorithm <- function(weights_list,
   # Initialize current layer in algorithm:
   current_layer <- 1
 
-  # Check if the problem is a regression or classification problem
-  # If it is regression, the last activation function must be "linear"
-  regression <- (af_string_list[[L]] == "linear")
+  # Check if the last layer is linear
+  last_linear <- (af_string_list[[L]] == "linear")
 
   # The list with the results of coefficients at each layer,
-  # depending on being a regression problem or not
-  if (regression == TRUE) {
+  # depending the last layer being linear or not
+  if (last_linear) {
     results <- vector(mode = "list", length = 2 * L - 1)
   } else {
     results <- vector(mode = "list", length = 2 * L)
@@ -109,13 +106,13 @@ nn2poly_algorithm <- function(weights_list,
 
   # generate and store the labels (as a list of integer vectors)
   # In this case the integer vectors are of length 1.
-  labels_output<- vector(mode = "list", length = p+1)
-  for (i in 0:p){
-    labels_output[[i+1]] <- c(i)
+  labels_output <- vector(mode = "list", length = p+1)
+  for (i in 0:p) {
+    labels_output[[i+1]] <- i
   }
   coeffs_list_output$labels <- labels_output
 
-  # For each neuron in the first hidden layer, when computing th synaptic
+  # For each neuron in the first hidden layer, when computing the activation
   # potentials (u_j), each column of the weight matrix represents the
   # coefficients of an order 1 polynomial for that neuron potential.
   # The first element will be the bias, and the rest the coefficient
@@ -125,11 +122,9 @@ nn2poly_algorithm <- function(weights_list,
   # Store the results
   results[[1]] <- coeffs_list_output
 
-  # Stop if last layer and regression
-  if (current_layer == L) {
-    if (regression == TRUE) {
-      return(results)
-    }
+  # Stop if last layer and the last layer is linear
+  if (current_layer == L && last_linear) {
+    return(coeffs_list_output)
   }
 
   ################# Loop over all layers #################
@@ -163,10 +158,12 @@ nn2poly_algorithm <- function(weights_list,
       # Save results from this layer:
       results[[2 * (current_layer) - 1]] <- coeffs_list_output
 
-      # Stop if last layer and regression
-      if (current_layer == L) {
-        if (regression == TRUE) {
+      # Stop if last layer and the last layer is linear
+      if (current_layer == L && last_linear) {
+        if (store_coeffs) {
           return(results)
+        } else {
+          return(coeffs_list_output)
         }
       }
 
@@ -185,7 +182,7 @@ nn2poly_algorithm <- function(weights_list,
     # ones can be reused.
     # The new labels will be for monomials of orders between the total order
     # of the previous polynomial and the total order of the new polynomial:
-    if (current_layer==1){
+    if (current_layer == 1) {
       previous_total_order <- 1
     } else {
       # Get the total order used in the previous iteration
@@ -194,10 +191,11 @@ nn2poly_algorithm <- function(weights_list,
 
     # Compute the new total order with the product of q_taylor_vector.
     # If a forced_max_Q value is used, its taken as the minimum between both.
-    if (missing(forced_max_Q)){
-      new_total_order <- previous_total_order*q_taylor_vector[current_layer]
+    if (missing(forced_max_Q)) {
+      new_total_order <- previous_total_order * q_taylor_vector[current_layer]
     } else {
-      new_total_order <- min(previous_total_order*q_taylor_vector[current_layer],forced_max_Q)
+      new_total_order <- min(previous_total_order * q_taylor_vector[current_layer],
+                             forced_max_Q)
     }
 
     # If the order has increased, create new needed labels.
@@ -246,12 +244,15 @@ nn2poly_algorithm <- function(weights_list,
     # Save results from this layer:
     results[[2 * (current_layer)]] <- coeffs_list_output
 
-    # Check if this is the last layer and if it is a classification problem
-    if (current_layer == L) {
-      if (regression == FALSE) {
+    # Check if this is the last layer and if the last layer is not linear
+    if (current_layer == L && !last_linear) {
+      if (store_coeffs) {
         return(results)
+      } else {
+        return(coeffs_list_output)
       }
     }
+
   }
 }
 
@@ -262,13 +263,11 @@ nn2poly_algorithm <- function(weights_list,
 #' compute their labels and store both things in a list of length 2.
 #'
 #'
-#' @param p number of variables.
+#' @param p Number of variables.
 #'
-#' @param q_max the maximum degree of the final polynomial.
+#' @param q_max Maximum degree of the final polynomial.
 #'
-#' @return List with 2 elements:
-#'
-#' It returns a list of length 2 where the first element is a list with the labels
+#' @return List of length 2 where the first element is a list with the labels
 #' and the second element is a list with the partitions.
 #'
 #' @examples
@@ -280,11 +279,11 @@ nn2poly_algorithm <- function(weights_list,
 obtain_partitions_with_labels <- function(p, q_max) {
   # This function will return a list with 2 elements:
   #
-  # - The partitions obtained with Knuth's algorithm
-  # - The actual coefficient's "labels" for which the partitions are obtained
+  # * The partitions obtained with Knuth's algorithm
+  # * The actual coefficient's "labels" for which the partitions are obtained
   #
 
-  if (missing(p) & missing(q_max)) {
+  if (missing(p) && missing(q_max)) {
     stop("Missing both arguments p and q_max.", call. = FALSE)
   } else if (missing(p)) {
       stop("Missing argument p.", call. = FALSE)

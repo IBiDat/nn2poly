@@ -9,7 +9,7 @@ Authors@R: c(
            email = "iucar@fedoraproject.org",
            comment = c(ORCID = "0000-0001-6403-5550")))
 Description: Implements a method that builds the coefficients of a polynomial
-    regression that performs almost equivalently as a given neural network
+    model that performs almost equivalently as a given neural network
     (densely connected). This is achieved using Taylor expansion at the
     activation functions.
 License: MIT + file LICENSE
@@ -17,14 +17,13 @@ Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.5.0)
 Imports:
-    Rcpp,
+    matrixStats,
     pracma,
-    RcppArmadillo,
-    matrixStats
+    Rcpp
 Suggests:
     ggplot2,
-    rmarkdown,
     knitr,
+    rmarkdown,
     testthat (>= 3.0.0)
 LinkingTo:
     Rcpp,
@@ -32,5 +31,5 @@ LinkingTo:
 SystemRequirements: C++11
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 Config/testthat/edition: 3

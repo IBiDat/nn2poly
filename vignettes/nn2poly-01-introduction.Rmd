@@ -269,11 +269,11 @@ plot_NN_PR_comparison(prediction_PR, prediction_NN)
 
 ![plot of chunk comparison-pr-nn](figure/nn2poly-01-comparison-pr-nn-1.png)
 
-Finally, a convenient plot to show how the algorithm is affected by each layer can be obtained with `plot_taylor_and_synpatic_potentials()`, where the synaptic potentials at each neuron are computed and presented over the Taylor expansion approximation of the activation function at each layer:
+Finally, a convenient plot to show how the algorithm is affected by each layer can be obtained with `plot_taylor_and_activation_potentials()`, where the activation potentials at each neuron are computed and presented over the Taylor expansion approximation of the activation function at each layer:
 
 
 ```r
-plot_taylor_and_synpatic_potentials(data = train,
+plot_taylor_and_activation_potentials(data = train,
                                     weights_list = nn_weights,
                                     af_string_list = af_string_list,
                                     q_taylor_vector = q_taylor_vector)

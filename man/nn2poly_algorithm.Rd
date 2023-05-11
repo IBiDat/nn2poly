@@ -24,9 +24,7 @@ number of neurons in the current layer L. Therefore, each column
 corresponds to the weight vector affecting each neuron in that layer.}
 
 \item{af_string_list}{\code{list} of length L containing \code{character}
-strings with the names of the activation function used at each layer.
-The last element should be "linear" if the output layer has a single linear
-output neuron, i.e., when solving a regression problem.}
+strings with the names of the activation function used at each layer.}
 
 \item{q_taylor_vector}{\code{vector} of length L containing the degree
 (\code{numeric}) up to which Taylor expansion should be performed at each
