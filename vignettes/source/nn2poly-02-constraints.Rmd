@@ -1,0 +1,558 @@
+---
+title: "02 - Constraining the weights in the NN"
+author: "Pablo Morala"
+output:
+  rmarkdown::html_vignette:
+    toc: yes
+    fig_width: 6
+date: "`r Sys.Date()`"
+vignette: >
+  %\VignetteIndexEntry{02 - Constraining the weights in the NN}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "figure/nn2poly-02-"
+)
+```
+
+Initial setup:
+
+```{r setup}
+library(nn2poly.tools)
+library(nn2poly)
+library(keras)
+library(tensorflow)
+
+# For reproducibility
+set.seed(1)
+tensorflow::tf$random$set_seed(1)
+```
+
+
+# NN with weight constraints
+
+# Overall Goal
+
+Mostrar el uso del paquete auxiliar nn2poly.tools para entrenar redes con constraints que permitan ajustar mejor el polinomio. Vamos a replicar los mismos ejemplos que en la viñeta anterior.
+
+
+# Simple regression example
+
+## Simulated data generation
+
+Here we create the polynomial : $4x_1 - 3 x_2x_3$:
+
+```{r data-polynomial}
+
+polynomial <- list()
+polynomial$labels <- list(c(1), c(2,3))
+polynomial$values <- c(4,-3)
+
+```
+
+
+With said polynomial, we can now generate the desired data that will train the NN for our example. We will employ a normal distribution to generate variables $x_1, x_2, x_3$ and also an error term $\epsilon$. Therefore, the response variable $y$ will be generated as: $y = 4x_1 - 3 x_2x_3 + \epsilon$
+
+```{r data-generation}
+# Define number of variables p and sample n
+p <- 3
+n_sample <- 500
+
+# Predictor variables
+X <- matrix(0,n_sample,p)
+for (i in 1:p){
+  X[,i] <- rnorm(n = n_sample,0,1)
+}
+
+# Response variable + small error term
+Y <- as.vector(eval_poly(X,polynomial)) + stats::rnorm(n_sample, 0, 0.1)
+
+# Store all as a data frame
+data <- as.data.frame(cbind(X, Y))
+head(data)
+
+
+```
+Then we will rescale the data to have everything in the $[-1,1]$ interval and divide in train and test datasets.
+
+```{r data-scaling-split}
+# Data scaling
+maxs <- apply(data, 2, max) 
+mins <- apply(data, 2, min) 
+data <- as.data.frame(scale(data, center = mins + (maxs - mins) / 2, scale = (maxs - mins) / 2))
+
+# Divide in train (0.75) and test (0.25)
+index <- sample(1:nrow(data), round(0.75 * nrow(data)))
+train <- data[index, ]
+test <- data[-index, ]
+
+train_x <- as.matrix(subset(train, select = -c(Y)))
+train_y <- as.matrix(train$Y)
+
+test_x <- as.matrix(subset(test, select = -c(Y)))
+test_y <- as.matrix(test$Y)
+```
+
+
+
+## Original neural network
+
+In this case, imposing constraints with custom layers:
+
+
+First, we build the model
+
+
+```{r}
+
+# keras hyperparameters 
+  my_loss <- "mse"
+  my_metrics <- "mse"
+  my_optimizer <- optimizer_adam()
+  my_epochs <- 2000
+  my_validation_split <- 0.2
+  my_verbose <- 0
+
+  # Parameters:
+af_string_list <- list("tanh", "tanh", "linear")
+
+h_neurons_vector <- c(50, 50, 1) # If the output is linear, the last value should be 1
+
+my_max_norm <- list("l1_norm",1)
+  
+```
+
+
+```{r}
+nn <- build_keras_model(p,
+    af_string_list,
+    h_neurons_vector,
+    my_max_norm)
+```
+
+```{r}
+# Compile the model
+	compile(nn,
+					loss = my_loss,
+					optimizer = my_optimizer,
+					metrics = my_metrics
+	)
+
+	# Fit the model
+	history <- fit(nn,
+								 train_x,
+								 train_y,
+								 verbose = my_verbose,
+								 epochs = my_epochs,
+								 validation_split = my_validation_split,
+								 batch_size = 50
+	)
+```
+
+
+
+We can visualize the training process:
+```{r history}
+plot(history)
+```
+
+----
+Visualización de la NN, cambiar la funcion:
+----
+
+
+```{r comparison-y-nn}
+# Obtain the predicted values with the NN to compare them
+prediction_NN <- predict(nn, test_x)
+
+plot_NN_PR_comparison(test_y, prediction_NN)
+```
+
+
+## Obtaining the polynomial regression
+
+
+Obtenemos los pesos, forma especial para capas custom
+
+```{r}
+keras_weights <- keras::get_weights(nn)
+
+n <- length(keras_weights)
+
+nn_weights <- keras_weights[1:(n-2)]
+
+nn_weights[[n-1]] <- rbind(keras_weights[[n]], keras_weights[[n-1]])
+
+
+```
+
+
+And finally the order of the Taylor approximation that we are going to choose is 3 at each hidden layer.
+
+```{r}
+q_taylor_vector <- c(8, 8,  1) 
+```
+
+When the input is in the desired shape, the method can be applied finally:
+
+```{r}
+all_layers_coeffs <- nn2poly_algorithm(
+  weights_list = nn_weights,
+  af_string_list = af_string_list,
+  q_taylor_vector = q_taylor_vector,
+  forced_max_Q = 3 
+)
+
+final_poly <- all_layers_coeffs[[length(all_layers_coeffs)]]
+```
+
+---
+TODO: Poner opción para que la función no guarde los coeficientes intermedios
+---
+
+We can have a glimpse at how the coefficients of the polynomial regression (PR) are stored.
+```{r}
+final_poly$values[1:7]
+```
+
+
+## Visualising the results
+
+After using the algorithm, it is advisable to always check that the predictions obtained with the new polynomial regression do not differ too much from the original neural network predictions (and in case they differ, we can also try to find why by checking the Taylor expansions).To help with that, a couple of functions are included that allow us to plot the results.
+
+First of all, after obtaining the PR coefficients, we want to use them to predict the response variable $Y$, which can be done with the function `evaluate_PR()`:
+
+```{r}
+# Obtain the predicted values for the test data with our Polynomial Regression
+
+prediction_PR <- as.vector(eval_poly(x = test_x, poly = final_poly))
+
+
+# Obtain the predicted values with the NN to compare them
+prediction_NN <- predict(nn, test_x)
+```
+
+
+A simple plot comparing the PR and NN predictions can be obtained with `plot_NN_PR_comparison()`, where the red diagonal line represents where a perfect relationship between the NN and the PR would be obtained. In this example, as the theoretical weights constraints have not been imposed, we can observe how the approximation is not perfect:
+
+
+```{r comparison-pr-nn}
+plot_NN_PR_comparison(prediction_PR, prediction_NN)
+```
+
+Finally, a convenient plot to show how the algorithm is affected by each layer can be obtained with `plot_taylor_and_synpatic_potentials()`, where the synaptic potentials at each neuron are computed and presented over the Taylor expansion approximation of the activation function at each layer:
+
+```{r potentials}
+plot_taylor_and_synpatic_potentials(data = train,
+                                    weights_list = nn_weights,
+                                    af_string_list = af_string_list,
+                                    q_taylor_vector = q_taylor_vector)
+```
+
+
+
+
+
+
+
+
+# Simple classification example
+
+
+## Simulated data generation
+
+
+Cómo hacemos un ejemplode classificacion?
+
+Usamos las mismas del anteiror.
+
+Podemos hacer que la respuesta sea aleatoriamente 0 o 1, pero entonces va a ser solo ruido. Si quiero que un polinomio me de los 0s y otro los 1s? Puede ser entonces que 
+
+
+En este caso, no generar a partir de polinomio, si no coger por ejemplo dos nubes de puntos
+
+
+In this case we can use the Iris dataset:
+
+```{r data-clas-generation}
+
+n <- 500
+
+# Generate 3 features for class 1
+x1_class1 <- rnorm(n/3, mean = 0, sd = 1)
+x2_class1 <- rnorm(n/3, mean = 2, sd = 1)
+x3_class1 <- rnorm(n/3, mean = 2, sd = 1)
+
+# Generate 3 features for class 2
+x1_class2 <- rnorm(n/3, mean = -2, sd = 1)
+x2_class2 <- rnorm(n/3, mean = -2, sd = 1)
+x3_class2 <- rnorm(n/3, mean = 0, sd = 1)
+
+# Generate 3 features for class 3
+x1_class3 <- rnorm(n/3, mean = 2, sd = 1)
+x2_class3 <- rnorm(n/3, mean = 0, sd = 1)
+x3_class3 <- rnorm(n/3, mean = -2, sd = 1)
+
+# Combine the features for all classes
+x1 <- c(x1_class1, x1_class2, x1_class3)
+x2 <- c(x2_class1, x2_class2, x2_class3)
+x3 <- c(x3_class1, x3_class2, x3_class3)
+
+# Assign class labels (needs to start at 0 so it works in tf )
+class_labels <- c(rep(0, n/3), rep(1, n/3), rep(2, n/3))
+
+
+# Combine the features in a dataframe so we can scale them to be between -1 and 1
+# without modifying the class labels, as they do no need to be scaled
+data <- data.frame(x1, x2, x3)
+
+# Data scaling
+maxs <- apply(data, 2, max) 
+mins <- apply(data, 2, min) 
+data <- as.data.frame(scale(data, center = mins + (maxs - mins) / 2, scale = (maxs - mins) / 2))
+
+# Join with the class labels
+data <- cbind(data, class_labels)
+
+
+
+```
+
+
+
+Dividimos en train y test
+
+
+```{r}
+
+
+# Divide in train (0.75) and test (0.25)
+index <- sample(1:nrow(data), round(0.75 * nrow(data)))
+train_x <- as.matrix(data[index, -(p+1)])
+test_x <- as.matrix(data[-index, -(p+1)])
+
+train_y <- as.matrix(class_labels[index])
+test_y <- as.matrix(class_labels[-index])
+
+```
+
+
+
+## Original neural network
+
+
+First, we build the model
+
+
+```{r}
+
+# keras hyperparameters 
+  my_loss <- "mse"
+  my_metrics <- "mse"
+  my_optimizer <- optimizer_adam()
+  my_epochs <- 200
+  my_validation_split <- 0.2
+  my_verbose <- 0
+
+  # Parameters:
+af_string_list <- list("tanh", "tanh", "linear")
+
+h_neurons_vector <- c(100, 100, 3) 
+
+my_max_norm <- list("l1_norm",1)
+  
+```
+
+
+```{r}
+nn <- build_keras_model(p,
+    af_string_list,
+    h_neurons_vector,
+    my_max_norm)
+```
+
+
+
+El mayor problema creo que es la selección de loss etc, no los datos
+
+Tenemos que definir una loss: Esta es para multiple, no binaria eh
+
+```{r}
+
+loss_fn <- loss_sparse_categorical_crossentropy(from_logits = TRUE)
+```
+
+
+
+Compile the model:
+```{r nn-compile}
+compile(nn,
+        loss = loss_fn,
+        optimizer = optimizer_adam(),
+        metrics = "accuracy")
+```
+
+And train it:
+```{r nn-train}
+history <- fit(nn,
+               train_x,
+               train_y,
+               verbose = 0,
+               epochs = my_epochs,
+               validation_split = 0.3
+)
+```
+
+We can visualize the training process:
+```{r history}
+plot(history)
+```
+
+Now, to visualize the results and see the acuracy, we need to use softmax:
+
+
+```{r}
+probability_model <- keras_model_sequential() %>%
+  nn() %>%
+  layer_activation_softmax() %>%
+  layer_lambda(k_argmax)
+```
+
+
+
+
+
+----
+Visualización de la NN, cambiar la funcion:
+----
+
+How to plot in a 3 class setting?
+
+
+```{r comparison-y-nn}
+# Obtain the predicted values with the NN to compare them
+prediction_NN <- predict(probability_model, test_x)
+
+```
+
+
+
+```{r}
+library(caret)
+
+# Create a confusion matrix
+cm <- confusionMatrix(as.factor(prediction_NN), as.factor(test_y))
+cm
+
+```
+
+## Obtaining the polynomial regression
+
+
+Obtenemos los pesos, forma especial para capas custom
+
+```{r}
+keras_weights <- keras::get_weights(nn)
+
+n <- length(keras_weights)
+
+nn_weights <- keras_weights[1:(n-2)]
+
+nn_weights[[n-1]] <- rbind(keras_weights[[n]], keras_weights[[n-1]])
+
+
+```
+
+
+And finally the order of the Taylor approximation that we are going to choose is 3 at each hidden layer.
+
+```{r}
+q_taylor_vector <- c(8, 8,  1) 
+```
+
+
+When the input is in the desired shape, the method can be applied finally:
+
+```{r}
+all_layers_coeffs <- nn2poly_algorithm(
+  weights_list = nn_weights,
+  af_string_list = af_string_list,
+  q_taylor_vector = q_taylor_vector,
+  forced_max_Q = 3
+)
+
+final_poly <- all_layers_coeffs[[length(all_layers_coeffs)]]
+```
+
+---
+TODO: Poner opción para que la función no guarde los coeficientes intermedios
+---
+
+We can have a glimpse at how the coefficients of the pollynomial regression (PR) are stored.
+```{r}
+final_poly$values[,1:7]
+```
+
+
+## Visualising the results
+
+Para predecir, tenemos que usar los polinomios para sacar los valores y después softmax y argmax
+
+```{r}
+# Obtain the predicted values for the test data with our Polynomial Regression
+prediction_poly_matrix <- eval_poly(x = test_x, poly = final_poly)
+
+a <- tf$math$softmax(prediction_poly_matrix)
+b <- as.integer(tf$math$argmax(a))
+
+
+
+ b2 <- t(prediction_poly_matrix) %>%
+  layer_activation_softmax() %>%
+  layer_lambda(k_argmax)
+ 
+ 
+cm <- confusionMatrix(as.factor(as.vector(b)), as.factor(prediction_NN))
+cm
+
+cm <- confusionMatrix(as.factor(as.vector(b2)), as.factor(prediction_NN))
+cm
+```
+
+
+Vemos que funciona regular, pero es por no tener constraints?
+
+Los plots de la expansion de Taylor son iguales aunque tengamos varias salidas,
+lo unico es que la capa de salida no se está haciendo Taylor, pero no pasa nada
+porque es la softmax. 
+En este caso parece que en la segunda capa es dond ehay mas fallo.
+
+```{r potentials}
+plot_taylor_and_synpatic_potentials(data = train,
+                                    weights_list = nn_weights,
+                                    af_string_list = af_string_list,
+                                    q_taylor_vector = q_taylor_vector)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
