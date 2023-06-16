@@ -27,22 +27,18 @@ library(nn2poly.tools)
 library(nn2poly)
 library(keras)
 library(tensorflow)
-tensorflow::tf$random$set_seed(42)
+
+# For reproducibility
+set.seed(1)
+tensorflow::tf$random$set_seed(1)
 ```
 
 
-# NN with weight constraints
-
-# Overall Goal
-
-The main objective of this package is obtaining a representation of a feed forward neural network in terms of a polynomial regression. This is achieved by applying a Taylor extension at each activation function in the neural network, and combining that with its trained weights, the coefficients of a polynomial regression are obtained.
-
-The main insights about the mathematical process to build this relationship can be found in this [article](https://doi.org/10.1016/j.neunet.2021.04.036) or its free access option through the orginal [arXiv version](https://arxiv.org/abs/2102.03865.).
-
-This vignette presents the direct usage of the package with a simple case. For additional tools to build neural networks with the needed conditions that ensure the correct theoretical behavior (constraining the weights and biases), check the VIGNETTE 2 that also uses the extension package `nn2polytools`.
 
 
-# Data preparation
+
+# .---------------------------------------------------------------------
+
 
 In order to show the most common application of `nn2poly`, we will be solving a regression problem on the Boston dataset, included in the `keras`package.
 

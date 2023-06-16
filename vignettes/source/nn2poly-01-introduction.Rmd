@@ -22,76 +22,108 @@ knitr::opts_chunk$set(
 
 # Overall package goal
 
-The main objective of `nn2poly` is to obtain a representation of a feed forward artificial neural network (like a multilayered perceptron) in terms of a polynomial representation. The coefficients of such polynomials are obtained by applying a Taylor expansion at each activation function in the neural network, and combining that with its trained weights and combinatorial properties. More information with the theoretical insights about the underlying mathematical process used to build this relationship can be found in the following references:
-* Initial development of the idea for a single hidden layer neural network in this [article](https://doi.org/10.1016/j.neunet.2021.04.036) or its free access [arXiv preprint](https://doi.org/10.48550/arXiv.2102.03865).
-* Extension to deeper layers and proper formulation of the NN2Poly method in this [arXiv preprint](https://doi.org/10.48550/arXiv.2112.11397).
+The main objective of `nn2poly` is to obtain a representation of a feed forward artificial neural network (like a multilayered perceptron) in terms of a polynomial representation. The coefficients of such polynomials are obtained by applying first a Taylor expansion at each activation function in the neural network. Then this expansions and the given neural network weights are joint using combinatorial properties, obtaining a final value for the polynomial coefficients. 
 
+More information with the theoretical insights about the underlying mathematical process used to build this relationship can be found in the following references:
+  * Initial development of the idea for a single hidden layer neural network in this [article](https://doi.org/10.1016/j.neunet.2021.04.036) or its free access [arXiv preprint version](https://doi.org/10.48550/arXiv.2102.03865).
+  * Extension to deeper layers and proper formulation of the _NN2Poly_ method in this [arXiv preprint](https://doi.org/10.48550/arXiv.2112.11397).
 
-# Simple example
+----
+*Important remark 1*: The approximations made by the NN2poly method rely on Taylor expansions and therefore require some constraints to be imposed when training the original neural network. This package, `nn2poly`, does not implement this constraints as it only uses the final weight matrices and some information about the neural network architecture, it does not limit how the user trains the neural network. However, we also provide an auxiliary package `nn2poly.tools` for this matter, which will be explained and properly introduced in `vignette("nn2poly-02-constraints")`.
+----
 
-This vignette presents the basic usage of the package with a simple regression case, using `tensorflow` to train a simple neural network on simulated polynomial data and then using `nn2poly` to obtain the desired polynomial that approximately represents the neural network.
+----
+*Important remark 2*: `nn2poly` is not limited to a special deep learning framework. As mentioned in the previous remark, only the weight matrices and some information about the neural network architecture is needed. Therefore, the framework used is not relevant. However, in this vignette examples we will be using `tensorflow` and `keras`. Furthermore, support for the training constraints in `nn2poly.tools`, explained in the previous remark, is currently limited to `tensroflow` and `keras`too.
+----
 
-Please note that the approximations employed by NN2Poly require that some constraints are imposed on the neural network. In this example we will not delve into this matter, but further information and tools regarding this step can be found in `vignette("nn2poly-02-constraints")`, where also uses the auxiliary package `nn2poly.tools` is also introduced.
+# This vignette goal
 
-Furthermore, note that `nn2poly` is not limited to a special deep learning framework (like `tensorflow` or `pytorch`), asthe only requisite is to be able to get the neural networks weights in the desired matrix (or list of matrices) form to be used as input.
+Here we aim to present the most simple use cases for `nn2poly`. For that matter, we will showcase how to use it in a regression problem with simulated data and then in a classification problem in the iris dataset. In both cases, a neural network will be trained first to solve the problem, and then `nn2poly` will generate one or several polynomials that approximate the neural network behaviour.
 
+In this case the neural network training will not have any constraint imposed. Then, as explained previously, the final approximation by the polynomial may not be accurate enough. For more information on how to impose those constraints and obtain good approximations, please see `vignette("nn2poly-02-constraints")`.
 
+The initial setup will be as follows, where besides the `nn2poly` package, we will load the `keras` package, which also loads `tensorflow`, used in this example to build and train the neural networks.
 
 
 ```{r setup}
 library(nn2poly)
 library(keras)
-tensorflow::tf$random$set_seed(42)
+
+# For reproducibility
+set.seed(1)
+tensorflow::tf$random$set_seed(1)
 ```
 
 
+## Simple regression example
 
-## Data generation
+This example will solve a regression problem using simulated data from a polynomial, which allows to control if the final polynomial coefficients obtained with `nn2poly` are similar to those from the polynomial that originates the data.
 
-In order to show the most common application of `nn2poly`, we will be solving a regression problem on the Boston dataset, included in the `keras`package.
 
-```{r}
-boston_housing <- dataset_boston_housing()
+### Simulated data generation
 
-c(train_x, train_y) %<-% boston_housing$train
-c(test_x, test_y) %<-% boston_housing$test
+We will simulate polynomial data as follows. First we define a polynomial using the format needed in `nn2poly`, specifically to use the function `eval_poly`, which consists of a list containing:
+  * Labels: A list of integer vectors denoting the combinations of variables that appear on each term of the polynomial. Variables are numbered from `1` to `p` where `p` is the dimension of the problem. As an example, `c(1,1,3)` would represent the term $x_1^2x_3$
+  * Values: Vector containing the numerical values of the coefficients denoted by labels. If multiple polynomials with the same terms but different coefficients want to be represented, a matrix can be employed, where each row is a polynomial.
+
+Here we create the polynomial : $4x_1 - 3 x_2x_3$:
+
+```{r 1-data-polynomial}
+
+polynomial <- list()
+polynomial$labels <- list(c(1), c(2,3))
+polynomial$values <- c(4,-3)
+
 ```
 
-The data needs to be scaled, both for training the NN and for the `nn2poly` algorithm to work properly. In the theoretical foundation of this method, the scaling assumed is to the $[-1,1]$ interval, so we will use it: 
 
-```{r}
-# Join the predictor variables (x) and the response (y)
-train <- as.data.frame(train_x)
-train$Y <- matrix(train_y, ncol = 1)
+With said polynomial, we can now generate the desired data that will train the NN for our example. We will employ a normal distribution to generate variables $x_1, x_2, x_3$ and also an error term $\epsilon$. Therefore, the response variable $y$ will be generated as: $y = 4x_1 - 3 x_2x_3 + \epsilon$
 
-test <- as.data.frame(test_x)
-test$Y <- matrix(test_y, ncol = 1)
+```{r 1-data-generation}
+# Define number of variables p and sample n
+p <- 3
+n_sample <- 500
 
-# Use the train data to obtain the scaling parameters, then apply them both to 
-# test and train
-maxs <- apply(train, 2, max)
-mins <- apply(train, 2, min) 
+# Predictor variables
+X <- matrix(0,n_sample,p)
+for (i in 1:p){
+  X[,i] <- rnorm(n = n_sample,0,1)
+}
 
-train <- as.data.frame(scale(train, 
-                             center = mins + (maxs - mins) / 2, 
-                             scale = (maxs - mins) / 2))
-test <- as.data.frame(scale(test, 
-                             center = mins + (maxs - mins) / 2, 
-                             scale = (maxs - mins) / 2))
+# Response variable + small error term
+Y <- as.vector(eval_poly(X,polynomial)) + stats::rnorm(n_sample, 0, 0.1)
 
-# Divide again in x and y
+# Store all as a data frame
+data <- as.data.frame(cbind(X, Y))
+head(data)
+
+
+```
+Then we will rescale the data to have everything in the $[-1,1]$ interval and divide in train and test datasets.
+
+```{r 1-data-scaling-split}
+# Data scaling
+maxs <- apply(data, 2, max) 
+mins <- apply(data, 2, min) 
+data <- as.data.frame(scale(data, center = mins + (maxs - mins) / 2, scale = (maxs - mins) / 2))
+
+# Divide in train (0.75) and test (0.25)
+index <- sample(1:nrow(data), round(0.75 * nrow(data)))
+train <- data[index, ]
+test <- data[-index, ]
+
 train_x <- as.matrix(subset(train, select = -c(Y)))
 train_y <- as.matrix(train$Y)
 
 test_x <- as.matrix(subset(test, select = -c(Y)))
 test_y <- as.matrix(test$Y)
-
-# Define the dimension p of the problem:
-p <- dim(train_x)[2]
 ```
 
 
-# Original neural network
+
+### Original neural network
+
+With our simulated data ready, we can train a feed forward dense neural network
 
 The method is expected to be applied to a given trained densely connected feed forward neural network (NN from now on), also referred as multilayer perceptron (MLP). Therefore, this step is completely **optional** and can be skipped if any preferred method has been used to train a NN and there is an already given NN and its weights. 
 
@@ -99,19 +131,19 @@ In order to present an example, here we will create and train a NN. Our choice w
 
 ----
 *Note*: It is important to note that in order to avoid asymptotic behavior of the method, it is useful to impose some kind of constraint when training the neural network weights. This is covered in VIGNETTE 2
-----
+
 
 First, we build the model
 
-```{r}
+```{r 1-nn-build}
 nn <- keras_model_sequential()
 
-nn %>% layer_dense(units = 30,
-                  activation = "softplus",
+nn %>% layer_dense(units = 10,
+                  activation = "tanh",
                   input_shape = p)
   
-nn %>% layer_dense(units = 30,
-                  activation = "softplus")
+nn %>% layer_dense(units = 10,
+                  activation = "tanh")
 
 nn %>% layer_dense(units = 1,
                   activation = "linear")
@@ -120,7 +152,7 @@ nn
 ```
 
 Compile the model:
-```{r}
+```{r 1-nn-compile}
 compile(nn,
         loss = "mse",
         optimizer = optimizer_adam(),
@@ -128,12 +160,12 @@ compile(nn,
 ```
 
 And train it:
-```{r}
+```{r 1-nn-train}
 history <- fit(nn,
                train_x,
                train_y,
                verbose = 0,
-               epochs = 200,
+               epochs = 300,
                validation_split = 0.3
 )
 ```
@@ -148,7 +180,7 @@ Visualización de la NN, cambiar la funcion:
 ----
 
 
-```{r comparison-y-nn}
+```{r 1-comparison-y-nn}
 # Obtain the predicted values with the NN to compare them
 prediction_NN <- predict(nn, test_x)
 
@@ -156,7 +188,337 @@ plot_NN_PR_comparison(test_y, prediction_NN)
 ```
 
 
-# Obtaining the polynomial regression
+### Obtaining the polynomial regression
+
+After the NN has been trained, using any chosen method by the user, the parameters have to be extracted and reshaped, if needed, to match the expected input of the function `nn2poly_algorithm()`. This input consists in the following objects:
+
+* `weights_list` A list of matrices with a weight matrix at each layer. The weights matrices should be of dimension ((1+input) * output) where the first row corresponds to the bias vector, and the rest of the rows correspond to each of the ordered vector weights associated to each input.
+* `af_string_list` A list of strings with the names of the activation functions at each layer.
+* `q_taylor_vector` A vector of integers containing the order of the Taylor expansion performed at each layer. If the output layer has a linear activation function, then the last value should be 1.
+
+Following the example of the NN that we created previously, we need to extract its weights and biases and reshape them. Particularly, the `keras` framework by default separates kernel weights matrices of dimension (input * output) and bias vectors (1 * output), so we need to add the bias as the first row of a matrix ((1+input) * output).
+
+
+```{r 1-extract-weights}
+keras_weights <- keras::get_weights(nn)
+
+# Due to keras giving weights separated from the bias, we have twice the 
+# elements that we want:
+n <- length(keras_weights)/2
+nn_weights <- vector(mode = "list", length = n)
+for (i in 1:n){
+  nn_weights[[i]] <- rbind(keras_weights[[2*i]], keras_weights[[2*i-1]])
+}
+```
+
+
+The activation functions that we used can be stored as:
+And finally the order of the Taylor approximation that we are going to choose is 3 at each hidden layer.
+
+```{r 1-extract-structure}
+af_string_list <- list("tanh","tanh", "linear")
+q_taylor_vector <- c(8, 8,  1) 
+```
+
+When the input is in the desired shape, the method can be applied finally:
+
+```{r 1-apply-nn2poly}
+all_layers_coeffs <- nn2poly_algorithm(
+  weights_list = nn_weights,
+  af_string_list = af_string_list,
+  q_taylor_vector = q_taylor_vector,
+  forced_max_Q = 3 
+)
+
+final_poly <- all_layers_coeffs[[length(all_layers_coeffs)]]
+```
+
+---
+TODO: Poner opción para que la función no guarde los coeficientes intermedios
+---
+
+We can have a glimpse at how the coefficients of the polynomial regression (PR) are stored.
+```{r 1-coefficients-glimpse}
+final_poly$values[1:7]
+```
+
+
+## Visualising the results
+
+After using the algorithm, it is advisable to always check that the predictions obtained with the new polynomial regression do not differ too much from the original neural network predictions (and in case they differ, we can also try to find why by checking the Taylor expansions).To help with that, a couple of functions are included that allow us to plot the results.
+
+First of all, after obtaining the PR coefficients, we want to use them to predict the response variable $Y$, which can be done with the function `evaluate_PR()`:
+
+```{r 1-polynomial-prediction}
+# Obtain the predicted values for the test data with our Polynomial Regression
+
+prediction_PR <- as.vector(eval_poly(x = test_x, poly = final_poly))
+
+
+# Obtain the predicted values with the NN to compare them
+prediction_NN <- predict(nn, test_x)
+```
+
+
+A simple plot comparing the PR and NN predictions can be obtained with `plot_NN_PR_comparison()`, where the red diagonal line represents where a perfect relationship between the NN and the PR would be obtained. In this example, as the theoretical weights constraints have not been imposed, we can observe how the approximation is not perfect:
+
+
+```{r 1-comparison-polynomial-nn}
+plot_NN_PR_comparison(prediction_PR, prediction_NN)
+```
+
+Finally, a convenient plot to show how the algorithm is affected by each layer can be obtained with `plot_taylor_and_activation_potentials()`, where the activation potentials at each neuron are computed and presented over the Taylor expansion approximation of the activation function at each layer:
+
+
+```{r 1-potentials}
+plot_taylor_and_synpatic_potentials(data = train,
+                                    weights_list = nn_weights,
+                                    af_string_list = af_string_list,
+                                    q_taylor_vector = q_taylor_vector)
+```
+
+
+
+
+
+
+# Simple classification example
+
+In this example, we will use `nn2poly` to transform a neural network that has been trained with the iris dataset in a classification task.
+
+
+## Data (iris) preparation
+
+
+In this case we can use the Iris dataset:
+
+
+
+
+```{r data-loading}
+# Load the data
+data(iris)
+
+iris$Species <- as.numeric(iris$Species)
+
+# Define dimension p (number of predictor variables)
+p <- dim(iris)[2] - 1
+
+# Define objective classes
+n_class <- max(iris[,(p+1)])
+
+# Move objective classes from (1:7) to (0:6), needed for tensoflow
+iris[,(p+1)] <- iris[,(p+1)] - 1
+```
+
+```{r data-scaling}
+# Scale the data in the [-1,1] interval and separate train and test
+# Only the predictor variables are scaled, not the response as those will be
+# the different classes. Note that variable 55 is the response in this case.
+scale_method <- "-1,1"
+data_x_scaled <- scale_data(iris[,-(p+1)], scale_method)
+data_scaled <- cbind(data_x_scaled, iris[,(p+1)])
+
+# Now, rejoin with Y and divide in train and test
+aux <- divide_train_test(data_scaled, train_proportion = 0.75)
+train <- aux$train
+test <- aux$test
+
+
+# Divide again in x and y to use in tensorflow and turn into matrix form
+train_x <- as.matrix(train[,-(p+1)])
+train_y <- as.matrix(train[,(p+1)])
+
+test_x <- as.matrix(test[,-(p+1)])
+test_y <- as.matrix(test[,(p+1)])
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r 2-data-clas-generation}
+
+n <- 500
+
+# Generate 3 features for class 1
+x1_class1 <- rnorm(n/3, mean = 0, sd = 1)
+x2_class1 <- rnorm(n/3, mean = 2, sd = 1)
+x3_class1 <- rnorm(n/3, mean = 2, sd = 1)
+
+# Generate 3 features for class 2
+x1_class2 <- rnorm(n/3, mean = -2, sd = 1)
+x2_class2 <- rnorm(n/3, mean = -2, sd = 1)
+x3_class2 <- rnorm(n/3, mean = 0, sd = 1)
+
+# Generate 3 features for class 3
+x1_class3 <- rnorm(n/3, mean = 2, sd = 1)
+x2_class3 <- rnorm(n/3, mean = 0, sd = 1)
+x3_class3 <- rnorm(n/3, mean = -2, sd = 1)
+
+# Combine the features for all classes
+x1 <- c(x1_class1, x1_class2, x1_class3)
+x2 <- c(x2_class1, x2_class2, x2_class3)
+x3 <- c(x3_class1, x3_class2, x3_class3)
+
+# Assign class labels (needs to start at 0 so it works in tf )
+class_labels <- c(rep(0, n/3), rep(1, n/3), rep(2, n/3))
+
+
+# Combine the features in a dataframe so we can scale them to be between -1 and 1
+# without modifying the class labels, as they do no need to be scaled
+data <- data.frame(x1, x2, x3)
+
+# Data scaling
+maxs <- apply(data, 2, max) 
+mins <- apply(data, 2, min) 
+data <- as.data.frame(scale(data, center = mins + (maxs - mins) / 2, scale = (maxs - mins) / 2))
+
+# Join with the class labels
+data <- cbind(data, class_labels)
+
+
+
+```
+
+
+
+Dividimos en train y test
+
+
+```{r}
+
+
+# Divide in train (0.75) and test (0.25)
+index <- sample(1:nrow(data), round(0.75 * nrow(data)))
+train_x <- as.matrix(data[index, -(p+1)])
+test_x <- as.matrix(data[-index, -(p+1)])
+
+train_y <- as.matrix(class_labels[index])
+test_y <- as.matrix(class_labels[-index])
+
+```
+
+
+
+## Original neural network
+
+With our simulated data ready, we can train a feed forward dense neural network
+
+The method is expected to be applied to a given trained densely connected feed forward neural network (NN from now on), also referred as multilayer perceptron (MLP). Therefore, this step is completely **optional** and can be skipped if any preferred method has been used to train a NN and there is an already given NN and its weights. 
+
+In order to present an example, here we will create and train a NN. Our choice will be to use the `keras` framework to build and train it.
+
+----
+*Note*: It is important to note that in order to avoid asymptotic behavior of the method, it is useful to impose some kind of constraint when training the neural network weights. This is covered in VIGNETTE 2
+----
+
+First, we build the model
+
+```{r nn-build}
+nn <- keras_model_sequential()
+
+nn %>% layer_dense(units = 100,
+                  activation = "tanh",
+                  input_shape = p)
+  
+nn %>% layer_dense(units = 100,
+                  activation = "tanh")
+
+nn %>% layer_dense(units = 3)
+
+nn
+```
+
+
+El mayor problema creo que es la selección de loss etc, no los datos
+
+Tenemos que definir una loss: Esta es para multiple, no binaria eh
+
+```{r}
+
+loss_fn <- loss_sparse_categorical_crossentropy(from_logits = TRUE)
+```
+
+
+
+Compile the model:
+```{r nn-compile}
+compile(nn,
+        loss = loss_fn,
+        optimizer = optimizer_adam(),
+        metrics = "accuracy")
+```
+
+And train it:
+```{r nn-train}
+history <- fit(nn,
+               train_x,
+               train_y,
+               verbose = 0,
+               epochs = 200,
+               validation_split = 0.3
+)
+```
+
+We can visualize the training process:
+```{r history}
+plot(history)
+```
+
+Now, to visualize the results and see the acuracy, we need to use softmax:
+
+
+```{r}
+probability_model <- keras_model_sequential() %>%
+  nn() %>%
+  layer_activation_softmax() %>%
+  layer_lambda(k_argmax)
+```
+
+
+
+
+
+----
+Visualización de la NN, cambiar la funcion:
+----
+
+How to plot in a 3 class setting?
+
+
+```{r comparison-y-nn}
+# Obtain the predicted values with the NN to compare them
+prediction_NN <- predict(probability_model, test_x)
+
+```
+
+
+
+```{r}
+library(caret)
+
+# Create a confusion matrix
+cm <- confusionMatrix(as.factor(prediction_NN), as.factor(test_y))
+cm
+
+```
+
+
+
+## Obtaining the polynomial regression
 
 After the NN has been trained, using any chosen method by the user, the parameters have to be extracted and reshaped, if needed, to match the expected input of the function `nn2poly_algorithm()`. This input consists in the following objects:
 
@@ -182,14 +544,14 @@ for (i in 1:n){
 
 The activation functions that we used can be stored as:
 ```{r}
-af_string_list <- list("softplus","softplus", "linear")
+af_string_list <- list("tanh","tanh", "linear")
 ```
 
 
 And finally the order of the Taylor approximation that we are going to choose is 3 at each hidden layer.
 
 ```{r}
-q_taylor_vector <- c(2, 2,  1) 
+q_taylor_vector <- c(8, 8,  1) 
 ```
 
 When the input is in the desired shape, the method can be applied finally:
@@ -198,11 +560,11 @@ When the input is in the desired shape, the method can be applied finally:
 all_layers_coeffs <- nn2poly_algorithm(
   weights_list = nn_weights,
   af_string_list = af_string_list,
-  q_taylor_vector = q_taylor_vector
+  q_taylor_vector = q_taylor_vector,
+  forced_max_Q = 3
 )
 
-labels <- all_layers_coeffs[[length(all_layers_coeffs)]][[1]]
-coeffs <- all_layers_coeffs[[length(all_layers_coeffs)]][[2]]
+final_poly <- all_layers_coeffs[[length(all_layers_coeffs)]]
 ```
 
 ---
@@ -211,50 +573,39 @@ TODO: Poner opción para que la función no guarde los coeficientes intermedios
 
 We can have a glimpse at how the coefficients of the pollynomial regression (PR) are stored.
 ```{r}
-coeffs[1:7]
+final_poly$values[,1:7]
 ```
 
 
-# Visualising the results
+## Visualising the results
 
-After using the algorithm, it is advisable to always check that the predictions obtained with the new polynomial regression do not differ too much from the original neural network predictions (and in case they differ, we can also try to find why by checking the Taylor expansions).To help with that, a couple of functions are included that allow us to plot the results.
-
-First of all, after obtaining the PR coefficients, we want to use them to predict the response variable $Y$, which can be done with the function `evaluate_PR()`:
+Para predecir, tenemos que usar los polinomios para sacar los valores y después softmax y argmax
 
 ```{r}
 # Obtain the predicted values for the test data with our Polynomial Regression
-n_test <- length(test_y)
-prediction_PR <- rep(0, n_test)
+prediction_poly_matrix <- eval_poly(x = test_x, poly = final_poly)
 
-for (i in 1:n_test) {
-  prediction_PR[i] <- eval_poly(test[i, seq(p)], labels = labels, coeffs = coeffs)
-}
+a <- tf$math$softmax(prediction_poly_matrix)
+b <- as.integer(tf$math$argmax(a))
 
-# Obtain the predicted values with the NN to compare them
-prediction_NN <- predict(nn, test_x)
+cm <- confusionMatrix(as.factor(prediction_NN), as.factor(b))
+cm
 ```
 
 
-A simple plot comparing the PR and NN predictions can be obtained with `plot_NN_PR_comparison()`, where the red diagonal line represents where a perfect relationship between the NN and the PR would be obtained. In this example, as the theoretical weights constraints have not been imposed, we can observe how the approximation is not perfect:
+Vemos que funciona regular, pero es por no tener constraints?
 
-
-```{r comparison-pr-nn}
-plot_NN_PR_comparison(prediction_PR, prediction_NN)
-```
-
-Finally, a convenient plot to show how the algorithm is affected by each layer can be obtained with `plot_taylor_and_activation_potentials()`, where the activation potentials at each neuron are computed and presented over the Taylor expansion approximation of the activation function at each layer:
+Los plots de la expansion de Taylor son iguales aunque tengamos varias salidas,
+lo unico es que la capa de salida no se está haciendo Taylor, pero no pasa nada
+porque es la softmax. 
+En este caso parece que en la segunda capa es dond ehay mas fallo.
 
 ```{r potentials}
-plot_taylor_and_activation_potentials(data = train,
+plot_taylor_and_synpatic_potentials(data = train,
                                     weights_list = nn_weights,
                                     af_string_list = af_string_list,
                                     q_taylor_vector = q_taylor_vector)
 ```
-
-
-
-
-
 
 
 
