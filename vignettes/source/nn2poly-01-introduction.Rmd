@@ -589,7 +589,7 @@ a <- tf$math$softmax(prediction_poly_matrix)
 b <- as.integer(tf$math$argmax(a))
 
 cm <- confusionMatrix(as.factor(prediction_NN), as.factor(b))
-cm
+cm 
 ```
 
 
