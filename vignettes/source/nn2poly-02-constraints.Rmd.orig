@@ -16,6 +16,8 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
+  message = FALSE, warning = FALSE, error = FALSE,
+  fig.cap = "",
   fig.path = "figure/nn2poly-02-"
 )
 ```
@@ -77,8 +79,8 @@ head(data)
 
 ```{r reg-data-scaling-split}
 # Data scaling
-maxs <- apply(data, 2, max) 
-mins <- apply(data, 2, min) 
+maxs <- apply(data, 2, max)
+mins <- apply(data, 2, min)
 data <- as.data.frame(scale(data, center = mins + (maxs - mins) / 2, scale = (maxs - mins) / 2))
 
 # Divide in train (0.75) and test (0.25)
@@ -96,7 +98,7 @@ test_y <- as.matrix(test[,(p+1)])
 
 ## Original neural network (with constraints)
 
-In this case, we need to use the custom layers from `nn2poly.tools` that include constraints. These constraints are different from the usual constraints in `keras` because in this case the restriction is applied to both the weight vector and the bias at each neuron at the same time, while usual `keras` constraints can only be employed on either the bias or the kernel weights. 
+In this case, we need to use the custom layers from `nn2poly.tools` that include constraints. These constraints are different from the usual constraints in `keras` because in this case the restriction is applied to both the weight vector and the bias at each neuron at the same time, while usual `keras` constraints can only be employed on either the bias or the kernel weights.
 
 Here we will use the L1 norm, checking that each vector of weights + bias arriving to a neuron satisfy that their L1 norm is equal or less than 1. This is created using the function `build_keras_model()` which requires:
 - The input dimension `p`.
@@ -107,7 +109,7 @@ Here we will use the L1 norm, checking that each vector of weights + bias arrivi
 We can define all these parameters as well as the ones used by `keras`:
 
 ```{r reg-parameters}
-# keras hyperparameters 
+# keras hyperparameters
 my_loss <- "mse"
 my_metrics <- "mse"
 my_optimizer <- optimizer_adam()
@@ -119,7 +121,7 @@ my_verbose <- 0
 af_string_list <- list("tanh", "tanh", "linear")
 h_neurons_vector <- c(50, 50, 1) # If the output is linear, the last value should be 1
 my_max_norm <- list("l1_norm",1)
-  
+
 ```
 
 Build the model with the custom constraints, then compile and fit the model:
@@ -193,7 +195,7 @@ af_string_list <- list("tanh","tanh", "linear")
 And finally the order of the Taylor approximation that we are going to choose is 8 at each hidden layer. (The final polynomial order will be limited by `forced_max_Q=3`)
 
 ```{r reg-taylor-orders}
-q_taylor_vector <- c(8, 8,  1) 
+q_taylor_vector <- c(8, 8,  1)
 ```
 
 When the input is in the desired shape, the nn2poly method can be applied:
@@ -204,7 +206,7 @@ final_poly <- nn2poly_algorithm(
   af_string_list = af_string_list,
   q_taylor_vector = q_taylor_vector,
   store_coeffs = FALSE,
-  forced_max_Q = 3 
+  forced_max_Q = 3
 )
 ```
 
@@ -268,10 +270,10 @@ iris[,(p+1)] <- iris[,(p+1)] - 1
 ```{r class-data-scaling}
 # Scale the data in the [-1,1] interval and separate train and test
 # Only the predictor variables are scaled, not the response as those will be
-# the different classes. 
+# the different classes.
 iris_x <- iris[,-(p+1)]
-maxs <- apply(iris_x, 2, max) 
-mins <- apply(iris_x, 2, min) 
+maxs <- apply(iris_x, 2, max)
+mins <- apply(iris_x, 2, min)
 data_x_scaled <- as.data.frame(scale(iris_x, center = mins + (maxs - mins) / 2, scale = (maxs - mins) / 2))
 data <- cbind(data_x_scaled, iris[,(p+1)])
 
@@ -296,7 +298,7 @@ First we define the parameters and keras hyperparameters:
 
 
 ```{r class-parameters}
-# keras hyperparameters 
+# keras hyperparameters
 my_loss <- loss_sparse_categorical_crossentropy(from_logits = TRUE)
 my_metrics <- "accuracy"
 my_optimizer <- optimizer_adam()
@@ -306,9 +308,9 @@ my_verbose <- 0
 
 # Parameters:
 af_string_list <- list("tanh", "tanh", "linear")
-h_neurons_vector <- c(50, 50, n_class) 
+h_neurons_vector <- c(50, 50, n_class)
 my_max_norm <- list("l1_norm",1)
-  
+
 ```
 
 Build the model with the custom constraints, then compile and fit the model:
@@ -400,7 +402,7 @@ af_string_list <- list("tanh","tanh", "linear")
 And finally the order of the Taylor approximation that we are going to choose is 8 at each hidden layer. (The final polynomial order will be limited by `forced_max_Q=3`)
 
 ```{r class-q-taylor}
-q_taylor_vector <- c(8, 8,  1) 
+q_taylor_vector <- c(8, 8,  1)
 ```
 
 When the input is in the desired shape, the nn2poly method can be applied:
@@ -411,7 +413,7 @@ final_poly <- nn2poly_algorithm(
   af_string_list = af_string_list,
   q_taylor_vector = q_taylor_vector,
   store_coeffs = FALSE,
-  forced_max_Q = 3 
+  forced_max_Q = 3
 )
 ```
 
@@ -452,15 +454,15 @@ We can compare, for each polynomial, its output with the the linear output of th
 ```{r class-diagonal-plot}
 for (i in 1:3){
   print(
-    plot_diagonal(x_axis =  prediction_NN[,i], 
-                  y_axis =  prediction_poly_matrix[i,], 
-                  xlab = "NN prediction", 
+    plot_diagonal(x_axis =  prediction_NN[,i],
+                  y_axis =  prediction_poly_matrix[i,],
+                  xlab = "NN prediction",
                   ylab = "Polynomial prediction")
         )
 }
 ```
 
-Finally, activation potentials can be visualized as follows, where it can be seen that the constraints have made the activations to be closer to zero than in the unrestricted case. However, there is still some dispersion in them that creates the slight deviations seen in the diagonal plots. However, the 
+Finally, activation potentials can be visualized as follows, where it can be seen that the constraints have made the activations to be closer to zero than in the unrestricted case. However, there is still some dispersion in them that creates the slight deviations seen in the diagonal plots. However, the
 
 ```{r potentials}
 plot_taylor_and_activation_potentials(data = train,
