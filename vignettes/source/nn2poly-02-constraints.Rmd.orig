@@ -5,14 +5,20 @@ output:
   rmarkdown::html_vignette:
     toc: yes
     fig_width: 6
-date: "2023-06-19"
+date: "`r Sys.Date()`"
 vignette: >
   %\VignetteIndexEntry{02 - Constraining the weights in the NN}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "figure/nn2poly-02-"
+)
+```
 
 # This vignette's goal
 
@@ -20,8 +26,7 @@ The goal of this vignette is to present how to impose the needed constraints on 
 
 The initial setup will be the same, using `keras`and `tensorflow` to create and train the NN. Additionally, we will now use the auxiliary package `nn2poly.tools` that implements some helper functions to impose the desired constraints on the NN.
 
-
-```r
+```{r setup}
 library(nn2poly.tools)
 library(nn2poly)
 library(keras)
@@ -41,16 +46,15 @@ We will solve again two simple examples, regression and classification.
 
 We will simulate polynomial data from the following polynomial: $4x_1 - 3 x_2x_3$. Data will needs to be scaled to the $[-1,1]$ interval.
 
-
-```r
+```{r reg-data-polynomial}
 # Define the desired polynomial for the simulated data
 polynomial <- list()
 polynomial$labels <- list(c(1), c(2,3))
 polynomial$values <- c(4,-3)
+
 ```
 
-
-```r
+```{r reg-data-generation}
 # Define number of variables p and sample n
 p <- 3
 n_sample <- 500
@@ -67,17 +71,11 @@ Y <- as.vector(eval_poly(X,polynomial)) + stats::rnorm(n_sample, 0, 0.1)
 # Store all as a data frame
 data <- as.data.frame(cbind(X, Y))
 head(data)
-#>           V1          V2          V3         Y
-#> 1 -0.6264538  0.07730312  1.13496509 -2.684020
-#> 2  0.1836433 -0.29686864  1.11193185  1.632335
-#> 3 -0.8356286 -1.18324224 -0.87077763 -6.344179
-#> 4  1.5952808  0.01129269  0.21073159  6.279883
-#> 5  0.3295078  0.99160104  0.06939565  1.165488
-#> 6 -0.8204684  1.59396745 -1.66264885  4.650553
+
+
 ```
 
-
-```r
+```{r reg-data-scaling-split}
 # Data scaling
 maxs <- apply(data, 2, max) 
 mins <- apply(data, 2, min) 
@@ -108,8 +106,7 @@ Here we will use the L1 norm, checking that each vector of weights + bias arrivi
 
 We can define all these parameters as well as the ones used by `keras`:
 
-
-```r
+```{r reg-parameters}
 # keras hyperparameters 
 my_loss <- "mse"
 my_metrics <- "mse"
@@ -127,8 +124,7 @@ my_max_norm <- list("l1_norm",1)
 
 Build the model with the custom constraints, then compile and fit the model:
 
-
-```r
+```{r reg-build-model}
 nn <- build_keras_model(p,
     af_string_list,
     h_neurons_vector,
@@ -152,37 +148,17 @@ history <- fit(nn,
 )
 
 nn
-#> Model: "sequential_22"
-#> ________________________________________________________________________________
-#>  Layer (type)                       Output Shape                    Param #     
-#> ================================================================================
-#>  layer__combined_l1_12 (Layer_Combi  (None, 50)                     200         
-#>  ned_L1)                                                                        
-#>  activation_12 (Activation)         (None, 50)                      0           
-#>  layer__combined_l1_13 (Layer_Combi  (None, 50)                     2550        
-#>  ned_L1)                                                                        
-#>  activation_13 (Activation)         (None, 50)                      0           
-#>  dense_21 (Dense)                   (None, 1)                       51          
-#> ================================================================================
-#> Total params: 2,801
-#> Trainable params: 2,801
-#> Non-trainable params: 0
-#> ________________________________________________________________________________
 ```
 
 We can visualize the training process:
 
-
-```r
+```{r reg-history}
 plot(history)
 ```
 
-![plot of chunk reg-history](figure/nn2poly-02-reg-history-1.png)
-
 And we can also visualize the NN predictions vs the original Y values.
 
-
-```r
+```{r reg-comparison-y-nn}
 # Obtain the predicted values with the NN to compare them
 prediction_NN <- predict(nn, test_x)
 
@@ -190,14 +166,11 @@ prediction_NN <- predict(nn, test_x)
 plot_diagonal(x_axis =  prediction_NN, y_axis =  test_y, xlab = "NN prediction", ylab = "Original Y")
 ```
 
-![plot of chunk reg-comparison-y-nn](figure/nn2poly-02-reg-comparison-y-nn-1.png)
-
 ### Using nn2poly to obtain  the polynomial
 
 After the NN has been trained (in this case with constraints) we extract and reshape the weights and NN parameters as explained in `vignette("nn2poly-01-introduction")`, with the only difference that the keras weights from the custom layers have a slightly different behavior as they already include the bias in the weights matrix:
 
-
-```r
+```{r reg-extract-weights}
 
 keras_weights <- keras::get_weights(nn)
 
@@ -207,27 +180,25 @@ nn_weights <- keras_weights[1:(n-2)]
 
 # Add last layer as this one has the bias separated, it is not a custom layer
 nn_weights[[n-1]] <- rbind(keras_weights[[n]], keras_weights[[n-1]])
+
 ```
 
 
 The activation functions that we used can be stored as:
 
-
-```r
+```{r reg-af-list}
 af_string_list <- list("tanh","tanh", "linear")
 ```
 
 And finally the order of the Taylor approximation that we are going to choose is 8 at each hidden layer. (The final polynomial order will be limited by `forced_max_Q=3`)
 
-
-```r
+```{r reg-taylor-orders}
 q_taylor_vector <- c(8, 8,  1) 
 ```
 
 When the input is in the desired shape, the nn2poly method can be applied:
 
-
-```r
+```{r reg-apply-nn2poly}
 final_poly <- nn2poly_algorithm(
   weights_list = nn_weights,
   af_string_list = af_string_list,
@@ -240,11 +211,11 @@ final_poly <- nn2poly_algorithm(
 
 ### Obtaining polynomial predictions
 
-
-```r
+```{r reg-polynomial-prediction}
 
 # Obtain the predicted values for the test data with our polynomial
 prediction_poly <- as.vector(eval_poly(x = test_x, poly = final_poly))
+
 ```
 
 
@@ -253,33 +224,19 @@ prediction_poly <- as.vector(eval_poly(x = test_x, poly = final_poly))
 - Diagonal plot. In this example, as we have imposed weight constraints the approximation is better.
 
 
-
-```r
+```{r reg-comparison-polynomial-nn}
 plot_diagonal(x_axis =  prediction_NN, y_axis =  prediction_poly, xlab = "NN prediction", ylab = "Polynomial prediction")
 ```
-
-![plot of chunk reg-comparison-polynomial-nn](figure/nn2poly-02-reg-comparison-polynomial-nn-1.png)
 
 - Representing the activation potentials, it can be seen that now they are centered around zero, where nn2poly works best.
 
 
-
-```r
+```{r reg-potentials}
 plot_taylor_and_activation_potentials(data = train,
                                     weights_list = nn_weights,
                                     af_string_list = af_string_list,
                                     q_taylor_vector = q_taylor_vector)
-#> [[1]]
 ```
-
-![plot of chunk reg-potentials](figure/nn2poly-02-reg-potentials-1.png)
-
-```
-#> 
-#> [[2]]
-```
-
-![plot of chunk reg-potentials](figure/nn2poly-02-reg-potentials-2.png)
 
 ## Simple classification example
 
@@ -290,8 +247,7 @@ In this example, instead of a regression problem we will show a classification e
 
 We will load the `iris` and scale the data:
 
-
-```r
+```{r class-data-loading}
 # Load the data
 data(iris)
 
@@ -309,8 +265,7 @@ n_class <- max(iris[,(p+1)])
 iris[,(p+1)] <- iris[,(p+1)] - 1
 ```
 
-
-```r
+```{r class-data-scaling}
 # Scale the data in the [-1,1] interval and separate train and test
 # Only the predictor variables are scaled, not the response as those will be
 # the different classes. 
@@ -340,8 +295,7 @@ We can now train the NN, following the same procedure as in the regression probl
 First we define the parameters and keras hyperparameters:
 
 
-
-```r
+```{r class-parameters}
 # keras hyperparameters 
 my_loss <- loss_sparse_categorical_crossentropy(from_logits = TRUE)
 my_metrics <- "accuracy"
@@ -359,8 +313,7 @@ my_max_norm <- list("l1_norm",1)
 
 Build the model with the custom constraints, then compile and fit the model:
 
-
-```r
+```{r class-build-model}
 nn <- build_keras_model(p,
     af_string_list,
     h_neurons_vector,
@@ -384,37 +337,17 @@ history <- fit(nn,
 )
 
 nn
-#> Model: "sequential_23"
-#> ________________________________________________________________________________
-#>  Layer (type)                       Output Shape                    Param #     
-#> ================================================================================
-#>  layer__combined_l1_14 (Layer_Combi  (None, 50)                     250         
-#>  ned_L1)                                                                        
-#>  activation_14 (Activation)         (None, 50)                      0           
-#>  layer__combined_l1_15 (Layer_Combi  (None, 50)                     2550        
-#>  ned_L1)                                                                        
-#>  activation_15 (Activation)         (None, 50)                      0           
-#>  dense_22 (Dense)                   (None, 3)                       153         
-#> ================================================================================
-#> Total params: 2,953
-#> Trainable params: 2,953
-#> Non-trainable params: 0
-#> ________________________________________________________________________________
 ```
 
 We can visualize the training process:
 
-
-```r
+```{r class-history}
 plot(history)
 ```
 
-![plot of chunk class-history](figure/nn2poly-02-class-history-1.png)
-
 In this case, to asses the NN accuracy we have to transform the nn output into a probability:
 
-
-```r
+```{r class-probability-model}
 probability_model <- keras_model_sequential() %>%
   nn() %>%
   layer_activation_softmax() %>%
@@ -423,51 +356,21 @@ probability_model <- keras_model_sequential() %>%
 
 And predict the results for the test data:
 
-
-```r
+```{r class-comparison-y-nn}
 # Obtain the predicted classes with the NN to compare them
 prediction_NN_class <- predict(probability_model, test_x)
 
 # Also, the linear output can be predicted before the probability model
 prediction_NN <- predict(nn, test_x)
+
 ```
 We can use here a confusion matrix to visualize the results, where we can see that the NN correctly predicts the classes of each observation:
 
-
-```r
+```{r class-confusion-matrix-nn}
 # Create a confusion matrix
 cm <- caret::confusionMatrix(as.factor(prediction_NN_class), as.factor(test_y))
 cm
-#> Confusion Matrix and Statistics
-#> 
-#>           Reference
-#> Prediction  0  1  2
-#>          0 15  0  0
-#>          1  0 11  0
-#>          2  0  0 12
-#> 
-#> Overall Statistics
-#>                                      
-#>                Accuracy : 1          
-#>                  95% CI : (0.9075, 1)
-#>     No Information Rate : 0.3947     
-#>     P-Value [Acc > NIR] : 4.568e-16  
-#>                                      
-#>                   Kappa : 1          
-#>                                      
-#>  Mcnemar's Test P-Value : NA         
-#> 
-#> Statistics by Class:
-#> 
-#>                      Class: 0 Class: 1 Class: 2
-#> Sensitivity            1.0000   1.0000   1.0000
-#> Specificity            1.0000   1.0000   1.0000
-#> Pos Pred Value         1.0000   1.0000   1.0000
-#> Neg Pred Value         1.0000   1.0000   1.0000
-#> Prevalence             0.3947   0.2895   0.3158
-#> Detection Rate         0.3947   0.2895   0.3158
-#> Detection Prevalence   0.3947   0.2895   0.3158
-#> Balanced Accuracy      1.0000   1.0000   1.0000
+
 ```
 
 
@@ -475,8 +378,7 @@ cm
 
 After the NN has been trained, we need to extract and reshape the parameters as explained in the regression case:
 
-
-```r
+```{r class-weights}
 keras_weights <- keras::get_weights(nn)
 
 n <- length(keras_weights)
@@ -490,23 +392,20 @@ nn_weights[[n-1]] <- rbind(keras_weights[[n]], keras_weights[[n-1]])
 
 The activation functions that we used can be stored as:
 
-
-```r
+```{r class-af}
 af_string_list <- list("tanh","tanh", "linear")
 ```
 
 
 And finally the order of the Taylor approximation that we are going to choose is 8 at each hidden layer. (The final polynomial order will be limited by `forced_max_Q=3`)
 
-
-```r
+```{r class-q-taylor}
 q_taylor_vector <- c(8, 8,  1) 
 ```
 
 When the input is in the desired shape, the nn2poly method can be applied:
 
-
-```r
+```{r class-apply-nn2poly}
 final_poly <- nn2poly_algorithm(
   weights_list = nn_weights,
   af_string_list = af_string_list,
@@ -520,8 +419,7 @@ final_poly <- nn2poly_algorithm(
 
 ### Obtaining polynomial predictions
 
-
-```r
+```{r class-polynomial-prediction}
 
 # Obtain the predicted values for the test data with our Polynomial Regression
 prediction_poly_matrix <- eval_poly(x = test_x, poly = final_poly)
@@ -533,6 +431,7 @@ probability_poly <- keras_model_sequential() %>%
 
 # Class prediction with the polynomial outputs (one row for each polynomial)
 prediction_poly_class <- predict(probability_poly,t(prediction_poly_matrix))
+
 ```
 
 
@@ -540,48 +439,17 @@ prediction_poly_class <- predict(probability_poly,t(prediction_poly_matrix))
 ### Visualising the results
 
 
-
-```r
+```{r class-confusion-matrix-poly}
 
 # Confussion matrix between NN class prediction and polynomial class prediction
 cm <- caret::confusionMatrix(as.factor(prediction_NN_class), as.factor(prediction_poly_class))
 cm
-#> Confusion Matrix and Statistics
-#> 
-#>           Reference
-#> Prediction  0  1  2
-#>          0 15  0  0
-#>          1  0 11  0
-#>          2  0  0 12
-#> 
-#> Overall Statistics
-#>                                      
-#>                Accuracy : 1          
-#>                  95% CI : (0.9075, 1)
-#>     No Information Rate : 0.3947     
-#>     P-Value [Acc > NIR] : 4.568e-16  
-#>                                      
-#>                   Kappa : 1          
-#>                                      
-#>  Mcnemar's Test P-Value : NA         
-#> 
-#> Statistics by Class:
-#> 
-#>                      Class: 0 Class: 1 Class: 2
-#> Sensitivity            1.0000   1.0000   1.0000
-#> Specificity            1.0000   1.0000   1.0000
-#> Pos Pred Value         1.0000   1.0000   1.0000
-#> Neg Pred Value         1.0000   1.0000   1.0000
-#> Prevalence             0.3947   0.2895   0.3158
-#> Detection Rate         0.3947   0.2895   0.3158
-#> Detection Prevalence   0.3947   0.2895   0.3158
-#> Balanced Accuracy      1.0000   1.0000   1.0000
+
 ```
 
 We can compare, for each polynomial, its output with the the linear output of the NN. In this case, as constraints have been used in training, the results are much closer than what happened in `vignette("nn2poly-01-introduction")`
 
-
-```r
+```{r class-diagonal-plot}
 for (i in 1:3){
   print(
     plot_diagonal(x_axis =  prediction_NN[,i], 
@@ -592,27 +460,14 @@ for (i in 1:3){
 }
 ```
 
-![plot of chunk class-diagonal-plot](figure/nn2poly-02-class-diagonal-plot-1.png)![plot of chunk class-diagonal-plot](figure/nn2poly-02-class-diagonal-plot-2.png)![plot of chunk class-diagonal-plot](figure/nn2poly-02-class-diagonal-plot-3.png)
-
 Finally, activation potentials can be visualized as follows, where it can be seen that the constraints have made the activations to be closer to zero than in the unrestricted case. However, there is still some dispersion in them that creates the slight deviations seen in the diagonal plots. However, the 
 
-
-```r
+```{r potentials}
 plot_taylor_and_activation_potentials(data = train,
                                     weights_list = nn_weights,
                                     af_string_list = af_string_list,
                                     q_taylor_vector = q_taylor_vector)
-#> [[1]]
 ```
-
-![plot of chunk potentials](figure/nn2poly-02-potentials-1.png)
-
-```
-#> 
-#> [[2]]
-```
-
-![plot of chunk potentials](figure/nn2poly-02-potentials-2.png)
 
 
 
