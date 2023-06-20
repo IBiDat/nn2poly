@@ -1,9 +1,10 @@
 #' Auxiliar function used to transform some of the used activation functions
-#' in the nerural network from their string name into an R function.
+#' in the neural network from their string name into an R function.
 #'
-#' @param af_string_list list of strings
+#' @param af_string_list List of strings containing the predefined possible
+#' activation functions, i.e., "softplus", "tanh", "sigmoid" or "linear".
 #'
-#' @return list of functions
+#' @return List of R functions associated with the string names provided.
 #' @export
 #'
 change_string_to_function <- function(af_string_list) {

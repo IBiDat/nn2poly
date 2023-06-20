@@ -1,10 +1,10 @@
 
 #' Check weight's vector constraints (including bias)
 #'
-#' @param weights list of matrices with the weights of each layer
-#' @param maxnorm list of 2 elements: the name of the used norm and its max value
+#' @param weights List of matrices with the weights of each layer.
+#' @param maxnorm List of 2 elements: the name of the used norm and its max value.
 #'
-#' @return list across all layers with a vector containing the norms of each weight vector
+#' @return List across all layers with a vector containing the norms of each weight vector.
 #' @export
 #'
 check_weight_constraints <- function(weights, maxnorm) {

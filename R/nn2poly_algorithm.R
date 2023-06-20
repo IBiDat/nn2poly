@@ -27,7 +27,7 @@
 #'
 #' @param store_coeffs Boolean that determines if all polynomials computed in
 #' the internal layers have to be stored and given in the output (TRUE), or if
-#' only the last layer is needed (FALSE).
+#' only the last layer is needed (FALSE). Default is FALSE.
 #'
 #' @param forced_max_Q Optional argument: integer that determines the maximum order
 #' that we will force in the final polynomial, discarding terms of higher order
