@@ -29,6 +29,8 @@
 #' as used in [`nn2poly_algorithm`].
 #' @param my_max_norm List containing type of norm and maximum value. See
 #' documentation on how to constrain NN weights.
+#' @param taylor_interval optional parameter determining the interval in which
+#' the Taylor expansion is represented. Default is 1.5.
 #'
 #' @return A list of plots.
 #' @export
@@ -39,7 +41,8 @@ plot_taylor_and_activation_potentials <- function(data,
                                                 af_string_list,
                                                 q_taylor_vector,
                                                 forced_max_Q,
-                                                my_max_norm) {
+                                                my_max_norm,
+                                                taylor_interval = 1.5) {
   if (!requireNamespace("ggplot2", quietly = TRUE))
     stop("package 'ggplot2' is required for this functionality", call.=FALSE)
 
@@ -114,22 +117,11 @@ plot_taylor_and_activation_potentials <- function(data,
 
     ################## Plot creation ########################
 
-
-    # Depending on the function we need to obtain an adequate interval:
-    if (af_string_list[[k]] == "tanh") {
-      taylor_interval <- 1.1
-    } else if (af_string_list[[k]] == "sigmoid") {
-      taylor_interval <- 2
-    } else if (af_string_list[[k]] == "softplus") {
-      taylor_interval <- 2
-    }
-
     # Create the x values for the Taylor plot
     x <- seq(-taylor_interval, taylor_interval, length.out = 1000)
 
     # create data frame and create an empty plot with only the density of those values
     df.density <- as.data.frame(activation_potentials_vectorized)
-    names(df.density) <- c("value")
 
     #### Taylor graph ######
     # compute the true function
@@ -158,7 +150,6 @@ plot_taylor_and_activation_potentials <- function(data,
       ggplot2::geom_line(data = df.plot, ggplot2::aes(x, yp, color ="red")) +
       ggplot2::geom_line(data = df.plot, ggplot2::aes(x, error, color = "blue")) +
       ggplot2::geom_hline(yintercept = 0, color = "gray", linetype = "dashed") +
-      ggplot2::xlim(-1, 1) +
       ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5, size = 10)) +
       ggplot2::theme(axis.text = ggplot2::element_text(size = 10), axis.title = ggplot2::element_text(size = 10)) +
       ggplot2::scale_color_identity(name = "Legend",
@@ -170,12 +161,10 @@ plot_taylor_and_activation_potentials <- function(data,
 
     # Create density plot
     density_plot <- cowplot::axis_canvas(plot.taylor.simple, axis = "x") +
-      ggplot2::xlim(-1, 1) +
       ggplot2::geom_density(data = df.density,
-                   ggplot2::aes(x = synaptic_potentials_vectorized, y = ggplot2::after_stat(density)+1),
+                   ggplot2::aes(x = activation_potentials_vectorized, y = ggplot2::after_stat(log10(density+1))),
                    color = "darkgreen",
                    fill = "lightgreen", trim=TRUE) +
-      ggplot2::scale_y_log10() +
       ggplot2::theme_void() +
       ggplot2::ylab(name_plot) +
       ggplot2::theme(axis.title.y=ggplot2::element_text(hjust = -1, angle=0, vjust=1,

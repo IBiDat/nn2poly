@@ -10,7 +10,8 @@ plot_taylor_and_activation_potentials(
   af_string_list,
   q_taylor_vector,
   forced_max_Q,
-  my_max_norm
+  my_max_norm,
+  taylor_interval = 1.5
 )
 }
 \arguments{
@@ -41,6 +42,9 @@ as used in \code{\link{nn2poly_algorithm}}.}
 
 \item{my_max_norm}{List containing type of norm and maximum value. See
 documentation on how to constrain NN weights.}
+
+\item{taylor_interval}{optional parameter determining the interval in which
+the Taylor expansion is represented. Default is 1.5.}
 }
 \value{
 A list of plots.
