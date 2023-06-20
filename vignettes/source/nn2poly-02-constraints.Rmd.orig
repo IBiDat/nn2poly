@@ -237,7 +237,9 @@ plot_diagonal(x_axis =  prediction_NN, y_axis =  prediction_poly, xlab = "NN pre
 plot_taylor_and_activation_potentials(data = train,
                                     weights_list = nn_weights,
                                     af_string_list = af_string_list,
-                                    q_taylor_vector = q_taylor_vector)
+                                    q_taylor_vector = q_taylor_vector,
+                                    forced_max_Q = 3,
+                                    my_max_norm = my_max_norm)
 ```
 
 ## Simple classification example
@@ -468,7 +470,9 @@ Finally, activation potentials can be visualized as follows, where it can be see
 plot_taylor_and_activation_potentials(data = train,
                                     weights_list = nn_weights,
                                     af_string_list = af_string_list,
-                                    q_taylor_vector = q_taylor_vector)
+                                    q_taylor_vector = q_taylor_vector,
+                                    forced_max_Q = 3,
+                                    my_max_norm = my_max_norm)
 ```
 
 

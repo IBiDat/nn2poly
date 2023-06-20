@@ -12,9 +12,6 @@ vignette: >
 ---
 
 
-
-
-
 # Overall package goal
 
 The main objective of `nn2poly` is to obtain a representation of a feed forward artificial neural network (like a multilayered perceptron) in terms of a polynomial representation. The coefficients of such polynomials are obtained by applying first a Taylor expansion at each activation function in the neural network. Then this expansions and the given neural network weights are joint using combinatorial properties, obtaining a final value for the polynomial coefficients.
@@ -154,13 +151,13 @@ nn %>% layer_dense(units = 1,
                   activation = "linear")
 
 nn
-#> Model: "sequential_60"
+#> Model: "sequential_12"
 #> __________________________________________________________________________________________________________________________
 #>  Layer (type)                                         Output Shape                                     Param #            
 #> ==========================================================================================================================
-#>  dense_63 (Dense)                                     (None, 10)                                       40                 
-#>  dense_64 (Dense)                                     (None, 10)                                       110                
-#>  dense_65 (Dense)                                     (None, 1)                                        11                 
+#>  dense_14 (Dense)                                     (None, 10)                                       40                 
+#>  dense_15 (Dense)                                     (None, 10)                                       110                
+#>  dense_16 (Dense)                                     (None, 1)                                        11                 
 #> ==========================================================================================================================
 #> Total params: 161
 #> Trainable params: 161
@@ -376,7 +373,7 @@ plot_diagonal(x_axis =  prediction_NN, y_axis =  prediction_poly, xlab = "NN pre
 
 ![](figure/nn2poly-01-reg-comparison-polynomial-nn-1.png)
 
-- Another convenient plot to show how the algorithm is affected by each layer can be obtained with `plot_taylor_and_activation_potentials()`, where the activation potentials at each neuron are computed and presented over the Taylor expansion approximation of the activation function at each layer. In this case, as we have not used constraints in the NN training, the activation potentials are not strictily centered around zero,
+- Another convenient plot to show how the algorithm is affected by each layer can be obtained with `plot_taylor_and_activation_potentials()`, where the activation potentials at each neuron are computed and presented over the Taylor expansion approximation of the activation function at each layer. In this case, as we have not used constraints in the NN training, the activation potentials are not strictly centered around zero.
 
 
 
@@ -384,7 +381,9 @@ plot_diagonal(x_axis =  prediction_NN, y_axis =  prediction_poly, xlab = "NN pre
 plot_taylor_and_activation_potentials(data = train,
                                     weights_list = nn_weights,
                                     af_string_list = af_string_list,
-                                    q_taylor_vector = q_taylor_vector)
+                                    q_taylor_vector = q_taylor_vector,
+                                    forced_max_Q = 3,
+                                    my_max_norm = list("unconstrained",1))
 #> [[1]]
 ```
 
@@ -396,6 +395,13 @@ plot_taylor_and_activation_potentials(data = train,
 ```
 
 ![](figure/nn2poly-01-reg-potentials-2.png)
+
+```
+#> 
+#> [[3]]
+```
+
+![](figure/nn2poly-01-reg-potentials-3.png)
 
 
 ## Simple classification example
@@ -474,13 +480,13 @@ nn %>% layer_dense(units = 100,
 nn %>% layer_dense(units = n_class)
 
 nn
-#> Model: "sequential_61"
+#> Model: "sequential_13"
 #> __________________________________________________________________________________________________________________________
 #>  Layer (type)                                         Output Shape                                     Param #            
 #> ==========================================================================================================================
-#>  dense_66 (Dense)                                     (None, 100)                                      500                
-#>  dense_67 (Dense)                                     (None, 100)                                      10100              
-#>  dense_68 (Dense)                                     (None, 3)                                        303                
+#>  dense_17 (Dense)                                     (None, 100)                                      500                
+#>  dense_18 (Dense)                                     (None, 100)                                      10100              
+#>  dense_19 (Dense)                                     (None, 3)                                        303                
 #> ==========================================================================================================================
 #> Total params: 10,903
 #> Trainable params: 10,903
@@ -846,7 +852,9 @@ In order to try to identify where the problem is arising, we can use the synapti
 plot_taylor_and_activation_potentials(data = train,
                                     weights_list = nn_weights,
                                     af_string_list = af_string_list,
-                                    q_taylor_vector = q_taylor_vector)
+                                    q_taylor_vector = q_taylor_vector,
+                                    forced_max_Q = 3,
+                                    my_max_norm = list("unconstrained",1))
 #> [[1]]
 ```
 
@@ -858,6 +866,13 @@ plot_taylor_and_activation_potentials(data = train,
 ```
 
 ![](figure/nn2poly-01-potentials-2.png)
+
+```
+#> 
+#> [[3]]
+```
+
+![](figure/nn2poly-01-potentials-3.png)
 
 
 
