@@ -151,15 +151,15 @@ history <- fit(nn,
 )
 
 nn
-#> Model: "sequential_64"
+#> Model: "sequential_16"
 #> __________________________________________________________________________________________________________________________
 #>  Layer (type)                                         Output Shape                                     Param #            
 #> ==========================================================================================================================
-#>  layer__combined_l1_30 (Layer_Combined_L1)            (None, 50)                                       200                
-#>  activation_30 (Activation)                           (None, 50)                                       0                  
-#>  layer__combined_l1_31 (Layer_Combined_L1)            (None, 50)                                       2550               
-#>  activation_31 (Activation)                           (None, 50)                                       0                  
-#>  dense_69 (Dense)                                     (None, 1)                                        51                 
+#>  layer__combined_l1_4 (Layer_Combined_L1)             (None, 50)                                       200                
+#>  activation_4 (Activation)                            (None, 50)                                       0                  
+#>  layer__combined_l1_5 (Layer_Combined_L1)             (None, 50)                                       2550               
+#>  activation_5 (Activation)                            (None, 50)                                       0                  
+#>  dense_20 (Dense)                                     (None, 1)                                        51                 
 #> ==========================================================================================================================
 #> Total params: 2,801
 #> Trainable params: 2,801
@@ -265,7 +265,9 @@ plot_diagonal(x_axis =  prediction_NN, y_axis =  prediction_poly, xlab = "NN pre
 plot_taylor_and_activation_potentials(data = train,
                                     weights_list = nn_weights,
                                     af_string_list = af_string_list,
-                                    q_taylor_vector = q_taylor_vector)
+                                    q_taylor_vector = q_taylor_vector,
+                                    forced_max_Q = 3,
+                                    my_max_norm = my_max_norm)
 #> [[1]]
 ```
 
@@ -277,6 +279,13 @@ plot_taylor_and_activation_potentials(data = train,
 ```
 
 ![](figure/nn2poly-02-reg-potentials-2.png)
+
+```
+#> 
+#> [[3]]
+```
+
+![](figure/nn2poly-02-reg-potentials-3.png)
 
 ## Simple classification example
 
@@ -380,15 +389,15 @@ history <- fit(nn,
 )
 
 nn
-#> Model: "sequential_65"
+#> Model: "sequential_17"
 #> __________________________________________________________________________________________________________________________
 #>  Layer (type)                                         Output Shape                                     Param #            
 #> ==========================================================================================================================
-#>  layer__combined_l1_32 (Layer_Combined_L1)            (None, 50)                                       250                
-#>  activation_32 (Activation)                           (None, 50)                                       0                  
-#>  layer__combined_l1_33 (Layer_Combined_L1)            (None, 50)                                       2550               
-#>  activation_33 (Activation)                           (None, 50)                                       0                  
-#>  dense_70 (Dense)                                     (None, 3)                                        153                
+#>  layer__combined_l1_6 (Layer_Combined_L1)             (None, 50)                                       250                
+#>  activation_6 (Activation)                            (None, 50)                                       0                  
+#>  layer__combined_l1_7 (Layer_Combined_L1)             (None, 50)                                       2550               
+#>  activation_7 (Activation)                            (None, 50)                                       0                  
+#>  dense_21 (Dense)                                     (None, 3)                                        153                
 #> ==========================================================================================================================
 #> Total params: 2,953
 #> Trainable params: 2,953
@@ -595,7 +604,9 @@ Finally, activation potentials can be visualized as follows, where it can be see
 plot_taylor_and_activation_potentials(data = train,
                                     weights_list = nn_weights,
                                     af_string_list = af_string_list,
-                                    q_taylor_vector = q_taylor_vector)
+                                    q_taylor_vector = q_taylor_vector,
+                                    forced_max_Q = 3,
+                                    my_max_norm = my_max_norm)
 #> [[1]]
 ```
 
@@ -607,6 +618,13 @@ plot_taylor_and_activation_potentials(data = train,
 ```
 
 ![](figure/nn2poly-02-potentials-2.png)
+
+```
+#> 
+#> [[3]]
+```
+
+![](figure/nn2poly-02-potentials-3.png)
 
 
 

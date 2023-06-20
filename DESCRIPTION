@@ -22,6 +22,8 @@ Imports:
     Rcpp
 Suggests:
     ggplot2,
+    cowplot,
+    patchwork,
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)

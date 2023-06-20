@@ -2,33 +2,58 @@
 % Please edit documentation in R/plot_taylor_and_activation_potentials.R
 \name{plot_taylor_and_activation_potentials}
 \alias{plot_taylor_and_activation_potentials}
-\title{Function that allows to take a NN and the data input values
-and plot the distribution of data activation potentials
-(sum of input values * weights) at all neurons together AT EACH HIDDEN LAYER
-with the Taylor expansion used in the activation functions.}
+\title{Plots activation potentials and Taylor expansion.}
 \usage{
 plot_taylor_and_activation_potentials(
   data,
   weights_list,
   af_string_list,
-  q_taylor_vector
+  q_taylor_vector,
+  forced_max_Q,
+  my_max_norm,
+  taylor_interval = 1.5
 )
 }
 \arguments{
-\item{data}{a}
+\item{data}{Matrix or data frame containing the predictor variables (X)
+to be used as input to compute their activation potentials. The response
+variable column should not be included.}
 
-\item{weights_list}{a}
+\item{weights_list}{\code{list} of length L ( number of hidden layers + 1)
+containing the weights matrix for each layer.
+The expected shape of such matrices at any layer L is of the form
+$(h_(l-1) + 1)*(h_l)$, that is, the number of rows is the number of neurons
+in the previous layer plus the bias vector, and the number of columns is the
+number of neurons in the current layer L. Therefore, each column
+corresponds to the weight vector affecting each neuron in that layer.}
 
-\item{af_string_list}{a}
+\item{af_string_list}{\code{list} of length L containing \code{character}
+strings with the names of the activation function used at each layer, as
+used in \code{\link{nn2poly_algorithm}}.}
 
-\item{q_taylor_vector}{a}
+\item{q_taylor_vector}{\code{vector} of length L containing the degree
+(\code{numeric}) up to which Taylor expansion should be performed at each
+layer, as used in \code{\link{nn2poly_algorithm}}.}
+
+\item{forced_max_Q}{Integer that determines the maximum order
+that we will force in the final polynomial, discarding terms of higher order
+that would naturally arise using all the orders in \code{q_taylor_vector},
+as used in \code{\link{nn2poly_algorithm}}.}
+
+\item{my_max_norm}{List containing type of norm and maximum value. See
+documentation on how to constrain NN weights.}
+
+\item{taylor_interval}{optional parameter determining the interval in which
+the Taylor expansion is represented. Default is 1.5.}
 }
 \value{
-a
+A list of plots.
 }
 \description{
 Function that allows to take a NN and the data input values
 and plot the distribution of data activation potentials
-(sum of input values * weights) at all neurons together AT EACH HIDDEN LAYER
-with the Taylor expansion used in the activation functions.
+(sum of input values * weights) at all neurons together at each layer
+with the Taylor expansion used in the activation functions. If any layer
+is \code{'linear'} (usually will be the output), then that layer will not
+be an approximation as Taylor expansion is not needed.
 }
