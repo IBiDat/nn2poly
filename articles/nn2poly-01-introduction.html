@@ -142,7 +142,7 @@ to build and train the neural networks.</p>
 <span></span>
 <span><span class="co"># For reproducibility</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
-<span><span class="fu">tensorflow</span><span class="fu">::</span><span class="va">tf</span><span class="op">$</span><span class="va">random</span><span class="op">$</span><span class="fu">set_seed</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">tensorflow</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/tensorflow/man/tf.html" class="external-link">tf</a></span><span class="op">$</span><span class="va">random</span><span class="op">$</span><span class="fu">set_seed</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="simple-regression-example">Simple regression example<a class="anchor" aria-label="anchor" href="#simple-regression-example"></a>
 </h3>
@@ -245,16 +245,16 @@ constraints when training the neural network weights. This is covered in
 </tr></tbody></table>
 <p>First, we build the model.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">nn</span> <span class="op">&lt;-</span> <span class="fu">keras_model_sequential</span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">nn</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/keras_model_sequential.html" class="external-link">keras_model_sequential</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">nn</span> <span class="op">%&gt;%</span> <span class="fu">layer_dense</span><span class="op">(</span>units <span class="op">=</span> <span class="fl">10</span>,</span>
+<span><span class="va">nn</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/layer_dense.html" class="external-link">layer_dense</a></span><span class="op">(</span>units <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>                  activation <span class="op">=</span> <span class="st">"tanh"</span>,</span>
 <span>                  input_shape <span class="op">=</span> <span class="va">p</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">nn</span> <span class="op">%&gt;%</span> <span class="fu">layer_dense</span><span class="op">(</span>units <span class="op">=</span> <span class="fl">10</span>,</span>
+<span><span class="va">nn</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/layer_dense.html" class="external-link">layer_dense</a></span><span class="op">(</span>units <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>                  activation <span class="op">=</span> <span class="st">"tanh"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">nn</span> <span class="op">%&gt;%</span> <span class="fu">layer_dense</span><span class="op">(</span>units <span class="op">=</span> <span class="fl">1</span>,</span>
+<span><span class="va">nn</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/layer_dense.html" class="external-link">layer_dense</a></span><span class="op">(</span>units <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>                  activation <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">nn</span></span>
@@ -272,13 +272,13 @@ constraints when training the neural network weights. This is covered in
 <span><span class="co">#&gt; __________________________________________________________________________________________________________________________</span></span></code></pre></div>
 <p>Compile the model:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">compile</span><span class="op">(</span><span class="va">nn</span>,</span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://generics.r-lib.org/reference/compile.html" class="external-link">compile</a></span><span class="op">(</span><span class="va">nn</span>,</span>
 <span>        loss <span class="op">=</span> <span class="st">"mse"</span>,</span>
-<span>        optimizer <span class="op">=</span> <span class="fu">optimizer_adam</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>        optimizer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/optimizer_adam.html" class="external-link">optimizer_adam</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>        metrics <span class="op">=</span> <span class="st">"mse"</span><span class="op">)</span></span></code></pre></div>
 <p>And train it:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">history</span> <span class="op">&lt;-</span> <span class="fu">fit</span><span class="op">(</span><span class="va">nn</span>,</span>
+<code class="sourceCode R"><span><span class="va">history</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">nn</span>,</span>
 <span>               <span class="va">train_x</span>,</span>
 <span>               <span class="va">train_y</span>,</span>
 <span>               verbose <span class="op">=</span> <span class="fl">0</span>,</span>
@@ -343,7 +343,7 @@ matrices of dimension (input * output) and bias vectors (1 * output), so
 we need to add the bias as the first row of a matrix ((1+input) *
 output).</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">keras_weights</span> <span class="op">&lt;-</span> <span class="fu">keras</span><span class="fu">::</span><span class="fu">get_weights</span><span class="op">(</span><span class="va">nn</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">keras_weights</span> <span class="op">&lt;-</span> <span class="fu">keras</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/keras/man/get_weights.html" class="external-link">get_weights</a></span><span class="op">(</span><span class="va">nn</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Due to keras giving weights separated from the bias, we have twice the</span></span>
 <span><span class="co"># elements that we want:</span></span>
@@ -572,16 +572,16 @@ training. Therefore, nn2poly will be used to obtain a polynomial that
 approximates this nn with linear outputs and then its results will also
 be transformed ito predict the highest probability class.</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">nn</span> <span class="op">&lt;-</span> <span class="fu">keras_model_sequential</span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">nn</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/keras_model_sequential.html" class="external-link">keras_model_sequential</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">nn</span> <span class="op">%&gt;%</span> <span class="fu">layer_dense</span><span class="op">(</span>units <span class="op">=</span> <span class="fl">100</span>,</span>
+<span><span class="va">nn</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/layer_dense.html" class="external-link">layer_dense</a></span><span class="op">(</span>units <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>                  activation <span class="op">=</span> <span class="st">"tanh"</span>,</span>
 <span>                  input_shape <span class="op">=</span> <span class="va">p</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">nn</span> <span class="op">%&gt;%</span> <span class="fu">layer_dense</span><span class="op">(</span>units <span class="op">=</span> <span class="fl">100</span>,</span>
+<span><span class="va">nn</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/layer_dense.html" class="external-link">layer_dense</a></span><span class="op">(</span>units <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>                  activation <span class="op">=</span> <span class="st">"tanh"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">nn</span> <span class="op">%&gt;%</span> <span class="fu">layer_dense</span><span class="op">(</span>units <span class="op">=</span> <span class="va">n_class</span><span class="op">)</span></span>
+<span><span class="va">nn</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/layer_dense.html" class="external-link">layer_dense</a></span><span class="op">(</span>units <span class="op">=</span> <span class="va">n_class</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">nn</span></span>
 <span><span class="co">#&gt; Model: "sequential_13"</span></span>
@@ -598,13 +598,13 @@ be transformed ito predict the highest probability class.</p>
 <span><span class="co">#&gt; __________________________________________________________________________________________________________________________</span></span></code></pre></div>
 <p>Compile the model:</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">compile</span><span class="op">(</span><span class="va">nn</span>,</span>
-<span>        loss <span class="op">=</span> <span class="fu">loss_sparse_categorical_crossentropy</span><span class="op">(</span>from_logits <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
-<span>        optimizer <span class="op">=</span> <span class="fu">optimizer_adam</span><span class="op">(</span><span class="op">)</span>,</span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://generics.r-lib.org/reference/compile.html" class="external-link">compile</a></span><span class="op">(</span><span class="va">nn</span>,</span>
+<span>        loss <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/loss-functions.html" class="external-link">loss_sparse_categorical_crossentropy</a></span><span class="op">(</span>from_logits <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>        optimizer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/optimizer_adam.html" class="external-link">optimizer_adam</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>        metrics <span class="op">=</span> <span class="st">"accuracy"</span><span class="op">)</span></span></code></pre></div>
 <p>And train it:</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">history</span> <span class="op">&lt;-</span> <span class="fu">fit</span><span class="op">(</span><span class="va">nn</span>,</span>
+<code class="sourceCode R"><span><span class="va">history</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">nn</span>,</span>
 <span>               <span class="va">train_x</span>,</span>
 <span>               <span class="va">train_y</span>,</span>
 <span>               verbose <span class="op">=</span> <span class="fl">0</span>,</span>
@@ -618,10 +618,10 @@ be transformed ito predict the highest probability class.</p>
 <p>In this case, to asses the NN accuracy we have to transform the nn
 output into a probability:</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">probability_model</span> <span class="op">&lt;-</span> <span class="fu">keras_model_sequential</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
-<span>  <span class="fu">nn</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
-<span>  <span class="fu">layer_activation_softmax</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
-<span>  <span class="fu">layer_lambda</span><span class="op">(</span><span class="va">k_argmax</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">probability_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/keras_model_sequential.html" class="external-link">keras_model_sequential</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu">nn</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/keras/man/layer_activation_softmax.html" class="external-link">layer_activation_softmax</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/keras/man/layer_lambda.html" class="external-link">layer_lambda</a></span><span class="op">(</span><span class="va">k_argmax</span><span class="op">)</span></span></code></pre></div>
 <p>And predict the results for the test data:</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Obtain the predicted classes with the NN to compare them</span></span>
@@ -673,7 +673,7 @@ observation:</p>
 <p>After the NN has been trained, we need to extract and reshape the
 parameters as explained in the regression case:</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">keras_weights</span> <span class="op">&lt;-</span> <span class="fu">keras</span><span class="fu">::</span><span class="fu">get_weights</span><span class="op">(</span><span class="va">nn</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">keras_weights</span> <span class="op">&lt;-</span> <span class="fu">keras</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/keras/man/get_weights.html" class="external-link">get_weights</a></span><span class="op">(</span><span class="va">nn</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Due to keras giving weights separated from the bias, we have twice the</span></span>
 <span><span class="co"># elements that we want:</span></span>
@@ -848,9 +848,9 @@ time:</p>
 <span><span class="va">prediction_poly_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/eval_poly.html">eval_poly</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">test_x</span>, poly <span class="op">=</span> <span class="va">final_poly</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Define probability model with keras fro the polynomial outputs</span></span>
-<span><span class="va">probability_poly</span> <span class="op">&lt;-</span> <span class="fu">keras_model_sequential</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
-<span>  <span class="fu">layer_activation_softmax</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
-<span>  <span class="fu">layer_lambda</span><span class="op">(</span><span class="va">k_argmax</span><span class="op">)</span></span>
+<span><span class="va">probability_poly</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/keras_model_sequential.html" class="external-link">keras_model_sequential</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/keras/man/layer_activation_softmax.html" class="external-link">layer_activation_softmax</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/keras/man/layer_lambda.html" class="external-link">layer_lambda</a></span><span class="op">(</span><span class="va">k_argmax</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Class prediction with the polynomial outputs</span></span>
 <span><span class="va">prediction_poly_class</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">probability_poly</span>,<span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">prediction_poly_matrix</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
