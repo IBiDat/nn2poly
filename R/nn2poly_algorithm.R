@@ -21,7 +21,7 @@
 #' layer.
 #'
 #' @param all_partitions Optional argument containing the needed multipartitions
-#' as list of lists of lists. If NULL, the function computes it first. This
+#' as list of lists of lists. If \code{NULL}, the function computes it first. This
 #' step can be computationally expensive and it is encouraged that the
 #' multipartitions are stored and reused when possible.
 #'
@@ -269,8 +269,6 @@ nn2poly_algorithm <- function(weights_list,
 #' @return List of length 2 where the first element is a list with the labels
 #' and the second element is a list with the partitions.
 #'
-#' @examples
-#' obtain_partitions_with_labels(2, 3)
 #'
 #'
 

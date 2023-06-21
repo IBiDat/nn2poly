@@ -5,7 +5,6 @@
 #' @param maxnorm list of 2 elements: the name of the used norm and its max value
 #'
 #' @return list across all layers with a vector containing the norms of each weight vector
-#' @export
 #'
 check_weight_constraints <- function(weights, maxnorm) {
   print("The used norm is:")
