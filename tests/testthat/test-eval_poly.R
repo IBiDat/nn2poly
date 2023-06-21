@@ -1,4 +1,4 @@
-test_that("single polynomial evaluation and single observation works", {
+test_that("Single polynomial evaluation and single observation works", {
 
   # With intercept and ordered labels
   poly <- list()
@@ -17,7 +17,7 @@ test_that("single polynomial evaluation and single observation works", {
   expect_equal(eval_poly(x,poly), as.matrix(4.5))
 })
 
-test_that("multiple polynomial evaluation and single observation works", {
+test_that("Multiple polynomial evaluation and single observation works", {
 
   # Without intercept
   poly <- list()
@@ -39,7 +39,7 @@ test_that("multiple polynomial evaluation and single observation works", {
 })
 
 
-test_that("singele polynomial evaluation and multiple observations (matrix) works", {
+test_that("Single polynomial evaluation and multiple observations (matrix) works", {
 
   # Without intercept
   poly <- list()
@@ -50,7 +50,7 @@ test_that("singele polynomial evaluation and multiple observations (matrix) work
   expect_equal(eval_poly(x,poly), t(as.matrix(c(0,1))))
 })
 
-test_that("multiple polynomial evaluation and multiple observations (matrix) works", {
+test_that("Multiple polynomial evaluation and multiple observations (matrix) works", {
 
   # Without intercept
   poly <- list()
