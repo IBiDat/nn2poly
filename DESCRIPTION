@@ -23,13 +23,11 @@ Imports:
     pracma,
     Rcpp
 Suggests:
-    cowplot,
     ggplot2,
-    keras,
+    cowplot,
     patchwork,
     knitr,
     rmarkdown,
-    R6,
     testthat (>= 3.0.0)
 LinkingTo:
     Rcpp,
