@@ -5,7 +5,7 @@ output:
   rmarkdown::html_vignette:
     toc: yes
     fig_width: 6
-date: "2023-06-20"
+date: "2023-06-22"
 vignette: >
   %\VignetteIndexEntry{02 - Constraining the weights in the NN}
   %\VignetteEngine{knitr::rmarkdown}
@@ -151,20 +151,20 @@ history <- fit(nn,
 )
 
 nn
-#> Model: "sequential_16"
-#> __________________________________________________________________________________________________________________________
-#>  Layer (type)                                         Output Shape                                     Param #            
-#> ==========================================================================================================================
-#>  layer__combined_l1_4 (Layer_Combined_L1)             (None, 50)                                       200                
-#>  activation_4 (Activation)                            (None, 50)                                       0                  
-#>  layer__combined_l1_5 (Layer_Combined_L1)             (None, 50)                                       2550               
-#>  activation_5 (Activation)                            (None, 50)                                       0                  
-#>  dense_20 (Dense)                                     (None, 1)                                        51                 
-#> ==========================================================================================================================
+#> Model: "sequential_34"
+#> ________________________________________________________________________________________________________________________
+#>  Layer (type)                                         Output Shape                                    Param #           
+#> ========================================================================================================================
+#>  layer__combined_l1_14 (Layer_Combined_L1)            (None, 50)                                      200               
+#>  activation_14 (Activation)                           (None, 50)                                      0                 
+#>  layer__combined_l1_15 (Layer_Combined_L1)            (None, 50)                                      2550              
+#>  activation_15 (Activation)                           (None, 50)                                      0                 
+#>  dense_40 (Dense)                                     (None, 1)                                       51                
+#> ========================================================================================================================
 #> Total params: 2,801
 #> Trainable params: 2,801
 #> Non-trainable params: 0
-#> __________________________________________________________________________________________________________________________
+#> ________________________________________________________________________________________________________________________
 ```
 
 We can visualize the training process:
@@ -247,7 +247,7 @@ prediction_poly <- as.vector(eval_poly(x = test_x, poly = final_poly))
 
 ### Visualizing the results
 
-- Diagonal plot. In this example, as we have imposed weight constraints the approximation is better.
+Diagonal plot. In this example, as we have imposed weight constraints the approximation is better.
 
 
 
@@ -256,8 +256,17 @@ plot_diagonal(x_axis =  prediction_NN, y_axis =  prediction_poly, xlab = "NN pre
 ```
 
 ![](figure/nn2poly-02-reg-comparison-polynomial-nn-1.png)
+We can also plot the $n$ most important coefficients in absolute value to compare which variables or interactions are more relevant in the polynomial. Note that, as data should be scaled to the $[-1,1]$ interval, interactions of order 2 or higher would usually need a higher absolute value than the lower order coefficients be more relevant.
 
-- Representing the activation potentials, it can be seen that now they are centered around zero, where nn2poly works best.
+
+```r
+plot_n_important_coeffs(final_poly, 8)
+```
+
+![](figure/nn2poly-02-reg-n-important-1.png)
+
+
+Representing the activation potentials, it can be seen that now they are centered around zero, where nn2poly works best.
 
 
 
@@ -389,20 +398,20 @@ history <- fit(nn,
 )
 
 nn
-#> Model: "sequential_17"
-#> __________________________________________________________________________________________________________________________
-#>  Layer (type)                                         Output Shape                                     Param #            
-#> ==========================================================================================================================
-#>  layer__combined_l1_6 (Layer_Combined_L1)             (None, 50)                                       250                
-#>  activation_6 (Activation)                            (None, 50)                                       0                  
-#>  layer__combined_l1_7 (Layer_Combined_L1)             (None, 50)                                       2550               
-#>  activation_7 (Activation)                            (None, 50)                                       0                  
-#>  dense_21 (Dense)                                     (None, 3)                                        153                
-#> ==========================================================================================================================
+#> Model: "sequential_35"
+#> ________________________________________________________________________________________________________________________
+#>  Layer (type)                                         Output Shape                                    Param #           
+#> ========================================================================================================================
+#>  layer__combined_l1_16 (Layer_Combined_L1)            (None, 50)                                      250               
+#>  activation_16 (Activation)                           (None, 50)                                      0                 
+#>  layer__combined_l1_17 (Layer_Combined_L1)            (None, 50)                                      2550              
+#>  activation_17 (Activation)                           (None, 50)                                      0                 
+#>  dense_41 (Dense)                                     (None, 3)                                       153               
+#> ========================================================================================================================
 #> Total params: 2,953
 #> Trainable params: 2,953
 #> Non-trainable params: 0
-#> __________________________________________________________________________________________________________________________
+#> ________________________________________________________________________________________________________________________
 ```
 
 We can visualize the training process:
@@ -597,7 +606,17 @@ for (i in 1:3){
 
 ![](figure/nn2poly-02-class-diagonal-plot-1.png)![](figure/nn2poly-02-class-diagonal-plot-2.png)![](figure/nn2poly-02-class-diagonal-plot-3.png)
 
-Finally, activation potentials can be visualized as follows, where it can be seen that the constraints have made the activations to be closer to zero than in the unrestricted case. However, there is still some dispersion in them that creates the slight deviations seen in the diagonal plots. However, the
+We can also plot the $n$ most important coefficients in absolute value (for each output polynomial) to compare which variables or interactions are more relevant in the polynomial. Note that, as data should be scaled to the $[-1,1]$ interval, interactions of order 2 or higher would usually need a higher absolute value than the lower order coefficients be more relevant.
+
+
+```r
+plot_n_important_coeffs(final_poly, 8)
+```
+
+![](figure/nn2poly-02-class-n-important-1.png)
+
+
+Finally, activation potentials can be visualized as follows, where it can be seen that the constraints have made the activations to be closer to zero than in the unrestricted case. However, there is still some dispersion in them that creates the slight deviations seen in the diagonal plots.
 
 
 ```r
@@ -610,21 +629,21 @@ plot_taylor_and_activation_potentials(data = train,
 #> [[1]]
 ```
 
-![](figure/nn2poly-02-potentials-1.png)
+![](figure/nn2poly-02-class-potentials-1.png)
 
 ```
 #> 
 #> [[2]]
 ```
 
-![](figure/nn2poly-02-potentials-2.png)
+![](figure/nn2poly-02-class-potentials-2.png)
 
 ```
 #> 
 #> [[3]]
 ```
 
-![](figure/nn2poly-02-potentials-3.png)
+![](figure/nn2poly-02-class-potentials-3.png)
 
 
 
