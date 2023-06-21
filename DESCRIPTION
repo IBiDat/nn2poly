@@ -23,12 +23,13 @@ Imports:
     pracma,
     Rcpp
 Suggests:
-    ggplot2,
     cowplot,
-    patchwork,
+    ggplot2,
     knitr,
+    patchwork,
     rmarkdown,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    tidytext
 LinkingTo:
     Rcpp,
     RcppArmadillo
