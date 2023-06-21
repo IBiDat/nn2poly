@@ -20,7 +20,3 @@ and the second element is a list with the partitions.
 This functions will generate the partitions obtained with Knuth's algorithm,
 compute their labels and store both things in a list of length 2.
 }
-\examples{
-obtain_partitions_with_labels(2, 3)
-
-}
