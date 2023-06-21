@@ -10,10 +10,9 @@
 #' @param n_important_coeffs An integer denoting the number of coefficients to
 #' be plotted, after ordering them by absolute magnitude.
 #'
-#' @return
+#' @return A plot showing the n most important coefficients.
 #' @export
 #'
-#' @examples
 plot_n_important_coeffs <- function(poly, n_important_coeffs) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("package 'ggplot2' is required for this functionality", call. = FALSE)
@@ -59,7 +58,12 @@ plot_n_important_coeffs <- function(poly, n_important_coeffs) {
     all_df <- rbind(all_df, df)
   }
 
-  plot_all <- ggplot2::ggplot(all_df, aes(x = tidytext::reorder_within(x = name, by = -value, within = type), y = value, fill = sign)) +
+  plot_all <- ggplot2::ggplot(all_df,
+                              ggplot2::aes(x = tidytext::reorder_within(x = .data$name,
+                                                                        by = -.data$value,
+                                                                        within = .data$type),
+                                           y = .data$value,
+                                           fill = .data$sign)) +
     ggplot2::geom_bar(stat = "identity", colour = "black", alpha = 1) +
     tidytext::scale_x_reordered() +
     ggplot2::facet_wrap(~type, scales = "free_x") +
