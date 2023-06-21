@@ -3,17 +3,18 @@
 \name{change_string_to_function}
 \alias{change_string_to_function}
 \title{Auxiliar function used to transform some of the used activation functions
-in the nerural network from their string name into an R function.}
+in the neural network from their string name into an R function.}
 \usage{
 change_string_to_function(af_string_list)
 }
 \arguments{
-\item{af_string_list}{list of strings}
+\item{af_string_list}{List of strings containing the predefined possible
+activation functions, i.e., "softplus", "tanh", "sigmoid" or "linear".}
 }
 \value{
-list of functions
+List of R functions associated with the string names provided.
 }
 \description{
 Auxiliar function used to transform some of the used activation functions
-in the nerural network from their string name into an R function.
+in the neural network from their string name into an R function.
 }

@@ -7,7 +7,9 @@ Authors@R: c(
            comment = c(ORCID = "0000-0002-4109-2330")),
     person(given = "Iñaki", family = "Ucar", role = c("aut"),
            email = "iucar@fedoraproject.org",
-           comment = c(ORCID = "0000-0001-6403-5550")))
+           comment = c(ORCID = "0000-0001-6403-5550")),
+    person(given = "Jose Ignacio", family = "Diez", role = c("ctr"))
+    )
 Description: Implements a method that builds the coefficients of a polynomial
     model that performs almost equivalently as a given neural network
     (densely connected). This is achieved using Taylor expansion at the
@@ -21,8 +23,10 @@ Imports:
     pracma,
     Rcpp
 Suggests:
+    cowplot,
     ggplot2,
     keras,
+    patchwork,
     knitr,
     rmarkdown,
     R6,
@@ -34,3 +38,4 @@ VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Config/testthat/edition: 3
+URL: https://ibidat.github.io/nn2poly/

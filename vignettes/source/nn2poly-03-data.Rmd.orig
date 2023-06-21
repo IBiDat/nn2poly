@@ -2,7 +2,7 @@
 title: "03 - Generating data to test the implementation"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{nn2poly-03-generating_data_to_test_the_implementation}
+  %\VignetteIndexEntry{03 - Generating data to test the implementation}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-This vignette will generate data necessary for the package examples and unit tests but does not explicitly showcase the usage of the package functions. 
+This vignette will generate data necessary for the package examples and unit tests but does not explicitly showcase the usage of the package functions.
 
 There will be 4 examples generated and stored as `nn2poly_exampleX` where `X` denotes the number of the example, from 0 to 4.
 
@@ -26,7 +26,7 @@ library(nn2poly)
 library(nn2poly.tools)
 library(keras)
 library(tensorflow)
-tensorflow::tf$random$set_seed(42) 
+tensorflow::tf$random$set_seed(42)
 set.seed(42)
 ```
 
@@ -78,7 +78,7 @@ nn2poly_example0$q_taylor_vector <- q_taylor_vector
 
 ## Example 1:
 
-2 variables, original order 2, 2 hidden layers, taylor order 2, LINEAR (so using Taylor should be exact), 2 hidden neurons per layer. 
+2 variables, original order 2, 2 hidden layers, taylor order 2, LINEAR (so using Taylor should be exact), 2 hidden neurons per layer.
 
 ```{r example-1}
 
@@ -122,14 +122,14 @@ my_validation_split <- 0.3
 my_verbose <- 0
 
 # NN training ---------------------------------
-  
+
 # Divide again in x and y to train the NN with keras
 train_x <- as.matrix(subset(train, select = -c(p+1)))
 train_y <- as.matrix(subset(train, select = c(p+1)))
 
 test_x <- as.matrix(subset(test, select = -c(p+1)))
 test_y <- as.matrix(subset(test, select = c(p+1)))
-  
+
 # Build the nn
 nn <- build_keras_model(
   p,
@@ -137,14 +137,14 @@ nn <- build_keras_model(
   h_neurons_vector,
   my_max_norm
 )
-  
+
 # Compile the model
 compile(nn,
         loss = my_loss,
         optimizer = my_optimizer,
         metrics = my_metrics
 )
-  
+
 # Fit the model
 history <- fit(nn,
                train_x,
@@ -154,19 +154,19 @@ history <- fit(nn,
                validation_split = my_validation_split,
                batch_size = 500
 )
-  
+
 # Visualize the training process
 plot(history)
 
 
 # Extract the weights:
   keras_weights <- keras::get_weights(nn)
-  
+
   # En este caso solo hace falta cambiar lo de la ultima capa
   # ARREGLAR ESTO PARA QUE SEA CONSISTENTE
-  
+
   n <- length(keras_weights)
-  
+
   if(my_max_norm[[1]]=="no_constraint"){
 
     n2 <- n/2
@@ -175,13 +175,13 @@ plot(history)
     for (i in 1:n2){
       nn_weights[[i]] <- rbind(keras_weights[[2*i]], keras_weights[[2*i-1]])
    }
-    
+
   } else {
     nn_weights <- keras_weights[1:(n - 2)]
-    
+
     nn_weights[[n - 1]] <- rbind(keras_weights[[n]], keras_weights[[n - 1]])
   }
-  
+
 weights_list <- nn_weights
 
 
@@ -209,7 +209,7 @@ nn2poly_example1$test_x <- test_x
 ```
 
 
-## Example 2: 
+## Example 2:
 
 2 variables, original order 2, 2 hidden layers, taylor order 2, softplus, 2 hidden neurons per layer
 
@@ -255,14 +255,14 @@ my_validation_split <- 0.3
 my_verbose <- 0
 
 # NN training ---------------------------------
-  
+
 # Divide again in x and y to train the NN with keras
 train_x <- as.matrix(subset(train, select = -c(p+1)))
 train_y <- as.matrix(subset(train, select = c(p+1)))
 
 test_x <- as.matrix(subset(test, select = -c(p+1)))
 test_y <- as.matrix(subset(test, select = c(p+1)))
-  
+
 # Build the nn
 nn <- build_keras_model(
   p,
@@ -270,14 +270,14 @@ nn <- build_keras_model(
   h_neurons_vector,
   my_max_norm
 )
-  
+
 # Compile the model
 compile(nn,
         loss = my_loss,
         optimizer = my_optimizer,
         metrics = my_metrics
 )
-  
+
 # Fit the model
 history <- fit(nn,
                train_x,
@@ -287,19 +287,19 @@ history <- fit(nn,
                validation_split = my_validation_split,
                batch_size = 500
 )
-  
+
 # Visualize the training process
 plot(history)
 
 
 # Extract the weights:
   keras_weights <- keras::get_weights(nn)
-  
+
   # En este caso solo hace falta cambiar lo de la ultima capa
   # ARREGLAR ESTO PARA QUE SEA CONSISTENTE
-  
+
   n <- length(keras_weights)
-  
+
   if(my_max_norm[[1]]=="no_constraint"){
 
     n2 <- n/2
@@ -308,13 +308,13 @@ plot(history)
     for (i in 1:n2){
       nn_weights[[i]] <- rbind(keras_weights[[2*i]], keras_weights[[2*i-1]])
    }
-    
+
   } else {
     nn_weights <- keras_weights[1:(n - 2)]
-    
+
     nn_weights[[n - 1]] <- rbind(keras_weights[[n]], keras_weights[[n - 1]])
   }
-  
+
 weights_list <- nn_weights
 
 
@@ -343,7 +343,7 @@ nn2poly_example2$test_x <- test_x
 
 
 
-## Example 3: 
+## Example 3:
 
 3 variables, original order 3, 3 hidden layers, taylor order 3, tanh, 50 neurons per layer
 
@@ -389,14 +389,14 @@ my_validation_split <- 0.3
 my_verbose <- 0
 
 # NN training ---------------------------------
-  
+
 # Divide again in x and y to train the NN with keras
 train_x <- as.matrix(subset(train, select = -c(p+1)))
 train_y <- as.matrix(subset(train, select = c(p+1)))
 
 test_x <- as.matrix(subset(test, select = -c(p+1)))
 test_y <- as.matrix(subset(test, select = c(p+1)))
-  
+
 # Build the nn
 nn <- build_keras_model(
   p,
@@ -404,14 +404,14 @@ nn <- build_keras_model(
   h_neurons_vector,
   my_max_norm
 )
-  
+
 # Compile the model
 compile(nn,
         loss = my_loss,
         optimizer = my_optimizer,
         metrics = my_metrics
 )
-  
+
 # Fit the model
 history <- fit(nn,
                train_x,
@@ -421,19 +421,19 @@ history <- fit(nn,
                validation_split = my_validation_split,
                batch_size = 500
 )
-  
+
 # Visualize the training process
 plot(history)
 
 
 # Extract the weights:
   keras_weights <- keras::get_weights(nn)
-  
+
   # En este caso solo hace falta cambiar lo de la ultima capa
   # ARREGLAR ESTO PARA QUE SEA CONSISTENTE
-  
+
   n <- length(keras_weights)
-  
+
   if(my_max_norm[[1]]=="no_constraint"){
 
     n2 <- n/2
@@ -442,13 +442,13 @@ plot(history)
     for (i in 1:n2){
       nn_weights[[i]] <- rbind(keras_weights[[2*i]], keras_weights[[2*i-1]])
    }
-    
+
   } else {
     nn_weights <- keras_weights[1:(n - 2)]
-    
+
     nn_weights[[n - 1]] <- rbind(keras_weights[[n]], keras_weights[[n - 1]])
   }
-  
+
 weights_list <- nn_weights
 
 
