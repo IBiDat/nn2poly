@@ -62,9 +62,9 @@ using its weights and a Taylor approximation of its activation functions.</p>
 <span>  <span class="va">weights_list</span>,</span>
 <span>  <span class="va">af_string_list</span>,</span>
 <span>  <span class="va">q_taylor_vector</span>,</span>
-<span>  all_partitions <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">all_partitions</span>,</span>
 <span>  store_coeffs <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  forced_max_Q <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  <span class="va">forced_max_Q</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -93,7 +93,7 @@ layer.</p></dd>
 
 <dt>all_partitions</dt>
 <dd><p>Optional argument containing the needed multipartitions
-as list of lists of lists. If <code>NULL</code>, the function computes it first. This
+as list of lists of lists. If missing, the function computes it first. This
 step can be computationally expensive and it is encouraged that the
 multipartitions are stored and reused when possible.</p></dd>
 
