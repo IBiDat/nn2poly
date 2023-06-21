@@ -34,3 +34,4 @@ VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Config/testthat/edition: 3
+URL: https://ibidat.github.io/nn2poly/
