@@ -223,14 +223,20 @@ prediction_poly <- as.vector(eval_poly(x = test_x, poly = final_poly))
 
 ### Visualizing the results
 
-- Diagonal plot. In this example, as we have imposed weight constraints the approximation is better.
+Diagonal plot. In this example, as we have imposed weight constraints the approximation is better.
 
 
 ```{r reg-comparison-polynomial-nn}
 plot_diagonal(x_axis =  prediction_NN, y_axis =  prediction_poly, xlab = "NN prediction", ylab = "Polynomial prediction")
 ```
+We can also plot the $n$ most important coefficients in absolute value to compare which variables or interactions are more relevant in the polynomial. Note that, as data should be scaled to the $[-1,1]$ interval, interactions of order 2 or higher would usually need a higher absolute value than the lower order coefficients be more relevant.
 
-- Representing the activation potentials, it can be seen that now they are centered around zero, where nn2poly works best.
+```{r reg-n-important}
+plot_n_important_coeffs(final_poly, 8)
+```
+
+
+Representing the activation potentials, it can be seen that now they are centered around zero, where nn2poly works best.
 
 
 ```{r reg-potentials}
@@ -464,9 +470,16 @@ for (i in 1:3){
 }
 ```
 
-Finally, activation potentials can be visualized as follows, where it can be seen that the constraints have made the activations to be closer to zero than in the unrestricted case. However, there is still some dispersion in them that creates the slight deviations seen in the diagonal plots. However, the
+We can also plot the $n$ most important coefficients in absolute value (for each output polynomial) to compare which variables or interactions are more relevant in the polynomial. Note that, as data should be scaled to the $[-1,1]$ interval, interactions of order 2 or higher would usually need a higher absolute value than the lower order coefficients be more relevant.
 
-```{r potentials}
+```{r class-n-important}
+plot_n_important_coeffs(final_poly, 8)
+```
+
+
+Finally, activation potentials can be visualized as follows, where it can be seen that the constraints have made the activations to be closer to zero than in the unrestricted case. However, there is still some dispersion in them that creates the slight deviations seen in the diagonal plots.
+
+```{r class-potentials}
 plot_taylor_and_activation_potentials(data = train,
                                     weights_list = nn_weights,
                                     af_string_list = af_string_list,
