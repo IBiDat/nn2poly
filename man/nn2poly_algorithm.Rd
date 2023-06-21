@@ -9,9 +9,9 @@ nn2poly_algorithm(
   weights_list,
   af_string_list,
   q_taylor_vector,
-  all_partitions = NULL,
+  all_partitions,
   store_coeffs = FALSE,
-  forced_max_Q = NULL
+  forced_max_Q
 )
 }
 \arguments{
@@ -31,7 +31,7 @@ strings with the names of the activation function used at each layer.}
 layer.}
 
 \item{all_partitions}{Optional argument containing the needed multipartitions
-as list of lists of lists. If \code{NULL}, the function computes it first. This
+as list of lists of lists. If missing, the function computes it first. This
 step can be computationally expensive and it is encouraged that the
 multipartitions are stored and reused when possible.}
 
