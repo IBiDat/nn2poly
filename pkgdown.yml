@@ -1,0 +1,11 @@
+pandoc: 2.19.2
+pkgdown: 2.0.7
+pkgdown_sha: ~
+articles:
+  nn2poly-01-introduction: nn2poly-01-introduction.html
+  nn2poly-02-constraints: nn2poly-02-constraints.html
+last_built: 2023-06-21T10:36Z
+urls:
+  reference: https://ibidat.github.io/nn2poly/reference
+  article: https://ibidat.github.io/nn2poly/articles
+
