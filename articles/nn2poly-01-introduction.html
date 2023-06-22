@@ -91,9 +91,7 @@ hidden layer neural network in this <a href="https://doi.org/10.1016/j.neunet.20
 free access <a href="https://doi.org/10.48550/arXiv.2102.03865" class="external-link">arXiv
 preprint version</a>. * Extension to deeper layers and proper
 formulation of the <em>NN2Poly</em> method in this <a href="https://doi.org/10.48550/arXiv.2112.11397" class="external-link">arXiv preprint</a>.</p>
-<table class="table"><tbody><tr class="odd">
-<td>
-<em>Important remark 1</em>: The approximations made by the NN2poly
+<p><em>Important remark 1</em>: The approximations made by the NN2poly
 method rely on Taylor expansions and therefore require some constraints
 to be imposed when training the original neural network. This package,
 <code>nn2poly</code>, does not implement this constraints as it only
@@ -102,20 +100,16 @@ network architecture, it does not limit how the user trains the neural
 network. However, we also provide an auxiliary package
 <code>nn2poly.tools</code> for this matter, which will be explained and
 properly introduced in
-<code><a href="../articles/nn2poly-02-constraints.html">vignette("nn2poly-02-constraints")</a></code>.</td>
-</tr></tbody></table>
-<table class="table"><tbody><tr class="odd">
-<td>
-<em>Important remark 2</em>: <code>nn2poly</code> is not limited to
-a special deep learning framework. As mentioned in the previous remark,
+<code><a href="../articles/nn2poly-02-constraints.html">vignette("nn2poly-02-constraints")</a></code>.</p>
+<p><em>Important remark 2</em>: <code>nn2poly</code> is not limited to a
+special deep learning framework. As mentioned in the previous remark,
 only the weight matrices and some information about the neural network
 architecture is needed. Therefore, the framework used is not relevant.
 However, in this vignette examples we will be using
 <code>tensorflow</code> and <code>keras</code>. Furthermore, support for
 the training constraints in <code>nn2poly.tools</code>, explained in the
-previous remark, is currently limited to <code>tensroflow</code> and
-<code>keras</code>too.</td>
-</tr></tbody></table>
+previous remark, is currently limited to <code>tensorflow</code> and
+<code>keras</code>too.</p>
 </div>
 <div class="section level2">
 <h2 id="this-vignettes-goal">This vignette’s goal<a class="anchor" aria-label="anchor" href="#this-vignettes-goal"></a>
@@ -143,16 +137,17 @@ to build and train the neural networks.</p>
 <span><span class="co"># For reproducibility</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="fu">tensorflow</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/tensorflow/man/tf.html" class="external-link">tf</a></span><span class="op">$</span><span class="va">random</span><span class="op">$</span><span class="fu">set_seed</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<div class="section level3">
-<h3 id="simple-regression-example">Simple regression example<a class="anchor" aria-label="anchor" href="#simple-regression-example"></a>
-</h3>
+</div>
+<div class="section level2">
+<h2 id="simple-regression-example">Simple regression example<a class="anchor" aria-label="anchor" href="#simple-regression-example"></a>
+</h2>
 <p>This example will solve a regression problem using simulated data
 from a polynomial, which allows to control if the final polynomial
 coefficients obtained with <code>nn2poly</code> are similar to those
 from the polynomial that originates the data.</p>
-<div class="section level4">
-<h4 id="simulated-data-generation">Simulated data generation<a class="anchor" aria-label="anchor" href="#simulated-data-generation"></a>
-</h4>
+<div class="section level3">
+<h3 id="simulated-data-generation">Simulated data generation<a class="anchor" aria-label="anchor" href="#simulated-data-generation"></a>
+</h3>
 <p>We will simulate polynomial data as follows. First we define a
 polynomial using the format needed in <code>nn2poly</code>, specifically
 to use the function <code>eval_poly</code>, which consists of a list
@@ -222,9 +217,9 @@ and test datasets.</p>
 <span><span class="va">test_x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">test</span><span class="op">[</span>,<span class="op">-</span><span class="op">(</span><span class="va">p</span><span class="op">+</span><span class="fl">1</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="va">test_y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">test</span><span class="op">[</span>,<span class="op">(</span><span class="va">p</span><span class="op">+</span><span class="fl">1</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 </div>
-<div class="section level4">
-<h4 id="original-neural-network">Original neural network<a class="anchor" aria-label="anchor" href="#original-neural-network"></a>
-</h4>
+<div class="section level3">
+<h3 id="original-neural-network">Original neural network<a class="anchor" aria-label="anchor" href="#original-neural-network"></a>
+</h3>
 <p>With our simulated data ready, we can train a feed forward dense
 neural network.</p>
 <p>The method is expected to be applied to a given trained densely
@@ -236,13 +231,10 @@ weights.</p>
 <p>In order to present an example, here we will create and train a NN.
 Our choice will be to use the <code>keras</code> framework to build and
 train it.</p>
-<table class="table"><tbody><tr class="odd">
-<td>
-<em>Note</em>: It is important to note that in order to avoid
+<p><em>Note</em>: It is important to note that in order to avoid
 asymptotic behaviour of the method, it is useful to impose some kind of
 constraints when training the neural network weights. This is covered in
-<code><a href="../articles/nn2poly-02-constraints.html">vignette("nn2poly-02-constraints")</a></code>.</td>
-</tr></tbody></table>
+<code><a href="../articles/nn2poly-02-constraints.html">vignette("nn2poly-02-constraints")</a></code>.</p>
 <p>First, we build the model.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">nn</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/keras_model_sequential.html" class="external-link">keras_model_sequential</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -258,13 +250,13 @@ constraints when training the neural network weights. This is covered in
 <span>                  activation <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">nn</span></span>
-<span><span class="co">#&gt; Model: "sequential_30"</span></span>
+<span><span class="co">#&gt; Model: "sequential_8"</span></span>
 <span><span class="co">#&gt; ________________________________________________________________________________________________________________________</span></span>
 <span><span class="co">#&gt;  Layer (type)                                         Output Shape                                    Param #           </span></span>
 <span><span class="co">#&gt; ========================================================================================================================</span></span>
-<span><span class="co">#&gt;  dense_34 (Dense)                                     (None, 10)                                      40                </span></span>
-<span><span class="co">#&gt;  dense_35 (Dense)                                     (None, 10)                                      110               </span></span>
-<span><span class="co">#&gt;  dense_36 (Dense)                                     (None, 1)                                       11                </span></span>
+<span><span class="co">#&gt;  dense_8 (Dense)                                      (None, 10)                                      40                </span></span>
+<span><span class="co">#&gt;  dense_9 (Dense)                                      (None, 10)                                      110               </span></span>
+<span><span class="co">#&gt;  dense_10 (Dense)                                     (None, 1)                                       11                </span></span>
 <span><span class="co">#&gt; ========================================================================================================================</span></span>
 <span><span class="co">#&gt; Total params: 161</span></span>
 <span><span class="co">#&gt; Trainable params: 161</span></span>
@@ -298,16 +290,13 @@ values.</p>
 <span><span class="co"># Diagonal plot implemented in the package to quickly visualize and compare predictions</span></span>
 <span><span class="fu"><a href="../reference/plot_diagonal.html">plot_diagonal</a></span><span class="op">(</span>x_axis <span class="op">=</span>  <span class="va">prediction_NN</span>, y_axis <span class="op">=</span>  <span class="va">test_y</span>, xlab <span class="op">=</span> <span class="st">"NN prediction"</span>, ylab <span class="op">=</span> <span class="st">"Original Y"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figure/nn2poly-01-reg-comparison-y-nn-1.png"></p>
-<table class="table"><tbody><tr class="odd">
-<td>
-<em>Note</em>: Recall that the NN performance is not addressed by
+<p><em>Note</em>: Recall that the NN performance is not addressed by
 nn2poly, meaning that this performance could be either good or bad and
-nn2poly still represent the NN behavior.</td>
-</tr></tbody></table>
+nn2poly still represent the NN behavior.</p>
 </div>
-<div class="section level4">
-<h4 id="using-nn2poly-to-obtain-the-polynomial">Using nn2poly to obtain the polynomial<a class="anchor" aria-label="anchor" href="#using-nn2poly-to-obtain-the-polynomial"></a>
-</h4>
+<div class="section level3">
+<h3 id="using-nn2poly-to-obtain-the-polynomial">Using nn2poly to obtain the polynomial<a class="anchor" aria-label="anchor" href="#using-nn2poly-to-obtain-the-polynomial"></a>
+</h3>
 <p>After the NN has been trained, using any chosen method by the user,
 the parameters have to be extracted and reshaped, if needed, to match
 the expected input of the function <code><a href="../reference/nn2poly_algorithm.html">nn2poly_algorithm()</a></code>.
@@ -444,9 +433,9 @@ this case, the obtained polynomial is up to order 3.</p>
 <span><span class="co">#&gt;            [,11]      [,12]      [,13]       [,14]     [,15]     [,16]     [,17]     [,18]      [,19]     [,20]</span></span>
 <span><span class="co">#&gt; [1,] -0.05425595 -0.1401266 0.08083027 -0.08008732 0.1254146 0.2044834 0.0233742 0.7296176 0.01581843 0.3277675</span></span></code></pre></div>
 </div>
-<div class="section level4">
-<h4 id="obtaining-polynomial-predictions">Obtaining polynomial predictions<a class="anchor" aria-label="anchor" href="#obtaining-polynomial-predictions"></a>
-</h4>
+<div class="section level3">
+<h3 id="obtaining-polynomial-predictions">Obtaining polynomial predictions<a class="anchor" aria-label="anchor" href="#obtaining-polynomial-predictions"></a>
+</h3>
 <p>After obtaining the polynomial coefficients, we can use them to
 predict the response variable <span class="math inline">\(Y\)</span>,
 which can be done using function <code><a href="../reference/eval_poly.html">eval_poly()</a></code>:</p>
@@ -455,9 +444,9 @@ which can be done using function <code><a href="../reference/eval_poly.html">eva
 <span><span class="co"># Obtain the predicted values for the test data with our polynomial</span></span>
 <span><span class="va">prediction_poly</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="fu"><a href="../reference/eval_poly.html">eval_poly</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">test_x</span>, poly <span class="op">=</span> <span class="va">final_poly</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
-<div class="section level4">
-<h4 id="visualizing-the-results">Visualizing the results<a class="anchor" aria-label="anchor" href="#visualizing-the-results"></a>
-</h4>
+<div class="section level3">
+<h3 id="visualizing-the-results">Visualizing the results<a class="anchor" aria-label="anchor" href="#visualizing-the-results"></a>
+</h3>
 <p>It is advisable to always check that the predictions obtained with
 the new polynomial do not differ too much from the original neural
 network predictions (and in case they differ, we can also try to find
@@ -506,16 +495,16 @@ activation potentials are not strictly centered around zero.</p>
 <p><img src="figure/nn2poly-01-reg-potentials-3.png"></p>
 </div>
 </div>
-<div class="section level3">
-<h3 id="simple-classification-example">Simple classification example<a class="anchor" aria-label="anchor" href="#simple-classification-example"></a>
-</h3>
+<div class="section level2">
+<h2 id="simple-classification-example">Simple classification example<a class="anchor" aria-label="anchor" href="#simple-classification-example"></a>
+</h2>
 <p>In this example, instead of a regression problem we will show a
 classification example, where a NN will be trained to classify species
 with the <code>iris</code> dataset, and then nn2poly will be employed to
 obtain a polynomial for each species.</p>
-<div class="section level4">
-<h4 id="data-preparation">Data preparation<a class="anchor" aria-label="anchor" href="#data-preparation"></a>
-</h4>
+<div class="section level3">
+<h3 id="data-preparation">Data preparation<a class="anchor" aria-label="anchor" href="#data-preparation"></a>
+</h3>
 <p>We will load the <code>iris</code> dataset from R and then scale it
 to have everything in the <span class="math inline">\([-1,1]\)</span>
 interval and divide it in train and test datasets, in the same manner as
@@ -557,18 +546,15 @@ the previous regression example.</p>
 <span><span class="va">test_x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">test</span><span class="op">[</span>,<span class="op">-</span><span class="op">(</span><span class="va">p</span><span class="op">+</span><span class="fl">1</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="va">test_y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">test</span><span class="op">[</span>,<span class="op">(</span><span class="va">p</span><span class="op">+</span><span class="fl">1</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 </div>
-<div class="section level4">
-<h4 id="original-neural-network-1">Original neural network<a class="anchor" aria-label="anchor" href="#original-neural-network-1"></a>
-</h4>
+<div class="section level3">
+<h3 id="original-neural-network-1">Original neural network<a class="anchor" aria-label="anchor" href="#original-neural-network-1"></a>
+</h3>
 <p>We can now train the NN, following the same procedure as in the
 regression problem.</p>
-<table class="table"><tbody><tr class="odd">
-<td>
-<em>Note</em>: It is important to note that in order to avoid
+<p><em>Note</em>: It is important to note that in order to avoid
 asymptotic behavior of the method, it is useful to impose some kind of
 constraint when training the neural network weights. This is covered in
-<code><a href="../articles/nn2poly-02-constraints.html">vignette("nn2poly-02-constraints")</a></code>.</td>
-</tr></tbody></table>
+<code><a href="../articles/nn2poly-02-constraints.html">vignette("nn2poly-02-constraints")</a></code>.</p>
 <p>First, we build the model. Note that in this case the NN has a linear
 output with the same number of neurons as the number of classes to
 predict (3 species). Then, the linear output will be transformed in a
@@ -589,13 +575,13 @@ be transformed ito predict the highest probability class.</p>
 <span><span class="va">nn</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/layer_dense.html" class="external-link">layer_dense</a></span><span class="op">(</span>units <span class="op">=</span> <span class="va">n_class</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">nn</span></span>
-<span><span class="co">#&gt; Model: "sequential_31"</span></span>
+<span><span class="co">#&gt; Model: "sequential_9"</span></span>
 <span><span class="co">#&gt; ________________________________________________________________________________________________________________________</span></span>
 <span><span class="co">#&gt;  Layer (type)                                         Output Shape                                    Param #           </span></span>
 <span><span class="co">#&gt; ========================================================================================================================</span></span>
-<span><span class="co">#&gt;  dense_37 (Dense)                                     (None, 100)                                     500               </span></span>
-<span><span class="co">#&gt;  dense_38 (Dense)                                     (None, 100)                                     10100             </span></span>
-<span><span class="co">#&gt;  dense_39 (Dense)                                     (None, 3)                                       303               </span></span>
+<span><span class="co">#&gt;  dense_11 (Dense)                                     (None, 100)                                     500               </span></span>
+<span><span class="co">#&gt;  dense_12 (Dense)                                     (None, 100)                                     10100             </span></span>
+<span><span class="co">#&gt;  dense_13 (Dense)                                     (None, 3)                                       303               </span></span>
 <span><span class="co">#&gt; ========================================================================================================================</span></span>
 <span><span class="co">#&gt; Total params: 10,903</span></span>
 <span><span class="co">#&gt; Trainable params: 10,903</span></span>
@@ -672,9 +658,9 @@ observation:</p>
 <span><span class="co">#&gt; Detection Prevalence   0.3947   0.2895   0.3158</span></span>
 <span><span class="co">#&gt; Balanced Accuracy      1.0000   1.0000   1.0000</span></span></code></pre></div>
 </div>
-<div class="section level4">
-<h4 id="using-nn2poly-to-obtain-the-polynomial-1">Using nn2poly to obtain the polynomial<a class="anchor" aria-label="anchor" href="#using-nn2poly-to-obtain-the-polynomial-1"></a>
-</h4>
+<div class="section level3">
+<h3 id="using-nn2poly-to-obtain-the-polynomial-1">Using nn2poly to obtain the polynomial<a class="anchor" aria-label="anchor" href="#using-nn2poly-to-obtain-the-polynomial-1"></a>
+</h3>
 <p>After the NN has been trained, we need to extract and reshape the
 parameters as explained in the regression case:</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
@@ -837,9 +823,9 @@ corresponding to the final polynomial at each neuron.</p>
 <span><span class="co">#&gt; [2,]  0.07348067  0.8013098  3.284242  3.329447  1.498424</span></span>
 <span><span class="co">#&gt; [3,] -1.67965325 -2.0488358 -5.474633 -5.517897 -1.817963</span></span></code></pre></div>
 </div>
-<div class="section level4">
-<h4 id="obtaining-polynomial-predictions-1">Obtaining polynomial predictions<a class="anchor" aria-label="anchor" href="#obtaining-polynomial-predictions-1"></a>
-</h4>
+<div class="section level3">
+<h3 id="obtaining-polynomial-predictions-1">Obtaining polynomial predictions<a class="anchor" aria-label="anchor" href="#obtaining-polynomial-predictions-1"></a>
+</h3>
 <p>As said before, the obtained polynomial represents the neural network
 before including the softmax function and computing the class assigned
 to each observation. Then, we need to define again a keras sequential
@@ -860,9 +846,9 @@ time:</p>
 <span><span class="co"># Class prediction with the polynomial outputs</span></span>
 <span><span class="va">prediction_poly_class</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">probability_poly</span>,<span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">prediction_poly_matrix</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
-<div class="section level4">
-<h4 id="visualising-the-results">Visualising the results<a class="anchor" aria-label="anchor" href="#visualising-the-results"></a>
-</h4>
+<div class="section level3">
+<h3 id="visualising-the-results">Visualising the results<a class="anchor" aria-label="anchor" href="#visualising-the-results"></a>
+</h3>
 <p>Again, a confusion matrix is useful to visualize the predictions, in
 this case we are comparing the polynomial predictions with the NN
 predictions.</p>
@@ -946,7 +932,6 @@ constraints are needed to keep them close to zero:</p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[3]]</span></span></code></pre>
 <p><img src="figure/nn2poly-01-class-potentials-3.png"></p>
-</div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
