@@ -29,7 +29,7 @@ Suggests:
     knitr,
     patchwork,
     rmarkdown,
-    R6
+    R6,
     testthat (>= 3.0.0),
     tidytext
 LinkingTo:
