@@ -20,6 +20,7 @@ knitr::opts_chunk$set(
   fig.path = "figure/nn2poly-01-"
 )
 ```
+
 # Overall package goal
 
 The main objective of `nn2poly` is to obtain a representation of a feed forward artificial neural network (like a multilayered perceptron) in terms of a polynomial representation. The coefficients of such polynomials are obtained by applying first a Taylor expansion at each activation function in the neural network. Then this expansions and the given neural network weights are joint using combinatorial properties, obtaining a final value for the polynomial coefficients.
@@ -28,13 +29,13 @@ More information with the theoretical insights about the underlying mathematical
   * Initial development of the idea for a single hidden layer neural network in this [article](https://doi.org/10.1016/j.neunet.2021.04.036) or its free access [arXiv preprint version](https://doi.org/10.48550/arXiv.2102.03865).
   * Extension to deeper layers and proper formulation of the _NN2Poly_ method in this [arXiv preprint](https://doi.org/10.48550/arXiv.2112.11397).
 
-----
-*Important remark 1*: The approximations made by the NN2poly method rely on Taylor expansions and therefore require some constraints to be imposed when training the original neural network. This package, `nn2poly`, does not implement this constraints as it only uses the final weight matrices and some information about the neural network architecture, it does not limit how the user trains the neural network. However, we also provide an auxiliary package `nn2poly.tools` for this matter, which will be explained and properly introduced in `vignette("nn2poly-02-constraints")`.
-----
 
-----
-*Important remark 2*: `nn2poly` is not limited to a special deep learning framework. As mentioned in the previous remark, only the weight matrices and some information about the neural network architecture is needed. Therefore, the framework used is not relevant. However, in this vignette examples we will be using `tensorflow` and `keras`. Furthermore, support for the training constraints in `nn2poly.tools`, explained in the previous remark, is currently limited to `tensroflow` and `keras`too.
-----
+*Important remark 1*: The approximations made by the NN2poly method rely on Taylor expansions and therefore require some constraints to be imposed when training the original neural network. This package, `nn2poly`, does not implement this constraints as it only uses the final weight matrices and some information about the neural network architecture, it does not limit how the user trains the neural network. However, we also provide an auxiliary package `nn2poly.tools` for this matter, which will be explained and properly introduced in `vignette("nn2poly-02-constraints")`.
+
+
+
+*Important remark 2*: `nn2poly` is not limited to a special deep learning framework. As mentioned in the previous remark, only the weight matrices and some information about the neural network architecture is needed. Therefore, the framework used is not relevant. However, in this vignette examples we will be using `tensorflow` and `keras`. Furthermore, support for the training constraints in `nn2poly.tools`, explained in the previous remark, is currently limited to `tensorflow` and `keras`too.
+
 
 # This vignette's goal
 
@@ -55,12 +56,11 @@ tensorflow::tf$random$set_seed(1)
 ```
 
 
-## Simple regression example
+# Simple regression example
 
 This example will solve a regression problem using simulated data from a polynomial, which allows to control if the final polynomial coefficients obtained with `nn2poly` are similar to those from the polynomial that originates the data.
 
-
-### Simulated data generation
+## Simulated data generation
 
 We will simulate polynomial data as follows. First we define a polynomial using the format needed in `nn2poly`, specifically to use the function `eval_poly`, which consists of a list containing:
   * Labels: A list of integer vectors denoting the combinations of variables that appear on each term of the polynomial. Variables are numbered from `1` to `p` where `p` is the dimension of the problem. As an example, `c(1,1,3)` would represent the term $x_1^2x_3$
@@ -121,8 +121,7 @@ test_y <- as.matrix(test[,(p+1)])
 ```
 
 
-
-### Original neural network
+## Original neural network
 
 With our simulated data ready, we can train a feed forward dense neural network.
 
@@ -130,9 +129,9 @@ The method is expected to be applied to a given trained densely connected feed f
 
 In order to present an example, here we will create and train a NN. Our choice will be to use the `keras` framework to build and train it.
 
-----
+
 *Note*: It is important to note that in order to avoid asymptotic behaviour of the method, it is useful to impose some kind of constraints when training the neural network weights. This is covered in `vignette("nn2poly-02-constraints")`.
-----
+
 
 First, we build the model.
 
@@ -189,13 +188,9 @@ prediction_NN <- predict(nn, test_x)
 plot_diagonal(x_axis =  prediction_NN, y_axis =  test_y, xlab = "NN prediction", ylab = "Original Y")
 ```
 
-
-----
 *Note*: Recall that the NN performance is not addressed by nn2poly, meaning that this performance could be either good or bad and nn2poly still represent the NN behavior.
-----
 
-
-### Using nn2poly to obtain  the polynomial
+## Using nn2poly to obtain  the polynomial
 
 After the NN has been trained, using any chosen method by the user, the parameters have to be extracted and reshaped, if needed, to match the expected input of the function `nn2poly_algorithm()`. This input consists of the following objects:
 
@@ -252,7 +247,7 @@ final_poly
 ```
 
 
-### Obtaining polynomial predictions
+## Obtaining polynomial predictions
 
 After obtaining the polynomial coefficients, we can use them to predict the response variable $Y$, which can be done using function `eval_poly()`:
 
@@ -265,7 +260,7 @@ prediction_poly <- as.vector(eval_poly(x = test_x, poly = final_poly))
 
 
 
-### Visualizing the results
+## Visualizing the results
 
 It is advisable to always check that the predictions obtained with the new polynomial do not differ too much from the original neural network predictions (and in case they differ, we can also try to find why by checking the Taylor expansions). To help with that, a couple of functions are included that allow us to plot the results.
 
@@ -297,12 +292,12 @@ plot_taylor_and_activation_potentials(data = train,
 ```
 
 
-## Simple classification example
+# Simple classification example
 
 In this example, instead of a regression problem we will show a classification example, where a NN will be trained to classify species with the `iris` dataset, and then nn2poly will be employed to obtain a polynomial for each species.
 
 
-### Data preparation
+## Data preparation
 
 We will load the `iris` dataset from R and then scale it to have everything in the $[-1,1]$ interval and divide it in train and test datasets, in the same manner as the previous regression example.
 
@@ -347,13 +342,13 @@ test_y <- as.matrix(test[,(p+1)])
 ```
 
 
-### Original neural network
+## Original neural network
 
 We can now train the NN, following the same procedure as in the regression problem.
 
-----
+
 *Note*: It is important to note that in order to avoid asymptotic behavior of the method, it is useful to impose some kind of constraint when training the neural network weights. This is covered in `vignette("nn2poly-02-constraints")`.
-----
+
 
 First, we build the model. Note that in this case the NN has a linear output with the same number of neurons as the number of classes to predict (3 species). Then, the linear output will be transformed in a probability to find the most probable class but this step is done after training. Therefore, nn2poly will be used to obtain a polynomial that approximates this nn with linear outputs and then its results will also be transformed ito predict the highest probability class.
 
@@ -430,7 +425,7 @@ cm
 ```
 
 
-### Using nn2poly to obtain  the polynomial
+## Using nn2poly to obtain  the polynomial
 
 After the NN has been trained, we need to extract and reshape the parameters as explained in the regression case:
 
@@ -479,7 +474,7 @@ We can have a glimpse at how the coefficients of the polynomial are stored. As e
 final_poly
 ```
 
-### Obtaining polynomial predictions
+## Obtaining polynomial predictions
 
 As said before, the obtained polynomial represents the neural network before including the softmax function and computing the class assigned to each observation. Then, we need to define again a keras sequential model that includes the class computation from the polynomial output. This polynomial output is obtained with `eval_poly()`, in this case in matrix form, as the 3 polynomials are evaluated at the same time:
 
@@ -500,7 +495,7 @@ prediction_poly_class <- predict(probability_poly,t(prediction_poly_matrix))
 
 
 
-### Visualising the results
+## Visualising the results
 
 Again, a confusion matrix is useful to visualize the predictions, in this case we are comparing the polynomial predictions with the NN predictions.
 

@@ -35,9 +35,9 @@ tensorflow::tf$random$set_seed(1)
 
 We will solve again two simple examples, regression and classification.
 
-## Simple regression example
+# Simple regression example
 
-### Simulated data generation
+## Simulated data generation
 
 We will simulate polynomial data from the following polynomial: $4x_1 - 3 x_2x_3$. Data will needs to be scaled to the $[-1,1]$ interval.
 
@@ -151,15 +151,15 @@ history <- fit(nn,
 )
 
 nn
-#> Model: "sequential_34"
+#> Model: "sequential_12"
 #> ________________________________________________________________________________________________________________________
 #>  Layer (type)                                         Output Shape                                    Param #           
 #> ========================================================================================================================
-#>  layer__combined_l1_14 (Layer_Combined_L1)            (None, 50)                                      200               
-#>  activation_14 (Activation)                           (None, 50)                                      0                 
-#>  layer__combined_l1_15 (Layer_Combined_L1)            (None, 50)                                      2550              
-#>  activation_15 (Activation)                           (None, 50)                                      0                 
-#>  dense_40 (Dense)                                     (None, 1)                                       51                
+#>  layer__combined_l1_4 (Layer_Combined_L1)             (None, 50)                                      200               
+#>  activation_4 (Activation)                            (None, 50)                                      0                 
+#>  layer__combined_l1_5 (Layer_Combined_L1)             (None, 50)                                      2550              
+#>  activation_5 (Activation)                            (None, 50)                                      0                 
+#>  dense_14 (Dense)                                     (None, 1)                                       51                
 #> ========================================================================================================================
 #> Total params: 2,801
 #> Trainable params: 2,801
@@ -189,7 +189,7 @@ plot_diagonal(x_axis =  prediction_NN, y_axis =  test_y, xlab = "NN prediction",
 
 ![](figure/nn2poly-02-reg-comparison-y-nn-1.png)
 
-### Using nn2poly to obtain  the polynomial
+## Using nn2poly to obtain  the polynomial
 
 After the NN has been trained (in this case with constraints) we extract and reshape the weights and NN parameters as explained in `vignette("nn2poly-01-introduction")`, with the only difference that the keras weights from the custom layers have a slightly different behavior as they already include the bias in the weights matrix:
 
@@ -235,7 +235,7 @@ final_poly <- nn2poly_algorithm(
 ```
 
 
-### Obtaining polynomial predictions
+## Obtaining polynomial predictions
 
 
 ```r
@@ -245,7 +245,7 @@ prediction_poly <- as.vector(eval_poly(x = test_x, poly = final_poly))
 ```
 
 
-### Visualizing the results
+## Visualizing the results
 
 Diagonal plot. In this example, as we have imposed weight constraints the approximation is better.
 
@@ -296,12 +296,12 @@ plot_taylor_and_activation_potentials(data = train,
 
 ![](figure/nn2poly-02-reg-potentials-3.png)
 
-## Simple classification example
+# Simple classification example
 
 In this example, instead of a regression problem we will show a classification example, where a NN will be trained to classify species with the `iris` dataset, and then nn2poly will be employed to obtain a polynomial for each species.
 
 
-### Data preparation
+## Data preparation
 
 We will load the `iris` and scale the data:
 
@@ -348,7 +348,7 @@ test_y <- as.matrix(test[,(p+1)])
 ```
 
 
-### Original neural network
+## Original neural network
 
 We can now train the NN, following the same procedure as in the regression problem and using the `build_keras_model` function which includes the layers with custom constrains.
 
@@ -398,15 +398,15 @@ history <- fit(nn,
 )
 
 nn
-#> Model: "sequential_35"
+#> Model: "sequential_13"
 #> ________________________________________________________________________________________________________________________
 #>  Layer (type)                                         Output Shape                                    Param #           
 #> ========================================================================================================================
-#>  layer__combined_l1_16 (Layer_Combined_L1)            (None, 50)                                      250               
-#>  activation_16 (Activation)                           (None, 50)                                      0                 
-#>  layer__combined_l1_17 (Layer_Combined_L1)            (None, 50)                                      2550              
-#>  activation_17 (Activation)                           (None, 50)                                      0                 
-#>  dense_41 (Dense)                                     (None, 3)                                       153               
+#>  layer__combined_l1_6 (Layer_Combined_L1)             (None, 50)                                      250               
+#>  activation_6 (Activation)                            (None, 50)                                      0                 
+#>  layer__combined_l1_7 (Layer_Combined_L1)             (None, 50)                                      2550              
+#>  activation_7 (Activation)                            (None, 50)                                      0                 
+#>  dense_15 (Dense)                                     (None, 3)                                       153               
 #> ========================================================================================================================
 #> Total params: 2,953
 #> Trainable params: 2,953
@@ -483,7 +483,7 @@ cm
 ```
 
 
-### Using nn2poly to obtain  the polynomial
+## Using nn2poly to obtain  the polynomial
 
 After the NN has been trained, we need to extract and reshape the parameters as explained in the regression case:
 
@@ -530,7 +530,7 @@ final_poly <- nn2poly_algorithm(
 
 
 
-### Obtaining polynomial predictions
+## Obtaining polynomial predictions
 
 
 ```r
@@ -549,7 +549,7 @@ prediction_poly_class <- predict(probability_poly,t(prediction_poly_matrix))
 
 
 
-### Visualising the results
+## Visualising the results
 
 
 
