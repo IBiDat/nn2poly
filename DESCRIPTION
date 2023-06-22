@@ -25,9 +25,11 @@ Imports:
 Suggests:
     cowplot,
     ggplot2,
+    keras,
     knitr,
     patchwork,
     rmarkdown,
+    R6
     testthat (>= 3.0.0),
     tidytext
 LinkingTo:

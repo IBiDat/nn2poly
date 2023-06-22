@@ -21,7 +21,7 @@
 #' layer.
 #'
 #' @param all_partitions Optional argument containing the needed multipartitions
-#' as list of lists of lists. If missing, the function computes it first. This
+#' as list of lists of lists. If \code{NULL}, the function computes it first. This
 #' step can be computationally expensive and it is encouraged that the
 #' multipartitions are stored and reused when possible.
 #'
@@ -44,14 +44,13 @@
 #' hidden layers are not needed to represent the NN but can be used to explore
 #' how the method works.
 #'
-#' @export
 #'
 nn2poly_algorithm <- function(weights_list,
                               af_string_list,
                               q_taylor_vector,
-                              all_partitions,
-                              store_coeffs = FALSE,
-                              forced_max_Q) {
+                              all_partitions = NULL,
+                              store_coeffs   = FALSE,
+                              forced_max_Q   = NULL) {
 
   # Obtain number of variables (dimension p)
   p <- dim(weights_list[[1]])[1] - 1
@@ -81,7 +80,7 @@ nn2poly_algorithm <- function(weights_list,
   )
 
   # Obtain the maximum degree of the final polynomial:
-  if(missing(forced_max_Q)){
+  if(is.null(forced_max_Q)){
     q_max <- prod(q_taylor_vector)
   } else {
     q_max <- min(prod(q_taylor_vector),forced_max_Q)
@@ -89,7 +88,7 @@ nn2poly_algorithm <- function(weights_list,
 
 
   # Check if partitions have not been given as an input
-  if (missing(all_partitions)) {
+  if (is.null(all_partitions)) {
     all_partitions <- obtain_partitions_with_labels(p, q_max)
   }
 
@@ -191,7 +190,7 @@ nn2poly_algorithm <- function(weights_list,
 
     # Compute the new total order with the product of q_taylor_vector.
     # If a forced_max_Q value is used, its taken as the minimum between both.
-    if (missing(forced_max_Q)) {
+    if (is.null(forced_max_Q)) {
       new_total_order <- previous_total_order * q_taylor_vector[current_layer]
     } else {
       new_total_order <- min(previous_total_order * q_taylor_vector[current_layer],
@@ -270,10 +269,7 @@ nn2poly_algorithm <- function(weights_list,
 #' @return List of length 2 where the first element is a list with the labels
 #' and the second element is a list with the partitions.
 #'
-#' @examples
-#' obtain_partitions_with_labels(2, 3)
 #'
-#' @export
 #'
 
 obtain_partitions_with_labels <- function(p, q_max) {
