@@ -32,7 +32,7 @@ get_model_parameters <- function(model) { # test needed for this function
       layer_index <- layer_index + 2
     } else {
       params[["bias"]] <- model$layers[[layer_index]]$get_weights()[[2]]
-      params[["wb"]] <- rbind(params[["weights"]], params[["bias"]])
+      params[["wb"]] <- rbind(params[["bias"]],params[["weights"]])
       params[["activation"]] <- model$layers[[layer_index]]$get_config()$activation
       layer_index <- layer_index + 1
     }
