@@ -2,13 +2,18 @@
 #'
 #' @param model Keras nn model.
 #'
-#' @return \code{list} of length 3 where the first dimension is the list of weights,
-#' the second dimension is the list of activation functions as strings and the third
-#' dimension is the number of neurons at each layer.
+#' @return \code{list} of length 3 with the following items:
+#' - \code{weights_list}  list of weights.
+#' - \code{af_string_list}: the list of activation functions as strings
+#' - \code{n_nurons}: the number of neurons at each layer.
+#' - \code{p}: the dimension of the problem, i.e., number of predictor variables.
 #'
-#' @examples
 get_model_parameters <- function(model) { # test needed for this function
+
   nlayers <- length(model$layers)
+  # This is expected to return the input dimension $p$
+  p <- model$inputs[[1]]$type_spec$shape$dims[[2]]$value
+
   l_params <- list()
   layer_index <- 1
   list_index  <- 1
@@ -18,7 +23,7 @@ get_model_parameters <- function(model) { # test needed for this function
     params[["n_neurons"]] <- model$layers[[layer_index]]$get_config()$units
     params[["weights"]]   <- model$layers[[layer_index]]$get_weights()[[1]]
 
-    neurons_previous_layer <- if (layer_index == 1) 0 else l_params[[list_index-1]][["n_neurons"]]
+    neurons_previous_layer <- if (layer_index == 1) p else l_params[[list_index-1]][["n_neurons"]]
 
     if (nrow(params[["weights"]]) == (neurons_previous_layer + 1)) {
       params[["wb"]] <- params[["weights"]]
@@ -41,5 +46,6 @@ get_model_parameters <- function(model) { # test needed for this function
 
   list(weights_list   = weights_list,
        af_string_list = af_string_list,
-       n_neurons      = n_neurons)
+       n_neurons      = n_neurons,
+       p = p)
 }

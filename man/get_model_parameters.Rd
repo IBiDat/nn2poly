@@ -10,9 +10,13 @@ get_model_parameters(model)
 \item{model}{Keras nn model.}
 }
 \value{
-\code{list} of length 3 where the first dimension is the list of weights,
-the second dimension is the list of activation functions as strings and the third
-dimension is the number of neurons at each layer.
+\code{list} of length 3 with the following items:
+\itemize{
+\item \code{weights_list}  list of weights.
+\item \code{af_string_list}: the list of activation functions as strings
+\item \code{n_nurons}: the number of neurons at each layer.
+\item \code{p}: the dimension of the problem, i.e., number of predictor variables.
+}
 }
 \description{
 Auxiliary function. It obtains some parameters of a keras model.
