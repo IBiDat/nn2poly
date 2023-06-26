@@ -45,7 +45,6 @@ NULL
 #' how the method works.
 #' @export
 #'
-#' @examples
 nn2poly <- function(object,
                     q_taylor_vector,
                     all_partitions = NULL,
