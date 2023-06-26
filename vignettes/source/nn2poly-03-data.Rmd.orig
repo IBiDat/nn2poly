@@ -473,3 +473,91 @@ nn2poly_example3$test_x <- test_x
 
 
 ```
+
+
+
+## Some small Keras NNs
+
+These keras NNs are designed to be used when testing.
+
+
+
+Small unconstrained NN:
+```{r}
+set.seed(42)
+tensorflow::tf$random$set_seed(42)
+
+nn <- keras_model_sequential()
+
+nn %>% layer_dense(units = 2,
+                  activation = "tanh",
+                  input_shape = 2)
+
+nn %>% layer_dense(units = 3,
+                  activation = "softplus")
+
+nn %>% layer_dense(units = 2,
+                  activation = "linear")
+
+nn
+```
+
+```{r}
+nn2poly:::get_model_parameters(nn)
+```
+
+NN with constraints (this depends on `add_constraints` working properly.)
+
+```{r}
+nn2 <- add_constraints(nn)
+
+nn2
+```
+
+
+
+```{r}
+nn2poly:::get_model_parameters(nn2)
+```
+
+
+Usando la forma que teniamos en build_keras model. Tienen que ser entrenadas.
+
+```{r}
+params <- get_model_parameters(nn)
+
+nn <- build_keras_model(params$p,
+    params$af_string_list,
+    params$n_neurons,
+    my_max_norm)
+
+nn <- nn$build(input_shape = )
+
+nn
+
+```
+```{r}
+compile(nn,
+				loss = my_loss,
+				optimizer = my_optimizer,
+				metrics = my_metrics
+)
+
+# Fit the model
+history <- fit(nn,
+							 train_x,
+							 train_y,
+							 verbose = my_verbose,
+							 epochs = 2,
+							 validation_split = my_validation_split,
+							 batch_size = 50
+)
+```
+
+
+```{r}
+get_model_parameters(nn)
+nn$layers[[1]]$get_weights()[[1]]
+
+```
+
