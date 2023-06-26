@@ -13,7 +13,7 @@ add_constraints(model, constraint_type = "l1_norm")
 'l1_norm' and 'l2_norm' can be applied.}
 }
 \value{
-A keras model with the custom cosntraints applied.
+A keras model with the custom constraints applied.
 }
 \description{
 Add custom constraints to the weights of a keras neural network.
