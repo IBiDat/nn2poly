@@ -11,8 +11,8 @@
 get_model_parameters <- function(model) { # test needed for this function
 
   nlayers <- length(model$layers)
-  # This is expected to return the input dimension $p$
-  p <- model$inputs[[1]]$type_spec$shape$dims[[2]]$value
+
+  p <- model$layers[[1]]$input_shape[[2]]
 
   l_params <- list()
   layer_index <- 1
