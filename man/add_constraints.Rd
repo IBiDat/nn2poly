@@ -16,5 +16,7 @@ add_constraints(model, constraint_type = "l1_norm")
 A keras model with the custom constraints applied.
 }
 \description{
-Add custom constraints to the weights of a keras neural network.
+This function is designed to transform a given keras NN (feed forward, dense),
+into a NN with the same structure, parameters and weights but with our custom
+layers that impose L1 and L2 norm constraints
 }

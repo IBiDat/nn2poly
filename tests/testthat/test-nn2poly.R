@@ -65,3 +65,27 @@ test_that("nn2poly_algorithm:
 
 
 })
+
+test_that("nn2poly for a keras.engine.training.Model object", {
+  skip_on_cran()
+  skip_on_covr()
+  skip_on_ci()
+
+  tensorflow::set_random_seed(42)
+
+  nn <- keras::keras_model_sequential()
+  keras::`%>%`(nn, keras::layer_dense(units = 2,
+                                      activation = "tanh",
+                                      input_shape = 2))
+  keras::`%>%`(nn, keras::layer_dense(units = 3,
+                                      activation = "softplus"))
+  keras::`%>%`(nn, keras::layer_dense(units = 2,
+                                      activation = "linear"))
+  result <- nn2poly(nn,
+                    q_taylor_vector = c(2,2,1),
+                    forced_max_Q = 2)
+
+  expect_equal(result$values[1,1],  0.18148204)
+  expect_equal(result$values[2,3], -0.71466625)
+  expect_equal(result$labels[[6]], c(2,2))
+})
