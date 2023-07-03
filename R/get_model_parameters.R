@@ -27,9 +27,17 @@ get_model_parameters <- function(model) { # test needed for this function
 
     if (nrow(params[["weights"]]) == (neurons_previous_layer + 1)) {
       params[["wb"]] <- params[["weights"]]
-      # currently, we assume that the next layer is the activation
-      params[["activation"]] <- model$layers[[layer_index+1]]$get_config()$activation
-      layer_index <- layer_index + 2
+
+      # check if the layer is one of our custom layers
+      if (class(model$layers[[layer_index]])[[1]] == "R6type.Layer_Combined_L1" ||
+          class(model$layers[[layer_index]])[[1]] == "R6type.Layer_Combined_L2") {
+        params[["activation"]] <- model$layers[[layer_index]]$get_config()$activation
+        layer_index <- layer_index + 1
+      } else {
+        # we assume that the next layer is the activation
+        params[["activation"]] <- model$layers[[layer_index + 1]]$get_config()$activation
+        layer_index <- layer_index + 2
+      }
     } else {
       params[["bias"]] <- model$layers[[layer_index]]$get_weights()[[2]]
       params[["wb"]] <- rbind(params[["bias"]],params[["weights"]])

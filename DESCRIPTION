@@ -30,6 +30,7 @@ Suggests:
     patchwork,
     rmarkdown,
     R6,
+    tensorflow,
     testthat (>= 3.0.0),
     tidytext
 LinkingTo:

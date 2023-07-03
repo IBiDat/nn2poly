@@ -108,8 +108,6 @@ nn2poly.keras.engine.training.Model <- function(object,
 #' @return \code{matrix} containing the predictions. There is one prediction for
 #' each row in `newdata`.
 #' @export
-#'
-#' @examples
 predict.nn2poly <- function(object, newdata, ...) {
   eval_poly(x = newdata, poly = object)
 }
