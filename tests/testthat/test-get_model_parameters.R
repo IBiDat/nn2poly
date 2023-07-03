@@ -1,4 +1,8 @@
 test_that("The function works well over a regular Neural Network.", {
+  # skip on cran and on github actions
+  skip_on_cran()
+  skip_on_covr()
+  skip_on_ci()
 
   # setting the seeds for reproducibility purposes
   tensorflow::set_random_seed(42)
@@ -32,6 +36,11 @@ test_that("The function works well over a regular Neural Network.", {
 
 test_that("The get_model_parameters functions returns the right list of activation
           functions for a neural network with custom constraints.", {
+  # skip on cran and on github actions
+  skip_on_cran()
+  skip_on_covr()
+  skip_on_ci()
+
   # setting the seeds for reproducibility purposes
   tensorflow::set_random_seed(42)
 

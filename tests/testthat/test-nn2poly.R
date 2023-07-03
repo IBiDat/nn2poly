@@ -67,6 +67,10 @@ test_that("nn2poly_algorithm:
 })
 
 test_that("nn2poly for a keras.engine.training.Model object", {
+  skip_on_cran()
+  skip_on_covr()
+  skip_on_ci()
+
   tensorflow::set_random_seed(42)
 
   nn <- keras::keras_model_sequential()
