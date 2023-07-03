@@ -63,7 +63,7 @@ add_constraints <- function(model, constraint_type = "l1_norm") {
       },
       build = function(input_shape) {
         self$combined_w_b = self$add_weight(
-          shape = keras::shape(utils::tail(input_shape, 1) + tensorflow::tf$ones(keras::shape(1, 1), dtype = "int32"), self$units),
+          shape = keras::shape(tensorflow::as_tensor(tail(input_shape, 1)) + tensorflow::tf$ones(keras::shape(1, 1), dtype = "int32"), self$units),
           initializer = "random_normal",
           trainable = TRUE,
           # Custom defined constraint with L1 norm
@@ -89,7 +89,7 @@ add_constraints <- function(model, constraint_type = "l1_norm") {
       },
       build = function(input_shape) {
         self$combined_w_b = self$add_weight(
-          shape = keras::shape(utils::tail(input_shape, 1) + tensorflow::tf$ones(keras::shape(1, 1), dtype = "int32"), self$units),
+          shape = keras::shape(tensorflow::as_tensor(utils::tail(input_shape, 1)) + tensorflow::tf$ones(keras::shape(1, 1), dtype = "int32"), self$units),
           initializer = "random_normal",
           trainable = TRUE,
           # maxnorm uses the L2 norm with a given max value
