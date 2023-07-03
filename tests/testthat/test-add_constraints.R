@@ -1,8 +1,6 @@
 test_that("Test that both the activation function and neurons are the same for
           the constrained and unconstrained version of the nn", {
   skip_on_cran()
-  skip_on_covr()
-  skip_on_ci()
 
   tensorflow::set_random_seed(42)
 
