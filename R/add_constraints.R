@@ -152,11 +152,9 @@ add_constraints <- function(model,
 
     # it is needed to convert the list to a keras array
     new_model$set_weights(keras::keras_array(params$weights_list))
-
-    new_model
-  } else {
-    new_model
   }
 
+  # return the model
+  new_model
 }
 
