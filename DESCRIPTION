@@ -32,7 +32,8 @@ Suggests:
     R6,
     tensorflow,
     testthat (>= 3.0.0),
-    tidytext
+    tidytext,
+    vdiffr
 LinkingTo:
     Rcpp,
     RcppArmadillo
