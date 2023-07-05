@@ -1,4 +1,7 @@
 test_that("The function works as expected", {
+  # set the seeds
+  tensorflow::set_random_seed(33)
+
   # load the example
   nn2poly_example <- nn2poly_example0
 
