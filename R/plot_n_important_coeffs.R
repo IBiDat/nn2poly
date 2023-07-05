@@ -26,6 +26,13 @@ plot_n_important_coeffs <- function(poly, n_important_coeffs) {
     stop("package 'patchwork' is required for this functionality", call. = FALSE)
   }
 
+  # a special case is needed for the case in which the polynomial was generated
+  # with `store_coeffs = TRUE`
+
+  if (is.null(poly$values)) {
+    poly <- poly[[length(poly)]]
+  }
+
   M <- poly$values
   all_labels <- poly$labels
 

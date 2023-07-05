@@ -41,10 +41,14 @@ constraint_l1_norm <- function(w) {
 #' @param model A keras model to which the restrictions on the weights are to be applied.
 #' @param constraint_type The type of constraint you want to apply on the model. Currently,
 #' 'l1_norm' and 'l2_norm' can be applied.
+#' @param keep_old_weights Binary parameters that controls if the weights of
+#' \code{model} are kept in the new constrained network.
 #'
 #' @return A keras model with the custom constraints applied.
 #' @export
-add_constraints <- function(model, constraint_type = "l1_norm") {
+add_constraints <- function(model,
+                            constraint_type  = "l1_norm",
+                            keep_old_weights = FALSE) {
   if (!requireNamespace("keras", quietly = TRUE)) {
     stop("package 'keras' is required for this functionality", call.=FALSE)
   }
@@ -108,10 +112,9 @@ add_constraints <- function(model, constraint_type = "l1_norm") {
   layer_combined_L1 <- keras::create_layer_wrapper(Layer_Combined_L1)
   layer_combined_L2 <- keras::create_layer_wrapper(Layer_Combined_L2)
 
-
   params      <- get_model_parameters(model)
   nlayers     <- length(params$weights_list)
-  new_layers  <- vector(mode = "list", length = nlayers)
+  new_layers  <- vector(mode = "list", length = nlayers) # create a list of new layers
 
   # choose the custom layer to use
   custom_layer <- switch(constraint_type,
@@ -133,11 +136,25 @@ add_constraints <- function(model, constraint_type = "l1_norm") {
     activation = params$af_string_list[[nlayers]]
   )
 
-  # return the new model with the custom constraints
-  keras::keras_model_sequential(
+  # create the new model with the custom constraints
+  new_model <- keras::keras_model_sequential(
     input_shape = params$p,
     layers = new_layers
   )
 
+  if (keep_old_weights) {
+    # save the first row of the last element of the weights list
+    last_bias <- params$weights_list[[nlayers]][1,]
+
+    # this is needed to math the weights dimensions
+    params$weights_list[[nlayers]]   <- params$weights_list[[nlayers]][-1,]
+    params$weights_list[[nlayers+1]] <- last_bias
+
+    # it is needed to convert the list to a keras array
+    new_model$set_weights(keras::keras_array(params$weights_list))
+  }
+
+  # return the model
+  new_model
 }
 
