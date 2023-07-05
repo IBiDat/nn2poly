@@ -1,4 +1,8 @@
 test_that("The function works as expected", {
+  skip_on_cran()
+  skip_on_covr()
+  skip_on_ci()
+
   # set the seeds
   tensorflow::set_random_seed(33)
 
