@@ -19,7 +19,8 @@
 #' 5, then the value stored in \code{values} at position 5 is the coefficient
 #' associated with the term x_1^2*x_3.
 #'
-#' @return Matrix containing the evaluation of the polynomials. Each row
+#' @return Vector containing the evaluation of a single polynomial or
+#' matrix containing the evaluation of the polynomials. Each row
 #' corresponds to each polynomial used and each column to each observation,
 #' meaning that each row vector corresponds to the results of evaluating all the
 #' given data for each polynomial.
@@ -124,6 +125,11 @@ eval_poly <- function(x, poly) {
       response_j <- response_j + values_j[i] * var_prod
     }
     response[j,] <- response_j
+  }
+
+  # Check if it is a single polynomial:
+  if (!is.matrix(poly$values)){
+    response <- as.vector(response)
   }
 
   return(response)
