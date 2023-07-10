@@ -6,7 +6,10 @@
 # The idea is to bound the norm of the weight vector affecting arriving to each
 # neuron, including the bias of that neuron. The supported norms are L1 and L2,
 # but L1 is preferred, with 1 as it maximum norm bound.
-# Here, the
+
+
+# Set Python vars to NULL to avoid global variable notes in package check
+super <- tail <- self <- constraint_maxnorm <- NULL
 
 
 #' Custom keras L1 constraint.
