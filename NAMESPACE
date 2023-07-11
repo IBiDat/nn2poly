@@ -2,6 +2,7 @@
 
 S3method(nn2poly,default)
 S3method(nn2poly,keras.engine.training.Model)
+S3method(plot_taylor_and_activation_potentials,default)
 S3method(predict,nn2poly)
 export(add_constraints)
 export(change_string_to_function)
