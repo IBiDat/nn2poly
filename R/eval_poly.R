@@ -128,7 +128,7 @@ eval_poly <- function(x, poly) {
   }
 
   # Check if it is a single polynomial:
-  if (!is.matrix(poly$values)){
+  if (dim(response)[1]==1){
     response <- as.vector(response)
   }
 

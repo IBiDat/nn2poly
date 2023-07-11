@@ -7,7 +7,7 @@ test_that("eval_poly: Single polynomial evaluation and single observation works"
   class(poly) <- "nn2poly"
 
   x <- c(1,1)
-  expect_equal(predict(poly, x), as.matrix(1.5))
+  expect_equal(predict(poly, x), as.vector(1.5))
 
   # With intercept and unnordered labels
   poly <- list()
@@ -16,7 +16,7 @@ test_that("eval_poly: Single polynomial evaluation and single observation works"
   class(poly) <- "nn2poly"
 
   x <- c(2,-1)
-  expect_equal(predict(poly, x), as.matrix(4.5))
+  expect_equal(predict(poly, x), as.vector(4.5))
 })
 
 
@@ -44,7 +44,7 @@ test_that("eval_poly: Multiple polynomial evaluation and single observation work
 })
 
 test_that("eval_poly: Observation as dataframe works", {
-  # Single observation
+  # Single observation, multiple polynomials
   poly <- list()
   poly$values <- matrix(c(1,-1,1,
                           2,3,-2), nrow = 2, byrow = TRUE)
