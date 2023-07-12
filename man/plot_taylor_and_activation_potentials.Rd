@@ -44,6 +44,8 @@ documentation on how to constrain NN weights.}
 
 \item{taylor_interval}{optional parameter determining the interval in which
 the Taylor expansion is represented. Default is 1.5.}
+
+\item{...}{Additional parameters.}
 }
 \value{
 A list of plots.
