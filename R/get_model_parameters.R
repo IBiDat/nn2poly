@@ -8,8 +8,7 @@
 #' - \code{n_nurons}: the number of neurons at each layer.
 #' - \code{p}: the dimension of the problem, i.e., number of predictor variables.
 #'
-get_model_parameters <- function(model) { # test needed for this function
-
+get_model_parameters <- function(model) {
   nlayers <- length(model$layers)
 
   p <- model$layers[[1]]$input_shape[[2]]

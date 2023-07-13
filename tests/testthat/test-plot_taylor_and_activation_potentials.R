@@ -49,14 +49,10 @@ test_that("The function works as expected", {
              validation_split = 0.3
   )
 
-  # save the weights of the nn
-  nn_weights <- get_model_parameters(nn)$weights_list
-
   # compute the different plots
   plots <- plot_taylor_and_activation_potentials(
+    object = nn,
     data = train,
-    weights_list = nn_weights,
-    af_string_list = af_string_list,
     q_taylor_vector = q_taylor_vector,
     forced_max_Q = 3,
     my_max_norm = list("unconstrained",1))
