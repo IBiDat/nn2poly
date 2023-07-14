@@ -9,7 +9,7 @@
 
 
 # Set Python vars to NULL to avoid global variable notes in package check
-super <- tail <- self <- constraint_maxnorm <- NULL
+super <- self <- constraint_maxnorm <- NULL
 
 
 #' Custom keras L1 constraint.
@@ -66,11 +66,11 @@ add_constraints <- function(model,
       initialize = function(units, activation) {
         super$initialize()
         self$units = units
-        self$activation = activation
+        self$activation = tensorflow::tf$keras$activations$get(activation)
       },
       build = function(input_shape) {
         self$combined_w_b = self$add_weight(
-          shape = keras::shape(tensorflow::as_tensor(tail(input_shape, 1)) + tensorflow::tf$ones(keras::shape(1, 1), dtype = "int32"), self$units),
+          shape = keras::shape(tensorflow::as_tensor(utils::tail(input_shape, 1)) + tensorflow::tf$ones(keras::shape(1, 1), dtype = "int32"), self$units),
           initializer = "random_normal",
           trainable = TRUE,
           # Custom defined constraint with L1 norm
@@ -80,7 +80,7 @@ add_constraints <- function(model,
       call = function(inputs) {
         b = self$combined_w_b[1, , drop = TRUE]
         w = self$combined_w_b[2:NULL, ]
-        tensorflow::tf$matmul(inputs, w) + b
+        self$activation(tensorflow::tf$matmul(inputs, w) + b)
       }
     )
   )
@@ -92,7 +92,7 @@ add_constraints <- function(model,
       initialize = function(units, activation) {
         super$initialize()
         self$units = units
-        self$activation = activation
+        self$activation = tensorflow::tf$keras$activations$get(activation)
       },
       build = function(input_shape) {
         self$combined_w_b = self$add_weight(
@@ -106,7 +106,7 @@ add_constraints <- function(model,
       call = function(inputs) {
         b = self$combined_w_b[1, , drop = TRUE]
         w = self$combined_w_b[2:NULL, ]
-        tensorflow::tf$matmul(inputs, w) + b
+        self$activation(tensorflow::tf$matmul(inputs, w) + b)
       }
     )
   )
