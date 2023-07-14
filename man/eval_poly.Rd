@@ -29,7 +29,8 @@ Example: If \code{labels} contains the integer vector c(1,1,3) at position
 associated with the term x_1^2*x_3.}
 }
 \value{
-Matrix containing the evaluation of the polynomials. Each row
+Vector containing the evaluation of a single polynomial or
+matrix containing the evaluation of the polynomials. Each row
 corresponds to each polynomial used and each column to each observation,
 meaning that each row vector corresponds to the results of evaluating all the
 given data for each polynomial.
