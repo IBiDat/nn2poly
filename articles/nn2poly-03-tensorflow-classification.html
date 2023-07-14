@@ -178,13 +178,13 @@ weights.</p>
 <span><span class="va">nn1</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/layer_dense.html" class="external-link">layer_dense</a></span><span class="op">(</span>units <span class="op">=</span> <span class="va">n_class</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">nn1</span></span>
-<span><span class="co">#&gt; Model: "sequential_3"</span></span>
+<span><span class="co">#&gt; Model: "sequential_12"</span></span>
 <span><span class="co">#&gt; ________________________________________________________________________________________________________________________</span></span>
 <span><span class="co">#&gt;  Layer (type)                                         Output Shape                                    Param #           </span></span>
 <span><span class="co">#&gt; ========================================================================================================================</span></span>
-<span><span class="co">#&gt;  dense_8 (Dense)                                      (None, 100)                                     500               </span></span>
-<span><span class="co">#&gt;  dense_9 (Dense)                                      (None, 100)                                     10100             </span></span>
-<span><span class="co">#&gt;  dense_10 (Dense)                                     (None, 3)                                       303               </span></span>
+<span><span class="co">#&gt;  dense_20 (Dense)                                     (None, 100)                                     500               </span></span>
+<span><span class="co">#&gt;  dense_21 (Dense)                                     (None, 100)                                     10100             </span></span>
+<span><span class="co">#&gt;  dense_22 (Dense)                                     (None, 3)                                       303               </span></span>
 <span><span class="co">#&gt; ========================================================================================================================</span></span>
 <span><span class="co">#&gt; Total params: 10,903</span></span>
 <span><span class="co">#&gt; Trainable params: 10,903</span></span>
@@ -213,13 +213,13 @@ option.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">nn2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_constraints.html">add_constraints</a></span><span class="op">(</span><span class="va">nn1</span>, constraint_type <span class="op">=</span> <span class="st">"l1_norm"</span><span class="op">)</span></span>
 <span><span class="va">nn2</span></span>
-<span><span class="co">#&gt; Model: "sequential_4"</span></span>
+<span><span class="co">#&gt; Model: "sequential_13"</span></span>
 <span><span class="co">#&gt; ________________________________________________________________________________________________________________________</span></span>
 <span><span class="co">#&gt;  Layer (type)                                         Output Shape                                    Param #           </span></span>
 <span><span class="co">#&gt; ========================================================================================================================</span></span>
-<span><span class="co">#&gt;  layer__combined_l1_3 (Layer_Combined_L1)             (None, 100)                                     500               </span></span>
-<span><span class="co">#&gt;  layer__combined_l1_4 (Layer_Combined_L1)             (None, 100)                                     10100             </span></span>
-<span><span class="co">#&gt;  dense_11 (Dense)                                     (None, 3)                                       303               </span></span>
+<span><span class="co">#&gt;  layer__combined_l1_8 (Layer_Combined_L1)             (None, 100)                                     500               </span></span>
+<span><span class="co">#&gt;  layer__combined_l1_9 (Layer_Combined_L1)             (None, 100)                                     10100             </span></span>
+<span><span class="co">#&gt;  dense_23 (Dense)                                     (None, 3)                                       303               </span></span>
 <span><span class="co">#&gt; ========================================================================================================================</span></span>
 <span><span class="co">#&gt; Total params: 10,903</span></span>
 <span><span class="co">#&gt; Trainable params: 10,903</span></span>
@@ -588,15 +588,11 @@ green, that it expands over a wide range in the unconstrained NN while
 the it is kept closer to zero in the constrained one, thus having a more
 accurate Taylor expansion around zero.</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#Temporary parameter, should be removed or detected from object</span></span>
-<span><span class="va">my_max_norm1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"no_constraints"</span>,<span class="fl">1</span><span class="op">)</span></span>
-<span><span class="va">my_max_norm2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"l1_norm"</span>,<span class="fl">1</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/plot_taylor_and_activation_potentials.html">plot_taylor_and_activation_potentials</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">nn1</span>,</span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_taylor_and_activation_potentials.html">plot_taylor_and_activation_potentials</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">nn1</span>,</span>
 <span>                                      data <span class="op">=</span> <span class="va">train</span>,</span>
 <span>                                      q_taylor_vector <span class="op">=</span> <span class="va">q_taylor_vector</span>,</span>
 <span>                                      forced_max_Q <span class="op">=</span> <span class="fl">3</span>,</span>
-<span>                                      my_max_norm <span class="op">=</span> <span class="va">my_max_norm1</span><span class="op">)</span></span>
+<span>                                      constraints <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [[1]]</span></span></code></pre></div>
 <p><img src="figure/nn2poly-03-class-potentials-1.png"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
@@ -611,7 +607,7 @@ accurate Taylor expansion around zero.</p>
 <span>                                      data <span class="op">=</span> <span class="va">train</span>,</span>
 <span>                                      q_taylor_vector <span class="op">=</span> <span class="va">q_taylor_vector</span>,</span>
 <span>                                      forced_max_Q <span class="op">=</span> <span class="fl">3</span>,</span>
-<span>                                      my_max_norm <span class="op">=</span> <span class="va">my_max_norm2</span><span class="op">)</span></span>
+<span>                                      constraints <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [[1]]</span></span></code></pre></div>
 <p><img src="figure/nn2poly-03-class-potentials-4.png"></p>
 <pre><code><span><span class="co">#&gt; </span></span>

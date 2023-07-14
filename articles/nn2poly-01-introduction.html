@@ -246,13 +246,13 @@ the next vignettes.</p>
 <span>                  activation <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">nn</span></span>
-<span><span class="co">#&gt; Model: "sequential"</span></span>
+<span><span class="co">#&gt; Model: "sequential_9"</span></span>
 <span><span class="co">#&gt; ________________________________________________________________________________________________________________________</span></span>
 <span><span class="co">#&gt;  Layer (type)                                         Output Shape                                    Param #           </span></span>
 <span><span class="co">#&gt; ========================================================================================================================</span></span>
-<span><span class="co">#&gt;  dense (Dense)                                        (None, 10)                                      40                </span></span>
-<span><span class="co">#&gt;  dense_1 (Dense)                                      (None, 10)                                      110               </span></span>
-<span><span class="co">#&gt;  dense_2 (Dense)                                      (None, 1)                                       11                </span></span>
+<span><span class="co">#&gt;  dense_12 (Dense)                                     (None, 10)                                      40                </span></span>
+<span><span class="co">#&gt;  dense_13 (Dense)                                     (None, 10)                                      110               </span></span>
+<span><span class="co">#&gt;  dense_14 (Dense)                                     (None, 1)                                       11                </span></span>
 <span><span class="co">#&gt; ========================================================================================================================</span></span>
 <span><span class="co">#&gt; Total params: 161</span></span>
 <span><span class="co">#&gt; Trainable params: 161</span></span>
@@ -535,7 +535,7 @@ activation potentials are not strictly centered around zero.</p>
 <span>                                      data <span class="op">=</span> <span class="va">train</span>,</span>
 <span>                                    q_taylor_vector <span class="op">=</span> <span class="va">q_taylor_vector</span>,</span>
 <span>                                    forced_max_Q <span class="op">=</span> <span class="fl">3</span>,</span>
-<span>                                    my_max_norm <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"unconstrained"</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span>                                    constraints <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [[1]]</span></span></code></pre></div>
 <p><img src="figure/nn2poly-01-reg-potentials-1.png"></p>
 <pre><code><span><span class="co">#&gt; </span></span>

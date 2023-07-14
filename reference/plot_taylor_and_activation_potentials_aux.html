@@ -62,7 +62,7 @@ plot_taylor_and_activation_potentials function."><!-- mathjax --><script src="ht
 <span>  <span class="va">af_string_list</span>,</span>
 <span>  <span class="va">q_taylor_vector</span>,</span>
 <span>  <span class="va">forced_max_Q</span>,</span>
-<span>  <span class="va">my_max_norm</span>,</span>
+<span>  constraints <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  taylor_interval <span class="op">=</span> <span class="fl">1.5</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -104,9 +104,11 @@ that would naturally arise using all the orders in <code>q_taylor_vector</code>,
 as used in <code><a href="nn2poly_algorithm.html">nn2poly_algorithm</a></code>.</p></dd>
 
 
-<dt>my_max_norm</dt>
-<dd><p>List containing type of norm and maximum value. See
-documentation on how to constrain NN weights.</p></dd>
+<dt>constraints</dt>
+<dd><p>Boolean parameter determining if the NN is constrained
+(TRUE) or not (FALSE). This only modifies de plots title to show
+"constrained" or "unconstrained" respectively. Setting it to NULL will leave
+that part of the title empty. Default is set to NULL.</p></dd>
 
 
 <dt>taylor_interval</dt>
