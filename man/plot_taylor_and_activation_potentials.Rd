@@ -5,31 +5,30 @@
 \title{Plots activation potentials and Taylor expansion.}
 \usage{
 plot_taylor_and_activation_potentials(
+  object,
   data,
-  weights_list,
-  af_string_list,
   q_taylor_vector,
   forced_max_Q,
   my_max_norm,
-  taylor_interval = 1.5
+  taylor_interval = 1.5,
+  ...
 )
 }
 \arguments{
-\item{data}{Matrix or data frame containing the predictor variables (X)
-to be used as input to compute their activation potentials. The response
-variable column should not be included.}
-
-\item{weights_list}{\code{list} of length L ( number of hidden layers + 1)
+\item{object}{\code{list} of length L ( number of hidden layers + 1)
 containing the weights matrix for each layer.
 The expected shape of such matrices at any layer L is of the form
 $(h_(l-1) + 1)*(h_l)$, that is, the number of rows is the number of neurons
 in the previous layer plus the bias vector, and the number of columns is the
 number of neurons in the current layer L. Therefore, each column
-corresponds to the weight vector affecting each neuron in that layer.}
-
-\item{af_string_list}{\code{list} of length L containing \code{character}
+corresponds to the weight vector affecting each neuron in that layer.
+The names of \code{object} should have length L and be \code{character}
 strings with the names of the activation function used at each layer, as
 used in \code{\link{nn2poly_algorithm}}.}
+
+\item{data}{Matrix or data frame containing the predictor variables (X)
+to be used as input to compute their activation potentials. The response
+variable column should not be included.}
 
 \item{q_taylor_vector}{\code{vector} of length L containing the degree
 (\code{numeric}) up to which Taylor expansion should be performed at each
@@ -45,6 +44,8 @@ documentation on how to constrain NN weights.}
 
 \item{taylor_interval}{optional parameter determining the interval in which
 the Taylor expansion is represented. Default is 1.5.}
+
+\item{...}{Additional parameters.}
 }
 \value{
 A list of plots.

@@ -9,9 +9,9 @@ nn2poly_algorithm(
   weights_list,
   af_string_list,
   q_taylor_vector,
-  all_partitions,
+  all_partitions = NULL,
   store_coeffs = FALSE,
-  forced_max_Q
+  forced_max_Q = NULL
 )
 }
 \arguments{
@@ -19,9 +19,10 @@ nn2poly_algorithm(
 containing the weights matrix for each layer.
 The expected shape of such matrices at any layer L is of the form
 $(h_(l-1) + 1)*(h_l)$, that is, the number of rows is the number of neurons
-in the previous layer plus the bias vector, and the number of columns is the
-number of neurons in the current layer L. Therefore, each column
-corresponds to the weight vector affecting each neuron in that layer.}
+in the previous layer plus one (as the bias vector is added in the first row),
+and the number of columns is the number of neurons in the current layer L.
+Therefore, each column corresponds to the weight vector affecting each neuron
+in that layer, from 0 (the bias) in row 1, to neuron h_l in row h_l +1.}
 
 \item{af_string_list}{\code{list} of length L containing \code{character}
 strings with the names of the activation function used at each layer.}
@@ -31,7 +32,7 @@ strings with the names of the activation function used at each layer.}
 layer.}
 
 \item{all_partitions}{Optional argument containing the needed multipartitions
-as list of lists of lists. If missing, the function computes it first. This
+as list of lists of lists. If \code{NULL}, the function computes it first. This
 step can be computationally expensive and it is encouraged that the
 multipartitions are stored and reused when possible.}
 

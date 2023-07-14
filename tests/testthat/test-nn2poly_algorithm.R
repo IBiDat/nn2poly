@@ -1,4 +1,5 @@
-test_that("Check algorithm against precomputed example", {
+test_that("Check algorithm against precomputed example, without restricting
+          the maximum order Q", {
   # Load the example:
   nn2poly_example <- nn2poly_example0
 

@@ -22,20 +22,16 @@ More information with the theoretical insights about the underlying mathematical
   * Extension to deeper layers and proper formulation of the _NN2Poly_ method in this [arXiv preprint](https://doi.org/10.48550/arXiv.2112.11397).
 
 
-*Important remark 1*: The approximations made by the NN2poly method rely on Taylor expansions and therefore require some constraints to be imposed when training the original neural network. This package, `nn2poly`, does not implement this constraints as it only uses the final weight matrices and some information about the neural network architecture, it does not limit how the user trains the neural network. However, we also provide an auxiliary package `nn2poly.tools` for this matter, which will be explained and properly introduced in `vignette("nn2poly-02-constraints")`.
-
-
-
-*Important remark 2*: `nn2poly` is not limited to a special deep learning framework. As mentioned in the previous remark, only the weight matrices and some information about the neural network architecture is needed. Therefore, the framework used is not relevant. However, in this vignette examples we will be using `tensorflow` and `keras`. Furthermore, support for the training constraints in `nn2poly.tools`, explained in the previous remark, is currently limited to `tensorflow` and `keras`too.
+*Important remark 1*: The approximations made by the NN2poly method rely on Taylor expansions and therefore require some constraints to be imposed when training the original neural network. The implementation of these constraints depend on the deep learning framework used to train the neural networks. Currently, this package supports constraints implementation for *keras/tensorflow*, covered in `vignette("nn2poly-02-tensorflow-regression")` and `vignette("nn2poly-03-tensorflow-classification")`. Implementation for *pytorch* networks is in development. However, the `nn2poly` can work by default with any kind of neural network by manually feeding the neural network weights and activation functions to the algorithm. Therefore, `nn2poly` is not limited to a special deep learning framework.
 
 
 # This vignette's goal
 
-Here we aim to present the most simple use cases for `nn2poly`. For that matter, we will showcase how to use it in a regression problem with simulated data and then in a classification problem in the iris dataset. In both cases, a neural network will be trained first to solve the problem, and then `nn2poly` will generate one or several polynomials that approximate the neural network behavior.
+Here we present the basic behavior of `nn2poly` when used in its default version, without specifying any deep learning framework as explained in the previous remark. For that matter, we will showcase an example where we will get the weights from a trained neural network and manually create the object with the needed information to use `nn2poly`.
 
-In this case the neural network training will not have any constraint imposed. Then, as explained previously, the final approximation by the polynomial may not be accurate enough. For more information on how to impose those constraints and obtain good approximations, please see `vignette("nn2poly-02-constraints")`.
+The result will be a polynomial that tries to approximate the neural network behavior. In this case the neural network training will not have any constraint imposed. Then, as explained previously, the final approximation by the polynomial may not be accurate enough.
 
-The initial setup will be as follows, where besides the `nn2poly` package, we will load the `keras` package, which also loads `tensorflow`, used in this example to build and train the neural networks.
+This example is focused in the default version, but we need to build a NN under some framework, we will use `keras` and `tensorflow` for that matter. In any case, the needed parameters will be extracted and used under the default version of `nn2poly`, so this can be extrapolated to any other framework.
 
 
 
@@ -43,9 +39,8 @@ The initial setup will be as follows, where besides the `nn2poly` package, we wi
 library(nn2poly)
 library(keras)
 
-# For reproducibility
-set.seed(1)
-tensorflow::tf$random$set_seed(1)
+# This sets all needed seeds
+tensorflow::set_random_seed(42)
 ```
 
 
@@ -59,7 +54,7 @@ We will simulate polynomial data as follows. First we define a polynomial using 
   * Labels: A list of integer vectors denoting the combinations of variables that appear on each term of the polynomial. Variables are numbered from `1` to `p` where `p` is the dimension of the problem. As an example, `c(1,1,3)` would represent the term $x_1^2x_3$
   * Values: Vector containing the numerical values of the coefficients denoted by labels. If multiple polynomials with the same terms but different coefficients want to be represented, a matrix can be employed, where each row is a polynomial.
 
-Here we create the polynomial : $4x_1 - 3 x_2x_3$:
+Here we create the polynomial $4x_1 - 3 x_2x_3$:
 
 
 ```r
@@ -90,13 +85,13 @@ Y <- as.vector(eval_poly(X,polynomial)) + stats::rnorm(n_sample, 0, 0.1)
 # Store all as a data frame
 data <- as.data.frame(cbind(X, Y))
 head(data)
-#>           V1          V2          V3         Y
-#> 1 -0.6264538  0.07730312  1.13496509 -2.684020
-#> 2  0.1836433 -0.29686864  1.11193185  1.632335
-#> 3 -0.8356286 -1.18324224 -0.87077763 -6.344179
-#> 4  1.5952808  0.01129269  0.21073159  6.279883
-#> 5  0.3295078  0.99160104  0.06939565  1.165488
-#> 6 -0.8204684  1.59396745 -1.66264885  4.650553
+#>           V1           V2         V3          Y
+#> 1  1.3709584  1.029140719  2.3250585 -1.7547416
+#> 2 -0.5646982  0.914774868  0.5241222 -3.7107357
+#> 3  0.3631284 -0.002456267  0.9707334  1.3609395
+#> 4  0.6328626  0.136009552  0.3769734  2.4608270
+#> 5  0.4042683 -0.720153545 -0.9959334 -0.6141076
+#> 6 -0.1061245 -0.198124330 -0.5974829 -0.7455793
 ```
 
 Then we will scale the data to have everything in the $[-1,1]$ interval and divide it in train and test datasets.
@@ -123,14 +118,10 @@ test_y <- as.matrix(test[,(p+1)])
 
 ## Original neural network
 
-With our simulated data ready, we can train a feed forward dense neural network.
-
-The method is expected to be applied to a given trained densely connected feed forward neural network (NN from now on), also referred as multilayer perceptron (MLP). Therefore, this step is completely **optional** and can be skipped if any preferred method has been used to train a NN and there is an already given NN and its weights.
-
-In order to present an example, here we will create and train a NN. Our choice will be to use the `keras` framework to build and train it.
+With our simulated data ready, we can train our neural network. The method is expected to be applied to a given trained densely connected feed forward neural network (NN from now on), also referred as multilayer perceptron (MLP). Therefore, as explained before, the method used to train the NN can be used. Here we will use `keras`to train it, but we will manually build the needed object with the weights that has to be fed to the `nn2poly` algorithm **as if it was trained with any other framework**. For more information on the specific `keras` methods implemented in the package, please refer to `vignette("nn2poly-02-tensorflow-regression")` and `vignette("nn2poly-02-tensorflow-classification")`.
 
 
-*Note*: It is important to note that in order to avoid asymptotic behaviour of the method, it is useful to impose some kind of constraints when training the neural network weights. This is covered in `vignette("nn2poly-02-constraints")`.
+*Note*: Once again, note that, in order to avoid asymptotic behavior of the method, it is important to impose some kind of constraints when training the neural network weights. Details on how to do this depend on the chosen deep learning framework and are covered in the next vignettes.
 
 
 First, we build the model.
@@ -150,18 +141,18 @@ nn %>% layer_dense(units = 1,
                   activation = "linear")
 
 nn
-#> Model: "sequential_8"
-#> ________________________________________________________________________________________________________________________
-#>  Layer (type)                                         Output Shape                                    Param #           
-#> ========================================================================================================================
-#>  dense_8 (Dense)                                      (None, 10)                                      40                
-#>  dense_9 (Dense)                                      (None, 10)                                      110               
-#>  dense_10 (Dense)                                     (None, 1)                                       11                
-#> ========================================================================================================================
+#> Model: "sequential_15"
+#> ________________________________________________________________________________
+#>  Layer (type)                       Output Shape                    Param #     
+#> ================================================================================
+#>  dense_18 (Dense)                   (None, 10)                      40          
+#>  dense_19 (Dense)                   (None, 10)                      110         
+#>  dense_20 (Dense)                   (None, 1)                       11          
+#> ================================================================================
 #> Total params: 161
 #> Trainable params: 161
 #> Non-trainable params: 0
-#> ________________________________________________________________________________________________________________________
+#> ________________________________________________________________________________
 ```
 
 Compile the model:
@@ -209,19 +200,17 @@ plot_diagonal(x_axis =  prediction_NN, y_axis =  test_y, xlab = "NN prediction",
 
 ![](figure/nn2poly-01-reg-comparison-y-nn-1.png)
 
-*Note*: Recall that the NN performance is not addressed by nn2poly, meaning that this performance could be either good or bad and nn2poly still represent the NN behavior.
+*Note*: Recall that the NN performance is not addressed by `nn2poly`, meaning that this performance could be either good or bad and `nn2poly` still represent the NN behavior.
 
 ## Using nn2poly to obtain  the polynomial
 
-After the NN has been trained, using any chosen method by the user, the parameters have to be extracted and reshaped, if needed, to match the expected input of the function `nn2poly_algorithm()`. This input consists of the following objects:
+After the NN has been trained, using any chosen method by the user, the parameters have to be extracted and reshaped, if needed, to match the expected input of the function `nn2poly_algorithm()`. 
 
-* `weights_list`: A list of matrices with a weight matrix at each layer. The weights matrices should be of dimension ((1+input) * output) where the first row corresponds to the bias vector, and the rest of the rows correspond to each of the ordered vector weights associated to each input.
-* `af_string_list`: A list of strings with the names of the activation functions at each layer.
-* `q_taylor_vector`: A vector of integers containing the order of the Taylor expansion performed at each layer. If the output layer has a linear activation function, then the last value should be 1.
-* `forced_max_Q`: (optional value) An integer value denoting the maximum order of the terms computed in the polynomial. Usually 2 or 3 should be enough in practice. Note that higher orders suppose an explosion in the possible combinations. If the user does not provide a value, the polynomial order grows multiplicatively with the Taylor order at each hidden layer, therefore its better to start with low values.
+This input should be an `object` formed by a list of matrices with a weight matrix at each layer. The weights matrices should be of dimension ((1+input) * output) where the first row corresponds to the bias vector, and the rest of the rows correspond to each of the ordered vector weights associated to each input. 
 
-Following the example of the NN that we created previously, we need to extract its weights and biases and reshape them. Particularly, the `keras` framework by default separates kernel weights matrices of dimension (input * output) and bias vectors (1 * output), so we need to add the bias as the first row of a matrix ((1+input) * output).
+In that list, the name of each element has to be the activation function names of each layer. Currently supported activation functions are `"tanh", "sigmoid", "softplus", "linear"`.
 
+Particularly, the `keras` framework by default separates kernel weights matrices of dimension (input * output) and bias vectors (1 * output), so we need to add the bias as the first row of a matrix ((1+input) * output).
 
 
 ```r
@@ -234,34 +223,87 @@ nn_weights <- vector(mode = "list", length = n)
 for (i in 1:n){
   nn_weights[[i]] <- rbind(keras_weights[[2*i]], keras_weights[[2*i-1]])
 }
+
+# The activation functions stored as strings:
+af_string_names <- c("tanh","tanh", "linear")
+
+weights_object <- nn_weights
+names(weights_object) <- af_string_names
+
+weights_object
+#> $tanh
+#>            [,1]       [,2]      [,3]        [,4]        [,5]       [,6]
+#> [1,]  0.2637966 -0.1632335 0.4649245 -0.20589803  0.04730094 -0.3763387
+#> [2,]  0.2385524  0.1342811 0.2513933  0.48018309 -0.47788176  0.1631715
+#> [3,] -0.7742428 -0.1097567 0.8174284  0.08418242  0.06163564  0.7477616
+#> [4,] -0.6955228  0.5266028 0.5572206 -0.46307948  0.48515409 -0.7743985
+#>            [,7]        [,8]        [,9]       [,10]
+#> [1,] -0.2124885 -0.08747434 -0.07051360 -0.37202930
+#> [2,]  0.6607828 -0.31218216 -0.01426336 -0.01626668
+#> [3,] -0.8533844 -0.48116657  0.04514860 -0.70131820
+#> [4,]  0.1162070  0.35274017  0.04112899 -0.56946415
+#> 
+#> $tanh
+#>              [,1]        [,2]        [,3]        [,4]        [,5]       [,6]
+#>  [1,] -0.06261473  0.01255261  0.42954829  0.06141516  0.08550595  0.2265693
+#>  [2,]  0.61023968 -0.15460493  0.32420215  0.16633785  0.25600886 -0.2739864
+#>  [3,] -0.25070983 -0.05766810 -0.50344008  0.13009298 -0.03173310 -0.4047118
+#>  [4,]  0.40872586  0.46675542  0.11527456  0.43078154  0.15864335  0.6346628
+#>  [5,] -0.24814591  0.01059229  0.40011716  0.27607894 -0.46360433 -0.3692199
+#>  [6,] -0.26658243  0.51526904 -0.09131107  0.37373766  0.26082405  0.4299564
+#>  [7,]  0.51186675  0.12881947  0.67951459 -0.17605777  0.15393135  0.4613117
+#>  [8,]  0.40394908 -0.42659599 -0.98550946 -0.15839998  0.02221864  0.3011585
+#>  [9,]  0.50324774  0.11122702 -0.84318024 -0.02784178  0.31848624  0.2643846
+#> [10,]  0.27406499 -0.11159007  0.02285146  0.35646623  0.25075704 -0.1359648
+#> [11,] -0.52268207  0.45537508 -0.56030786  0.49129054 -0.03669148 -0.7891714
+#>              [,7]        [,8]        [,9]         [,10]
+#>  [1,]  0.08071607  0.16983804  0.08445328  0.0732324421
+#>  [2,]  0.06122208 -0.04379337 -0.57018125 -0.3144004941
+#>  [3,]  0.28472036  0.23372132 -0.47447795  0.0003889628
+#>  [4,]  0.01778316 -0.29318872  0.07777876 -0.0302867368
+#>  [5,] -0.53746992 -0.42425549 -0.48620722 -0.1922566146
+#>  [6,] -0.41601449 -0.25669649 -0.28299403 -0.2540818155
+#>  [7,] -0.22281407  0.40243641 -0.12623918 -0.4014825821
+#>  [8,] -0.04859665 -0.38288346  0.25072047 -0.3935797811
+#>  [9,]  0.48137835 -0.40863025  0.01616014 -0.5411312580
+#> [10,] -0.32286894  0.09449039 -0.06011314 -0.4011713266
+#> [11,]  0.14410253 -0.21469988  0.24569559  0.3822859824
+#> 
+#> $linear
+#>              [,1]
+#>  [1,] -0.07251097
+#>  [2,]  0.95829737
+#>  [3,] -0.07316440
+#>  [4,] -0.35980642
+#>  [5,] -0.43944517
+#>  [6,] -0.07012334
+#>  [7,]  0.60509491
+#>  [8,] -0.66404337
+#>  [9,] -0.04713812
+#> [10,] -0.79189116
+#> [11,] -0.91330308
 ```
 
+Additionally, there are other parameters affecting properties of the algorithm:
 
-The activation functions that we used can be stored as:
-
-
-```r
-af_string_list <- list("tanh","tanh", "linear")
-```
-
-And finally the order of the Taylor approximation that we are going to choose is 8 at each hidden layer. (The final polynomial order will be limited by `forced_max_Q=3`)
+* `q_taylor_vector`: A vector of integers containing the order of the Taylor expansion performed at each layer. If the output layer has a linear activation function, then the last value should be 1.
 
 
 ```r
 q_taylor_vector <- c(8, 8,  1)
 ```
 
+* `forced_max_Q`: (optional value) An integer value denoting the maximum order of the terms computed in the polynomial. Usually 2 or 3 should be enough in practice. Note that higher orders suppose an explosion in the possible combinations. If the user does not provide a value, the polynomial order grows multiplicatively with the Taylor order at each hidden layer, therefore its better to start with low values.
+
 When the input is in the desired shape, the nn2poly method can be applied:
 
 
+
 ```r
-final_poly <- nn2poly_algorithm(
-  weights_list = nn_weights,
-  af_string_list = af_string_list,
-  q_taylor_vector = q_taylor_vector,
-  store_coeffs = FALSE,
-  forced_max_Q = 3
-)
+
+final_poly <- nn2poly(object = weights_object,
+                      q_taylor_vector = q_taylor_vector,
+                      forced_max_Q = 3)
 ```
 
 
@@ -333,24 +375,32 @@ final_poly
 #> 
 #> 
 #> $values
-#>           [,1]      [,2]        [,3]        [,4]          [,5]        [,6]        [,7]       [,8]      [,9]      [,10]
-#> [1,] 0.1563016 0.7812154 -0.03797179 -0.05108133 -0.0002868382 -0.04386124 -0.01815984 -0.1081569 -2.742122 -0.1109731
-#>            [,11]      [,12]      [,13]       [,14]     [,15]     [,16]     [,17]     [,18]      [,19]     [,20]
-#> [1,] -0.05425595 -0.1401266 0.08083027 -0.08008732 0.1254146 0.2044834 0.0233742 0.7296176 0.01581843 0.3277675
+#>            [,1]      [,2]       [,3]        [,4]       [,5]       [,6]
+#> [1,] -0.1617715 0.7475098 0.09908831 -0.08050417 0.07277049 0.03545956
+#>             [,7]      [,8]      [,9]      [,10]       [,11]     [,12]
+#> [1,] 0.009334022 0.3035036 -2.559723 0.02124509 -0.08924709 0.2939184
+#>           [,13]     [,14]       [,15]      [,16]     [,17]     [,18]      [,19]
+#> [1,] 0.01080101 0.6197476 -0.04956815 0.07802355 0.5294107 -1.012448 -0.7079898
+#>            [,20]
+#> [1,] -0.05140071
+#> 
+#> attr(,"class")
+#> [1] "nn2poly"
 ```
-
+Note that the output has the `nn2poly` class.
 
 ## Obtaining polynomial predictions
 
-After obtaining the polynomial coefficients, we can use them to predict the response variable $Y$, which can be done using function `eval_poly()`:
+After obtaining the polynomial coefficients, we can use them to predict the response variable $Y$. This is done by employing function `predcit`on an `nn2poly` object and providing the new data to predict.
+
 
 
 ```r
 
 # Obtain the predicted values for the test data with our polynomial
-prediction_poly <- as.vector(eval_poly(x = test_x, poly = final_poly))
+prediction_poly <- predict(object = final_poly,
+                           newdata = test_x)
 ```
-
 
 
 ## Visualizing the results
@@ -368,7 +418,9 @@ plot_diagonal(x_axis =  prediction_NN, y_axis =  prediction_poly, xlab = "NN pre
 
 ![](figure/nn2poly-01-reg-comparison-polynomial-nn-1.png)
 
-We can also plot the $n$ most important coefficients in absolute value to compare which variables or interactions are more relevant in the polynomial. Note that, as data should be scaled to the $[-1,1]$ interval, interactions of order 2 or higher would usually need a higher absolute value than the lower order coefficients be more relevant.
+We can also plot the $n$ most important coefficients in absolute value to compare which variables or interactions are more relevant in the polynomial. Note that, as data should be scaled to the $[-1,1]$ interval, interactions of order 2 or higher would usually need a higher absolute value than the lower order coefficients to be more relevant.
+
+In this case we can see how the coefficients differ from the original polynomial $4x_1 - 3 x_2x_3$, as there were no constraints on the neural network weights training.
 
 
 ```r
@@ -378,14 +430,15 @@ plot_n_important_coeffs(final_poly, 8)
 ![](figure/nn2poly-01-reg-n-important-1.png)
 
 
-Another convenient plot to show how the algorithm is affected by each layer can be obtained with `plot_taylor_and_activation_potentials()`, where the activation potentials at each neuron are computed and presented over the Taylor expansion approximation of the activation function at each layer. In this case, as we have not used constraints in the NN training, the activation potentials are not strictly centered around zero.
+Another convenient plot to show how the algorithm is affected by each layer can be obtained with `plot_taylor_and_activation_potentials()`, where the activation potentials at each neuron are computed and presented over the Taylor expansion approximation of the activation function at each layer. 
+
+In this case, as we have not used constraints in the NN training, the activation potentials are not strictly centered around zero.
 
 
 
 ```r
-plot_taylor_and_activation_potentials(data = train,
-                                    weights_list = nn_weights,
-                                    af_string_list = af_string_list,
+plot_taylor_and_activation_potentials(object = nn,
+                                      data = train,
                                     q_taylor_vector = q_taylor_vector,
                                     forced_max_Q = 3,
                                     my_max_norm = list("unconstrained",1))
@@ -407,491 +460,6 @@ plot_taylor_and_activation_potentials(data = train,
 ```
 
 ![](figure/nn2poly-01-reg-potentials-3.png)
-
-
-# Simple classification example
-
-In this example, instead of a regression problem we will show a classification example, where a NN will be trained to classify species with the `iris` dataset, and then nn2poly will be employed to obtain a polynomial for each species.
-
-
-## Data preparation
-
-We will load the `iris` dataset from R and then scale it to have everything in the $[-1,1]$ interval and divide it in train and test datasets, in the same manner as the previous regression example.
-
-
-```r
-# Load the data
-data(iris)
-
-# Change response to numeric. In this case, Species was already numeric,
-# but this step is needed if it is a factor variable.
-iris$Species <- as.numeric(iris$Species)
-
-# Define dimension p (number of predictor variables)
-p <- dim(iris)[2] - 1
-
-# Define objective classes
-n_class <- max(iris[,(p+1)])
-
-# Move objective classes from (1:3) to (0:2), needed for tensorflow
-iris[,(p+1)] <- iris[,(p+1)] - 1
-```
-
-
-```r
-# Scale the data in the [-1,1] interval and separate train and test
-# Only the predictor variables are scaled, not the response as those will be
-# the different classes.
-iris_x <- iris[,-(p+1)]
-maxs <- apply(iris_x, 2, max)
-mins <- apply(iris_x, 2, min)
-data_x_scaled <- as.data.frame(scale(iris_x, center = mins + (maxs - mins) / 2, scale = (maxs - mins) / 2))
-data <- cbind(data_x_scaled, iris[,(p+1)])
-
-# Divide in train (0.75) and test (0.25)
-index <- sample(1:nrow(data), round(0.75 * nrow(data)))
-train <- data[index, ]
-test <- data[-index, ]
-
-train_x <- as.matrix(train[,-(p+1)])
-train_y <- as.matrix(train[,(p+1)])
-
-test_x <- as.matrix(test[,-(p+1)])
-test_y <- as.matrix(test[,(p+1)])
-```
-
-
-## Original neural network
-
-We can now train the NN, following the same procedure as in the regression problem.
-
-
-*Note*: It is important to note that in order to avoid asymptotic behavior of the method, it is useful to impose some kind of constraint when training the neural network weights. This is covered in `vignette("nn2poly-02-constraints")`.
-
-
-First, we build the model. Note that in this case the NN has a linear output with the same number of neurons as the number of classes to predict (3 species). Then, the linear output will be transformed in a probability to find the most probable class but this step is done after training. Therefore, nn2poly will be used to obtain a polynomial that approximates this nn with linear outputs and then its results will also be transformed ito predict the highest probability class.
-
-
-```r
-nn <- keras_model_sequential()
-
-nn %>% layer_dense(units = 100,
-                  activation = "tanh",
-                  input_shape = p)
-
-nn %>% layer_dense(units = 100,
-                  activation = "tanh")
-
-nn %>% layer_dense(units = n_class)
-
-nn
-#> Model: "sequential_9"
-#> ________________________________________________________________________________________________________________________
-#>  Layer (type)                                         Output Shape                                    Param #           
-#> ========================================================================================================================
-#>  dense_11 (Dense)                                     (None, 100)                                     500               
-#>  dense_12 (Dense)                                     (None, 100)                                     10100             
-#>  dense_13 (Dense)                                     (None, 3)                                       303               
-#> ========================================================================================================================
-#> Total params: 10,903
-#> Trainable params: 10,903
-#> Non-trainable params: 0
-#> ________________________________________________________________________________________________________________________
-```
-
-
-
-Compile the model:
-
-
-```r
-compile(nn,
-        loss = loss_sparse_categorical_crossentropy(from_logits = TRUE),
-        optimizer = optimizer_adam(),
-        metrics = "accuracy")
-```
-
-And train it:
-
-
-```r
-history <- fit(nn,
-               train_x,
-               train_y,
-               verbose = 0,
-               epochs = 200,
-               validation_split = 0.3
-)
-```
-
-We can visualize the training process:
-
-
-```r
-plot(history)
-```
-
-![](figure/nn2poly-01-class-history-1.png)
-
-In this case, to asses the NN accuracy we have to transform the nn output into a probability:
-
-
-```r
-probability_model <- keras_model_sequential() %>%
-  nn() %>%
-  layer_activation_softmax() %>%
-  layer_lambda(k_argmax)
-```
-
-And predict the results for the test data:
-
-
-```r
-# Obtain the predicted classes with the NN to compare them
-prediction_NN_class <- predict(probability_model, test_x)
-
-# Also, the linear output can be predicted before the probability model
-prediction_NN <- predict(nn, test_x)
-```
-We can use here a confusion matrix to visualize the results, where we can see that the NN correctly predicts the classes of each observation:
-
-
-```r
-# Create a confusion matrix
-cm <- caret::confusionMatrix(as.factor(prediction_NN_class), as.factor(test_y))
-cm
-#> Confusion Matrix and Statistics
-#> 
-#>           Reference
-#> Prediction  0  1  2
-#>          0 15  0  0
-#>          1  0 11  0
-#>          2  0  0 12
-#> 
-#> Overall Statistics
-#>                                      
-#>                Accuracy : 1          
-#>                  95% CI : (0.9075, 1)
-#>     No Information Rate : 0.3947     
-#>     P-Value [Acc > NIR] : 4.568e-16  
-#>                                      
-#>                   Kappa : 1          
-#>                                      
-#>  Mcnemar's Test P-Value : NA         
-#> 
-#> Statistics by Class:
-#> 
-#>                      Class: 0 Class: 1 Class: 2
-#> Sensitivity            1.0000   1.0000   1.0000
-#> Specificity            1.0000   1.0000   1.0000
-#> Pos Pred Value         1.0000   1.0000   1.0000
-#> Neg Pred Value         1.0000   1.0000   1.0000
-#> Prevalence             0.3947   0.2895   0.3158
-#> Detection Rate         0.3947   0.2895   0.3158
-#> Detection Prevalence   0.3947   0.2895   0.3158
-#> Balanced Accuracy      1.0000   1.0000   1.0000
-```
-
-
-## Using nn2poly to obtain  the polynomial
-
-After the NN has been trained, we need to extract and reshape the parameters as explained in the regression case:
-
-
-```r
-keras_weights <- keras::get_weights(nn)
-
-# Due to keras giving weights separated from the bias, we have twice the
-# elements that we want:
-n <- length(keras_weights)/2
-nn_weights <- vector(mode = "list", length = n)
-for (i in 1:n){
-  nn_weights[[i]] <- rbind(keras_weights[[2*i]], keras_weights[[2*i-1]])
-}
-```
-
-
-The activation functions that we used can be stored as:
-
-
-```r
-af_string_list <- list("tanh","tanh", "linear")
-```
-
-
-And finally the order of the Taylor approximation that we are going to choose is 8 at each hidden layer. (The final polynomial order will be limited by `forced_max_Q=3`)
-
-
-```r
-q_taylor_vector <- c(8, 8,  1)
-```
-
-When the input is in the desired shape, the nn2poly method can be applied:
-
-
-```r
-final_poly <- nn2poly_algorithm(
-  weights_list = nn_weights,
-  af_string_list = af_string_list,
-  q_taylor_vector = q_taylor_vector,
-  store_coeffs = FALSE,
-  forced_max_Q = 3
-)
-```
-
-
-We can have a glimpse at how the coefficients of the polynomial are stored. As explained before, it has an structure as a list with labels and values. In this case, as we have 3 output polynomials (one per output neuron), the values are stored as a matrix with 3 rows, each one corresponding to the final polynomial at each neuron.
-
-
-```r
-final_poly
-#> $labels
-#> $labels[[1]]
-#> [1] 0
-#> 
-#> $labels[[2]]
-#> [1] 1
-#> 
-#> $labels[[3]]
-#> [1] 2
-#> 
-#> $labels[[4]]
-#> [1] 3
-#> 
-#> $labels[[5]]
-#> [1] 4
-#> 
-#> $labels[[6]]
-#> [1] 1 1
-#> 
-#> $labels[[7]]
-#> [1] 1 2
-#> 
-#> $labels[[8]]
-#> [1] 1 3
-#> 
-#> $labels[[9]]
-#> [1] 1 4
-#> 
-#> $labels[[10]]
-#> [1] 2 2
-#> 
-#> $labels[[11]]
-#> [1] 2 3
-#> 
-#> $labels[[12]]
-#> [1] 2 4
-#> 
-#> $labels[[13]]
-#> [1] 3 3
-#> 
-#> $labels[[14]]
-#> [1] 3 4
-#> 
-#> $labels[[15]]
-#> [1] 4 4
-#> 
-#> $labels[[16]]
-#> [1] 1 1 1
-#> 
-#> $labels[[17]]
-#> [1] 1 1 2
-#> 
-#> $labels[[18]]
-#> [1] 1 1 3
-#> 
-#> $labels[[19]]
-#> [1] 1 1 4
-#> 
-#> $labels[[20]]
-#> [1] 1 2 2
-#> 
-#> $labels[[21]]
-#> [1] 1 2 3
-#> 
-#> $labels[[22]]
-#> [1] 1 2 4
-#> 
-#> $labels[[23]]
-#> [1] 1 3 3
-#> 
-#> $labels[[24]]
-#> [1] 1 3 4
-#> 
-#> $labels[[25]]
-#> [1] 1 4 4
-#> 
-#> $labels[[26]]
-#> [1] 2 2 2
-#> 
-#> $labels[[27]]
-#> [1] 2 2 3
-#> 
-#> $labels[[28]]
-#> [1] 2 2 4
-#> 
-#> $labels[[29]]
-#> [1] 2 3 3
-#> 
-#> $labels[[30]]
-#> [1] 2 3 4
-#> 
-#> $labels[[31]]
-#> [1] 2 4 4
-#> 
-#> $labels[[32]]
-#> [1] 3 3 3
-#> 
-#> $labels[[33]]
-#> [1] 3 3 4
-#> 
-#> $labels[[34]]
-#> [1] 3 4 4
-#> 
-#> $labels[[35]]
-#> [1] 4 4 4
-#> 
-#> 
-#> $values
-#>            [,1]       [,2]      [,3]       [,4]      [,5]       [,6]        [,7]       [,8]       [,9]      [,10]
-#> [1,]  0.8657658 -1.7300284  8.113782 -10.717649 -7.525810  0.1469271 -0.70277557  0.8939304  0.5885493  0.1100270
-#> [2,]  5.4942742  1.4966233 -1.085263  -1.835088 -3.184985 -0.2746923  0.04573656  0.6527696  0.8150438 -0.8027244
-#> [3,] -5.7575579 -0.5725639 -4.417216   8.945973  8.171859  0.2144595  0.33243746 -1.0557353 -1.0806295  0.6099637
-#>           [,11]     [,12]     [,13]     [,14]     [,15]         [,16]      [,17]       [,18]       [,19]      [,20]
-#> [1,]  0.4881656  1.068435 -1.166918 -2.792616 -1.501065  0.1063938930 -0.4377667  0.51825850  0.34801827 -0.4742372
-#> [2,]  2.7916732  2.479559 -3.668994 -7.058366 -3.785811 -0.0600402544  0.1777157 -0.06871239  0.02029091  0.1880001
-#> [3,] -2.6275450 -2.659728  3.825817  7.535975  4.007151  0.0008082067  0.1119611 -0.25966474 -0.25119710  0.1195640
-#>           [,21]      [,22]       [,23]      [,24]      [,25]      [,26]      [,27]      [,28]      [,29]     [,30]
-#> [1,] -1.0910061 -0.5866069  0.57747843  0.3071512  0.4076099 -1.0644389  3.6230229  2.3926840  3.7525210 -6.062567
-#> [2,]  0.7459916  0.5918715  0.06005741 -1.4353904  0.1645449  0.2718333 -0.6268611 -0.1363726 -0.4302278 -1.263415
-#> [3,] -0.3287014 -0.3277693 -0.41444497  1.1755901 -0.4089281  0.4415258 -1.7749913 -1.4421963 -2.0169330  4.834294
-#>            [,31]      [,32]     [,33]     [,34]     [,35]
-#> [1,]  2.50018436  2.2998056  4.735468  4.741073  1.159419
-#> [2,]  0.07348067  0.8013098  3.284242  3.329447  1.498424
-#> [3,] -1.67965325 -2.0488358 -5.474633 -5.517897 -1.817963
-```
-
-## Obtaining polynomial predictions
-
-As said before, the obtained polynomial represents the neural network before including the softmax function and computing the class assigned to each observation. Then, we need to define again a keras sequential model that includes the class computation from the polynomial output. This polynomial output is obtained with `eval_poly()`, in this case in matrix form, as the 3 polynomials are evaluated at the same time:
-
-
-```r
-
-# Obtain the predicted values for the test data with our Polynomial Regression
-prediction_poly_matrix <- eval_poly(x = test_x, poly = final_poly)
-
-# Define probability model with keras fro the polynomial outputs
-probability_poly <- keras_model_sequential() %>%
-  layer_activation_softmax() %>%
-  layer_lambda(k_argmax)
-
-# Class prediction with the polynomial outputs
-prediction_poly_class <- predict(probability_poly,t(prediction_poly_matrix))
-```
-
-
-
-## Visualising the results
-
-Again, a confusion matrix is useful to visualize the predictions, in this case we are comparing the polynomial predictions with the NN predictions.
-
-
-```r
-
-# Confussion matrix between NN class prediction and polynomial class prediction
-cm <- caret::confusionMatrix(as.factor(prediction_NN_class), as.factor(prediction_poly_class))
-cm
-#> Confusion Matrix and Statistics
-#> 
-#>           Reference
-#> Prediction  0  1  2
-#>          0 14  0  1
-#>          1  0 11  0
-#>          2  0  0 12
-#> 
-#> Overall Statistics
-#>                                           
-#>                Accuracy : 0.9737          
-#>                  95% CI : (0.8619, 0.9993)
-#>     No Information Rate : 0.3684          
-#>     P-Value [Acc > NIR] : 2.196e-15       
-#>                                           
-#>                   Kappa : 0.9603          
-#>                                           
-#>  Mcnemar's Test P-Value : NA              
-#> 
-#> Statistics by Class:
-#> 
-#>                      Class: 0 Class: 1 Class: 2
-#> Sensitivity            1.0000   1.0000   0.9231
-#> Specificity            0.9583   1.0000   1.0000
-#> Pos Pred Value         0.9333   1.0000   1.0000
-#> Neg Pred Value         1.0000   1.0000   0.9615
-#> Prevalence             0.3684   0.2895   0.3421
-#> Detection Rate         0.3684   0.2895   0.3158
-#> Detection Prevalence   0.3947   0.2895   0.3158
-#> Balanced Accuracy      0.9792   1.0000   0.9615
-```
-
-We can also compare the linear output of the NN with each polynomial output, before computing the assigned class. In this case we can see that even when almost all the classes were correctly assigned, the linear output is not so well approximated by the polynomial. This is due to this example being computed without any kind of constraints on the NN, problem that is solved in `vignette("nn2poly-02-constraints")`:
-
-
-```r
-for (i in 1:3){
-  print(
-    plot_diagonal(x_axis =  prediction_NN[,i],
-                  y_axis =  prediction_poly_matrix[i,],
-                  xlab = "NN prediction",
-                  ylab = "Polynomial prediction")
-        )
-}
-```
-
-![](figure/nn2poly-01-class-diagonal-plot-1.png)![](figure/nn2poly-01-class-diagonal-plot-2.png)![](figure/nn2poly-01-class-diagonal-plot-3.png)
-
-We can also plot the $n$ most important coefficients in absolute value (for each output polynomial) to compare which variables or interactions are more relevant in the polynomial. Note that, as data should be scaled to the $[-1,1]$ interval, interactions of order 2 or higher would usually need a higher absolute value than the lower order coefficients be more relevant.
-
-
-```r
-plot_n_important_coeffs(final_poly, 8)
-```
-
-![](figure/nn2poly-01-class-n-important-1.png)
-
-In order to try to identify where the problem is arising, we can use the synaptic potential plots. In this case it is easy to see that those activation potentials are widely spread over the x axis. Therefore, constraints are needed to keep them close to zero:
-
-
-```r
-plot_taylor_and_activation_potentials(data = train,
-                                    weights_list = nn_weights,
-                                    af_string_list = af_string_list,
-                                    q_taylor_vector = q_taylor_vector,
-                                    forced_max_Q = 3,
-                                    my_max_norm = list("unconstrained",1))
-#> [[1]]
-```
-
-![](figure/nn2poly-01-class-potentials-1.png)
-
-```
-#> 
-#> [[2]]
-```
-
-![](figure/nn2poly-01-class-potentials-2.png)
-
-```
-#> 
-#> [[3]]
-```
-
-![](figure/nn2poly-01-class-potentials-3.png)
-
-
-
-
-
 
 
 

@@ -1,3 +1,4 @@
+
 #' Plots activation potentials and Taylor expansion.
 #'
 #' Function that allows to take a NN and the data input values
@@ -6,6 +7,87 @@
 #' with the Taylor expansion used in the activation functions. If any layer
 #' is \code{'linear'} (usually will be the output), then that layer will not
 #' be an approximation as Taylor expansion is not needed.
+#'
+#' @param object \code{list} of length L ( number of hidden layers + 1)
+#' containing the weights matrix for each layer.
+#' The expected shape of such matrices at any layer L is of the form
+#' $(h_(l-1) + 1)*(h_l)$, that is, the number of rows is the number of neurons
+#' in the previous layer plus the bias vector, and the number of columns is the
+#' number of neurons in the current layer L. Therefore, each column
+#' corresponds to the weight vector affecting each neuron in that layer.
+#' The names of \code{object} should have length L and be \code{character}
+#' strings with the names of the activation function used at each layer, as
+#' used in [`nn2poly_algorithm`].
+#' @param data Matrix or data frame containing the predictor variables (X)
+#' to be used as input to compute their activation potentials. The response
+#' variable column should not be included.
+#' @param q_taylor_vector \code{vector} of length L containing the degree
+#' (\code{numeric}) up to which Taylor expansion should be performed at each
+#' layer, as used in [`nn2poly_algorithm`].
+#' @param forced_max_Q Integer that determines the maximum order
+#' that we will force in the final polynomial, discarding terms of higher order
+#' that would naturally arise using all the orders in `q_taylor_vector`,
+#' as used in [`nn2poly_algorithm`].
+#' @param my_max_norm List containing type of norm and maximum value. See
+#' documentation on how to constrain NN weights.
+#' @param taylor_interval optional parameter determining the interval in which
+#' the Taylor expansion is represented. Default is 1.5.
+#' @param ... Additional parameters.
+#'
+#' @return A list of plots.
+#' @export
+plot_taylor_and_activation_potentials <- function(object,
+                                                  data,
+                                                  q_taylor_vector,
+                                                  forced_max_Q,
+                                                  my_max_norm,
+                                                  taylor_interval = 1.5,
+                                                  ...) {
+  UseMethod("plot_taylor_and_activation_potentials")
+}
+
+#' @export
+plot_taylor_and_activation_potentials.default <- function(object,
+                                                          data,
+                                                          q_taylor_vector,
+                                                          forced_max_Q,
+                                                          my_max_norm,
+                                                          taylor_interval = 1.5,
+                                                          ...) {
+  weights_list   <- object
+  af_string_list <- names(object)
+
+  plot_taylor_and_activation_potentials_aux(data            = data,
+                                            weights_list    = weights_list,
+                                            af_string_list  = af_string_list,
+                                            q_taylor_vector = q_taylor_vector,
+                                            forced_max_Q    = forced_max_Q,
+                                            my_max_norm     = my_max_norm,
+                                            taylor_interval = taylor_interval)
+}
+
+#' @export
+plot_taylor_and_activation_potentials.keras.engine.training.Model <- function(object,
+                                                                              data,
+                                                                              q_taylor_vector,
+                                                                              forced_max_Q,
+                                                                              my_max_norm,
+                                                                              taylor_interval = 1.5,
+                                                                              ...) {
+  model_parameters <- get_model_parameters(object)
+
+  plot_taylor_and_activation_potentials_aux(data            = data,
+                                            weights_list    = model_parameters$weights_list,
+                                            af_string_list  = model_parameters$af_string_list,
+                                            q_taylor_vector = q_taylor_vector,
+                                            forced_max_Q    = forced_max_Q,
+                                            my_max_norm     = my_max_norm,
+                                            taylor_interval = taylor_interval)
+
+}
+
+#' Auxiliary function to reduce the code of the S3 methods for the
+#' \code{plot_taylor_and_activation_potentials} function.
 #'
 #' @param data Matrix or data frame containing the predictor variables (X)
 #' to be used as input to compute their activation potentials. The response
@@ -33,16 +115,14 @@
 #' the Taylor expansion is represented. Default is 1.5.
 #'
 #' @return A list of plots.
-#' @export
 #'
-
-plot_taylor_and_activation_potentials <- function(data,
-                                                weights_list,
-                                                af_string_list,
-                                                q_taylor_vector,
-                                                forced_max_Q,
-                                                my_max_norm,
-                                                taylor_interval = 1.5) {
+plot_taylor_and_activation_potentials_aux <- function(data,
+                                                      weights_list,
+                                                      af_string_list,
+                                                      q_taylor_vector,
+                                                      forced_max_Q,
+                                                      my_max_norm,
+                                                      taylor_interval = 1.5) {
   if (!requireNamespace("ggplot2", quietly = TRUE))
     stop("package 'ggplot2' is required for this functionality", call.=FALSE)
 

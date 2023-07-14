@@ -1,4 +1,4 @@
-test_that("single polynomial evaluation and single observation works", {
+test_that("Single polynomial evaluation and single observation works", {
 
   # With intercept and ordered labels
   poly <- list()
@@ -6,7 +6,7 @@ test_that("single polynomial evaluation and single observation works", {
   poly$labels <- list(c(0),c(1),c(2),c(1,1))
 
   x <- c(1,1)
-  expect_equal(eval_poly(x,poly), as.matrix(1.5))
+  expect_equal(eval_poly(x,poly), as.vector(1.5))
 
   # With intercept and unnordered labels
   poly <- list()
@@ -14,10 +14,10 @@ test_that("single polynomial evaluation and single observation works", {
   poly$labels <- list(c(1),c(0),c(1,1),c(2))
 
   x <- c(2,-1)
-  expect_equal(eval_poly(x,poly), as.matrix(4.5))
+  expect_equal(eval_poly(x,poly), as.vector(4.5))
 })
 
-test_that("multiple polynomial evaluation and single observation works", {
+test_that("Multiple polynomial evaluation and single observation works", {
 
   # Without intercept
   poly <- list()
@@ -39,7 +39,7 @@ test_that("multiple polynomial evaluation and single observation works", {
 })
 
 
-test_that("singele polynomial evaluation and multiple observations (matrix) works", {
+test_that("Single polynomial evaluation and multiple observations (matrix) works", {
 
   # Without intercept
   poly <- list()
@@ -47,10 +47,10 @@ test_that("singele polynomial evaluation and multiple observations (matrix) work
   poly$labels <- list(c(1),c(2),c(1,1))
 
   x <- rbind(c(1,2), c(1,1))
-  expect_equal(eval_poly(x,poly), t(as.matrix(c(0,1))))
+  expect_equal(eval_poly(x,poly), as.vector(c(0,1)))
 })
 
-test_that("multiple polynomial evaluation and multiple observations (matrix) works", {
+test_that("Multiple polynomial evaluation and multiple observations (matrix) works", {
 
   # Without intercept
   poly <- list()
@@ -73,7 +73,7 @@ test_that("multiple polynomial evaluation and multiple observations (matrix) wor
 
 
 test_that("Observation as dataframe works", {
-  # Single Observations
+  # Single Observation, multiple polynomials
   poly <- list()
   poly$values <- matrix(c(1,-1,1,
                           2,3,-2), nrow = 2, byrow = TRUE)
