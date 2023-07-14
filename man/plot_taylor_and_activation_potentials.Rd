@@ -9,7 +9,7 @@ plot_taylor_and_activation_potentials(
   data,
   q_taylor_vector,
   forced_max_Q,
-  constraints = NULL,
+  constraints,
   taylor_interval = 1.5,
   ...
 )
@@ -41,8 +41,7 @@ as used in \code{\link{nn2poly_algorithm}}.}
 
 \item{constraints}{Boolean parameter determining if the NN is constrained
 (TRUE) or not (FALSE). This only modifies de plots title to show
-"constrained" or "unconstrained" respectively. Setting it to NULL will leave
-that part of the title empty. Default is set to NULL.}
+"constrained" or "unconstrained" respectively.}
 
 \item{taylor_interval}{optional parameter determining the interval in which
 the Taylor expansion is represented. Default is 1.5.}
