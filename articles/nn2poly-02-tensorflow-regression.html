@@ -186,19 +186,19 @@ weights.</p>
 <span>                  activation <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">nn1</span></span>
-<span><span class="co">#&gt; Model: "sequential_16"</span></span>
-<span><span class="co">#&gt; ________________________________________________________________________________</span></span>
-<span><span class="co">#&gt;  Layer (type)                       Output Shape                    Param #     </span></span>
-<span><span class="co">#&gt; ================================================================================</span></span>
-<span><span class="co">#&gt;  dense_21 (Dense)                   (None, 100)                     400         </span></span>
-<span><span class="co">#&gt;  dense_22 (Dense)                   (None, 100)                     10100       </span></span>
-<span><span class="co">#&gt;  dense_23 (Dense)                   (None, 100)                     10100       </span></span>
-<span><span class="co">#&gt;  dense_24 (Dense)                   (None, 1)                       101         </span></span>
-<span><span class="co">#&gt; ================================================================================</span></span>
+<span><span class="co">#&gt; Model: "sequential_1"</span></span>
+<span><span class="co">#&gt; ________________________________________________________________________________________________________________________</span></span>
+<span><span class="co">#&gt;  Layer (type)                                         Output Shape                                    Param #           </span></span>
+<span><span class="co">#&gt; ========================================================================================================================</span></span>
+<span><span class="co">#&gt;  dense_3 (Dense)                                      (None, 100)                                     400               </span></span>
+<span><span class="co">#&gt;  dense_4 (Dense)                                      (None, 100)                                     10100             </span></span>
+<span><span class="co">#&gt;  dense_5 (Dense)                                      (None, 100)                                     10100             </span></span>
+<span><span class="co">#&gt;  dense_6 (Dense)                                      (None, 1)                                       101               </span></span>
+<span><span class="co">#&gt; ========================================================================================================================</span></span>
 <span><span class="co">#&gt; Total params: 20,701</span></span>
 <span><span class="co">#&gt; Trainable params: 20,701</span></span>
 <span><span class="co">#&gt; Non-trainable params: 0</span></span>
-<span><span class="co">#&gt; ________________________________________________________________________________</span></span></code></pre></div>
+<span><span class="co">#&gt; ________________________________________________________________________________________________________________________</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="build-nn-2-constrained">Build NN 2, constrained<a class="anchor" aria-label="anchor" href="#build-nn-2-constrained"></a>
@@ -222,22 +222,19 @@ option.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">nn2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_constraints.html">add_constraints</a></span><span class="op">(</span><span class="va">nn1</span>, constraint_type <span class="op">=</span> <span class="st">"l1_norm"</span><span class="op">)</span></span>
 <span><span class="va">nn2</span></span>
-<span><span class="co">#&gt; Model: "sequential_17"</span></span>
-<span><span class="co">#&gt; ________________________________________________________________________________</span></span>
-<span><span class="co">#&gt;  Layer (type)                       Output Shape                    Param #     </span></span>
-<span><span class="co">#&gt; ================================================================================</span></span>
-<span><span class="co">#&gt;  layer__combined_l1_12 (Layer_Combi  (None, 100)                    400         </span></span>
-<span><span class="co">#&gt;  ned_L1)                                                                        </span></span>
-<span><span class="co">#&gt;  layer__combined_l1_13 (Layer_Combi  (None, 100)                    10100       </span></span>
-<span><span class="co">#&gt;  ned_L1)                                                                        </span></span>
-<span><span class="co">#&gt;  layer__combined_l1_14 (Layer_Combi  (None, 100)                    10100       </span></span>
-<span><span class="co">#&gt;  ned_L1)                                                                        </span></span>
-<span><span class="co">#&gt;  dense_25 (Dense)                   (None, 1)                       101         </span></span>
-<span><span class="co">#&gt; ================================================================================</span></span>
+<span><span class="co">#&gt; Model: "sequential_2"</span></span>
+<span><span class="co">#&gt; ________________________________________________________________________________________________________________________</span></span>
+<span><span class="co">#&gt;  Layer (type)                                         Output Shape                                    Param #           </span></span>
+<span><span class="co">#&gt; ========================================================================================================================</span></span>
+<span><span class="co">#&gt;  layer__combined_l1 (Layer_Combined_L1)               (None, 100)                                     400               </span></span>
+<span><span class="co">#&gt;  layer__combined_l1_1 (Layer_Combined_L1)             (None, 100)                                     10100             </span></span>
+<span><span class="co">#&gt;  layer__combined_l1_2 (Layer_Combined_L1)             (None, 100)                                     10100             </span></span>
+<span><span class="co">#&gt;  dense_7 (Dense)                                      (None, 1)                                       101               </span></span>
+<span><span class="co">#&gt; ========================================================================================================================</span></span>
 <span><span class="co">#&gt; Total params: 20,701</span></span>
 <span><span class="co">#&gt; Trainable params: 20,701</span></span>
 <span><span class="co">#&gt; Non-trainable params: 0</span></span>
-<span><span class="co">#&gt; ________________________________________________________________________________</span></span></code></pre></div>
+<span><span class="co">#&gt; ________________________________________________________________________________________________________________________</span></span></code></pre></div>
 <p>Note how the parameters and structure are the same, but the layer
 type has been modified.</p>
 </div>

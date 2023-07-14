@@ -178,18 +178,18 @@ weights.</p>
 <span><span class="va">nn1</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/layer_dense.html" class="external-link">layer_dense</a></span><span class="op">(</span>units <span class="op">=</span> <span class="va">n_class</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">nn1</span></span>
-<span><span class="co">#&gt; Model: "sequential_18"</span></span>
-<span><span class="co">#&gt; ________________________________________________________________________________</span></span>
-<span><span class="co">#&gt;  Layer (type)                       Output Shape                    Param #     </span></span>
-<span><span class="co">#&gt; ================================================================================</span></span>
-<span><span class="co">#&gt;  dense_26 (Dense)                   (None, 100)                     500         </span></span>
-<span><span class="co">#&gt;  dense_27 (Dense)                   (None, 100)                     10100       </span></span>
-<span><span class="co">#&gt;  dense_28 (Dense)                   (None, 3)                       303         </span></span>
-<span><span class="co">#&gt; ================================================================================</span></span>
+<span><span class="co">#&gt; Model: "sequential_3"</span></span>
+<span><span class="co">#&gt; ________________________________________________________________________________________________________________________</span></span>
+<span><span class="co">#&gt;  Layer (type)                                         Output Shape                                    Param #           </span></span>
+<span><span class="co">#&gt; ========================================================================================================================</span></span>
+<span><span class="co">#&gt;  dense_8 (Dense)                                      (None, 100)                                     500               </span></span>
+<span><span class="co">#&gt;  dense_9 (Dense)                                      (None, 100)                                     10100             </span></span>
+<span><span class="co">#&gt;  dense_10 (Dense)                                     (None, 3)                                       303               </span></span>
+<span><span class="co">#&gt; ========================================================================================================================</span></span>
 <span><span class="co">#&gt; Total params: 10,903</span></span>
 <span><span class="co">#&gt; Trainable params: 10,903</span></span>
 <span><span class="co">#&gt; Non-trainable params: 0</span></span>
-<span><span class="co">#&gt; ________________________________________________________________________________</span></span></code></pre></div>
+<span><span class="co">#&gt; ________________________________________________________________________________________________________________________</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="build-nn-2-constrained">Build NN 2, constrained<a class="anchor" aria-label="anchor" href="#build-nn-2-constrained"></a>
@@ -213,20 +213,18 @@ option.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">nn2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_constraints.html">add_constraints</a></span><span class="op">(</span><span class="va">nn1</span>, constraint_type <span class="op">=</span> <span class="st">"l1_norm"</span><span class="op">)</span></span>
 <span><span class="va">nn2</span></span>
-<span><span class="co">#&gt; Model: "sequential_19"</span></span>
-<span><span class="co">#&gt; ________________________________________________________________________________</span></span>
-<span><span class="co">#&gt;  Layer (type)                       Output Shape                    Param #     </span></span>
-<span><span class="co">#&gt; ================================================================================</span></span>
-<span><span class="co">#&gt;  layer__combined_l1_15 (Layer_Combi  (None, 100)                    500         </span></span>
-<span><span class="co">#&gt;  ned_L1)                                                                        </span></span>
-<span><span class="co">#&gt;  layer__combined_l1_16 (Layer_Combi  (None, 100)                    10100       </span></span>
-<span><span class="co">#&gt;  ned_L1)                                                                        </span></span>
-<span><span class="co">#&gt;  dense_29 (Dense)                   (None, 3)                       303         </span></span>
-<span><span class="co">#&gt; ================================================================================</span></span>
+<span><span class="co">#&gt; Model: "sequential_4"</span></span>
+<span><span class="co">#&gt; ________________________________________________________________________________________________________________________</span></span>
+<span><span class="co">#&gt;  Layer (type)                                         Output Shape                                    Param #           </span></span>
+<span><span class="co">#&gt; ========================================================================================================================</span></span>
+<span><span class="co">#&gt;  layer__combined_l1_3 (Layer_Combined_L1)             (None, 100)                                     500               </span></span>
+<span><span class="co">#&gt;  layer__combined_l1_4 (Layer_Combined_L1)             (None, 100)                                     10100             </span></span>
+<span><span class="co">#&gt;  dense_11 (Dense)                                     (None, 3)                                       303               </span></span>
+<span><span class="co">#&gt; ========================================================================================================================</span></span>
 <span><span class="co">#&gt; Total params: 10,903</span></span>
 <span><span class="co">#&gt; Trainable params: 10,903</span></span>
 <span><span class="co">#&gt; Non-trainable params: 0</span></span>
-<span><span class="co">#&gt; ________________________________________________________________________________</span></span></code></pre></div>
+<span><span class="co">#&gt; ________________________________________________________________________________________________________________________</span></span></code></pre></div>
 <p>Note how the parameters and structure are the same, but the layer
 type has been modified.</p>
 </div>
@@ -305,11 +303,9 @@ later with the polynomial output)</p>
 <span><span class="co"># Also, the linear output can be predicted before the probability model</span></span>
 <span><span class="va">prediction_NN2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">nn2</span>, <span class="va">test_x</span><span class="op">)</span></span></code></pre></div>
 </div>
-</div>
-</div>
-<div class="section level2">
-<h2 id="visualize-the-nns-results">Visualize the NNs results:<a class="anchor" aria-label="anchor" href="#visualize-the-nns-results"></a>
-</h2>
+<div class="section level4">
+<h4 id="visualize-the-nns-results">Visualize the NNs results:<a class="anchor" aria-label="anchor" href="#visualize-the-nns-results"></a>
+</h4>
 <p>We can use here a confusion matrix to visualize the results, where we
 can see that both NNs correctly predicts almost all of the classes in
 the test data:</p>
@@ -381,6 +377,8 @@ the test data:</p>
 <span><span class="co">#&gt; Detection Rate         0.3421   0.3684   0.2105</span></span>
 <span><span class="co">#&gt; Detection Prevalence   0.3421   0.4474   0.2105</span></span>
 <span><span class="co">#&gt; Balanced Accuracy      1.0000   0.9375   0.8636</span></span></code></pre></div>
+</div>
+</div>
 <div class="section level3">
 <h3 id="using-nn2poly-to-obtain-the-polynomial">Using nn2poly to obtain the polynomial<a class="anchor" aria-label="anchor" href="#using-nn2poly-to-obtain-the-polynomial"></a>
 </h3>
