@@ -29,7 +29,8 @@ compute their labels and store both things in a list of length 2."><!-- mathjax 
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/nn2poly-01-introduction.html">01 - Introduction to nn2poly</a>
-    <a class="dropdown-item" href="../articles/nn2poly-02-constraints.html">02 - Constraining the weights in the NN</a>
+    <a class="dropdown-item" href="../articles/nn2poly-02-tensorflow-regression.html">02 - Regression example using tensorflow</a>
+    <a class="dropdown-item" href="../articles/nn2poly-03-tensorflow-classification.html">03 - Classification example using tensorflow</a>
   </div>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -76,128 +77,6 @@ compute their labels and store both things in a list of length 2.</p>
 and the second element is a list with the partitions.</p>
     </div>
 
-    <div class="section level2">
-    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">obtain_partitions_with_labels</span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $labels</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $labels[[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $labels[[2]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $labels[[3]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1 2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $labels[[4]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1 1 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $labels[[5]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1 1 2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[1]][[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[1]][[1]][[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[2]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[2]][[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[2]][[1]][[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[2]][[2]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[2]][[2]][[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[2]][[2]][[2]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[3]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[3]][[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[3]][[1]][[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1 2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[3]][[2]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[3]][[2]][[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[3]][[2]][[2]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[4]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[4]][[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[4]][[1]][[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1 1 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[4]][[2]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[4]][[2]][[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[4]][[2]][[2]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[4]][[3]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[4]][[3]][[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[4]][[3]][[2]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[4]][[3]][[3]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[5]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[5]][[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[5]][[1]][[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1 1 2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[5]][[2]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[5]][[2]][[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[5]][[2]][[2]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[5]][[3]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[5]][[3]][[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1 2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[5]][[3]][[2]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[5]][[4]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[5]][[4]][[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[5]][[4]][[2]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $partitions[[5]][[4]][[3]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span></span></span>
-</code></pre></div>
-    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 

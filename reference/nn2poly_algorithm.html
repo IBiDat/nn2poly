@@ -31,7 +31,8 @@ using its weights and a Taylor approximation of its activation functions."><!-- 
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/nn2poly-01-introduction.html">01 - Introduction to nn2poly</a>
-    <a class="dropdown-item" href="../articles/nn2poly-02-constraints.html">02 - Constraining the weights in the NN</a>
+    <a class="dropdown-item" href="../articles/nn2poly-02-tensorflow-regression.html">02 - Regression example using tensorflow</a>
+    <a class="dropdown-item" href="../articles/nn2poly-03-tensorflow-classification.html">03 - Classification example using tensorflow</a>
   </div>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -62,9 +63,9 @@ using its weights and a Taylor approximation of its activation functions.</p>
 <span>  <span class="va">weights_list</span>,</span>
 <span>  <span class="va">af_string_list</span>,</span>
 <span>  <span class="va">q_taylor_vector</span>,</span>
-<span>  <span class="va">all_partitions</span>,</span>
+<span>  all_partitions <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  store_coeffs <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  <span class="va">forced_max_Q</span></span>
+<span>  forced_max_Q <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -75,9 +76,10 @@ using its weights and a Taylor approximation of its activation functions.</p>
 containing the weights matrix for each layer.
 The expected shape of such matrices at any layer L is of the form
 $(h_(l-1) + 1)*(h_l)$, that is, the number of rows is the number of neurons
-in the previous layer plus the bias vector, and the number of columns is the
-number of neurons in the current layer L. Therefore, each column
-corresponds to the weight vector affecting each neuron in that layer.</p></dd>
+in the previous layer plus one (as the bias vector is added in the first row),
+and the number of columns is the number of neurons in the current layer L.
+Therefore, each column corresponds to the weight vector affecting each neuron
+in that layer, from 0 (the bias) in row 1, to neuron h_l in row h_l +1.</p></dd>
 
 
 <dt>af_string_list</dt>
@@ -93,7 +95,7 @@ layer.</p></dd>
 
 <dt>all_partitions</dt>
 <dd><p>Optional argument containing the needed multipartitions
-as list of lists of lists. If missing, the function computes it first. This
+as list of lists of lists. If <code>NULL</code>, the function computes it first. This
 step can be computationally expensive and it is encouraged that the
 multipartitions are stored and reused when possible.</p></dd>
 

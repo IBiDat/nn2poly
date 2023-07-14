@@ -16,7 +16,10 @@
     <loc>https://ibidat.github.io/nn2poly/articles/nn2poly-01-introduction.html</loc>
   </url>
   <url>
-    <loc>https://ibidat.github.io/nn2poly/articles/nn2poly-02-constraints.html</loc>
+    <loc>https://ibidat.github.io/nn2poly/articles/nn2poly-02-tensorflow-regression.html</loc>
+  </url>
+  <url>
+    <loc>https://ibidat.github.io/nn2poly/articles/nn2poly-03-tensorflow-classification.html</loc>
   </url>
   <url>
     <loc>https://ibidat.github.io/nn2poly/authors.html</loc>
@@ -25,10 +28,16 @@
     <loc>https://ibidat.github.io/nn2poly/index.html</loc>
   </url>
   <url>
+    <loc>https://ibidat.github.io/nn2poly/reference/add_constraints.html</loc>
+  </url>
+  <url>
     <loc>https://ibidat.github.io/nn2poly/reference/change_string_to_function.html</loc>
   </url>
   <url>
     <loc>https://ibidat.github.io/nn2poly/reference/check_weight_constraints.html</loc>
+  </url>
+  <url>
+    <loc>https://ibidat.github.io/nn2poly/reference/constraint_l1_norm.html</loc>
   </url>
   <url>
     <loc>https://ibidat.github.io/nn2poly/reference/datasets.html</loc>
@@ -37,7 +46,13 @@
     <loc>https://ibidat.github.io/nn2poly/reference/eval_poly.html</loc>
   </url>
   <url>
+    <loc>https://ibidat.github.io/nn2poly/reference/get_model_parameters.html</loc>
+  </url>
+  <url>
     <loc>https://ibidat.github.io/nn2poly/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>https://ibidat.github.io/nn2poly/reference/nn2poly.html</loc>
   </url>
   <url>
     <loc>https://ibidat.github.io/nn2poly/reference/nn2poly_algorithm.html</loc>
@@ -56,5 +71,11 @@
   </url>
   <url>
     <loc>https://ibidat.github.io/nn2poly/reference/plot_taylor_and_activation_potentials.html</loc>
+  </url>
+  <url>
+    <loc>https://ibidat.github.io/nn2poly/reference/plot_taylor_and_activation_potentials_aux.html</loc>
+  </url>
+  <url>
+    <loc>https://ibidat.github.io/nn2poly/reference/predict.nn2poly.html</loc>
   </url>
 </urlset>
