@@ -9,7 +9,7 @@ plot_taylor_and_activation_potentials(
   data,
   q_taylor_vector,
   forced_max_Q,
-  my_max_norm,
+  constraints = NULL,
   taylor_interval = 1.5,
   ...
 )
@@ -39,8 +39,10 @@ that we will force in the final polynomial, discarding terms of higher order
 that would naturally arise using all the orders in \code{q_taylor_vector},
 as used in \code{\link{nn2poly_algorithm}}.}
 
-\item{my_max_norm}{List containing type of norm and maximum value. See
-documentation on how to constrain NN weights.}
+\item{constraints}{Boolean parameter determining if the NN is constrained
+(TRUE) or not (FALSE). This only modifies de plots title to show
+"constrained" or "unconstrained" respectively. Setting it to NULL will leave
+that part of the title empty. Default is set to NULL.}
 
 \item{taylor_interval}{optional parameter determining the interval in which
 the Taylor expansion is represented. Default is 1.5.}

@@ -18,7 +18,7 @@ vignette: >
 
 After showing how to use `nn2poly` in its default version in `vignette("nn2poly-01-introduction")`, here we will present how to use specific methods related to `keras` and `tensorflow` that allow for an easier and smoother use of `nn2poly` with that deep learning framework. Furthermore, we will sow how to impose the needed weight constraints in `tensorflow` during training to have accurate results and compare those results with an unconstrained neural network.
 
-In this vignette we will focus on a simple regression example and a classification one is covered in `vignette("nn2poly-03-tensorflow-classification")`. 
+In this vignette we will focus on a simple regression example and a classification one is covered in `vignette("nn2poly-03-tensorflow-classification")`.
 
 
 ```r
@@ -123,14 +123,14 @@ nn1 %>% layer_dense(units = 1,
                   activation = "linear")
 
 nn1
-#> Model: "sequential_1"
+#> Model: "sequential_10"
 #> ________________________________________________________________________________________________________________________
 #>  Layer (type)                                         Output Shape                                    Param #           
 #> ========================================================================================================================
-#>  dense_3 (Dense)                                      (None, 100)                                     400               
-#>  dense_4 (Dense)                                      (None, 100)                                     10100             
-#>  dense_5 (Dense)                                      (None, 100)                                     10100             
-#>  dense_6 (Dense)                                      (None, 1)                                       101               
+#>  dense_15 (Dense)                                     (None, 100)                                     400               
+#>  dense_16 (Dense)                                     (None, 100)                                     10100             
+#>  dense_17 (Dense)                                     (None, 100)                                     10100             
+#>  dense_18 (Dense)                                     (None, 1)                                       101               
 #> ========================================================================================================================
 #> Total params: 20,701
 #> Trainable params: 20,701
@@ -151,14 +151,14 @@ Note that L1 norm equal to 1 when scaling the input data to the $[-1,1]$ interva
 ```r
 nn2 <- add_constraints(nn1, constraint_type = "l1_norm")
 nn2
-#> Model: "sequential_2"
+#> Model: "sequential_11"
 #> ________________________________________________________________________________________________________________________
 #>  Layer (type)                                         Output Shape                                    Param #           
 #> ========================================================================================================================
-#>  layer__combined_l1 (Layer_Combined_L1)               (None, 100)                                     400               
-#>  layer__combined_l1_1 (Layer_Combined_L1)             (None, 100)                                     10100             
-#>  layer__combined_l1_2 (Layer_Combined_L1)             (None, 100)                                     10100             
-#>  dense_7 (Dense)                                      (None, 1)                                       101               
+#>  layer__combined_l1_5 (Layer_Combined_L1)             (None, 100)                                     400               
+#>  layer__combined_l1_6 (Layer_Combined_L1)             (None, 100)                                     10100             
+#>  layer__combined_l1_7 (Layer_Combined_L1)             (None, 100)                                     10100             
+#>  dense_19 (Dense)                                     (None, 1)                                       101               
 #> ========================================================================================================================
 #> Total params: 20,701
 #> Trainable params: 20,701
@@ -331,15 +331,11 @@ It can be clearly seen with the activation potentials density, in green, that it
 
 
 ```r
-#Temporary parameter, should be removed or detected from object
-my_max_norm1 <- list("no_constraints",1)
-my_max_norm2 <- list("l1_norm",1)
-
 plot_taylor_and_activation_potentials(object = nn1,
                                       data = train,
                                       q_taylor_vector = q_taylor_vector,
                                       forced_max_Q = 3,
-                                      my_max_norm = my_max_norm1)
+                                      constraints = FALSE)
 #> [[1]]
 ```
 
@@ -372,7 +368,7 @@ plot_taylor_and_activation_potentials(object = nn2,
                                       data = train,
                                       q_taylor_vector = q_taylor_vector,
                                       forced_max_Q = 3,
-                                      my_max_norm = my_max_norm2)
+                                      constraints = TRUE)
 #> [[1]]
 ```
 

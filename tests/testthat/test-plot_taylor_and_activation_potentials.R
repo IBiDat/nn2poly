@@ -55,7 +55,7 @@ test_that("The function works as expected", {
     data = train,
     q_taylor_vector = q_taylor_vector,
     forced_max_Q = 3,
-    my_max_norm = list("unconstrained",1))
+    constraints = FALSE)
 
   # test the different plots
   vdiffr::expect_doppelganger("layer1", plots[[1]])

@@ -26,7 +26,7 @@ knitr::opts_chunk$set(
 
 After showing how to use `nn2poly` in its default version in `vignette("nn2poly-01-introduction")`, here we will present how to use specific methods related to `keras` and `tensorflow` that allow for an easier and smoother use of `nn2poly` with that deep learning framework. Furthermore, we will sow how to impose the needed weight constraints in `tensorflow` during training to have accurate results and compare those results with an unconstrained neural network.
 
-In this vignette we will focus on a simple classification example using the `iris` dataset. A regression one is covered in `vignette("nn2poly-02-tensorflow-regression")`. 
+In this vignette we will focus on a simple classification example using the `iris` dataset. A regression one is covered in `vignette("nn2poly-02-tensorflow-regression")`.
 
 ```{r setup}
 library(nn2poly)
@@ -356,19 +356,15 @@ Finally, the problem with Taylor expansion can be checked with the following plo
 It can be clearly seen with the activation potentials density, in green, that it expands over a wide range in the unconstrained NN while the it is kept closer to zero in the constrained one, thus having a more accurate Taylor expansion  around zero.
 
 ```{r class-potentials}
-#Temporary parameter, should be removed or detected from object
-my_max_norm1 <- list("no_constraints",1)
-my_max_norm2 <- list("l1_norm",1)
-
 plot_taylor_and_activation_potentials(object = nn1,
                                       data = train,
                                       q_taylor_vector = q_taylor_vector,
                                       forced_max_Q = 3,
-                                      my_max_norm = my_max_norm1)
+                                      constraints = FALSE)
 
 plot_taylor_and_activation_potentials(object = nn2,
                                       data = train,
                                       q_taylor_vector = q_taylor_vector,
                                       forced_max_Q = 3,
-                                      my_max_norm = my_max_norm2)
+                                      constraints = TRUE)
 ```

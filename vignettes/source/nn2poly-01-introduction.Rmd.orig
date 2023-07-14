@@ -184,9 +184,9 @@ plot_diagonal(x_axis =  prediction_NN, y_axis =  test_y, xlab = "NN prediction",
 
 ## Using nn2poly to obtain  the polynomial
 
-After the NN has been trained, using any chosen method by the user, the parameters have to be extracted and reshaped, if needed, to match the expected input of the function `nn2poly_algorithm()`. 
+After the NN has been trained, using any chosen method by the user, the parameters have to be extracted and reshaped, if needed, to match the expected input of the function `nn2poly_algorithm()`.
 
-This input should be an `object` formed by a list of matrices with a weight matrix at each layer. The weights matrices should be of dimension ((1+input) * output) where the first row corresponds to the bias vector, and the rest of the rows correspond to each of the ordered vector weights associated to each input. 
+This input should be an `object` formed by a list of matrices with a weight matrix at each layer. The weights matrices should be of dimension ((1+input) * output) where the first row corresponds to the bias vector, and the rest of the rows correspond to each of the ordered vector weights associated to each input.
 
 In that list, the name of each element has to be the activation function names of each layer. Currently supported activation functions are `"tanh", "sigmoid", "softplus", "linear"`.
 
@@ -276,7 +276,7 @@ plot_n_important_coeffs(final_poly, 8)
 ```
 
 
-Another convenient plot to show how the algorithm is affected by each layer can be obtained with `plot_taylor_and_activation_potentials()`, where the activation potentials at each neuron are computed and presented over the Taylor expansion approximation of the activation function at each layer. 
+Another convenient plot to show how the algorithm is affected by each layer can be obtained with `plot_taylor_and_activation_potentials()`, where the activation potentials at each neuron are computed and presented over the Taylor expansion approximation of the activation function at each layer.
 
 In this case, as we have not used constraints in the NN training, the activation potentials are not strictly centered around zero.
 
@@ -286,7 +286,7 @@ plot_taylor_and_activation_potentials(object = nn,
                                       data = train,
                                     q_taylor_vector = q_taylor_vector,
                                     forced_max_Q = 3,
-                                    my_max_norm = list("unconstrained",1))
+                                    constraints = FALSE)
 ```
 
 

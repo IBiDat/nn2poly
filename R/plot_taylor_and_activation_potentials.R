@@ -28,8 +28,9 @@
 #' that we will force in the final polynomial, discarding terms of higher order
 #' that would naturally arise using all the orders in `q_taylor_vector`,
 #' as used in [`nn2poly_algorithm`].
-#' @param my_max_norm List containing type of norm and maximum value. See
-#' documentation on how to constrain NN weights.
+#' @param constraints Boolean parameter determining if the NN is constrained
+#' (TRUE) or not (FALSE). This only modifies de plots title to show
+#' "constrained" or "unconstrained" respectively.
 #' @param taylor_interval optional parameter determining the interval in which
 #' the Taylor expansion is represented. Default is 1.5.
 #' @param ... Additional parameters.
@@ -40,7 +41,7 @@ plot_taylor_and_activation_potentials <- function(object,
                                                   data,
                                                   q_taylor_vector,
                                                   forced_max_Q,
-                                                  my_max_norm,
+                                                  constraints,
                                                   taylor_interval = 1.5,
                                                   ...) {
   UseMethod("plot_taylor_and_activation_potentials")
@@ -51,7 +52,7 @@ plot_taylor_and_activation_potentials.default <- function(object,
                                                           data,
                                                           q_taylor_vector,
                                                           forced_max_Q,
-                                                          my_max_norm,
+                                                          constraints,
                                                           taylor_interval = 1.5,
                                                           ...) {
   weights_list   <- object
@@ -62,7 +63,7 @@ plot_taylor_and_activation_potentials.default <- function(object,
                                             af_string_list  = af_string_list,
                                             q_taylor_vector = q_taylor_vector,
                                             forced_max_Q    = forced_max_Q,
-                                            my_max_norm     = my_max_norm,
+                                            constraints     = constraints,
                                             taylor_interval = taylor_interval)
 }
 
@@ -71,7 +72,7 @@ plot_taylor_and_activation_potentials.keras.engine.training.Model <- function(ob
                                                                               data,
                                                                               q_taylor_vector,
                                                                               forced_max_Q,
-                                                                              my_max_norm,
+                                                                              constraints,
                                                                               taylor_interval = 1.5,
                                                                               ...) {
   model_parameters <- get_model_parameters(object)
@@ -81,7 +82,7 @@ plot_taylor_and_activation_potentials.keras.engine.training.Model <- function(ob
                                             af_string_list  = model_parameters$af_string_list,
                                             q_taylor_vector = q_taylor_vector,
                                             forced_max_Q    = forced_max_Q,
-                                            my_max_norm     = my_max_norm,
+                                            constraints     = constraints,
                                             taylor_interval = taylor_interval)
 
 }
@@ -109,8 +110,9 @@ plot_taylor_and_activation_potentials.keras.engine.training.Model <- function(ob
 #' that we will force in the final polynomial, discarding terms of higher order
 #' that would naturally arise using all the orders in `q_taylor_vector`,
 #' as used in [`nn2poly_algorithm`].
-#' @param my_max_norm List containing type of norm and maximum value. See
-#' documentation on how to constrain NN weights.
+#' @param constraints Boolean parameter determining if the NN is constrained
+#' (TRUE) or not (FALSE). This only modifies de plots title to show
+#' "constrained" or "unconstrained" respectively.
 #' @param taylor_interval optional parameter determining the interval in which
 #' the Taylor expansion is represented. Default is 1.5.
 #'
@@ -121,7 +123,7 @@ plot_taylor_and_activation_potentials_aux <- function(data,
                                                       af_string_list,
                                                       q_taylor_vector,
                                                       forced_max_Q,
-                                                      my_max_norm,
+                                                      constraints,
                                                       taylor_interval = 1.5) {
   if (!requireNamespace("ggplot2", quietly = TRUE))
     stop("package 'ggplot2' is required for this functionality", call.=FALSE)
@@ -216,11 +218,13 @@ plot_taylor_and_activation_potentials_aux <- function(data,
     df.plot <- data.frame(x, yf, yp, error)
 
     name_plot <- paste0("Layer ",k, ",")
-    if (my_max_norm[[1]] %in% c("l1_norm","l2_norm")){
+    if (constraints){
       name_plot <- paste0(name_plot," constrained")
-    } else {
+    } else if (!constraints) {
       name_plot <- paste0(name_plot," no constraints")
     }
+
+
 
     plot.taylor.simple <- ggplot2::ggplot() +
       ggplot2::geom_line(data = df.plot, ggplot2::aes(x, yf, color = "black")) +
