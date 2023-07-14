@@ -107,18 +107,18 @@ nn1 %>% layer_dense(units = 100,
 nn1 %>% layer_dense(units = n_class)
 
 nn1
-#> Model: "sequential_18"
-#> ________________________________________________________________________________
-#>  Layer (type)                       Output Shape                    Param #     
-#> ================================================================================
-#>  dense_26 (Dense)                   (None, 100)                     500         
-#>  dense_27 (Dense)                   (None, 100)                     10100       
-#>  dense_28 (Dense)                   (None, 3)                       303         
-#> ================================================================================
+#> Model: "sequential_3"
+#> ________________________________________________________________________________________________________________________
+#>  Layer (type)                                         Output Shape                                    Param #           
+#> ========================================================================================================================
+#>  dense_8 (Dense)                                      (None, 100)                                     500               
+#>  dense_9 (Dense)                                      (None, 100)                                     10100             
+#>  dense_10 (Dense)                                     (None, 3)                                       303               
+#> ========================================================================================================================
 #> Total params: 10,903
 #> Trainable params: 10,903
 #> Non-trainable params: 0
-#> ________________________________________________________________________________
+#> ________________________________________________________________________________________________________________________
 ```
 
 
@@ -134,20 +134,18 @@ Note that L1 norm equal to 1 when scaling the input data to the $[-1,1]$ interva
 ```r
 nn2 <- add_constraints(nn1, constraint_type = "l1_norm")
 nn2
-#> Model: "sequential_19"
-#> ________________________________________________________________________________
-#>  Layer (type)                       Output Shape                    Param #     
-#> ================================================================================
-#>  layer__combined_l1_15 (Layer_Combi  (None, 100)                    500         
-#>  ned_L1)                                                                        
-#>  layer__combined_l1_16 (Layer_Combi  (None, 100)                    10100       
-#>  ned_L1)                                                                        
-#>  dense_29 (Dense)                   (None, 3)                       303         
-#> ================================================================================
+#> Model: "sequential_4"
+#> ________________________________________________________________________________________________________________________
+#>  Layer (type)                                         Output Shape                                    Param #           
+#> ========================================================================================================================
+#>  layer__combined_l1_3 (Layer_Combined_L1)             (None, 100)                                     500               
+#>  layer__combined_l1_4 (Layer_Combined_L1)             (None, 100)                                     10100             
+#>  dense_11 (Dense)                                     (None, 3)                                       303               
+#> ========================================================================================================================
 #> Total params: 10,903
 #> Trainable params: 10,903
 #> Non-trainable params: 0
-#> ________________________________________________________________________________
+#> ________________________________________________________________________________________________________________________
 ```
 
 Note how the parameters and structure are the same, but the layer type has been modified.
@@ -242,7 +240,7 @@ prediction_NN_class2 <- predict(probability_model2, test_x)
 # Also, the linear output can be predicted before the probability model
 prediction_NN2 <- predict(nn2, test_x)
 ```
-# Visualize the NNs results:
+### Visualize the NNs results:
 
 We can use here a confusion matrix to visualize the results, where we can see that both NNs correctly predicts almost all of the classes in the test data:
 

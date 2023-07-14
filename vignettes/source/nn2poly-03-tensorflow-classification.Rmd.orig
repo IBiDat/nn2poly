@@ -211,7 +211,7 @@ prediction_NN_class2 <- predict(probability_model2, test_x)
 prediction_NN2 <- predict(nn2, test_x)
 
 ```
-# Visualize the NNs results:
+### Visualize the NNs results:
 
 We can use here a confusion matrix to visualize the results, where we can see that both NNs correctly predicts almost all of the classes in the test data:
 
