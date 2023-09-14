@@ -1,14 +1,24 @@
-#' Auxiliary function. It obtains some parameters of a keras model.
+#' Generic auxiliary function.
+#' It obtains some parameters of a keras or torch model,
+#' useful for the computation of the nn2poly algorithm.
+#' @param model Keras model (class \code{keras.engine.training.Model}) or
+#' torch model (class \code{nn_module}).
 #'
-#' @param model Keras nn model.
-#'
-#' @return \code{list} of length 3 with the following items:
-#' - \code{weights_list}  list of weights.
+#' @return \code{list} of length 4 with the following items:
+#' - \code{weights_list}: list of weights and biases. Each element of the list
+#' is a matrix where the first row is the bias and the remaining rows are the
+#' weights.
 #' - \code{af_string_list}: the list of activation functions as strings
-#' - \code{n_nurons}: the number of neurons at each layer.
+#' - \code{n_neurons}: the number of neurons at each layer.
 #' - \code{p}: the dimension of the problem, i.e., number of predictor variables.
 #'
+
 get_model_parameters <- function(model) {
+  UseMethod("get_model_parameters")
+}
+
+#' @export
+get_model_parameters.keras.engine.training.Model <- function(model) {
   nlayers <- length(model$layers)
 
   p <- model$layers[[1]]$input_shape[[2]]
@@ -27,19 +37,21 @@ get_model_parameters <- function(model) {
     if (nrow(params[["weights"]]) == (neurons_previous_layer + 1)) {
       params[["wb"]] <- params[["weights"]]
 
-      # check if the layer is one of our custom layers
+      # Check if the layer is one of our custom layers
       if (class(model$layers[[layer_index]])[[1]] == "R6type.Layer_Combined_L1" ||
           class(model$layers[[layer_index]])[[1]] == "R6type.Layer_Combined_L2") {
+
         params[["activation"]] <- model$layers[[layer_index]]$get_config()$activation
         layer_index <- layer_index + 1
+
       } else {
-        # we assume that the next layer is the activation
+        # We assume that the next layer is the activation
         params[["activation"]] <- model$layers[[layer_index + 1]]$get_config()$activation
         layer_index <- layer_index + 2
       }
     } else {
-      params[["bias"]] <- model$layers[[layer_index]]$get_weights()[[2]]
-      params[["wb"]] <- rbind(params[["bias"]],params[["weights"]])
+      params[["bias"]]       <- model$layers[[layer_index]]$get_weights()[[2]]
+      params[["wb"]]         <- rbind(params[["bias"]],params[["weights"]])
       params[["activation"]] <- model$layers[[layer_index]]$get_config()$activation
       layer_index <- layer_index + 1
     }
@@ -54,5 +66,66 @@ get_model_parameters <- function(model) {
   list(weights_list   = weights_list,
        af_string_list = af_string_list,
        n_neurons      = n_neurons,
-       p = p)
+       p              = p)
+}
+
+#' @export
+get_model_parameters.nn_module <- function(model) {
+  if (inherits(model, "nn_module_generator")) {
+    model <- model()
+  }
+
+  layers_class      <- lapply(model$children,
+                              function(layer) class(layer)[[1]])
+  layers_inunits    <- lapply(model$children,
+                              function(layer) layer$in_features)
+  layers_outunits   <- lapply(model$children,
+                              function(layer) layer$out_feature)
+  layers_islinear   <- sapply(model$children,
+                              function(layer) inherits(layer, "nn_linear"))
+  # The shape of layer$weight is (out_features, in_features) therefore we
+  # must transpose it to make it of shape (in_features, out_features)
+  linlayers_weights <- lapply(model$children[layers_islinear],
+                              function(layer) t(as.matrix(layer$weight)))
+  linlayers_bias    <- lapply(model$children[layers_islinear],
+                              function(layer) t(as.matrix(layer$bias)))
+  linlayers_wb      <- lapply(model$children[layers_islinear],
+                              function(layer) rbind(t(as.matrix(layer$bias)),t(as.matrix(layer$weight))))
+  p                 <- layers_inunits[[1]]
+
+  # Parsing the forward function to obtain af_string_list
+  forward <- deparse(model$forward)
+  forward <- trimws(forward)
+  forward <- paste(forward[-c(1,2,length(forward))], collapse = "")
+  forward_components <- trimws(strsplit(forward, split = "%>%")[[1]])[-1]
+  splited <- strsplit(forward_components, split = "\\$")
+  forward_functions_order <- sapply(splited,
+                                    function(x) strsplit(x[[2]], split = "\\(")[[1]][1])
+
+  for (i in 1:length(layers_class)) {
+    forward_functions_order <- ifelse(forward_functions_order == names(layers_class)[[i]],
+                                      strsplit(layers_class[[i]], "nn_")[[1]][[2]],
+                                      forward_functions_order)
+  }
+
+  last_linear <- forward_functions_order[length(forward_functions_order)] == "linear"
+
+  af_string_list <- list()
+
+  for (i in 1:length(forward_functions_order)) {
+    if (forward_functions_order[[i]] == "linear") {
+      # If last iteration and linear, add linear as af
+      if (i == length(forward_functions_order)) {
+        af_string_list <- append(af_string_list, "linear")
+      }
+      next
+    }
+    af_string_list <- append(af_string_list, forward_functions_order[[i]])
+  }
+
+  list(weights_list   = linlayers_wb,
+       af_string_list = af_string_list,
+       n_neurons      = layers_outunits[layers_islinear],
+       p              = p)
+
 }

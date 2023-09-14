@@ -29,8 +29,6 @@ test_that("nn2poly_algorithm:
   expect_equal(coeff,0.63351833)
 })
 
-
-
 test_that("nn2poly_algorithm:
           Check that the algortihm provides a correct value for a certain
           coefficient from a given example that has been computed manually,
@@ -41,7 +39,7 @@ test_that("nn2poly_algorithm:
 
   # Get the needed data
   object <- nn2poly_example$weights_list
-  names(object) <- nn2poly_example$af_string_list
+  names(object)   <- nn2poly_example$af_string_list
   q_taylor_vector <- nn2poly_example$q_taylor_vector
 
   result <- nn2poly(
@@ -113,3 +111,106 @@ test_that("nn2poly for a constrained keras.engine.training.Model object", {
   expect_equal(result$labels[[6]], c(2,2))
 })
 
+test_that("nn2poly for a nn_module object", {
+  skip_on_cran()
+
+  set.seed(42)
+  torch::torch_manual_seed(42)
+
+  nn2poly_dataset <- torch::dataset(
+    name = "nn2poly_dataset",
+
+    initialize = function(df) {
+      self$x <- torch::torch_tensor(as.matrix(df[,1:2]))
+      self$y <- torch::torch_tensor(as.matrix(df[,3]))
+    },
+
+    .getitem = function(i) {
+      x <- self$x[i,]
+      y <- self$y[i]
+
+      list(x = x,
+           y = y)
+    },
+
+    .length = function() {
+      self$y$size()[[1]]
+    }
+
+  )
+
+
+
+  example    <- nn2poly_example0
+  data_train_full <- nn2poly_dataset(as.data.frame(cbind(example$train_x, example$train_y)))
+
+  all_indices   <- 1:length(data_train_full)
+  train_indices <- sample(all_indices, size = round(length(data_train_full)) * 0.8)
+  val_indices   <- setdiff(all_indices, train_indices)
+
+  data_train <- torch::dataset_subset(data_train_full, train_indices)
+  data_val   <- torch::dataset_subset(data_train_full, val_indices)
+
+  # data_test  <- nn2poly_dataset(as.data.frame(cbind(example$test_x, example$test_y)))
+  train_dl <- torch::dataloader(data_train, batch_size = 32, shuffle = TRUE)
+  val_dl   <- torch::dataloader(data_val, batch_size = 32)
+
+  net <- torch::nn_module(
+    "my_network",
+
+    initialize = function() {
+      self$linear1  <- torch::nn_linear(2,2)
+      self$linear2  <- torch::nn_linear(2,3)
+      self$output   <- torch::nn_linear(3,1)
+      self$softplus <- torch::nn_softplus()
+    },
+
+    forward = function(x) {
+      x %>%
+        self$linear1() %>%
+        self$softplus() %>%
+        self$linear2() %>%
+        self$softplus() %>%
+        self$output()
+    }
+  )
+
+  fitted <- net %>%
+    luz::setup(
+      loss = torch::nn_mse_loss(),
+      optimizer = torch::optim_adam,
+      metrics = list(
+        luz::luz_metric_mse()
+      )
+    ) %>%
+    luz::fit(train_dl, epochs = 5, valid_data = val_dl)
+
+  result <- nn2poly(fitted$model,
+                    q_taylor_vector = example$q_taylor_vector,
+                    forced_max_Q = 3)
+
+  expect_equal(round(result$values[1,1],2), 0.11)
+  # expect_equal(result$values[2,1], -0.45410551)
+  expect_equal(result$labels[[7]], c(1,1,1))
+
+})
+
+test_that("Check that it throws an error when the dimensions of the weights list
+          are not right.", {
+  nn2poly_example <- nn2poly_example0
+
+  # Get the needed data
+  object <- nn2poly_example$weights_list
+  names(object) <- nn2poly_example$af_string_list
+  object[[2]] <- rbind(object[[2]], c(1,1))
+
+  q_taylor_vector <- nn2poly_example$q_taylor_vector
+
+  expect_error(
+    nn2poly(
+      object = object,
+      q_taylor_vector = q_taylor_vector,
+      store_coeffs = TRUE
+    )
+  )
+})
