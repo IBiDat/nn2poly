@@ -6,7 +6,7 @@
 \usage{
 nn2poly(
   object,
-  q_taylor_vector,
+  q_taylor_vector = NULL,
   all_partitions = NULL,
   store_coeffs = FALSE,
   forced_max_Q = NULL,

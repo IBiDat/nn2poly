@@ -48,10 +48,10 @@
 #'
 nn2poly_algorithm <- function(weights_list,
                               af_string_list,
-                              q_taylor_vector,
-                              all_partitions = NULL,
-                              store_coeffs   = FALSE,
-                              forced_max_Q   = NULL) {
+                              q_taylor_vector = NULL,
+                              all_partitions  = NULL,
+                              store_coeffs    = FALSE,
+                              forced_max_Q    = NULL) {
 
   # Obtain number of variables (dimension p)
   p <- dim(weights_list[[1]])[1] - 1
@@ -72,6 +72,12 @@ nn2poly_algorithm <- function(weights_list,
     results <- vector(mode = "list", length = 2 * L - 1)
   } else {
     results <- vector(mode = "list", length = 2 * L)
+  }
+
+  # Create a default q_taylor_vector if it is not given by the user
+  if (is.null(q_taylor_vector)) {
+    # 8 for the non-linear layers and 1 for the line
+    q_taylor_vector <- ifelse(af_string_list=="linear", 1, 8)
   }
 
   # Obtain all the derivatives up to the desired Taylor degree at each layer
