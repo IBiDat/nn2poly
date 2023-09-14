@@ -5,13 +5,14 @@ jobs:
   build:
     if: ${{ !contains(github.event.head_commit.message, '[ci skip]') }}
     runs-on: ${{ matrix.config.os }}
-    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+    name: ${{ matrix.config.os }} ${{ matrix.config.arch }} (${{ matrix.config.r }})
 
     strategy:
       fail-fast: false
       matrix:
         config:
-        - {os: macOS-latest, tf: 'default', r: 'release'}
+        - {os: macOS-latest, tf: 'default', r: 'release', arch: 'x86'}
+        - {os: macOS-latest, tf: 'default', r: 'release', arch: 'arm64'}
         - {os: windows-latest, tf: 'default', r: 'release'}
         - {os: ubuntu-latest, tf: 'default', r: 'devel', http-user-agent: 'release'}
         - {os: ubuntu-latest, tf: 'default', r: 'release', covr: 'yes'}
@@ -34,10 +35,11 @@ jobs:
       with:
         extra-packages: any::rcmdcheck, any::covr
         needs: check, coverage
-    - name: Miniconda + Tensorflow + Keras installation
+    - name: Miniconda + Tensorflow + Keras + Torch installation
       run: |
         reticulate::install_miniconda()
         keras::install_keras(tensorflow = '${{ matrix.tf }}-cpu')
+        torch::install_torch()
       shell: Rscript {0}
 
     - name: Check
