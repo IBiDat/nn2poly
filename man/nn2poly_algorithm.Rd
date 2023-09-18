@@ -8,7 +8,7 @@ using the NN2Poly algorithm.}
 nn2poly_algorithm(
   weights_list,
   af_string_list,
-  q_taylor_vector,
+  q_taylor_vector = NULL,
   all_partitions = NULL,
   store_coeffs = FALSE,
   forced_max_Q = NULL

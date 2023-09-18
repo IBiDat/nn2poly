@@ -5,12 +5,8 @@
 #' @param maxnorm List of 2 elements: the name of the used norm and its max value.
 #'
 #' @return List across all layers with a vector containing the norms of each weight vector.
-#' @export
 #'
 check_weight_constraints <- function(weights, maxnorm) {
-  print("The used norm is:")
-  print(maxnorm)
-
   #### Compute the norm for the full matrix ####
 
   n_weights <- length(weights)
@@ -40,7 +36,7 @@ check_weight_constraints <- function(weights, maxnorm) {
         norm <- pracma::Norm(weights[[i]][, j], 2)
         weights_norms[[i]][j] <- norm
       } else {
-        print("Checking the l1_norm in case of no chosen norm")
+        print("Imprecise norm. Computing the l1 norm...")
         norm <- pracma::Norm(weights[[i]][, j], 1)
         weights_norms[[i]][j] <- norm
       }

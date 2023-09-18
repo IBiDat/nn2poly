@@ -46,21 +46,26 @@ NULL
 #' @export
 #'
 nn2poly <- function(object,
-                    q_taylor_vector,
-                    all_partitions = NULL,
-                    store_coeffs   = FALSE,
-                    forced_max_Q   = NULL,
+                    q_taylor_vector = NULL,
+                    all_partitions  = NULL,
+                    store_coeffs    = FALSE,
+                    forced_max_Q    = NULL,
                     ...) {
   UseMethod("nn2poly")
 }
 
 #' @export
 nn2poly.default <- function(object, # weights_list and af_string_list
-                            q_taylor_vector,
-                            all_partitions = NULL,
-                            store_coeffs   = FALSE,
-                            forced_max_Q   = NULL,
+                            q_taylor_vector = NULL,
+                            all_partitions  = NULL,
+                            store_coeffs    = FALSE,
+                            forced_max_Q    = NULL,
                             ...) {
+  if (!check_weights_dimensions(object)) {
+    stop("The list of weights has incorrect dimensions.
+         Please, check the  right dimmensions in the documentation.",
+         call. = FALSE)
+  }
 
   result <- nn2poly_algorithm(
     weights_list    = object,
@@ -76,10 +81,10 @@ nn2poly.default <- function(object, # weights_list and af_string_list
 
 #' @export
 nn2poly.keras.engine.training.Model <- function(object,
-                                                q_taylor_vector,
-                                                all_partitions = NULL,
-                                                store_coeffs   = FALSE,
-                                                forced_max_Q   = NULL,
+                                                q_taylor_vector = NULL,
+                                                all_partitions  = NULL,
+                                                store_coeffs    = FALSE,
+                                                forced_max_Q    = NULL,
                                                 ...) {
 
   model_parameters <- get_model_parameters(object)
