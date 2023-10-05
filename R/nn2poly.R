@@ -62,6 +62,13 @@ nn2poly.default <- function(object, # weights_list and af_string_list
                             store_coeffs    = FALSE,
                             forced_max_Q    = NULL,
                             ...) {
+
+  if (!check_weights_dimensions(object)) {
+    stop("The list of weights has incorrect dimensions.
+         Please, check the  right dimmensions in the documentation.",
+         call. = FALSE)
+  }
+
   result <- nn2poly_algorithm(
     weights_list    = object,
     af_string_list  = names(object),
