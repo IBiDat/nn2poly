@@ -139,8 +139,6 @@ test_that("nn2poly for a nn_module object", {
 
   )
 
-
-
   example    <- nn2poly_example0
   data_train_full <- nn2poly_dataset(as.data.frame(cbind(example$train_x, example$train_y)))
 

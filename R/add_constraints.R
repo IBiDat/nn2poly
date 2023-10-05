@@ -49,9 +49,18 @@ constraint_l1_norm <- function(w) {
 #'
 #' @return A keras model with the custom constraints applied.
 #' @export
+#'
+
 add_constraints <- function(model,
-                            constraint_type  = "l1_norm",
-                            keep_old_weights = FALSE) {
+                            constraint_type = "l1_norm",
+                            ...) {
+  UseMethod("add_constraints")
+}
+
+#' @export
+add_constraints.keras.engine.training.Model <- function(model,
+                                                        constraint_type  = "l1_norm",
+                                                        keep_old_weights = FALSE) {
   if (!requireNamespace("keras", quietly = TRUE)) {
     stop("package 'keras' is required for this functionality", call.=FALSE)
   }
