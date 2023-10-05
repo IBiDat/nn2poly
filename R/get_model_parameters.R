@@ -11,7 +11,6 @@
 #' - \code{af_string_list}: the list of activation functions as strings
 #' - \code{n_neurons}: the number of neurons at each layer.
 #' - \code{p}: the dimension of the problem, i.e., number of predictor variables.
-#'
 
 get_model_parameters <- function(model) {
   UseMethod("get_model_parameters")
@@ -120,10 +119,9 @@ get_model_parameters.nn_module <- function(model) {
 }
 
 
-#' Title
+#' Parse the forward function of a torch neural network.
 #'
-#' @param model_forward Forward function of a torch model.
-#' @param layers_class
+#' @param model Torch model.
 #' @return A list where the first element is a vector with the functions of
 #' forward in order and the second element is a vector with the class of those
 #' functions in order.

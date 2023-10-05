@@ -46,6 +46,7 @@ constraint_l1_norm <- function(w) {
 #' 'l1_norm' and 'l2_norm' can be applied.
 #' @param keep_old_weights Binary parameters that controls if the weights of
 #' \code{model} are kept in the new constrained network.
+#' @param ... Additional arguments.
 #'
 #' @return A keras model with the custom constraints applied.
 #' @export
@@ -53,6 +54,7 @@ constraint_l1_norm <- function(w) {
 
 add_constraints <- function(model,
                             constraint_type = "l1_norm",
+                            keep_old_weights = FALSE,
                             ...) {
   UseMethod("add_constraints")
 }
@@ -60,7 +62,8 @@ add_constraints <- function(model,
 #' @export
 add_constraints.keras.engine.training.Model <- function(model,
                                                         constraint_type  = "l1_norm",
-                                                        keep_old_weights = FALSE) {
+                                                        keep_old_weights = FALSE,
+                                                        ...) {
   if (!requireNamespace("keras", quietly = TRUE)) {
     stop("package 'keras' is required for this functionality", call.=FALSE)
   }
