@@ -94,15 +94,15 @@ get_model_parameters.nn_module <- function(model) {
   p                 <- layers_inunits[[1]]
 
   forward_parsed <- torch_forward_parser(model)
-  functions_order <- forward_parsed$forward_functions_order
-  functions_order_class <- forward_parsed$forward_functions_order_class
+  functions_order <- forward_parsed$functions_order
+  functions_order_class <- forward_parsed$functions_order_class
 
-  last_linear <- functions_order_class[length(functions_order_class)] == "linear"
+  last_linear <- functions_order_class[length(functions_order_class)] == "nn_linear"
 
   af_string_list <- list()
 
   for (i in 1:length(functions_order)) {
-    if (functions_order[[i]] == "linear") {
+    if (functions_order_class[[i]] == "nn_linear") {
       # If last iteration and linear, add linear as af
       if (i == length(functions_order)) {
         af_string_list <- append(af_string_list, "linear")
@@ -112,7 +112,7 @@ get_model_parameters.nn_module <- function(model) {
     af_string_list <- append(af_string_list, functions_order[[i]])
   }
 
-  list(weights_list   = linlayers_wb,
+    list(weights_list   = linlayers_wb,
        af_string_list = af_string_list,
        n_neurons      = layers_outunits[layers_islinear],
        p              = p)

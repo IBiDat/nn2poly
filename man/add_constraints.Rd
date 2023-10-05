@@ -4,7 +4,7 @@
 \alias{add_constraints}
 \title{Add custom constraints to the weights of a keras neural network.}
 \usage{
-add_constraints(model, constraint_type = "l1_norm", keep_old_weights = FALSE)
+add_constraints(model, constraint_type = "l1_norm", ...)
 }
 \arguments{
 \item{model}{A keras model to which the restrictions on the weights are to be applied.}

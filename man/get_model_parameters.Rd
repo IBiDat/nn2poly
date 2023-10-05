@@ -2,22 +2,29 @@
 % Please edit documentation in R/get_model_parameters.R
 \name{get_model_parameters}
 \alias{get_model_parameters}
-\title{Auxiliary function. It obtains some parameters of a keras model.}
+\title{Generic auxiliary function.
+It obtains some parameters of a keras or torch model,
+useful for the computation of the nn2poly algorithm.}
 \usage{
 get_model_parameters(model)
 }
 \arguments{
-\item{model}{Keras nn model.}
+\item{model}{Keras model (class \code{keras.engine.training.Model}) or
+torch model (class \code{nn_module}).}
 }
 \value{
-\code{list} of length 3 with the following items:
+\code{list} of length 4 with the following items:
 \itemize{
-\item \code{weights_list}  list of weights.
+\item \code{weights_list}: list of weights and biases. Each element of the list
+is a matrix where the first row is the bias and the remaining rows are the
+weights.
 \item \code{af_string_list}: the list of activation functions as strings
-\item \code{n_nurons}: the number of neurons at each layer.
+\item \code{n_neurons}: the number of neurons at each layer.
 \item \code{p}: the dimension of the problem, i.e., number of predictor variables.
 }
 }
 \description{
-Auxiliary function. It obtains some parameters of a keras model.
+Generic auxiliary function.
+It obtains some parameters of a keras or torch model,
+useful for the computation of the nn2poly algorithm.
 }
