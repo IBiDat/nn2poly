@@ -117,38 +117,3 @@ get_model_parameters.nn_module <- function(model) {
        p              = p)
 
 }
-
-
-#' Parse the forward function of a torch neural network.
-#'
-#' @param model Torch model.
-#' @return A list where the first element is a vector with the functions of
-#' forward in order and the second element is a vector with the class of those
-#' functions in order.
-torch_forward_parser <- function(model) {
-  layers_class      <- lapply(model$children,
-                              function(layer) class(layer)[[1]])
-  # Parsing the forward function to obtain af_string_list
-  forward <- deparse(model$forward)
-  forward <- trimws(forward)
-  forward <- paste(forward[-c(1,2,length(forward))], collapse = "")
-  forward_components <- trimws(strsplit(forward, split = "%>%")[[1]])[-1]
-  forward_componentes_splited <- strsplit(forward_components, split = "\\$")
-  functions_order <- sapply(forward_componentes_splited,
-                                    function(x) strsplit(x[[2]], split = "\\(")[[1]][1])
-
-  functions_order_class <- c()
-  for (i in 1:length(functions_order)) {
-
-    class_index <-which(functions_order[[i]] == names(layers_class))[[1]]
-    functions_order_class <- c(functions_order_class,
-                                       layers_class[[class_index]])
-
-  }
-
-  list(
-    functions_order       = functions_order,
-    functions_order_class = functions_order_class
-  )
-
-}

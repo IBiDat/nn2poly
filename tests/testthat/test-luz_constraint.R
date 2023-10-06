@@ -54,7 +54,7 @@ test_that("The constranied training works using the l1 and l2 constraints", {
     }
   )
 
-  # Do the constrainted training with the l1 constraint
+  # Do the constrained training with the l1 constraint
   fitted <- net %>%
     luz::setup(
       loss = torch::nn_mse_loss(),
