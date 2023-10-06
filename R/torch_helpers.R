@@ -131,9 +131,10 @@ layers_to_constrain <- function(model) {
 #' @export
 #'
 luz_constraint <- function(constraint_type = "l1") {
+  ctx <- NULL
   if (!(constraint_type %in% c("l1", "l2"))) {
-    stop("Only l1 and l2 constraints are supported.",
-         call. = FALSE)
+    message("Only l1 and l2 constraints are supported. Using l1 constraint...")
+    constraint_type <- "l1"
   }
 
   constraint <- switch(constraint_type,

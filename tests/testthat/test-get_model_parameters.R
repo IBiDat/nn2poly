@@ -59,7 +59,6 @@ test_that("The get_model_parameters functions returns the right list of activati
 
 test_that("The get_model_parameters function works for a torch model (nn_module)
           and the list of activation functions is the expected one.", {
-  # Skip on cran and on github actions
   skip_on_cran()
 
   set.seed(42)

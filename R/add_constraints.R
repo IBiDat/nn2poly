@@ -8,9 +8,6 @@
 # but L1 is preferred, with 1 as it maximum norm bound.
 
 
-# Set Python vars to NULL to avoid global variable notes in package check
-super <- self <- constraint_maxnorm <- NULL
-
 
 #' Custom keras L1 constraint.
 #'
@@ -64,6 +61,9 @@ add_constraints.keras.engine.training.Model <- function(model,
                                                         constraint_type  = "l1_norm",
                                                         keep_old_weights = FALSE,
                                                         ...) {
+  # Set Python vars to NULL to avoid global variable notes in package check
+  super <- self <- constraint_maxnorm <- NULL
+
   if (!requireNamespace("keras", quietly = TRUE)) {
     stop("package 'keras' is required for this functionality", call.=FALSE)
   }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_model_parameters.R, R/torch_helpers.R
 \name{torch_forward_parser}
 \alias{torch_forward_parser}
-\title{Title}
+\title{Parse the forward function of a torch neural network.}
 \usage{
 torch_forward_parser(model)
 
