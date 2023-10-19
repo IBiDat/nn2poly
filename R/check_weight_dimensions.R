@@ -4,6 +4,7 @@
 #'
 #' @return `TRUE` if the dimensiones are correct, `FALSE` if not.
 #'
+#' @noRd
 check_weights_dimensions <- function(weights_matrices_list) {
   for (matrix_index in 2:length(weights_matrices_list)) {
     nrows_current <- nrow(weights_matrices_list[[matrix_index]])

@@ -1,70 +1,36 @@
-#' l1-constraint
+#' torch constraint generator
 #'
-#' l1-constraint for a module of a torch neural network. Only for internal use.
+#' @param ord Order of norm (default: 1).
 #'
-#' @param module Module from nn_module.
+#' @return Constraint function.
 #'
-#' @return Module with the l1 constraint applied.
-torch_l1_constraint <- function(module) {
+#' @noRd
+torch_constraint <- function(ord = 1) function(object) {
   wb <- torch::torch_tensor(
     rbind(
-      t(as.matrix(module[["bias"]])),
-      t(as.matrix(module[["weight"]]))
+      t(as.matrix(object[["bias"]])),
+      t(as.matrix(object[["weight"]]))
     ),
     requires_grad = TRUE
   )
 
-  norms <- torch::linalg_vector_norm(wb, dim = 1, ord = 1)
+  norms <- torch::linalg_vector_norm(wb, dim = 1, ord = ord)
   desired <- norms$clip(0,1)
   result <- wb * (desired / (torch::torch_tensor(1e-7) + norms))
 
   torch::with_no_grad({
-    module[["bias"]][] <- torch::torch_tensor(
+    object[["bias"]][] <- torch::torch_tensor(
       t(as.matrix(result)[1,]),
       requires_grad = TRUE
     )
 
-    module[["weight"]][] <- torch::torch_tensor(
+    object[["weight"]][] <- torch::torch_tensor(
       t(as.matrix(result)[-1,]),
       requires_grad = TRUE
     )
   })
 
-  return(module)
-}
-#' l2-constraint
-#'
-#' l2-constraint for a module of a torch neural network. Only for internal use.
-#'
-#' @param module Module from nn_module.
-#'
-#' @return Module with the l1 constraint applied.
-torch_l2_constraint <- function(module) {
-  wb <- torch::torch_tensor(
-    rbind(
-      t(as.matrix(module[["bias"]])),
-      t(as.matrix(module[["weight"]]))
-    ),
-    requires_grad = TRUE
-  )
-
-  norms <- torch::linalg_vector_norm(wb, dim = 1, ord = 2)
-  desired <- norms$clip(0,1)
-  result <- wb * (desired / (torch::torch_tensor(1e-7) + norms))
-
-  torch::with_no_grad({
-    module[["bias"]][] <- torch::torch_tensor(
-      t(as.matrix(result)[1,]),
-      requires_grad = TRUE
-    )
-
-    module[["weight"]][] <- torch::torch_tensor(
-      t(as.matrix(result)[-1,]),
-      requires_grad = TRUE
-    )
-  })
-
-  return(module)
+  object
 }
 
 #' Parse the forward function of a torch model.
@@ -76,6 +42,8 @@ torch_l2_constraint <- function(module) {
 #' @return A \code{list} with two elements where the first element is a vector with
 #' the name of the functions of the forward function in order and the second element
 #' is the class of those functions in order.
+#'
+#' @noRd
 torch_forward_parser <- function(model) {
   layers_class      <- lapply(model$children,
                               function(layer) class(layer)[[1]])
@@ -107,6 +75,8 @@ torch_forward_parser <- function(model) {
 #' @param model A torch neural network.
 #'
 #' @return Vector with the names of the layers to constrain.
+#'
+#' @noRd
 layers_to_constrain <- function(model) {
   forward_parsed <- torch_forward_parser(model)
   functions_order <- forward_parsed$functions_order
@@ -118,43 +88,3 @@ layers_to_constrain <- function(model) {
   to_constrain <- functions_order[which(functions_order_class[-length(functions_order_class)] == "nn_linear")]
   to_constrain
 }
-
-#' Luz constraint callback generator.
-#'
-#' It generates a callback constraint to use when training a torch neural network
-#' with luz.
-#'
-#' @param constraint_type The type of the constraint. It should be l1 or l2.
-#' Defaults l1.
-#'
-#' @return A luz callback that applies the constraint to the torch model.
-#' @export
-#'
-luz_constraint <- function(constraint_type = "l1") {
-  ctx <- NULL
-  if (!(constraint_type %in% c("l1", "l2"))) {
-    message("Only l1 and l2 constraints are supported. Using l1 constraint...")
-    constraint_type <- "l1"
-  }
-
-  constraint <- switch(constraint_type,
-    "l1" = torch_l1_constraint,
-    "l2" = torch_l2_constraint
-  )
-
-  luz_callback <- luz::luz_callback(
-    name = paste0(constraint_type, "_callback"),
-    initialize = function() {
-
-    },
-    on_train_batch_after_step = function() {
-      self$to_constrain <- layers_to_constrain(ctx$model)
-      for (layer_name in self$to_constrain) {
-        ctx$model$modules[[layer_name]]$apply(constraint)
-      }
-    }
-  )
-
-  return(luz_callback())
-}
-

@@ -44,8 +44,8 @@ NULL
 #' layer contains an item as explained before. The polynomials obtained at the
 #' hidden layers are not needed to represent the NN but can be used to explore
 #' how the method works.
-#' @export
 #'
+#' @export
 nn2poly <- function(object,
                     q_taylor_vector = NULL,
                     all_partitions  = NULL,
@@ -56,75 +56,25 @@ nn2poly <- function(object,
 }
 
 #' @export
-nn2poly.default <- function(object, # weights_list and af_string_list
-                            q_taylor_vector = NULL,
-                            all_partitions  = NULL,
-                            store_coeffs    = FALSE,
-                            forced_max_Q    = NULL,
-                            ...) {
-
+nn2poly.list <- function(object, ...) {
   if (!check_weights_dimensions(object)) {
     stop("The list of weights has incorrect dimensions.
          Please, check the  right dimmensions in the documentation.",
          call. = FALSE)
   }
 
-  result <- nn2poly_algorithm(
-    weights_list    = object,
-    af_string_list  = names(object),
-    q_taylor_vector = q_taylor_vector,
-    all_partitions  = all_partitions,
-    store_coeffs    = store_coeffs,
-    forced_max_Q    = forced_max_Q
-  )
+  result <- nn2poly_algorithm(object, names(object), ...)
   class(result) <- "nn2poly"
   result
 }
 
 #' @export
-nn2poly.keras.engine.training.Model <- function(object,
-                                                q_taylor_vector = NULL,
-                                                all_partitions  = NULL,
-                                                store_coeffs    = FALSE,
-                                                forced_max_Q    = NULL,
-                                                ...) {
+nn2poly.default <- function(object, ...) {
+  params <- get_parameters(object)
+  object <- params$weights_list
+  names(object) <- params$af_string_list
 
-  model_parameters <- get_model_parameters(object)
-
-  result <- nn2poly_algorithm(
-    weights_list    = model_parameters$weights_list,
-    af_string_list  = model_parameters$af_string_list,
-    q_taylor_vector = q_taylor_vector,
-    all_partitions  = all_partitions,
-    store_coeffs    = store_coeffs,
-    forced_max_Q    = forced_max_Q
-  )
-
-  class(result) <- "nn2poly"
-  result
-}
-
-#' @export
-nn2poly.nn_module <- function(object,
-                              q_taylor_vector = NULL,
-                              all_partitions  = NULL,
-                              store_coeffs    = FALSE,
-                              forced_max_Q    = NULL,
-                              ...) {
-
-  model_parameters <- get_model_parameters(object)
-
-  result <- nn2poly_algorithm(
-    weights_list    = model_parameters$weights_list,
-    af_string_list  = model_parameters$af_string_list,
-    q_taylor_vector = q_taylor_vector,
-    all_partitions  = all_partitions,
-    store_coeffs    = store_coeffs,
-    forced_max_Q    = forced_max_Q
-  )
-
-  class(result) <- "nn2poly"
-  result
+  nn2poly(object, ...)
 }
 
 #' S3 method for class 'nn2poly'
@@ -135,6 +85,7 @@ nn2poly.nn_module <- function(object,
 #'
 #' @return \code{matrix} containing the predictions. There is one prediction for
 #' each row in `newdata`.
+#'
 #' @export
 predict.nn2poly <- function(object, newdata, ...) {
   eval_poly(x = newdata, poly = object)

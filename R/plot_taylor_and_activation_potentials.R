@@ -1,4 +1,3 @@
-
 #' Plots activation potentials and Taylor expansion.
 #'
 #' Function that allows to take a NN and the data input values
@@ -17,17 +16,17 @@
 #' corresponds to the weight vector affecting each neuron in that layer.
 #' The names of \code{object} should have length L and be \code{character}
 #' strings with the names of the activation function used at each layer, as
-#' used in [`nn2poly_algorithm`].
+#' used in the \pkg{nn2poly} algorithm.
 #' @param data Matrix or data frame containing the predictor variables (X)
 #' to be used as input to compute their activation potentials. The response
 #' variable column should not be included.
 #' @param q_taylor_vector \code{vector} of length L containing the degree
 #' (\code{numeric}) up to which Taylor expansion should be performed at each
-#' layer, as used in [`nn2poly_algorithm`].
+#' layer, as used in the \pkg{nn2poly} algorithm.
 #' @param forced_max_Q Integer that determines the maximum order
 #' that we will force in the final polynomial, discarding terms of higher order
 #' that would naturally arise using all the orders in `q_taylor_vector`,
-#' as used in [`nn2poly_algorithm`].
+#' as used in the \pkg{nn2poly} algorithm.
 #' @param constraints Boolean parameter determining if the NN is constrained
 #' (TRUE) or not (FALSE). This only modifies de plots title to show
 #' "constrained" or "unconstrained" respectively.
@@ -48,83 +47,25 @@ plot_taylor_and_activation_potentials <- function(object,
 }
 
 #' @export
-plot_taylor_and_activation_potentials.default <- function(object,
-                                                          data,
-                                                          q_taylor_vector,
-                                                          forced_max_Q,
-                                                          constraints,
-                                                          taylor_interval = 1.5,
-                                                          ...) {
-  weights_list   <- object
-  af_string_list <- names(object)
+plot_taylor_and_activation_potentials.default <- function(object, ...) {
+  params <- get_parameters(object)
+  object <- params$weights_list
+  names(object) <- params$af_string_list
 
-  plot_taylor_and_activation_potentials_aux(data            = data,
-                                            weights_list    = weights_list,
-                                            af_string_list  = af_string_list,
-                                            q_taylor_vector = q_taylor_vector,
-                                            forced_max_Q    = forced_max_Q,
-                                            constraints     = constraints,
-                                            taylor_interval = taylor_interval)
+  plot_taylor_and_activation_potentials(object, ...)
 }
 
 #' @export
-plot_taylor_and_activation_potentials.keras.engine.training.Model <- function(object,
-                                                                              data,
-                                                                              q_taylor_vector,
-                                                                              forced_max_Q,
-                                                                              constraints,
-                                                                              taylor_interval = 1.5,
-                                                                              ...) {
-  model_parameters <- get_model_parameters(object)
+plot_taylor_and_activation_potentials.list <- function(object,
+                                                       data,
+                                                       q_taylor_vector,
+                                                       forced_max_Q,
+                                                       constraints,
+                                                       taylor_interval = 1.5,
+                                                       ...) {
+  weights_list   <- object
+  af_string_list <- names(object)
 
-  plot_taylor_and_activation_potentials_aux(data            = data,
-                                            weights_list    = model_parameters$weights_list,
-                                            af_string_list  = model_parameters$af_string_list,
-                                            q_taylor_vector = q_taylor_vector,
-                                            forced_max_Q    = forced_max_Q,
-                                            constraints     = constraints,
-                                            taylor_interval = taylor_interval)
-
-}
-
-#' Auxiliary function to reduce the code of the S3 methods for the
-#' \code{plot_taylor_and_activation_potentials} function.
-#'
-#' @param data Matrix or data frame containing the predictor variables (X)
-#' to be used as input to compute their activation potentials. The response
-#' variable column should not be included.
-#' @param weights_list \code{list} of length L ( number of hidden layers + 1)
-#' containing the weights matrix for each layer.
-#' The expected shape of such matrices at any layer L is of the form
-#' $(h_(l-1) + 1)*(h_l)$, that is, the number of rows is the number of neurons
-#' in the previous layer plus the bias vector, and the number of columns is the
-#' number of neurons in the current layer L. Therefore, each column
-#' corresponds to the weight vector affecting each neuron in that layer.
-#' @param af_string_list \code{list} of length L containing \code{character}
-#' strings with the names of the activation function used at each layer, as
-#' used in [`nn2poly_algorithm`].
-#' @param q_taylor_vector \code{vector} of length L containing the degree
-#' (\code{numeric}) up to which Taylor expansion should be performed at each
-#' layer, as used in [`nn2poly_algorithm`].
-#' @param forced_max_Q Integer that determines the maximum order
-#' that we will force in the final polynomial, discarding terms of higher order
-#' that would naturally arise using all the orders in `q_taylor_vector`,
-#' as used in [`nn2poly_algorithm`].
-#' @param constraints Boolean parameter determining if the NN is constrained
-#' (TRUE) or not (FALSE). This only modifies de plots title to show
-#' "constrained" or "unconstrained" respectively.
-#' @param taylor_interval optional parameter determining the interval in which
-#' the Taylor expansion is represented. Default is 1.5.
-#'
-#' @return A list of plots.
-#'
-plot_taylor_and_activation_potentials_aux <- function(data,
-                                                      weights_list,
-                                                      af_string_list,
-                                                      q_taylor_vector,
-                                                      forced_max_Q,
-                                                      constraints,
-                                                      taylor_interval = 1.5) {
   if (!requireNamespace("ggplot2", quietly = TRUE))
     stop("package 'ggplot2' is required for this functionality", call.=FALSE)
 

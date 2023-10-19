@@ -19,6 +19,7 @@ Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.5.0)
 Imports:
+    generics,
     matrixStats,
     pracma,
     Rcpp

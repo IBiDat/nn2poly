@@ -164,7 +164,7 @@ arma::mat alg_non_linear(arma::mat coeffs_input,
         // Now we need to use the labels to get the needed coefficients:
         LogicalVector needed = Function("%in%")(labels_input, partition);
         arma::mat coeffs_input_needed = coeffs_input.cols(find(as<arma::vec>(needed) == 1));
-        for (int i = 0; i < coeffs_input_needed.n_cols; i++)
+        for (unsigned int i = 0; i < coeffs_input_needed.n_cols; i++)
           coeffs_input_needed.col(i) = arma::pow(coeffs_input_needed.col(i), m[i + 1]);
 
 

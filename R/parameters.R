@@ -1,8 +1,4 @@
-#' Generic auxiliary function.
-#' It obtains some parameters of a keras or torch model,
-#' useful for the computation of the nn2poly algorithm.
-#' @param model Keras model (class \code{keras.engine.training.Model}) or
-#' torch model (class \code{nn_module}).
+#' Get the parameters of the model required by the nn2poly algorithm
 #'
 #' @return \code{list} of length 4 with the following items:
 #' - \code{weights_list}: list of weights and biases. Each element of the list
@@ -11,13 +7,13 @@
 #' - \code{af_string_list}: the list of activation functions as strings
 #' - \code{n_neurons}: the number of neurons at each layer.
 #' - \code{p}: the dimension of the problem, i.e., number of predictor variables.
-
-get_model_parameters <- function(model) {
-  UseMethod("get_model_parameters")
+#'
+#' @noRd
+get_parameters <- function(model) {
+  UseMethod("get_parameters")
 }
 
-#' @export
-get_model_parameters.keras.engine.training.Model <- function(model) {
+get_parameters.keras.engine.training.Model <- function(model) {
   nlayers <- length(model$layers)
 
   p <- model$layers[[1]]$input_shape[[2]]
@@ -68,8 +64,7 @@ get_model_parameters.keras.engine.training.Model <- function(model) {
        p              = p)
 }
 
-#' @export
-get_model_parameters.nn_module <- function(model) {
+get_parameters.nn_module <- function(model) {
   if (inherits(model, "nn_module_generator")) {
     model <- model()
   }

@@ -15,7 +15,7 @@ test_that("The function works well over a regular Neural Network.", {
                                       activation = "linear"))
 
   # Save the parameters into a list
-  params <- get_model_parameters(nn)
+  params <- get_parameters(nn)
 
   expect_equal(params$p, 2)
 
@@ -32,7 +32,7 @@ test_that("The function works well over a regular Neural Network.", {
 
 })
 
-test_that("The get_model_parameters functions returns the right list of activation
+test_that("The get_parameters functions returns the right list of activation
           functions for a neural network with custom constraints.", {
   # Skip on cran and on github actions
   skip_on_cran()
@@ -50,14 +50,14 @@ test_that("The get_model_parameters functions returns the right list of activati
                                       activation = "linear"))
 
   constrained_nn <- add_constraints(nn)
-  params <- get_model_parameters(constrained_nn)
+  params <- get_parameters(constrained_nn)
 
   expect_equal(params$af_string_list, list("tanh", "softplus", "linear"))
 
 
 })
 
-test_that("The get_model_parameters function works for a torch model (nn_module)
+test_that("The get_parameters function works for a torch model (nn_module)
           and the list of activation functions is the expected one.", {
   skip_on_cran()
 
@@ -130,7 +130,7 @@ test_that("The get_model_parameters function works for a torch model (nn_module)
     ) %>%
     luz::fit(train_dl, epochs = 5, valid_data = val_dl)
 
-  params <- get_model_parameters(fitted$model)
+  params <- get_parameters(fitted$model)
   expect_equal(params$af_string_list, nn2poly_example0$af_string_list)
 
 })

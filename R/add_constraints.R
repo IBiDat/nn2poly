@@ -22,6 +22,7 @@
 #' the custom layers implemented here, where bias and weights will be joined
 #' together.
 #'
+#' @noRd
 constraint_l1_norm <- function(w) {
   norms   = keras::k_sum(keras::k_abs(w), axis = 1, keepdims = TRUE)
   desired = keras::k_clip(norms, 0, 1)
@@ -39,18 +40,17 @@ constraint_l1_norm <- function(w) {
 #' layers that impose L1 and L2 norm constraints
 #'
 #' @param model A keras model to which the restrictions on the weights are to be applied.
-#' @param constraint_type The type of constraint you want to apply on the model. Currently,
+#' @param type The type of constraint you want to apply on the model. Currently,
 #' 'l1_norm' and 'l2_norm' can be applied.
 #' @param keep_old_weights Binary parameters that controls if the weights of
 #' \code{model} are kept in the new constrained network.
-#' @param ... Additional arguments.
+#' @param ... Additional arguments (unused).
 #'
 #' @return A keras model with the custom constraints applied.
-#' @export
 #'
-
+#' @export
 add_constraints <- function(model,
-                            constraint_type = "l1_norm",
+                            type = c("l1_norm", "l2_norm"),
                             keep_old_weights = FALSE,
                             ...) {
   UseMethod("add_constraints")
@@ -58,7 +58,7 @@ add_constraints <- function(model,
 
 #' @export
 add_constraints.keras.engine.training.Model <- function(model,
-                                                        constraint_type  = "l1_norm",
+                                                        type = c("l1_norm", "l2_norm"),
                                                         keep_old_weights = FALSE,
                                                         ...) {
   # Set Python vars to NULL to avoid global variable notes in package check
@@ -127,12 +127,12 @@ add_constraints.keras.engine.training.Model <- function(model,
   layer_combined_L1 <- keras::create_layer_wrapper(Layer_Combined_L1)
   layer_combined_L2 <- keras::create_layer_wrapper(Layer_Combined_L2)
 
-  params      <- get_model_parameters(model)
+  params      <- get_parameters(model)
   nlayers     <- length(params$weights_list)
   new_layers  <- vector(mode = "list", length = nlayers) # create a list of new layers
 
   # choose the custom layer to use
-  custom_layer <- switch(constraint_type,
+  custom_layer <- switch(match.arg(type),
                          "l1_norm" = layer_combined_L1,
                          "l2_norm" = layer_combined_L2,
                          layer_combined_L1)
@@ -173,3 +173,11 @@ add_constraints.keras.engine.training.Model <- function(model,
   new_model
 }
 
+#' @export
+add_constraints.luz_module_generator <- function(model,
+                                                 type = c("l1_norm", "l2_norm"),
+                                                 ...) {
+  attr(model, "constraint") <- match.arg(type)
+  class(model) <- c("nn2poly", class(model))
+  model
+}
