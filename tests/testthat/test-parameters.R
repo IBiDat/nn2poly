@@ -100,24 +100,12 @@ test_that("The get_parameters function works for a torch model (nn_module)
   train_dl <- torch::dataloader(data_train, batch_size = 32, shuffle = TRUE)
   val_dl   <- torch::dataloader(data_val, batch_size = 32)
 
-  net <- torch::nn_module(
-    "my_network",
-
-    initialize = function() {
-      self$linear1  <- torch::nn_linear(2,2)
-      self$linear2  <- torch::nn_linear(2,3)
-      self$output   <- torch::nn_linear(3,1)
-      self$softplus <- torch::nn_softplus()
-    },
-
-    forward = function(x) {
-      x %>%
-        self$linear1() %>%
-        self$softplus() %>%
-        self$linear2() %>%
-        self$softplus() %>%
-        self$output()
-    }
+  net <- luz_model_sequential(
+    torch::nn_linear(2,2),
+    torch::nn_softplus(),
+    torch::nn_linear(2,3),
+    torch::nn_softplus(),
+    torch::nn_linear(3,1)
   )
 
   fitted <- net %>%

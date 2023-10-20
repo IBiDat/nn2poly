@@ -12,24 +12,19 @@ norm_order <- function(type = c("l1_norm", "l2_norm")) {
 build_callback.luz_module_generator <- function(object,
                                                 type = c("l1_norm", "l2_norm")) {
   ctx <- NULL
-  constraint <- torch_constraint(norm_order(type))
 
   luz_callback <- luz::luz_callback(
     name = paste0(type, "_callback"),
 
-    initialize = function(constraint) {
-      self$constraint <- constraint
-      self$to_constrain <- NULL
+    initialize = function() {
+      self$constraint <- torch_constraint(norm_order(type))
     },
 
     on_train_batch_end = function() {
-      if (is.null(self$to_constrain))
-        self$to_constrain <- layers_to_constrain(ctx$model)
-      for (layer_name in self$to_constrain) {
-        ctx$model$modules[[layer_name]]$apply(self$constraint)
-      }
+      for (layer in ctx$model$children)
+        layer$apply(self$constraint)
     }
   )
 
-  luz_callback(constraint)
+  luz_callback()
 }

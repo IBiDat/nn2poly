@@ -34,24 +34,12 @@ test_that("The constranied training works using the l1 and l2 constraints", {
   train_dl <- torch::dataloader(data_train, batch_size = 32, shuffle = TRUE)
   val_dl   <- torch::dataloader(data_val, batch_size = 32)
 
-  net <- torch::nn_module(
-    "my_network",
-
-    initialize = function() {
-      self$linear1  <- torch::nn_linear(2,2)
-      self$linear2  <- torch::nn_linear(2,3)
-      self$output   <- torch::nn_linear(3,1)
-      self$softplus <- torch::nn_softplus()
-    },
-
-    forward = function(x) {
-      x %>%
-        self$linear1() %>%
-        self$softplus() %>%
-        self$linear2() %>%
-        self$softplus() %>%
-        self$output()
-    }
+  net <- luz_model_sequential(
+    torch::nn_linear(2,2),
+    torch::nn_softplus(),
+    torch::nn_linear(2,3),
+    torch::nn_softplus(),
+    torch::nn_linear(3,1)
   )
 
   # Do the constrained training with the l1 constraint
@@ -65,8 +53,8 @@ test_that("The constranied training works using the l1 and l2 constraints", {
 
   wb <- torch::torch_tensor(
     rbind(
-      t(as.matrix(fitted$model$children$linear1[["bias"]])),
-      t(as.matrix(fitted$model$children$linear1[["weight"]]))
+      t(as.matrix(fitted$model$children[[1]][["bias"]])),
+      t(as.matrix(fitted$model$children[[1]][["weight"]]))
     ),
     requires_grad = TRUE
   )
@@ -89,8 +77,8 @@ test_that("The constranied training works using the l1 and l2 constraints", {
 
   wb <- torch::torch_tensor(
     rbind(
-      t(as.matrix(fitted$model$children$linear1[["bias"]])),
-      t(as.matrix(fitted$model$children$linear1[["weight"]]))
+      t(as.matrix(fitted$model$children[[1]][["bias"]])),
+      t(as.matrix(fitted$model$children[[1]][["weight"]]))
     ),
     requires_grad = TRUE
   )
