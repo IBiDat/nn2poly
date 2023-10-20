@@ -95,18 +95,12 @@ test_that("nn2poly_algorithm:
 })
 
 test_that("nn2poly for a keras.engine.training.Model object", {
+  skip_if_not_installed("keras")
+  skip_if_not_installed("tensorflow")
   skip_on_cran()
 
-  tensorflow::set_random_seed(42)
+  nn <- keras_test_model()
 
-  nn <- keras::keras_model_sequential()
-  keras::`%>%`(nn, keras::layer_dense(units = 2,
-                                      activation = "tanh",
-                                      input_shape = 2))
-  keras::`%>%`(nn, keras::layer_dense(units = 3,
-                                      activation = "softplus"))
-  keras::`%>%`(nn, keras::layer_dense(units = 2,
-                                      activation = "linear"))
   result <- nn2poly(nn,
                     q_taylor_vector = c(2,2,1),
                     forced_max_Q = 2)
@@ -117,18 +111,11 @@ test_that("nn2poly for a keras.engine.training.Model object", {
 })
 
 test_that("nn2poly for a constrained keras.engine.training.Model object", {
+  skip_if_not_installed("keras")
+  skip_if_not_installed("tensorflow")
   skip_on_cran()
 
-  tensorflow::set_random_seed(42)
-
-  nn <- keras::keras_model_sequential()
-  keras::`%>%`(nn, keras::layer_dense(units = 2,
-                                      activation = "tanh",
-                                      input_shape = 2))
-  keras::`%>%`(nn, keras::layer_dense(units = 3,
-                                      activation = "softplus"))
-  keras::`%>%`(nn, keras::layer_dense(units = 2,
-                                      activation = "linear"))
+  nn <- keras_test_model()
 
   constrained_nn <- add_constraints(nn)
 
@@ -143,56 +130,13 @@ test_that("nn2poly for a constrained keras.engine.training.Model object", {
 
 
 test_that("nn2poly for a nn_module object", {
+  skip_if_not_installed("luz")
+  skip_if_not_installed("torch")
   skip_on_cran()
 
-  set.seed(42)
-  torch::torch_manual_seed(42)
+  data <- luz_test_data(nn2poly_example0)
 
-  nn2poly_dataset <- torch::dataset(
-    name = "nn2poly_dataset",
-
-    initialize = function(df) {
-      self$x <- torch::torch_tensor(as.matrix(df[,1:2]))
-      self$y <- torch::torch_tensor(as.matrix(df[,3]))
-    },
-
-    .getitem = function(i) {
-      x <- self$x[i,]
-      y <- self$y[i]
-
-      list(x = x,
-           y = y)
-    },
-
-    .length = function() {
-      self$y$size()[[1]]
-    }
-
-  )
-
-  example    <- nn2poly_example0
-  data_train_full <- nn2poly_dataset(as.data.frame(cbind(example$train_x, example$train_y)))
-
-  all_indices   <- 1:length(data_train_full)
-  train_indices <- sample(all_indices, size = round(length(data_train_full)) * 0.8)
-  val_indices   <- setdiff(all_indices, train_indices)
-
-  data_train <- torch::dataset_subset(data_train_full, train_indices)
-  data_val   <- torch::dataset_subset(data_train_full, val_indices)
-
-  # data_test  <- nn2poly_dataset(as.data.frame(cbind(example$test_x, example$test_y)))
-  train_dl <- torch::dataloader(data_train, batch_size = 32, shuffle = TRUE)
-  val_dl   <- torch::dataloader(data_val, batch_size = 32)
-
-  net <- luz_model_sequential(
-    torch::nn_linear(2,2),
-    torch::nn_softplus(),
-    torch::nn_linear(2,3),
-    torch::nn_softplus(),
-    torch::nn_linear(3,1)
-  )
-
-  fitted <- net %>%
+  fitted <- luz_test_model() %>%
     luz::setup(
       loss = torch::nn_mse_loss(),
       optimizer = torch::optim_adam,
@@ -200,10 +144,10 @@ test_that("nn2poly for a nn_module object", {
         luz::luz_metric_mse()
       )
     ) %>%
-    luz::fit(train_dl, epochs = 5, valid_data = val_dl)
+    luz::fit(data$train, epochs = 5, valid_data = data$valid)
 
-  result <- nn2poly(fitted$model,
-                    q_taylor_vector = example$q_taylor_vector,
+  result <- nn2poly(fitted,
+                    q_taylor_vector = nn2poly_example0$q_taylor_vector,
                     forced_max_Q = 3)
 
   expect_equal(round(result$values[1,1],2), 0.11)

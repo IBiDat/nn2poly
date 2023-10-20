@@ -1,55 +1,18 @@
 test_that("The constranied training works using the l1 and l2 constraints", {
-  nn2poly_dataset <- torch::dataset(
-    name = "nn2poly_dataset",
+  skip_if_not_installed("luz")
+  skip_if_not_installed("torch")
+  skip_on_cran()
 
-    initialize = function(df) {
-      self$x <- torch::torch_tensor(as.matrix(df[,1:2]))
-      self$y <- torch::torch_tensor(as.matrix(df[,3]))
-    },
-
-    .getitem = function(i) {
-      x <- self$x[i,]
-      y <- self$y[i]
-
-      list(x = x,
-           y = y)
-    },
-
-    .length = function() {
-      self$y$size()[[1]]
-    }
-
-  )
-
-  example    <- nn2poly_example0
-  data_train_full <- nn2poly_dataset(as.data.frame(cbind(example$train_x, example$train_y)))
-
-  all_indices   <- 1:length(data_train_full)
-  train_indices <- sample(all_indices, size = round(length(data_train_full)) * 0.8)
-  val_indices   <- setdiff(all_indices, train_indices)
-
-  data_train <- torch::dataset_subset(data_train_full, train_indices)
-  data_val   <- torch::dataset_subset(data_train_full, val_indices)
-
-  train_dl <- torch::dataloader(data_train, batch_size = 32, shuffle = TRUE)
-  val_dl   <- torch::dataloader(data_val, batch_size = 32)
-
-  net <- luz_model_sequential(
-    torch::nn_linear(2,2),
-    torch::nn_softplus(),
-    torch::nn_linear(2,3),
-    torch::nn_softplus(),
-    torch::nn_linear(3,1)
-  )
+  data <- luz_test_data(nn2poly_example0)
 
   # Do the constrained training with the l1 constraint
-  fitted <- net %>%
+  fitted <- luz_test_model() %>%
     luz::setup(
       loss = torch::nn_mse_loss(),
       optimizer = torch::optim_adam,
     ) %>%
     add_constraints("l1_norm") %>%
-    fit(train_dl, epochs = 3, valid_data = val_dl)
+    fit(data$train, epochs = 3, valid_data = data$valid)
 
   wb <- torch::torch_tensor(
     rbind(
@@ -67,13 +30,13 @@ test_that("The constranied training works using the l1 and l2 constraints", {
   # Now, the same but with the l2 constraint
 
   # Do the constrainted training with the l2 constraint
-  fitted <- net %>%
+  fitted <- luz_test_model() %>%
     luz::setup(
       loss = torch::nn_mse_loss(),
       optimizer = torch::optim_adam,
     ) %>%
     add_constraints("l2_norm") %>%
-    fit(train_dl, epochs = 3, valid_data = val_dl)
+    fit(data$train, epochs = 3, valid_data = data$valid)
 
   wb <- torch::torch_tensor(
     rbind(
