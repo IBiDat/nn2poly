@@ -61,12 +61,8 @@ add_constraints.keras.engine.training.Model <- function(model,
                                                         type = c("l1_norm", "l2_norm"),
                                                         keep_old_weights = FALSE,
                                                         ...) {
-  # Set Python vars to NULL to avoid global variable notes in package check
-  super <- self <- constraint_maxnorm <- NULL
-
-  if (!requireNamespace("keras", quietly = TRUE)) {
+  if (!requireNamespace("keras", quietly = TRUE))
     stop("package 'keras' is required for this functionality", call.=FALSE)
-  }
 
   # Custom keras layers using L1 and L2 norms. These are needed to impose
   # constraints simultaneously to the weights and bias.
@@ -112,7 +108,7 @@ add_constraints.keras.engine.training.Model <- function(model,
           initializer = "random_normal",
           trainable = TRUE,
           # maxnorm uses the L2 norm with a given max value
-          constraint = constraint_maxnorm(max_value = 1, axis = 0)
+          constraint = keras::constraint_maxnorm(max_value = 1, axis = 0)
         )
       },
       call = function(inputs) {

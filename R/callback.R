@@ -11,8 +11,6 @@ norm_order <- function(type = c("l1_norm", "l2_norm")) {
 
 build_callback.luz_module_generator <- function(object,
                                                 type = c("l1_norm", "l2_norm")) {
-  ctx <- NULL
-
   luz_callback <- luz::luz_callback(
     name = paste0(type, "_callback"),
 

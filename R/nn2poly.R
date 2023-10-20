@@ -1,7 +1,7 @@
 #' @useDynLib nn2poly, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
 #' @importFrom stats density
-utils::globalVariables(".data")
+utils::globalVariables(c(".data", "super", "self", "private", "ctx"))
 NULL
 
 #' nn2poly generic
