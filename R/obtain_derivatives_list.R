@@ -1,4 +1,8 @@
-#' Title
+#' Obtain needed derivatives up to the chosen order (q Taylor)
+#'
+#' This function is internally used in nn2poly_algorithm to obtain the
+#' derivatives of the given activation function at 0 up to the desired order $q$
+#' for each layer.
 #'
 #' @param af_string_list List with the names of the activation function used
 #' at each layer as a string. Currently accepted values: "softplus", "linear",
@@ -7,7 +11,7 @@
 #' expansion should be performed at each layer.
 #'
 #' @return list of vectors with the derivatives
-#' @export
+#' @noRd
 #'
 obtain_derivatives_list <- function(af_string_list, q_taylor_vector) {
 
