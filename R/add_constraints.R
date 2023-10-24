@@ -173,9 +173,7 @@ add_constraints.keras.engine.training.Model <- function(model,
 add_constraints.luz_module_generator <- function(model,
                                                  type = c("l1_norm", "l2_norm"),
                                                  ...) {
-  if (!inherits(model(), "nn_sequential"))
-    stop("only sequential models are supported, see 'luz_model_sequential", call.=FALSE)
-
+  luz_model_sequential_check(model)
   attr(model, "constraint") <- match.arg(type)
   class(model) <- c("nn2poly", class(model))
   model

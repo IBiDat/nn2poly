@@ -24,6 +24,14 @@ luz_model_sequential <- function(...) {
   )
 }
 
+luz_model_sequential_check <- function(object) {
+  if (any(grepl("_generator", class(object))))
+    object <- object()
+
+  if (!inherits(object, "nn_sequential"))
+    stop("only sequential models are supported, see '?luz_model_sequential'", call.=FALSE)
+}
+
 #' torch constraint generator
 #'
 #' @param ord Order of norm (default: 1).

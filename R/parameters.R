@@ -65,8 +65,8 @@ get_parameters.keras.engine.training.Model <- function(object) {
 }
 
 get_parameters.nn_module <- function(object) {
-  if (!inherits(object, "nn_sequential"))
-    stop("only sequential models are supported, see 'luz_model_sequential", call.=FALSE)
+  luz_model_sequential_check(model)
+
   if (inherits(object, "nn_module_generator"))
     object <- object()
 
