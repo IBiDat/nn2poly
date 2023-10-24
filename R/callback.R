@@ -19,7 +19,7 @@ build_callback.luz_module_generator <- function(object,
     },
 
     on_train_batch_end = function() {
-      for (layer in ctx$model$children)
+      for (layer in utils::head(ctx$model$children, -1))
         layer$apply(self$constraint)
     }
   )
