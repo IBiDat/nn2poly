@@ -65,7 +65,7 @@ get_parameters.keras.engine.training.Model <- function(object) {
 }
 
 get_parameters.nn_module <- function(object) {
-  luz_model_sequential_check(model)
+  luz_model_sequential_check(object)
 
   if (inherits(object, "nn_module_generator"))
     object <- object()
