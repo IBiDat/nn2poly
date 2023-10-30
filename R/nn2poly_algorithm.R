@@ -45,13 +45,14 @@
 #' hidden layers are not needed to represent the NN but can be used to explore
 #' how the method works.
 #'
-#'
+#' @noRd
 nn2poly_algorithm <- function(weights_list,
                               af_string_list,
                               q_taylor_vector = NULL,
                               all_partitions  = NULL,
                               store_coeffs    = FALSE,
-                              forced_max_Q    = NULL) {
+                              forced_max_Q    = NULL,
+                              ...) {
 
   # Obtain number of variables (dimension p)
   p <- dim(weights_list[[1]])[1] - 1
@@ -276,9 +277,7 @@ nn2poly_algorithm <- function(weights_list,
 #' @return List of length 2 where the first element is a list with the labels
 #' and the second element is a list with the partitions.
 #'
-#'
-#'
-
+#' @noRd
 obtain_partitions_with_labels <- function(p, q_max) {
   # This function will return a list with 2 elements:
   #

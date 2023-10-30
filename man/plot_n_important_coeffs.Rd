@@ -8,7 +8,7 @@ plot_n_important_coeffs(poly, n_important_coeffs)
 }
 \arguments{
 \item{poly}{A polynomial represented as a list with "labels" and "values",
-in the same manner as returned by \code{\link{nn2poly_algorithm}}.}
+in the same manner as returned by \pkg{nn2poly} algorithm.}
 
 \item{n_important_coeffs}{An integer denoting the number of coefficients to
 be plotted, after ordering them by absolute magnitude.}
@@ -17,8 +17,8 @@ be plotted, after ordering them by absolute magnitude.}
 A plot showing the n most important coefficients.
 }
 \description{
-A function that takes a polynomial (or several ones) as given by
-\code{\link{nn2poly_algorithm}}, and then plots their absolute magnitude as barplots
+A function that takes a polynomial (or several ones) as given by the
+\pkg{nn2poly} algorithm, and then plots their absolute magnitude as barplots
 to be able to compare the most important coefficients. The number of plotted
 coefficients is controlled by \code{n_important_coeffs}.
 }

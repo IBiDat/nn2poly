@@ -20,10 +20,11 @@ containing the weights matrix for each layer. The name of every element in the l
 should be the name of the activation function to be used at each layer.
 
 The expected shape of such matrices at any layer L is of the form
-$(h_(l-1) + 1)*(h_l)$, that is, the number of rows is the number of neurons
+\eqn{(h_{(l-1)} + 1)*(h_l)}, that is, the number of rows is the number of neurons
 in the previous layer plus the bias vector, and the number of columns is the
 number of neurons in the current layer L. Therefore, each column
 corresponds to the weight vector affecting each neuron in that layer.
+The bias vector should be in the first row.
 It could also be a \code{keras.engine.training.Model} model.}
 
 \item{q_taylor_vector}{\code{vector} of length L containing the degree
@@ -36,8 +37,8 @@ step can be computationally expensive and it is encouraged that the
 multipartitions are stored and reused when possible.}
 
 \item{store_coeffs}{Boolean that determines if all polynomials computed in
-the internal layers have to be stored and given in the output (TRUE), or if
-only the last layer is needed (FALSE).}
+the internal layers have to be stored and given in the output (\code{TRUE}),
+or if only the last layer is needed (\code{FALSE}).}
 
 \item{forced_max_Q}{Optional argument: integer that determines the maximum order
 that we will force in the final polynomial, discarding terms of higher order

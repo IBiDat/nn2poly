@@ -15,9 +15,8 @@
 #'   be plotted.
 #'
 #' @return Plot (ggplot object).
-#' @export
 #'
-
+#' @export
 plot_diagonal <- function(x_axis, y_axis,
                           xlab       = NULL,
                           ylab       = NULL,

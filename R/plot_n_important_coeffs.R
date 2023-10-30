@@ -1,18 +1,18 @@
 #' Plot n most important coefficients.
 #'
-#' A function that takes a polynomial (or several ones) as given by
-#' [`nn2poly_algorithm`], and then plots their absolute magnitude as barplots
+#' A function that takes a polynomial (or several ones) as given by the
+#' \pkg{nn2poly} algorithm, and then plots their absolute magnitude as barplots
 #' to be able to compare the most important coefficients. The number of plotted
 #' coefficients is controlled by `n_important_coeffs`.
 #'
 #' @param poly A polynomial represented as a list with "labels" and "values",
-#' in the same manner as returned by [`nn2poly_algorithm`].
+#' in the same manner as returned by \pkg{nn2poly} algorithm.
 #' @param n_important_coeffs An integer denoting the number of coefficients to
 #' be plotted, after ordering them by absolute magnitude.
 #'
 #' @return A plot showing the n most important coefficients.
-#' @export
 #'
+#' @export
 plot_n_important_coeffs <- function(poly, n_important_coeffs) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("package 'ggplot2' is required for this functionality", call. = FALSE)

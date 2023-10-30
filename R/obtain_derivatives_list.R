@@ -7,8 +7,8 @@
 #' expansion should be performed at each layer.
 #'
 #' @return list of vectors with the derivatives
-#' @export
 #'
+#' @export
 obtain_derivatives_list <- function(af_string_list, q_taylor_vector) {
 
   n <- length(af_string_list)
