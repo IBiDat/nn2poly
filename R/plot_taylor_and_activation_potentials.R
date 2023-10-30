@@ -20,12 +20,12 @@
 #' @param data Matrix or data frame containing the predictor variables (X)
 #' to be used as input to compute their activation potentials. The response
 #' variable column should not be included.
-#' @param q_taylor_vector \code{vector} of length L containing the degree
+#' @param taylor_orders \code{vector} of length L containing the degree
 #' (\code{numeric}) up to which Taylor expansion should be performed at each
 #' layer, as used in the \pkg{nn2poly} algorithm.
-#' @param forced_max_Q Integer that determines the maximum order
+#' @param max_order Integer that determines the maximum order
 #' that we will force in the final polynomial, discarding terms of higher order
-#' that would naturally arise using all the orders in `q_taylor_vector`,
+#' that would naturally arise using all the orders in `taylor_orders`,
 #' as used in the \pkg{nn2poly} algorithm.
 #' @param constraints Boolean parameter determining if the NN is constrained
 #' (TRUE) or not (FALSE). This only modifies de plots title to show
@@ -38,8 +38,8 @@
 #' @export
 plot_taylor_and_activation_potentials <- function(object,
                                                   data,
-                                                  q_taylor_vector,
-                                                  forced_max_Q,
+                                                  taylor_orders,
+                                                  max_order,
                                                   constraints,
                                                   taylor_interval = 1.5,
                                                   ...) {
@@ -58,8 +58,8 @@ plot_taylor_and_activation_potentials.default <- function(object, ...) {
 #' @export
 plot_taylor_and_activation_potentials.list <- function(object,
                                                        data,
-                                                       q_taylor_vector,
-                                                       forced_max_Q,
+                                                       taylor_orders,
+                                                       max_order,
                                                        constraints,
                                                        taylor_interval = 1.5,
                                                        ...) {
@@ -150,7 +150,7 @@ plot_taylor_and_activation_potentials.list <- function(object,
     # compute the true function
     yf <- fun(x)
     # compute the Taylor approximation
-    pol <- pracma::taylor(fun, 0, min(q_taylor_vector[k],forced_max_Q))
+    pol <- pracma::taylor(fun, 0, min(taylor_orders[k],max_order))
     yp <- pracma::polyval(pol, x)
     # compute the error as the absolute value of the difference
     error <- abs(yf - yp)

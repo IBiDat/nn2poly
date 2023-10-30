@@ -27,8 +27,8 @@ test_that("The function works as expected", {
   plots <- plot_taylor_and_activation_potentials(
     object = nn,
     data = cbind(nn2poly_example0$train_x, nn2poly_example0$train_y),
-    q_taylor_vector = nn2poly_example0$q_taylor_vector,
-    forced_max_Q = 3,
+    taylor_orders = nn2poly_example0$taylor_orders,
+    max_order = 3,
     constraints = FALSE)
 
   # test the different plots

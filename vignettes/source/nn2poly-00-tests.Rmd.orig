@@ -33,13 +33,13 @@ This vignette contains several usecases of the `nn2poly` package applied to some
   weights_list <- nn2poly_example$weights_list
   af_string_list <- nn2poly_example$af_string_list
   af_derivatives_list <- nn2poly_example$af_derivatives_list
-  q_taylor_vector <- nn2poly_example$q_taylor_vector
+  taylor_orders <- nn2poly_example$taylor_orders
 
   result <- nn2poly_algorithm(
     weights_list = weights_list,
     af_string_list = af_string_list,
-    q_taylor_vector = q_taylor_vector,
-    store_coeffs = TRUE
+    taylor_orders = taylor_orders,
+    keep_layers = TRUE
   )
 
   # Comparamos el potencial en la segunda capa para neurona 1
@@ -72,15 +72,15 @@ This vignette contains several usecases of the `nn2poly` package applied to some
   weights_list <- nn2poly_example$weights_list
   af_string_list <- nn2poly_example$af_string_list
   af_derivatives_list <- nn2poly_example$af_derivatives_list
-  q_taylor_vector <- nn2poly_example$q_taylor_vector
+  taylor_orders <- nn2poly_example$taylor_orders
   test_y <- nn2poly_example$test_y
   test_x <- nn2poly_example$test_x
 
   result <- nn2poly_algorithm(
     weights_list = weights_list,
     af_string_list = af_string_list,
-    q_taylor_vector = q_taylor_vector,
-    store_coeffs = TRUE
+    taylor_orders = taylor_orders,
+    keep_layers = TRUE
   )
 
   labels <- result[[length(historical_coeffs)]][[1]]

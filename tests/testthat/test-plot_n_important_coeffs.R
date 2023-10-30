@@ -1,15 +1,15 @@
-test_that("Test the plot for a polynomial generated `store_coeffs = FALSE`", {
+test_that("Test the plot for a polynomial generated `keep_layers = FALSE`", {
   # loading the example
   nn2poly_example <- nn2poly_example0
   object <- nn2poly_example$weights_list
   names(object) <- nn2poly_example$af_string_list
-  q_taylor_vector <- nn2poly_example$q_taylor_vector
+  taylor_orders <- nn2poly_example$taylor_orders
 
   # computing the polynomial
   result <- nn2poly(
     object = object,
-    q_taylor_vector = q_taylor_vector,
-    store_coeffs = FALSE
+    taylor_orders = taylor_orders,
+    keep_layers = FALSE
   )
 
   # computing the plot with 5 important coefficients
@@ -19,18 +19,18 @@ test_that("Test the plot for a polynomial generated `store_coeffs = FALSE`", {
   vdiffr::expect_doppelganger("top 5 important coefficients", p)
 })
 
-test_that("Test the plot for a polynomial generated `store_coeffs = TRUE`", {
+test_that("Test the plot for a polynomial generated `keep_layers = TRUE`", {
   # loading the example
   nn2poly_example <- nn2poly_example0
   object <- nn2poly_example$weights_list
   names(object) <- nn2poly_example$af_string_list
-  q_taylor_vector <- nn2poly_example$q_taylor_vector
+  taylor_orders <- nn2poly_example$taylor_orders
 
   # computing the polynomial
   result <- nn2poly(
     object = object,
-    q_taylor_vector = q_taylor_vector,
-    store_coeffs = TRUE
+    taylor_orders = taylor_orders,
+    keep_layers = TRUE
   )
 
   # computing the plot with 5 important coefficients

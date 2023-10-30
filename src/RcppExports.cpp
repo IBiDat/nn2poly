@@ -26,20 +26,20 @@ BEGIN_RCPP
 END_RCPP
 }
 // alg_non_linear
-arma::mat alg_non_linear(arma::mat coeffs_input, ListOf<IntegerVector> labels_input, ListOf<IntegerVector> labels_output, IntegerVector q_taylor_vector, int current_layer, arma::vec g, ListOf<IntegerVector> partitions_labels, List partitions);
-RcppExport SEXP _nn2poly_alg_non_linear(SEXP coeffs_inputSEXP, SEXP labels_inputSEXP, SEXP labels_outputSEXP, SEXP q_taylor_vectorSEXP, SEXP current_layerSEXP, SEXP gSEXP, SEXP partitions_labelsSEXP, SEXP partitionsSEXP) {
+arma::mat alg_non_linear(arma::mat coeffs_input, ListOf<IntegerVector> labels_input, ListOf<IntegerVector> labels_output, IntegerVector taylor_orders, int current_layer, arma::vec g, ListOf<IntegerVector> partitions_labels, List partitions);
+RcppExport SEXP _nn2poly_alg_non_linear(SEXP coeffs_inputSEXP, SEXP labels_inputSEXP, SEXP labels_outputSEXP, SEXP taylor_ordersSEXP, SEXP current_layerSEXP, SEXP gSEXP, SEXP partitions_labelsSEXP, SEXP partitionsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::mat >::type coeffs_input(coeffs_inputSEXP);
     Rcpp::traits::input_parameter< ListOf<IntegerVector> >::type labels_input(labels_inputSEXP);
     Rcpp::traits::input_parameter< ListOf<IntegerVector> >::type labels_output(labels_outputSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type q_taylor_vector(q_taylor_vectorSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type taylor_orders(taylor_ordersSEXP);
     Rcpp::traits::input_parameter< int >::type current_layer(current_layerSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type g(gSEXP);
     Rcpp::traits::input_parameter< ListOf<IntegerVector> >::type partitions_labels(partitions_labelsSEXP);
     Rcpp::traits::input_parameter< List >::type partitions(partitionsSEXP);
-    rcpp_result_gen = Rcpp::wrap(alg_non_linear(coeffs_input, labels_input, labels_output, q_taylor_vector, current_layer, g, partitions_labels, partitions));
+    rcpp_result_gen = Rcpp::wrap(alg_non_linear(coeffs_input, labels_input, labels_output, taylor_orders, current_layer, g, partitions_labels, partitions));
     return rcpp_result_gen;
 END_RCPP
 }

@@ -27,7 +27,7 @@ plot_n_important_coeffs <- function(poly, n_important_coeffs) {
   }
 
   # a special case is needed for the case in which the polynomial was generated
-  # with `store_coeffs = TRUE`
+  # with `keep_layers = TRUE`
 
   if (is.null(poly$values)) {
     poly <- poly[[length(poly)]]

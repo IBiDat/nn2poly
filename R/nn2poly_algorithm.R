@@ -17,7 +17,7 @@
 #' @param af_string_list \code{list} of length L containing \code{character}
 #' strings with the names of the activation function used at each layer.
 #'
-#' @param q_taylor_vector \code{vector} of length L containing the degree
+#' @param taylor_orders \code{vector} of length L containing the degree
 #' (\code{numeric}) up to which Taylor expansion should be performed at each
 #' layer.
 #'
@@ -26,21 +26,21 @@
 #' step can be computationally expensive and it is encouraged that the
 #' multipartitions are stored and reused when possible.
 #'
-#' @param store_coeffs Boolean that determines if all polynomials computed in
+#' @param keep_layers Boolean that determines if all polynomials computed in
 #' the internal layers have to be stored and given in the output (TRUE), or if
 #' only the last layer is needed (FALSE). Default is FALSE.
 #'
-#' @param forced_max_Q Optional argument: integer that determines the maximum order
+#' @param max_order Optional argument: integer that determines the maximum order
 #' that we will force in the final polynomial, discarding terms of higher order
-#' that would naturally arise using all the orders in `q_taylor_vector`.
+#' that would naturally arise using all the orders in `taylor_orders`.
 #'
-#' @return If \code{store_coeffs = FALSE} (default case), it returns a list
+#' @return If \code{keep_layers = FALSE} (default case), it returns a list
 #' with an item named `labels` that is a list of integer vectors with each the
 #' variables index associated to each polynomial term, and a item named `values`
 #' which contains a matrix where each row are the coefficients of the polynomial
 #' associated with an output neuron.
 #'
-#' If \code{store_coeffs = TRUE}, it returns a list of length L that for each
+#' If \code{keep_layers = TRUE}, it returns a list of length L that for each
 #' layer contains an item as explained before. The polynomials obtained at the
 #' hidden layers are not needed to represent the NN but can be used to explore
 #' how the method works.
@@ -48,10 +48,10 @@
 #' @noRd
 nn2poly_algorithm <- function(weights_list,
                               af_string_list,
-                              q_taylor_vector = NULL,
+                              taylor_orders = NULL,
                               all_partitions  = NULL,
-                              store_coeffs    = FALSE,
-                              forced_max_Q    = NULL,
+                              keep_layers    = FALSE,
+                              max_order    = NULL,
                               ...) {
 
   # Obtain number of variables (dimension p)
@@ -75,23 +75,23 @@ nn2poly_algorithm <- function(weights_list,
     results <- vector(mode = "list", length = 2 * L)
   }
 
-  # Create a default q_taylor_vector if it is not given by the user
-  if (is.null(q_taylor_vector)) {
+  # Create a default taylor_orders if it is not given by the user
+  if (is.null(taylor_orders)) {
     # 8 for the non-linear layers and 1 for the line
-    q_taylor_vector <- ifelse(af_string_list=="linear", 1, 8)
+    taylor_orders <- ifelse(af_string_list=="linear", 1, 8)
   }
 
   # Obtain all the derivatives up to the desired Taylor degree at each layer
   af_derivatives_list <- obtain_derivatives_list(
     af_string_list = af_string_list,
-    q_taylor_vector = q_taylor_vector
+    taylor_orders = taylor_orders
   )
 
   # Obtain the maximum degree of the final polynomial:
-  if(is.null(forced_max_Q)){
-    q_max <- prod(q_taylor_vector)
+  if(is.null(max_order)){
+    q_max <- prod(taylor_orders)
   } else {
-    q_max <- min(prod(q_taylor_vector),forced_max_Q)
+    q_max <- min(prod(taylor_orders),max_order)
   }
 
 
@@ -167,7 +167,7 @@ nn2poly_algorithm <- function(weights_list,
 
       # Stop if last layer and the last layer is linear
       if (current_layer == L && last_linear) {
-        if (store_coeffs) {
+        if (keep_layers) {
           return(results)
         } else {
           return(coeffs_list_output)
@@ -184,7 +184,7 @@ nn2poly_algorithm <- function(weights_list,
     # Treat the previous coeff output as input
     coeffs_list_input <- coeffs_list_output
 
-    # In the non linear case the polynomial order increases (unless forced_max_Q is
+    # In the non linear case the polynomial order increases (unless max_order is
     # reached), so the new labels need to be computed. However, the previous
     # ones can be reused.
     # The new labels will be for monomials of orders between the total order
@@ -196,17 +196,17 @@ nn2poly_algorithm <- function(weights_list,
       previous_total_order <- new_total_order
     }
 
-    # Compute the new total order with the product of q_taylor_vector.
-    # If a forced_max_Q value is used, its taken as the minimum between both.
-    if (is.null(forced_max_Q)) {
-      new_total_order <- previous_total_order * q_taylor_vector[current_layer]
+    # Compute the new total order with the product of taylor_orders.
+    # If a max_order value is used, its taken as the minimum between both.
+    if (is.null(max_order)) {
+      new_total_order <- previous_total_order * taylor_orders[current_layer]
     } else {
-      new_total_order <- min(previous_total_order * q_taylor_vector[current_layer],
-                             forced_max_Q)
+      new_total_order <- min(previous_total_order * taylor_orders[current_layer],
+                             max_order)
     }
 
     # If the order has increased, create new needed labels.
-    # If not, forced_max_Q has been reached and no new labels are needed.
+    # If not, max_order has been reached and no new labels are needed.
     if (previous_total_order != new_total_order){
       # Loop over each of the new orders up to the maximum one
       for (order in (previous_total_order+1):new_total_order){
@@ -238,7 +238,7 @@ nn2poly_algorithm <- function(weights_list,
       coeffs_list_input$values,
       labels_input = coeffs_list_input$labels,
       labels_output = coeffs_list_output$labels,
-      q_taylor_vector = q_taylor_vector,
+      taylor_orders = taylor_orders,
       current_layer = current_layer,
       g = af_derivatives_list[[current_layer]],
       partitions_labels = all_partitions$labels,
@@ -253,7 +253,7 @@ nn2poly_algorithm <- function(weights_list,
 
     # Check if this is the last layer and if the last layer is not linear
     if (current_layer == L && !last_linear) {
-      if (store_coeffs) {
+      if (keep_layers) {
         return(results)
       } else {
         return(coeffs_list_output)

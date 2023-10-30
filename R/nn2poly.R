@@ -4,7 +4,7 @@
 utils::globalVariables(c(".data", "super", "self", "private", "ctx"))
 NULL
 
-#' nn2poly generic
+#' Obtain a polynomial from a trained neural network
 #'
 #' @param object An object for which the computation of the nn2poly algorithm is desired.
 #' For the default case, it should be a \code{list} of length L ( number of hidden layers + 1)
@@ -18,39 +18,39 @@ NULL
 #' corresponds to the weight vector affecting each neuron in that layer.
 #' The bias vector should be in the first row.
 #' It could also be a `keras.engine.training.Model` model.
-#' @param q_taylor_vector \code{vector} of length L containing the degree
+#' @param taylor_orders \code{vector} of length L containing the degree
 #' (\code{numeric}) up to which Taylor expansion should be performed at each
 #' layer.
 #' @param all_partitions Optional argument containing the needed multipartitions
 #' as list of lists of lists. If \code{NULL}, the function computes it first. This
 #' step can be computationally expensive and it is encouraged that the
 #' multipartitions are stored and reused when possible.
-#' @param store_coeffs Boolean that determines if all polynomials computed in
+#' @param keep_layers Boolean that determines if all polynomials computed in
 #' the internal layers have to be stored and given in the output (\code{TRUE}),
 #' or if only the last layer is needed (\code{FALSE}).
-#' @param forced_max_Q Optional argument: integer that determines the maximum order
+#' @param max_order Optional argument: integer that determines the maximum order
 #' that we will force in the final polynomial, discarding terms of higher order
-#' that would naturally arise using all the orders in `q_taylor_vector`.
+#' that would naturally arise using all the orders in `taylor_orders`.
 #' @param ... Ignored.
 #'
 #' @return An object of class `nn2poly`.
-#' If \code{store_coeffs = FALSE} (default case), it returns a list
+#' If \code{keep_layers = FALSE} (default case), it returns a list
 #' with an item named `labels` that is a list of integer vectors with each the
 #' variables index associated to each polynomial term, and a item named `values`
 #' which contains a matrix where each row are the coefficients of the polynomial
 #' associated with an output neuron.
 #'
-#' If \code{store_coeffs = TRUE}, it returns a list of length L that for each
+#' If \code{keep_layers = TRUE}, it returns a list of length L that for each
 #' layer contains an item as explained before. The polynomials obtained at the
 #' hidden layers are not needed to represent the NN but can be used to explore
 #' how the method works.
 #'
 #' @export
 nn2poly <- function(object,
-                    q_taylor_vector = NULL,
+                    taylor_orders = NULL,
                     all_partitions  = NULL,
-                    store_coeffs    = FALSE,
-                    forced_max_Q    = NULL,
+                    keep_layers    = FALSE,
+                    max_order    = NULL,
                     ...) {
   UseMethod("nn2poly")
 }

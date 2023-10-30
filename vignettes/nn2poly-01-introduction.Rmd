@@ -281,14 +281,14 @@ weights_object
 
 Additionally, there are other parameters affecting properties of the algorithm:
 
-* `q_taylor_vector`: A vector of integers containing the order of the Taylor expansion performed at each layer. If the output layer has a linear activation function, then the last value should be 1.
+* `taylor_orders`: A vector of integers containing the order of the Taylor expansion performed at each layer. If the output layer has a linear activation function, then the last value should be 1.
 
 
 ```r
-q_taylor_vector <- c(8, 8,  1)
+taylor_orders <- c(8, 8,  1)
 ```
 
-* `forced_max_Q`: (optional value) An integer value denoting the maximum order of the terms computed in the polynomial. Usually 2 or 3 should be enough in practice. Note that higher orders suppose an explosion in the possible combinations. If the user does not provide a value, the polynomial order grows multiplicatively with the Taylor order at each hidden layer, therefore its better to start with low values.
+* `max_order`: (optional value) An integer value denoting the maximum order of the terms computed in the polynomial. Usually 2 or 3 should be enough in practice. Note that higher orders suppose an explosion in the possible combinations. If the user does not provide a value, the polynomial order grows multiplicatively with the Taylor order at each hidden layer, therefore its better to start with low values.
 
 When the input is in the desired shape, the nn2poly method can be applied:
 
@@ -297,8 +297,8 @@ When the input is in the desired shape, the nn2poly method can be applied:
 ```r
 
 final_poly <- nn2poly(object = weights_object,
-                      q_taylor_vector = q_taylor_vector,
-                      forced_max_Q = 3)
+                      taylor_orders = taylor_orders,
+                      max_order = 3)
 ```
 
 
@@ -430,8 +430,8 @@ In this case, as we have not used constraints in the NN training, the activation
 ```r
 plot_taylor_and_activation_potentials(object = nn,
                                       data = train,
-                                    q_taylor_vector = q_taylor_vector,
-                                    forced_max_Q = 3,
+                                    taylor_orders = taylor_orders,
+                                    max_order = 3,
                                     constraints = FALSE)
 #> [[1]]
 ```

@@ -51,15 +51,15 @@ std::vector<ListOf<IntegerVector>> select_allowed_partitions(
 arma::mat alg_non_linear(arma::mat coeffs_input,
                              ListOf<IntegerVector> labels_input,
                              ListOf<IntegerVector> labels_output,
-                             IntegerVector q_taylor_vector,
+                             IntegerVector taylor_orders,
                              int current_layer, arma::vec g,
                              ListOf<IntegerVector> partitions_labels, List partitions)
 {
   // Extract the needed parameters and values:
-  int q_layer = q_taylor_vector[current_layer - 1];
+  int q_layer = taylor_orders[current_layer - 1];
   int q_previous_layer = 1;
   if (current_layer != 1)
-    q_previous_layer = q_taylor_vector[current_layer - 2];
+    q_previous_layer = taylor_orders[current_layer - 2];
 
   // Obtain total number of terms in the polynomial from labels
   int n_poly_terms = labels_output.size();

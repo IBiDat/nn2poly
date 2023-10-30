@@ -6,13 +6,13 @@ test_that("Check algorithm against precomputed example, without restricting
   # Get the needed data
   weights_list <- nn2poly_example$weights_list
   af_string_list <- nn2poly_example$af_string_list
-  q_taylor_vector <- nn2poly_example$q_taylor_vector
+  taylor_orders <- nn2poly_example$taylor_orders
 
   result <- nn2poly_algorithm(
     weights_list = weights_list,
     af_string_list = af_string_list,
-    q_taylor_vector = q_taylor_vector,
-    store_coeffs = TRUE
+    taylor_orders = taylor_orders,
+    keep_layers = TRUE
   )
 
   # Output polynomial order is 4, as no order is forced and taylor
@@ -33,7 +33,7 @@ test_that("Check algorithm against precomputed example, without restricting
 
 test_that("Check that the algortihm provides a correct value for a certain
           coefficient from a given example that has been computed manually,
-          using the optional parameter `forced_max_Q`", {
+          using the optional parameter `max_order`", {
 
   # Load the example:
   nn2poly_example <- nn2poly_example0
@@ -41,14 +41,14 @@ test_that("Check that the algortihm provides a correct value for a certain
   # Get the needed data
   weights_list <- nn2poly_example$weights_list
   af_string_list <- nn2poly_example$af_string_list
-  q_taylor_vector <- nn2poly_example$q_taylor_vector
+  taylor_orders <- nn2poly_example$taylor_orders
 
   result <- nn2poly_algorithm(
     weights_list = weights_list,
     af_string_list = af_string_list,
-    q_taylor_vector = q_taylor_vector,
-    store_coeffs = TRUE,
-    forced_max_Q = 2
+    taylor_orders = taylor_orders,
+    keep_layers = TRUE,
+    max_order = 2
   )
 
   # Output polynomial order is 2, as it is forced to be 2 instead of 4.

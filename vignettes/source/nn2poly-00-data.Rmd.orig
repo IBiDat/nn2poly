@@ -50,9 +50,9 @@ my_fun <-"softplus"
 my_q_taylor <- 2
 
 af_string_list <- list(my_fun, my_fun, "linear")
-q_taylor_vector <- c(my_q_taylor, my_q_taylor, 1) # If the output is linear, the last value should be 1 so it doesn't affect the product
+taylor_orders <- c(my_q_taylor, my_q_taylor, 1) # If the output is linear, the last value should be 1 so it doesn't affect the product
 
-af_derivatives_list <- nn2poly::obtain_derivatives_list(af_string_list,q_taylor_vector)
+af_derivatives_list <- nn2poly::obtain_derivatives_list(af_string_list,taylor_orders)
 
 # Directly assgin the wegiths as 1's to compute everything.
 
@@ -69,7 +69,7 @@ nn2poly_example0 <- vector(mode="list", length= 0)
 nn2poly_example0$weights_list <- weights_list
 nn2poly_example0$af_string_list <- af_string_list
 nn2poly_example0$af_derivatives_list <- af_derivatives_list
-nn2poly_example0$q_taylor_vector <- q_taylor_vector
+nn2poly_example0$taylor_orders <- taylor_orders
 
 #save(nn2poly_example0, file ="data/nn2poly_example0.rda")
 
@@ -90,10 +90,10 @@ my_q_taylor <- 2
 my_h <- 2
 
 af_string_list <- list(my_fun, my_fun, "linear")
-q_taylor_vector <- c(my_q_taylor, my_q_taylor, 1) # If the output is linear, the last value should be 1 so it doesn't affect the product
+taylor_orders <- c(my_q_taylor, my_q_taylor, 1) # If the output is linear, the last value should be 1 so it doesn't affect the product
 h_neurons_vector <- c(my_h, my_h,  1) # If the output is linear, the last value should be 1
 my_max_norm <- list("l1_norm", 1)
-af_derivatives_list <- nn2poly::obtain_derivatives_list(af_string_list,q_taylor_vector)
+af_derivatives_list <- nn2poly::obtain_derivatives_list(af_string_list,taylor_orders)
 
 # Fixed parameters for the data generation
 n_sample <- 400
@@ -196,7 +196,7 @@ nn2poly_example1$weights_list <- weights_list
 nn2poly_example1$coefficients <- original_betas
 nn2poly_example1$af_string_list <- af_string_list
 nn2poly_example1$af_derivatives_list <- af_derivatives_list
-nn2poly_example1$q_taylor_vector <- q_taylor_vector
+nn2poly_example1$taylor_orders <- taylor_orders
 nn2poly_example1$h_neurons_vector <- h_neurons_vector
 nn2poly_example1$train_x <- train_x
 nn2poly_example1$train_y <- train_y
@@ -223,10 +223,10 @@ my_q_taylor <- 2
 my_h <- 2
 
 af_string_list <- list(my_fun, my_fun, "linear")
-q_taylor_vector <- c(my_q_taylor, my_q_taylor, 1) # If the output is linear, the last value should be 1 so it doesn't affect the product
+taylor_orders <- c(my_q_taylor, my_q_taylor, 1) # If the output is linear, the last value should be 1 so it doesn't affect the product
 h_neurons_vector <- c(my_h, my_h,  1) # If the output is linear, the last value should be 1
 my_max_norm <- list("l1_norm", 1)
-af_derivatives_list <- nn2poly::obtain_derivatives_list(af_string_list,q_taylor_vector)
+af_derivatives_list <- nn2poly::obtain_derivatives_list(af_string_list,taylor_orders)
 
 # Fixed parameters for the data generation
 n_sample <- 400
@@ -329,7 +329,7 @@ nn2poly_example2$weights_list <- weights_list
 nn2poly_example2$coefficients <- original_betas
 nn2poly_example2$af_string_list <- af_string_list
 nn2poly_example2$af_derivatives_list <- af_derivatives_list
-nn2poly_example2$q_taylor_vector <- q_taylor_vector
+nn2poly_example2$taylor_orders <- taylor_orders
 nn2poly_example2$h_neurons_vector <- h_neurons_vector
 nn2poly_example2$train_x <- train_x
 nn2poly_example2$train_y <- train_y
@@ -357,10 +357,10 @@ my_q_taylor <- 3
 my_h <- 50
 
 af_string_list <- list(my_fun, my_fun,  my_fun, "linear")
-q_taylor_vector <- c(my_q_taylor, my_q_taylor, my_q_taylor, 1) # If the output is linear, the last value should be 1 so it doesn't affect the product
+taylor_orders <- c(my_q_taylor, my_q_taylor, my_q_taylor, 1) # If the output is linear, the last value should be 1 so it doesn't affect the product
 h_neurons_vector <- c(my_h, my_h,  1) # If the output is linear, the last value should be 1
 my_max_norm <- list("l1_norm", 1)
-af_derivatives_list <- nn2poly::obtain_derivatives_list(af_string_list,q_taylor_vector)
+af_derivatives_list <- nn2poly::obtain_derivatives_list(af_string_list,taylor_orders)
 
 # Fixed parameters for the data generation
 n_sample <- 400
@@ -462,7 +462,7 @@ nn2poly_example3$weights_list <- weights_list
 nn2poly_example3$coefficients <- original_betas
 nn2poly_example3$af_string_list <- af_string_list
 nn2poly_example3$af_derivatives_list <- af_derivatives_list
-nn2poly_example3$q_taylor_vector <- q_taylor_vector
+nn2poly_example3$taylor_orders <- taylor_orders
 nn2poly_example3$h_neurons_vector <- h_neurons_vector
 nn2poly_example3$train_x <- train_x
 nn2poly_example3$train_y <- train_y
