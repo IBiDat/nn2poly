@@ -7,7 +7,7 @@ output:
     fig_width: 6
 date: "`r Sys.Date()`"
 vignette: >
-  %\VignetteIndexEntry{02 - Regression example using tensorflow}
+  %\VignetteIndexEntry{04 - Regression example using torch}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -146,7 +146,7 @@ Then, the NNs will be built using a sequential model with `luz`and `torch`. As w
 
 luz_nn1 <- function() {
   torch::torch_manual_seed(42)
-  
+
   luz_model_sequential(
     torch::nn_linear(p,100),
     torch::nn_tanh(),
@@ -160,7 +160,7 @@ luz_nn1 <- function() {
 
 luz_nn2 <- function() {
   torch::torch_manual_seed(42)
-  
+
   luz_model_sequential(
     torch::nn_linear(p,100),
     torch::nn_tanh(),
@@ -190,7 +190,7 @@ fitted_1 <- luz_nn1() %>%
     luz::fit(torch_data$train, epochs = 50, valid_data = torch_data$valid)
 ```
 
-In order to implement the desired constraints, we provide the `add_constraints()` function, that allows to set the desired constraints in the torch training setup as callbacks. 
+In order to implement the desired constraints, we provide the `add_constraints()` function, that allows to set the desired constraints in the torch training setup as callbacks.
 
 Our constraints implementation is such that the bias on each neuron is included in the weights vector incident on that neuron, meaning that if the previous layer had $h$ neurons, then the considered weight vector including the bias at a given neuron would have dimension $h+1$, having the bias as it first element. Currently, L1 norm and L2 norm equal to 1 are implemented as options.
 

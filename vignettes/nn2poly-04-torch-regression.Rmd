@@ -7,7 +7,7 @@ output:
     fig_width: 6
 date: "2023-10-30"
 vignette: >
-  %\VignetteIndexEntry{02 - Regression example using tensorflow}
+  %\VignetteIndexEntry{04 - Regression example using torch}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
