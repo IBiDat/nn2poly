@@ -36,8 +36,6 @@
 #' eval_poly(x,poly)
 #'
 #' @export
-#'
-
 eval_poly <- function(x, poly) {
 
   # Remove names and transform into matrix (variables as columns)

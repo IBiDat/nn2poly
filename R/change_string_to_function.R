@@ -5,8 +5,8 @@
 #' activation functions, i.e., "softplus", "tanh", "sigmoid" or "linear".
 #'
 #' @return List of R functions associated with the string names provided.
-#' @export
 #'
+#' @noRd
 change_string_to_function <- function(af_string_list) {
   n <- length(af_string_list)
 

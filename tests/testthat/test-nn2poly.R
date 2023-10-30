@@ -69,7 +69,7 @@ test_that("nn2poly_algorithm:
 
   # Get the needed data
   object <- nn2poly_example$weights_list
-  names(object) <- nn2poly_example$af_string_list
+  names(object)   <- nn2poly_example$af_string_list
   q_taylor_vector <- nn2poly_example$q_taylor_vector
 
   result <- nn2poly(
@@ -95,18 +95,12 @@ test_that("nn2poly_algorithm:
 })
 
 test_that("nn2poly for a keras.engine.training.Model object", {
+  skip_if_not_installed("keras")
+  skip_if_not_installed("tensorflow")
   skip_on_cran()
 
-  tensorflow::set_random_seed(42)
+  nn <- keras_test_model()
 
-  nn <- keras::keras_model_sequential()
-  keras::`%>%`(nn, keras::layer_dense(units = 2,
-                                      activation = "tanh",
-                                      input_shape = 2))
-  keras::`%>%`(nn, keras::layer_dense(units = 3,
-                                      activation = "softplus"))
-  keras::`%>%`(nn, keras::layer_dense(units = 2,
-                                      activation = "linear"))
   result <- nn2poly(nn,
                     q_taylor_vector = c(2,2,1),
                     forced_max_Q = 2)
@@ -117,18 +111,11 @@ test_that("nn2poly for a keras.engine.training.Model object", {
 })
 
 test_that("nn2poly for a constrained keras.engine.training.Model object", {
+  skip_if_not_installed("keras")
+  skip_if_not_installed("tensorflow")
   skip_on_cran()
 
-  tensorflow::set_random_seed(42)
-
-  nn <- keras::keras_model_sequential()
-  keras::`%>%`(nn, keras::layer_dense(units = 2,
-                                      activation = "tanh",
-                                      input_shape = 2))
-  keras::`%>%`(nn, keras::layer_dense(units = 3,
-                                      activation = "softplus"))
-  keras::`%>%`(nn, keras::layer_dense(units = 2,
-                                      activation = "linear"))
+  nn <- keras_test_model()
 
   constrained_nn <- add_constraints(nn)
 
@@ -139,6 +126,34 @@ test_that("nn2poly for a constrained keras.engine.training.Model object", {
   expect_equal(result$values[1,1],  1.1253606)
   expect_equal(result$values[2,1], -0.45410551)
   expect_equal(result$labels[[6]], c(2,2))
+})
+
+
+test_that("nn2poly for a nn_module object", {
+  skip_if_not_installed("luz")
+  skip_if_not_installed("torch")
+  skip_on_cran()
+
+  data <- luz_test_data(nn2poly_example0)
+
+  fitted <- luz_test_model() %>%
+    luz::setup(
+      loss = torch::nn_mse_loss(),
+      optimizer = torch::optim_adam,
+      metrics = list(
+        luz::luz_metric_mse()
+      )
+    ) %>%
+    luz::fit(data$train, epochs = 5, valid_data = data$valid)
+
+  result <- nn2poly(fitted,
+                    q_taylor_vector = nn2poly_example0$q_taylor_vector,
+                    forced_max_Q = 3)
+
+  expect_equal(round(result$values[1,1],2), 0.11)
+  # expect_equal(result$values[2,1], -0.45410551)
+  expect_equal(result$labels[[7]], c(1,1,1))
+
 })
 
 test_that("Check that it throws an error when the dimensions of the weights list

@@ -19,6 +19,7 @@ Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.5.0)
 Imports:
+    generics,
     matrixStats,
     pracma,
     Rcpp
@@ -27,12 +28,14 @@ Suggests:
     ggplot2,
     keras,
     knitr,
+    luz,
     patchwork,
     rmarkdown,
     R6,
     tensorflow,
     testthat (>= 3.0.0),
     tidytext,
+    torch,
     vdiffr
 LinkingTo:
     Rcpp,

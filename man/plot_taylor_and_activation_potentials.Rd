@@ -24,7 +24,7 @@ number of neurons in the current layer L. Therefore, each column
 corresponds to the weight vector affecting each neuron in that layer.
 The names of \code{object} should have length L and be \code{character}
 strings with the names of the activation function used at each layer, as
-used in \code{\link{nn2poly_algorithm}}.}
+used in the \pkg{nn2poly} algorithm.}
 
 \item{data}{Matrix or data frame containing the predictor variables (X)
 to be used as input to compute their activation potentials. The response
@@ -32,12 +32,12 @@ variable column should not be included.}
 
 \item{q_taylor_vector}{\code{vector} of length L containing the degree
 (\code{numeric}) up to which Taylor expansion should be performed at each
-layer, as used in \code{\link{nn2poly_algorithm}}.}
+layer, as used in the \pkg{nn2poly} algorithm.}
 
 \item{forced_max_Q}{Integer that determines the maximum order
 that we will force in the final polynomial, discarding terms of higher order
 that would naturally arise using all the orders in \code{q_taylor_vector},
-as used in \code{\link{nn2poly_algorithm}}.}
+as used in the \pkg{nn2poly} algorithm.}
 
 \item{constraints}{Boolean parameter determining if the NN is constrained
 (TRUE) or not (FALSE). This only modifies de plots title to show

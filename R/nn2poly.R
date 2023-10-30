@@ -1,7 +1,7 @@
 #' @useDynLib nn2poly, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
 #' @importFrom stats density
-utils::globalVariables(".data")
+utils::globalVariables(c(".data", "super", "self", "private", "ctx"))
 NULL
 
 #' nn2poly generic
@@ -12,10 +12,11 @@ NULL
 #' should be the name of the activation function to be used at each layer.
 #'
 #' The expected shape of such matrices at any layer L is of the form
-#' $(h_(l-1) + 1)*(h_l)$, that is, the number of rows is the number of neurons
+#' \eqn{(h_{(l-1)} + 1)*(h_l)}, that is, the number of rows is the number of neurons
 #' in the previous layer plus the bias vector, and the number of columns is the
 #' number of neurons in the current layer L. Therefore, each column
 #' corresponds to the weight vector affecting each neuron in that layer.
+#' The bias vector should be in the first row.
 #' It could also be a `keras.engine.training.Model` model.
 #' @param q_taylor_vector \code{vector} of length L containing the degree
 #' (\code{numeric}) up to which Taylor expansion should be performed at each
@@ -25,8 +26,8 @@ NULL
 #' step can be computationally expensive and it is encouraged that the
 #' multipartitions are stored and reused when possible.
 #' @param store_coeffs Boolean that determines if all polynomials computed in
-#' the internal layers have to be stored and given in the output (TRUE), or if
-#' only the last layer is needed (FALSE).
+#' the internal layers have to be stored and given in the output (\code{TRUE}),
+#' or if only the last layer is needed (\code{FALSE}).
 #' @param forced_max_Q Optional argument: integer that determines the maximum order
 #' that we will force in the final polynomial, discarding terms of higher order
 #' that would naturally arise using all the orders in `q_taylor_vector`.
@@ -43,8 +44,8 @@ NULL
 #' layer contains an item as explained before. The polynomials obtained at the
 #' hidden layers are not needed to represent the NN but can be used to explore
 #' how the method works.
-#' @export
 #'
+#' @export
 nn2poly <- function(object,
                     q_taylor_vector = NULL,
                     all_partitions  = NULL,
@@ -55,54 +56,26 @@ nn2poly <- function(object,
 }
 
 #' @export
-nn2poly.default <- function(object, # weights_list and af_string_list
-                            q_taylor_vector = NULL,
-                            all_partitions  = NULL,
-                            store_coeffs    = FALSE,
-                            forced_max_Q    = NULL,
-                            ...) {
+nn2poly.list <- function(object, ...) {
   if (!check_weights_dimensions(object)) {
     stop("The list of weights has incorrect dimensions.
          Please, check the  right dimmensions in the documentation.",
          call. = FALSE)
   }
 
-  result <- nn2poly_algorithm(
-    weights_list    = object,
-    af_string_list  = names(object),
-    q_taylor_vector = q_taylor_vector,
-    all_partitions  = all_partitions,
-    store_coeffs    = store_coeffs,
-    forced_max_Q    = forced_max_Q
-  )
+  result <- nn2poly_algorithm(object, names(object), ...)
   class(result) <- "nn2poly"
   result
 }
 
 #' @export
-nn2poly.keras.engine.training.Model <- function(object,
-                                                q_taylor_vector = NULL,
-                                                all_partitions  = NULL,
-                                                store_coeffs    = FALSE,
-                                                forced_max_Q    = NULL,
-                                                ...) {
+nn2poly.default <- function(object, ...) {
+  params <- get_parameters(object)
+  object <- params$weights_list
+  names(object) <- params$af_string_list
 
-  model_parameters <- get_model_parameters(object)
-
-  result <- nn2poly_algorithm(
-    weights_list    = model_parameters$weights_list,
-    af_string_list  = model_parameters$af_string_list,
-    q_taylor_vector = q_taylor_vector,
-    all_partitions  = all_partitions,
-    store_coeffs    = store_coeffs,
-    forced_max_Q    = forced_max_Q
-  )
-
-  class(result) <- "nn2poly"
-  result
+  nn2poly(object, ...)
 }
-
-
 
 #' S3 method for class 'nn2poly'
 #'
@@ -112,9 +85,8 @@ nn2poly.keras.engine.training.Model <- function(object,
 #'
 #' @return \code{matrix} containing the predictions. There is one prediction for
 #' each row in `newdata`.
+#'
 #' @export
 predict.nn2poly <- function(object, newdata, ...) {
   eval_poly(x = newdata, poly = object)
 }
-
-

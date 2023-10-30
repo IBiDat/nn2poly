@@ -12,7 +12,6 @@
 #'
 #' @return list of vectors with the derivatives
 #' @noRd
-#'
 obtain_derivatives_list <- function(af_string_list, q_taylor_vector) {
 
   n <- length(af_string_list)
