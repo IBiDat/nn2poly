@@ -27,6 +27,7 @@
     <a class="dropdown-item" href="../articles/nn2poly-01-introduction.html">01 - Introduction to nn2poly</a>
     <a class="dropdown-item" href="../articles/nn2poly-02-tensorflow-regression.html">02 - Regression example using tensorflow</a>
     <a class="dropdown-item" href="../articles/nn2poly-03-tensorflow-classification.html">03 - Classification example using tensorflow</a>
+    <a class="dropdown-item" href="../articles/nn2poly-04-torch-regression.html">04 - Regression example using torch</a>
   </div>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -68,10 +69,11 @@ For the default case, it should be a <code>list</code> of length L ( number of h
 containing the weights matrix for each layer. The name of every element in the list
 should be the name of the activation function to be used at each layer.</p>
 <p>The expected shape of such matrices at any layer L is of the form
-$(h_(l-1) + 1)*(h_l)$, that is, the number of rows is the number of neurons
+\((h_{(l-1)} + 1)*(h_l)\), that is, the number of rows is the number of neurons
 in the previous layer plus the bias vector, and the number of columns is the
 number of neurons in the current layer L. Therefore, each column
 corresponds to the weight vector affecting each neuron in that layer.
+The bias vector should be in the first row.
 It could also be a <code>keras.engine.training.Model</code> model.</p></dd>
 
 
@@ -90,8 +92,8 @@ multipartitions are stored and reused when possible.</p></dd>
 
 <dt>store_coeffs</dt>
 <dd><p>Boolean that determines if all polynomials computed in
-the internal layers have to be stored and given in the output (TRUE), or if
-only the last layer is needed (FALSE).</p></dd>
+the internal layers have to be stored and given in the output (<code>TRUE</code>),
+or if only the last layer is needed (<code>FALSE</code>).</p></dd>
 
 
 <dt>forced_max_Q</dt>
