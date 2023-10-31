@@ -4,7 +4,11 @@
 utils::globalVariables(c(".data", "super", "self", "private", "ctx"))
 NULL
 
-#' Obtain a polynomial from a trained neural network
+#' Obtain a polynomial representation from a trained neural network
+#'
+#' Implements the main nn2poly algorithm to obtain a polynomial representation
+#' of a trained neural network from its weights and Taylor expansion of its
+#' activation functions.
 #'
 #' @param object An object for which the computation of the nn2poly algorithm is desired.
 #' For the default case, it should be a \code{list} of length L ( number of hidden layers + 1)
@@ -18,20 +22,25 @@ NULL
 #' corresponds to the weight vector affecting each neuron in that layer.
 #' The bias vector should be in the first row.
 #' It could also be a `keras.engine.training.Model` model.
+#'
+#' @param max_order Integer that determines the maximum order
+#' that we will force in the final polynomial, discarding terms of higher order
+#' that would naturally arise using all the orders in `taylor_orders`.
+#'
 #' @param taylor_orders \code{vector} of length L containing the degree
 #' (\code{numeric}) up to which Taylor expansion should be performed at each
 #' layer.
+#'
+#' @param keep_layers Boolean that determines if all polynomials computed in
+#' the internal layers have to be stored and given in the output (\code{TRUE}),
+#' or if only the last layer is needed (\code{FALSE}).
+#'
+#' @param ... Ignored.
+#'
 #' @param all_partitions Optional argument containing the needed multipartitions
 #' as list of lists of lists. If \code{NULL}, the function computes it first. This
 #' step can be computationally expensive and it is encouraged that the
 #' multipartitions are stored and reused when possible.
-#' @param keep_layers Boolean that determines if all polynomials computed in
-#' the internal layers have to be stored and given in the output (\code{TRUE}),
-#' or if only the last layer is needed (\code{FALSE}).
-#' @param max_order Optional argument: integer that determines the maximum order
-#' that we will force in the final polynomial, discarding terms of higher order
-#' that would naturally arise using all the orders in `taylor_orders`.
-#' @param ... Ignored.
 #'
 #' @return An object of class `nn2poly`.
 #' If \code{keep_layers = FALSE} (default case), it returns a list
@@ -47,11 +56,11 @@ NULL
 #'
 #' @export
 nn2poly <- function(object,
-                    taylor_orders = NULL,
-                    all_partitions  = NULL,
-                    keep_layers    = FALSE,
                     max_order    = NULL,
-                    ...) {
+                    keep_layers    = FALSE,
+                    taylor_orders = NULL,
+                    ...,
+                    all_partitions  = NULL) {
   UseMethod("nn2poly")
 }
 

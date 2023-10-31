@@ -2,15 +2,15 @@
 % Please edit documentation in R/nn2poly.R
 \name{nn2poly}
 \alias{nn2poly}
-\title{Obtain a polynomial from a trained neural network}
+\title{Obtain a polynomial representation from a trained neural network}
 \usage{
 nn2poly(
   object,
-  taylor_orders = NULL,
-  all_partitions = NULL,
-  keep_layers = FALSE,
   max_order = NULL,
-  ...
+  keep_layers = FALSE,
+  taylor_orders = NULL,
+  ...,
+  all_partitions = NULL
 )
 }
 \arguments{
@@ -27,24 +27,24 @@ corresponds to the weight vector affecting each neuron in that layer.
 The bias vector should be in the first row.
 It could also be a \code{keras.engine.training.Model} model.}
 
-\item{taylor_orders}{\code{vector} of length L containing the degree
-(\code{numeric}) up to which Taylor expansion should be performed at each
-layer.}
-
-\item{all_partitions}{Optional argument containing the needed multipartitions
-as list of lists of lists. If \code{NULL}, the function computes it first. This
-step can be computationally expensive and it is encouraged that the
-multipartitions are stored and reused when possible.}
+\item{max_order}{Integer that determines the maximum order
+that we will force in the final polynomial, discarding terms of higher order
+that would naturally arise using all the orders in \code{taylor_orders}.}
 
 \item{keep_layers}{Boolean that determines if all polynomials computed in
 the internal layers have to be stored and given in the output (\code{TRUE}),
 or if only the last layer is needed (\code{FALSE}).}
 
-\item{max_order}{Optional argument: integer that determines the maximum order
-that we will force in the final polynomial, discarding terms of higher order
-that would naturally arise using all the orders in \code{taylor_orders}.}
+\item{taylor_orders}{\code{vector} of length L containing the degree
+(\code{numeric}) up to which Taylor expansion should be performed at each
+layer.}
 
 \item{...}{Ignored.}
+
+\item{all_partitions}{Optional argument containing the needed multipartitions
+as list of lists of lists. If \code{NULL}, the function computes it first. This
+step can be computationally expensive and it is encouraged that the
+multipartitions are stored and reused when possible.}
 }
 \value{
 An object of class \code{nn2poly}.
@@ -60,5 +60,7 @@ hidden layers are not needed to represent the NN but can be used to explore
 how the method works.
 }
 \description{
-Obtain a polynomial from a trained neural network
+Implements the main nn2poly algorithm to obtain a polynomial representation
+of a trained neural network from its weights and Taylor expansion of its
+activation functions.
 }

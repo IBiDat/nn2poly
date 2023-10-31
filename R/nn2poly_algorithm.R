@@ -5,6 +5,7 @@
 #' for a model that performs closely as a given already trained neural network
 #' using its weights and a Taylor approximation of its activation functions.
 #'
+#' @inheritParams nn2poly
 #' @param weights_list \code{list} of length L ( number of hidden layers + 1)
 #' containing the weights matrix for each layer.
 #' The expected shape of such matrices at any layer L is of the form
@@ -16,23 +17,6 @@
 #'
 #' @param af_string_list \code{list} of length L containing \code{character}
 #' strings with the names of the activation function used at each layer.
-#'
-#' @param taylor_orders \code{vector} of length L containing the degree
-#' (\code{numeric}) up to which Taylor expansion should be performed at each
-#' layer.
-#'
-#' @param all_partitions Optional argument containing the needed multipartitions
-#' as list of lists of lists. If \code{NULL}, the function computes it first. This
-#' step can be computationally expensive and it is encouraged that the
-#' multipartitions are stored and reused when possible.
-#'
-#' @param keep_layers Boolean that determines if all polynomials computed in
-#' the internal layers have to be stored and given in the output (TRUE), or if
-#' only the last layer is needed (FALSE). Default is FALSE.
-#'
-#' @param max_order Optional argument: integer that determines the maximum order
-#' that we will force in the final polynomial, discarding terms of higher order
-#' that would naturally arise using all the orders in `taylor_orders`.
 #'
 #' @return If \code{keep_layers = FALSE} (default case), it returns a list
 #' with an item named `labels` that is a list of integer vectors with each the
@@ -48,11 +32,12 @@
 #' @noRd
 nn2poly_algorithm <- function(weights_list,
                               af_string_list,
-                              taylor_orders = NULL,
-                              all_partitions  = NULL,
-                              keep_layers    = FALSE,
                               max_order    = NULL,
-                              ...) {
+                              keep_layers    = FALSE,
+                              taylor_orders = NULL,
+                              ...,
+                              all_partitions  = NULL
+                              ) {
 
   # Obtain number of variables (dimension p)
   p <- dim(weights_list[[1]])[1] - 1
