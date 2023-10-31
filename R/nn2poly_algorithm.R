@@ -6,6 +6,7 @@
 #' using its weights and a Taylor approximation of its activation functions.
 #'
 #' @inheritParams nn2poly
+#'
 #' @param weights_list \code{list} of length L ( number of hidden layers + 1)
 #' containing the weights matrix for each layer.
 #' The expected shape of such matrices at any layer L is of the form
@@ -32,11 +33,11 @@
 #' @noRd
 nn2poly_algorithm <- function(weights_list,
                               af_string_list,
-                              max_order    = NULL,
-                              keep_layers    = FALSE,
-                              taylor_orders = NULL,
+                              max_order,
+                              keep_layers,
+                              taylor_orders,
                               ...,
-                              all_partitions  = NULL
+                              all_partitions
                               ) {
 
   # Obtain number of variables (dimension p)
