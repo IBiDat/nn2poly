@@ -1,33 +1,21 @@
-#' NN2Poly algorithm full algorithm
+#' NN2Poly algorithm full algorithm.
 #'
-#' Performs the full NN2Poly algorithm that obtains polynomial coefficients
-#' for a model that performs closely as a given already trained neural network
-#' using its weights and a Taylor approximation of its activation functions.
+#' Internal function that performs the full NN2Poly algorithm given a list of
+#' weights and a list of activation functions (af),
+#' used inside nn2poly S3 method.
 #'
 #' @inheritParams nn2poly
 #'
-#' @param weights_list \code{list} of length L ( number of hidden layers + 1)
-#' containing the weights matrix for each layer.
-#' The expected shape of such matrices at any layer L is of the form
-#' $(h_(l-1) + 1)*(h_l)$, that is, the number of rows is the number of neurons
-#' in the previous layer plus one (as the bias vector is added in the first row),
-#' and the number of columns is the number of neurons in the current layer L.
-#' Therefore, each column corresponds to the weight vector affecting each neuron
-#' in that layer, from 0 (the bias) in row 1, to neuron h_l in row h_l +1.
+#' @param weights_list \code{list} of length L (number of hidden layers + 1)
+#' containing the weights matrix for each layer. See nn2poly object argument
+#' documentation.
 #'
 #' @param af_string_list \code{list} of length L containing \code{character}
-#' strings with the names of the activation function used at each layer.
+#' strings with the names of the activation function used at each layer as the
+#' names of the list expected by nn2poly.
 #'
-#' @return If \code{keep_layers = FALSE} (default case), it returns a list
-#' with an item named `labels` that is a list of integer vectors with each the
-#' variables index associated to each polynomial term, and a item named `values`
-#' which contains a matrix where each row are the coefficients of the polynomial
-#' associated with an output neuron.
-#'
-#' If \code{keep_layers = TRUE}, it returns a list of length L that for each
-#' layer contains an item as explained before. The polynomials obtained at the
-#' hidden layers are not needed to represent the NN but can be used to explore
-#' how the method works.
+#' @return A list as expected in \code{nn2poly} output but without the nn2poly
+#' class.
 #'
 #' @noRd
 nn2poly_algorithm <- function(weights_list,

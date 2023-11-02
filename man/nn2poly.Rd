@@ -14,26 +14,34 @@ nn2poly(
 )
 }
 \arguments{
-\item{object}{An object for which the computation of the nn2poly algorithm is desired.
-For the default case, it should be a \code{list} of length L ( number of hidden layers + 1)
-containing the weights matrix for each layer. The name of every element in the list
-should be the name of the activation function to be used at each layer.
+\item{object}{An object for which the computation of the NN2Poly algorithm is
+desired. Currently supports models from the following deep learning frameworks:
+\itemize{
+\item \code{tensorflow}/\code{keras} models built as a sequential model.
+\item \code{torch}/\code{luz} models built as a sequential model.
+}
 
-The expected shape of such matrices at any layer L is of the form
-\eqn{(h_{(l-1)} + 1)*(h_l)}, that is, the number of rows is the number of neurons
-in the previous layer plus the bias vector, and the number of columns is the
-number of neurons in the current layer L. Therefore, each column
+It also supports a named \code{list} as input which allows to introduce by
+hand a model from any other source. This \code{list} should be of length L
+(number of hidden layers + 1) containing the weights matrix for each layer.
+Each element of the list should be names as the activation function used at
+each layer.
+
+At any layer \eqn{l}, the expected shape of such matrices is of the form
+\eqn{(h_{(l-1)} + 1)*(h_l)}, that is, the number of rows is the number of
+neurons in the previous layer plus the bias vector, and the number of columns
+is the number of neurons in the current layer L. Therefore, each column
 corresponds to the weight vector affecting each neuron in that layer.
-The bias vector should be in the first row.
-It could also be a \code{keras.engine.training.Model} model.}
+The bias vector should be in the first row.}
 
-\item{max_order}{Integer that determines the maximum order
+\item{max_order}{\code{integer} that determines the maximum order
 that will be forced in the final polynomial, discarding terms of higher order
-that would naturally arise using all the orders in \code{taylor_orders}.}
+that would naturally arise when considering all Taylor expansions allowed by
+\code{taylor_orders}.}
 
 \item{keep_layers}{Boolean that determines if all polynomials computed in
 the internal layers have to be stored and given in the output (\code{TRUE}),
-or if only the last layer is needed (\code{FALSE}).}
+or if only the polynomials from the last layer are needed (\code{FALSE}).}
 
 \item{taylor_orders}{\code{integer} or \code{vector} of length L that sets the
 degree at which Taylor expansion is truncated at each layer. If a single
@@ -43,25 +51,36 @@ at each layer activation function. Default is set to 8.}
 \item{...}{Ignored.}
 
 \item{all_partitions}{Optional argument containing the needed multipartitions
-as list of lists of lists. If \code{NULL}, the function computes it first. This
-step can be computationally expensive and it is encouraged that the
-multipartitions are stored and reused when possible.}
+as list of lists of lists. If set to \code{NULL}, nn2poly will compute said
+multipartitions. This step can be computationally expensive when the chosen
+polynomial order or the dimension are too high. In such cases, it is
+encouraged that the multipartitions are stored and reused when possible.}
 }
 \value{
 An object of class \code{nn2poly}.
-If \code{keep_layers = FALSE} (default case), it returns a list
-with an item named \code{labels} that is a list of integer vectors with each the
-variables index associated to each polynomial term, and a item named \code{values}
-which contains a matrix where each row are the coefficients of the polynomial
-associated with an output neuron.
+If \code{keep_layers = FALSE} (default case), it returns a list with two
+items:
+\itemize{
+\item An item named \code{labels} that is a list of integer vectors. Those vectors
+represent each monomial in the polynomial, where each integer in the vector
+represents each time one of the original variables appears in that term.
+As an example, vector c(1,1,2) represents the term \eqn{x_1^2x_2}.
+\item An item named \code{values} which contains a matrix in which each row contains
+the coefficients of the polynomial associated with an output neuron. That is,
+if the neural network has a single output unit, the matrix \code{values} will have
+a single row and if it has multiple output units, the matrix \code{values} will
+have several rows.
+}
 
 If \code{keep_layers = TRUE}, it returns a list of length L that for each
-layer contains an item as explained before. The polynomials obtained at the
-hidden layers are not needed to represent the NN but can be used to explore
-how the method works.
+layer contains an item as explained before. The last element of the list will
+be the same element as if \code{keep_layers = FALSE}.
+
+The polynomials obtained at the hidden layers are not needed to represent the
+NN but can be used to explore other insights from the NN.
 }
 \description{
-Implements the main nn2poly algorithm to obtain a polynomial representation
-of a trained neural network from its weights and Taylor expansion of its
+Implements the main NN2Poly algorithm to obtain a polynomial representation
+of a trained neural network using its weights and Taylor expansion of its
 activation functions.
 }

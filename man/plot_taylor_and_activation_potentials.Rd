@@ -15,18 +15,25 @@ plot_taylor_and_activation_potentials(
 )
 }
 \arguments{
-\item{object}{An object for which the computation of the nn2poly algorithm is desired.
-For the default case, it should be a \code{list} of length L ( number of hidden layers + 1)
-containing the weights matrix for each layer. The name of every element in the list
-should be the name of the activation function to be used at each layer.
+\item{object}{An object for which the computation of the NN2Poly algorithm is
+desired. Currently supports models from the following deep learning frameworks:
+\itemize{
+\item \code{tensorflow}/\code{keras} models built as a sequential model.
+\item \code{torch}/\code{luz} models built as a sequential model.
+}
 
-The expected shape of such matrices at any layer L is of the form
-\eqn{(h_{(l-1)} + 1)*(h_l)}, that is, the number of rows is the number of neurons
-in the previous layer plus the bias vector, and the number of columns is the
-number of neurons in the current layer L. Therefore, each column
+It also supports a named \code{list} as input which allows to introduce by
+hand a model from any other source. This \code{list} should be of length L
+(number of hidden layers + 1) containing the weights matrix for each layer.
+Each element of the list should be names as the activation function used at
+each layer.
+
+At any layer \eqn{l}, the expected shape of such matrices is of the form
+\eqn{(h_{(l-1)} + 1)*(h_l)}, that is, the number of rows is the number of
+neurons in the previous layer plus the bias vector, and the number of columns
+is the number of neurons in the current layer L. Therefore, each column
 corresponds to the weight vector affecting each neuron in that layer.
-The bias vector should be in the first row.
-It could also be a \code{keras.engine.training.Model} model.}
+The bias vector should be in the first row.}
 
 \item{data}{Matrix or data frame containing the predictor variables (X)
 to be used as input to compute their activation potentials. The response
@@ -37,9 +44,10 @@ degree at which Taylor expansion is truncated at each layer. If a single
 value is used, that value is set for each non linear layer and 1 for linear
 at each layer activation function. Default is set to 8.}
 
-\item{max_order}{Integer that determines the maximum order
+\item{max_order}{\code{integer} that determines the maximum order
 that will be forced in the final polynomial, discarding terms of higher order
-that would naturally arise using all the orders in \code{taylor_orders}.}
+that would naturally arise when considering all Taylor expansions allowed by
+\code{taylor_orders}.}
 
 \item{constraints}{Boolean parameter determining if the NN is constrained
 (TRUE) or not (FALSE). This only modifies de plots title to show
