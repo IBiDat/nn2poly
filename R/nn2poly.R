@@ -69,13 +69,6 @@ nn2poly <- function(object,
 
 #' @export
 nn2poly.list <- function(object, ...) {
-  if (!check_weights_dimensions(object)) {
-    stop("The list of weights has incorrect dimensions.
-         Please, check the  right dimmensions in the documentation.",
-      call. = FALSE
-    )
-  }
-
   result <- nn2poly_algorithm(object, ...)
   class(result) <- "nn2poly"
   result

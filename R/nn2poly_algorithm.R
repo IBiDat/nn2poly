@@ -25,14 +25,20 @@ nn2poly_algorithm <- function(object,
                               ...,
                               all_partitions = NULL
                               ) {
+
+  if (!check_weights_dimensions(object)) {
+    stop("The list of weights has incorrect dimensions.
+         Please, check the  right dimmensions in the documentation.",
+         call. = FALSE
+    )
+  }
+
   # Extract weights and AFs from object:
   weights_list <- unname(object)
   af_string_list <- names(object)
 
-
   # Obtain number of variables (dimension p)
   p <- dim(weights_list[[1]])[1] - 1
-
 
   # Obtain number of layers L (L-1 hidden + 1 output, input is denoted by 0)
   L <- length(af_string_list)
@@ -198,9 +204,6 @@ nn2poly_algorithm <- function(object,
 
       }
     }
-
-
-
 
     # Parallel lapply
     # The output index is already computed in the linear case
