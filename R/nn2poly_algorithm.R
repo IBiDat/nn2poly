@@ -35,8 +35,8 @@ nn2poly_algorithm <- function(weights_list,
                               max_order = 2,
                               keep_layers = FALSE,
                               taylor_orders = NULL,
-                              all_partitions = NULL,
-                              ...
+                              ...,
+                              all_partitions = NULL
                               ) {
 
   # Obtain number of variables (dimension p)
