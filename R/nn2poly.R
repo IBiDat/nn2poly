@@ -27,9 +27,11 @@ NULL
 #' that will be forced in the final polynomial, discarding terms of higher order
 #' that would naturally arise using all the orders in `taylor_orders`.
 #'
-#' @param taylor_orders \code{vector} of length L containing the degree
-#' (\code{numeric}) up to which Taylor expansion should be performed at each
-#' layer.
+#' @param taylor_orders \code{integer} or \code{vector} of length L that sets the
+#' degree at which Taylor expansion is truncated at each layer. If a single
+#' value is used, that value is set for each non linear layer and 1 for linear
+#  layers. If a vector is used, each value corresponds to the Taylor order used
+#' at each layer activation function. Default is set to 8.
 #'
 #' @param keep_layers Boolean that determines if all polynomials computed in
 #' the internal layers have to be stored and given in the output (\code{TRUE}),
@@ -58,7 +60,7 @@ NULL
 nn2poly <- function(object,
                     max_order = 2,
                     keep_layers = FALSE,
-                    taylor_orders = NULL,
+                    taylor_orders = 8,
                     ...,
                     all_partitions = NULL
                     ) {

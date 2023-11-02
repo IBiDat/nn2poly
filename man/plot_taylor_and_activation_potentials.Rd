@@ -32,9 +32,10 @@ It could also be a \code{keras.engine.training.Model} model.}
 to be used as input to compute their activation potentials. The response
 variable column should not be included.}
 
-\item{taylor_orders}{\code{vector} of length L containing the degree
-(\code{numeric}) up to which Taylor expansion should be performed at each
-layer.}
+\item{taylor_orders}{\code{integer} or \code{vector} of length L that sets the
+degree at which Taylor expansion is truncated at each layer. If a single
+value is used, that value is set for each non linear layer and 1 for linear
+at each layer activation function. Default is set to 8.}
 
 \item{max_order}{Integer that determines the maximum order
 that will be forced in the final polynomial, discarding terms of higher order

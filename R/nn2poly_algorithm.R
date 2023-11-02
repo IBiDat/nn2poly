@@ -34,7 +34,7 @@ nn2poly_algorithm <- function(weights_list,
                               af_string_list,
                               max_order = 2,
                               keep_layers = FALSE,
-                              taylor_orders = NULL,
+                              taylor_orders = 8,
                               ...,
                               all_partitions = NULL
                               ) {
@@ -53,7 +53,7 @@ nn2poly_algorithm <- function(weights_list,
   last_linear <- (af_string_list[[L]] == "linear")
 
   # The list with the results of coefficients at each layer,
-  # depending the last layer being linear or not
+  # depending on the last layer being linear or not
   if (last_linear) {
     results <- vector(mode = "list", length = 2 * L - 1)
   } else {
@@ -61,16 +61,16 @@ nn2poly_algorithm <- function(weights_list,
   }
 
   # Create a default taylor_orders if it is not given by the user
-  if (is.null(taylor_orders)) {
-    # 8 for the non-linear layers and 1 for the line
-    taylor_orders <- ifelse(af_string_list=="linear", 1, 8)
-  }
+  taylor_orders <- obtain_taylor_vector(
+    taylor_orders = taylor_orders,
+    af_string_list = af_string_list
+    )
 
   # Obtain all the derivatives up to the desired Taylor degree at each layer
   af_derivatives_list <- obtain_derivatives_list(
     af_string_list = af_string_list,
     taylor_orders = taylor_orders
-  )
+    )
 
   # Obtain the maximum degree of the final polynomial:
   q_max <- obtain_final_poly_order(max_order, taylor_orders)
@@ -290,10 +290,13 @@ obtain_partitions_with_labels <- function(p, q_max) {
 
 
 
-#' Computes the maximum polynomial order allowed by \code{max_order} and
+#' Computes the maximum polynomial order allowed by max_order and
 #' Taylor orders at each layer
 #'
-#' This function is internally used inside nn2poly_algorithm.
+#' Internal function used in nn2poly_algorithm.
+#' Computes the final polynomial order by checking if max_order is an integer
+#' and that the product of the Taylor order values allows for it. If it is
+#' not reached, a warning is provided.
 #'
 #' @inheritParams nn2poly
 #' @return An integer with the final polynomial order
@@ -308,13 +311,47 @@ obtain_final_poly_order <- function(max_order, taylor_orders){
 
     # Warning if max_order has not been reached. (Very rare situation)
     if (poly_order < max_order){
-      warning("max_order has not been reached due to chosen taylor_orders")
+      warning("Argument `max_order` has not been reached due to chosen taylor_orders")
     }
   } else {
-    stop("max_order is not an integer")
+    stop("Argument `max_order` is not an integer value", call. = FALSE)
   }
 
   return(poly_order)
+}
+
+
+#' Obtain a vector containing the Taylor order to be applied at each layer
+#'
+#' Internal function used in nn2poly_algorithm.
+#' It allows the user to specify a single numeric value, in which case that
+#' value will be employed at all no linear layers and 1 at linear layers. The
+#' user can also provide their own vector, where in that case the dimensions
+#' are checked so they match the number of layers provided by af_string_list.
+#'
+#' @inheritParams nn2poly
+#'
+#' @return An integer vector
+#'
+#' @noRd
+obtain_taylor_vector <- function(taylor_orders, af_string_list){
+  # Get the number of layers
+  L <- length(af_string_list)
+
+  # First check if taylor_orders are integers or numeric with no decimal part:
+  if(!(is.numeric(taylor_orders) & all((taylor_orders %% 1)==0))){
+    stop("Argument `taylor_orders` is non numeric", call. = FALSE)
+  } else if(length(taylor_orders)==1) {
+    # Single value case, set 1 in linear, 8 in other AF
+    taylor_orders <- ifelse(af_string_list=="linear", 1, taylor_orders)
+  } else {
+    # Vector provided by user, check if dimensions match
+    if(!(length(taylor_orders)==length(af_string_list))){
+      stop("Argument `taylor_orders` length does not match provided number of layers",
+           call. = FALSE)
+    }
+  }
+  return(taylor_orders)
 }
 
 

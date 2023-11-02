@@ -35,9 +35,10 @@ that would naturally arise using all the orders in \code{taylor_orders}.}
 the internal layers have to be stored and given in the output (\code{TRUE}),
 or if only the last layer is needed (\code{FALSE}).}
 
-\item{taylor_orders}{\code{vector} of length L containing the degree
-(\code{numeric}) up to which Taylor expansion should be performed at each
-layer.}
+\item{taylor_orders}{\code{integer} or \code{vector} of length L that sets the
+degree at which Taylor expansion is truncated at each layer. If a single
+value is used, that value is set for each non linear layer and 1 for linear
+at each layer activation function. Default is set to 8.}
 
 \item{...}{Ignored.}
 
