@@ -32,11 +32,11 @@
 #' @noRd
 nn2poly_algorithm <- function(weights_list,
                               af_string_list,
-                              max_order,
-                              keep_layers,
-                              taylor_orders,
-                              ...,
-                              all_partitions
+                              max_order = 2,
+                              keep_layers = FALSE,
+                              taylor_orders = NULL,
+                              all_partitions = NULL,
+                              ...
                               ) {
 
   # Obtain number of variables (dimension p)
@@ -73,7 +73,7 @@ nn2poly_algorithm <- function(weights_list,
   )
 
   # Obtain the maximum degree of the final polynomial:
-  q_max <- obtain_final_poly_order
+  q_max <- obtain_final_poly_order(max_order, taylor_orders)
 
   # Check if partitions have not been given as an input
   if (is.null(all_partitions)) {

@@ -6,7 +6,7 @@ test_that("nn2poly_algorithm:
   object <- nn2poly_example$weights_list
   names(object) <- nn2poly_example$af_string_list
 
-  taylor_orders <- nn2poly_example$taylor_orders
+  taylor_orders <- nn2poly_example$q_taylor_vector
 
 
   result <- nn2poly(
@@ -15,11 +15,10 @@ test_that("nn2poly_algorithm:
     keep_layers = TRUE
   )
 
-  # Output polynomial order is 4, as no order is forced and taylor
-  # vector is 2,2,1, so the product is 4:
+  # Output polynomial order is 2, as no max_order is specified and default is 2
   n_terms <- length(result[[length(result)]]$labels)
   order <- length(result[[length(result)]]$labels[[n_terms]])
-  expect_equal(order, 4)
+  expect_equal(order, 2)
 
   # Desired coefficient is  output y at layer 2, neuron 1,
   # coefficient "1,1"
@@ -70,7 +69,7 @@ test_that("nn2poly_algorithm:
   # Get the needed data
   object <- nn2poly_example$weights_list
   names(object)   <- nn2poly_example$af_string_list
-  taylor_orders <- nn2poly_example$taylor_orders
+  taylor_orders <- nn2poly_example$q_taylor_vector
 
   result <- nn2poly(
     object = object,
@@ -147,7 +146,7 @@ test_that("nn2poly for a nn_module object", {
     luz::fit(data$train, epochs = 5, valid_data = data$valid)
 
   result <- nn2poly(fitted,
-                    taylor_orders = nn2poly_example0$taylor_orders,
+                    taylor_orders = nn2poly_example0$q_taylor_vector,
                     max_order = 3)
 
   expect_equal(round(result$values[1,1],2), 0.11)
@@ -165,7 +164,7 @@ test_that("Check that it throws an error when the dimensions of the weights list
   names(object) <- nn2poly_example$af_string_list
   object[[2]] <- rbind(object[[2]], c(1,1))
 
-  taylor_orders <- nn2poly_example$taylor_orders
+  taylor_orders <- nn2poly_example$q_taylor_vector
 
   expect_error(
     nn2poly(
