@@ -4,12 +4,13 @@ test_that("Check algorithm against precomputed example, without restricting
   nn2poly_example <- nn2poly_example0
 
   # Get the needed data
-  object <- nn2poly_example$weights_list
-  names(object) <- nn2poly_example$af_string_list
+  weights_list <- nn2poly_example$weights_list
+  af_string_list <- nn2poly_example$af_string_list
   taylor_orders <- nn2poly_example$q_taylor_vector
 
   result <- nn2poly_algorithm(
-    object = object,
+    weights_list = weights_list,
+    af_string_list = af_string_list,
     taylor_orders = taylor_orders,
     keep_layers = TRUE
   )
@@ -37,12 +38,13 @@ test_that("Check that the algortihm provides a correct value for a certain
   nn2poly_example <- nn2poly_example0
 
   # Get the needed data
-  object <- nn2poly_example$weights_list
-  names(object) <- nn2poly_example$af_string_list
+  weights_list <- nn2poly_example$weights_list
+  af_string_list <- nn2poly_example$af_string_list
   taylor_orders <- nn2poly_example$q_taylor_vector
 
   result <- nn2poly_algorithm(
-    object = object,
+    weights_list = weights_list,
+    af_string_list = af_string_list,
     taylor_orders = taylor_orders,
     keep_layers = TRUE,
     max_order = 2

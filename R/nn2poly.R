@@ -69,7 +69,7 @@ nn2poly <- function(object,
 
 #' @export
 nn2poly.list <- function(object, ...) {
-  result <- nn2poly_algorithm(object, ...)
+  result <- nn2poly_algorithm(object, names(object), ...)
   class(result) <- "nn2poly"
   result
 }
