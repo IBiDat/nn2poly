@@ -76,7 +76,7 @@ nn2poly.list <- function(object, ...) {
     )
   }
 
-  result <- nn2poly_algorithm(object, names(object), ...)
+  result <- nn2poly_algorithm(object, ...)
   class(result) <- "nn2poly"
   result
 }

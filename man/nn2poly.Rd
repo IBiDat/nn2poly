@@ -8,7 +8,7 @@ nn2poly(
   object,
   max_order = 2,
   keep_layers = FALSE,
-  taylor_orders = NULL,
+  taylor_orders = 8,
   ...,
   all_partitions = NULL
 )

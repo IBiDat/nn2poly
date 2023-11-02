@@ -6,18 +6,6 @@
 #' using its weights and a Taylor approximation of its activation functions.
 #' @inheritParams nn2poly
 #'
-#' @param weights_list \code{list} of length L ( number of hidden layers + 1)
-#' containing the weights matrix for each layer.
-#' The expected shape of such matrices at any layer L is of the form
-#' $(h_(l-1) + 1)*(h_l)$, that is, the number of rows is the number of neurons
-#' in the previous layer plus one (as the bias vector is added in the first row),
-#' and the number of columns is the number of neurons in the current layer L.
-#' Therefore, each column corresponds to the weight vector affecting each neuron
-#' in that layer, from 0 (the bias) in row 1, to neuron h_l in row h_l +1.
-#'
-#' @param af_string_list \code{list} of length L containing \code{character}
-#' strings with the names of the activation function used at each layer.
-#'
 #' @return If \code{keep_layers = FALSE} (default case), it returns a list
 #' with an item named `labels` that is a list of integer vectors with each the
 #' variables index associated to each polynomial term, and a item named `values`
@@ -30,14 +18,17 @@
 #' how the method works.
 #'
 #' @noRd
-nn2poly_algorithm <- function(weights_list,
-                              af_string_list,
+nn2poly_algorithm <- function(object,
                               max_order = 2,
                               keep_layers = FALSE,
                               taylor_orders = 8,
                               ...,
                               all_partitions = NULL
                               ) {
+  # Extract weights and AFs from object:
+  weights_list <- unname(object)
+  af_string_list <- names(object)
+
 
   # Obtain number of variables (dimension p)
   p <- dim(weights_list[[1]])[1] - 1
