@@ -73,12 +73,7 @@ nn2poly_algorithm <- function(weights_list,
   )
 
   # Obtain the maximum degree of the final polynomial:
-  if(is.null(max_order)){
-    q_max <- prod(taylor_orders)
-  } else {
-    q_max <- min(prod(taylor_orders),max_order)
-  }
-
+  q_max <- obtain_final_poly_order
 
   # Check if partitions have not been given as an input
   if (is.null(all_partitions)) {
@@ -297,7 +292,8 @@ obtain_partitions_with_labels <- function(p, q_max) {
 
 #' Computes the maximum polynomial order allowed by \code{max_order} and
 #' Taylor orders at each layer
-#'AÑADIR TESTS
+#'
+#' This function is internally used inside nn2poly_algorithm.
 #'
 #' @inheritParams nn2poly
 #' @return An integer with the final polynomial order

@@ -60,7 +60,8 @@ nn2poly <- function(object,
                     keep_layers = FALSE,
                     taylor_orders = NULL,
                     ...,
-                    all_partitions = NULL) {
+                    all_partitions = NULL
+                    ) {
   UseMethod("nn2poly")
 }
 
