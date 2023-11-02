@@ -4,14 +4,13 @@
 #' derivatives of the given activation function at 0 up to the desired order $q$
 #' for each layer.
 #'
-#' @param af_string_list List with the names of the activation function used
-#' at each layer as a string. Currently accepted values: "softplus", "linear",
-#' "tanh" and "sigmoid.
-#' @param taylor_orders List containing the degree up to which Taylor
-#' expansion should be performed at each layer.
+#' @inheritParams nn2poly
+#' @inheritParams nn2poly_algorithm
 #'
 #' @return list of vectors with the derivatives
 #' @noRd
+#'
+
 obtain_derivatives_list <- function(af_string_list, taylor_orders) {
 
   n <- length(af_string_list)

@@ -6,7 +6,7 @@
 \usage{
 nn2poly(
   object,
-  max_order = NULL,
+  max_order = 2,
   keep_layers = FALSE,
   taylor_orders = NULL,
   ...,
@@ -28,7 +28,7 @@ The bias vector should be in the first row.
 It could also be a \code{keras.engine.training.Model} model.}
 
 \item{max_order}{Integer that determines the maximum order
-that we will force in the final polynomial, discarding terms of higher order
+that will be forced in the final polynomial, discarding terms of higher order
 that would naturally arise using all the orders in \code{taylor_orders}.}
 
 \item{keep_layers}{Boolean that determines if all polynomials computed in

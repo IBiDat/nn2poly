@@ -15,16 +15,18 @@ plot_taylor_and_activation_potentials(
 )
 }
 \arguments{
-\item{object}{\code{list} of length L ( number of hidden layers + 1)
-containing the weights matrix for each layer.
+\item{object}{An object for which the computation of the nn2poly algorithm is desired.
+For the default case, it should be a \code{list} of length L ( number of hidden layers + 1)
+containing the weights matrix for each layer. The name of every element in the list
+should be the name of the activation function to be used at each layer.
+
 The expected shape of such matrices at any layer L is of the form
-$(h_(l-1) + 1)*(h_l)$, that is, the number of rows is the number of neurons
+\eqn{(h_{(l-1)} + 1)*(h_l)}, that is, the number of rows is the number of neurons
 in the previous layer plus the bias vector, and the number of columns is the
 number of neurons in the current layer L. Therefore, each column
 corresponds to the weight vector affecting each neuron in that layer.
-The names of \code{object} should have length L and be \code{character}
-strings with the names of the activation function used at each layer, as
-used in the \pkg{nn2poly} algorithm.}
+The bias vector should be in the first row.
+It could also be a \code{keras.engine.training.Model} model.}
 
 \item{data}{Matrix or data frame containing the predictor variables (X)
 to be used as input to compute their activation potentials. The response
@@ -32,12 +34,11 @@ variable column should not be included.}
 
 \item{taylor_orders}{\code{vector} of length L containing the degree
 (\code{numeric}) up to which Taylor expansion should be performed at each
-layer, as used in the \pkg{nn2poly} algorithm.}
+layer.}
 
 \item{max_order}{Integer that determines the maximum order
-that we will force in the final polynomial, discarding terms of higher order
-that would naturally arise using all the orders in \code{taylor_orders},
-as used in the \pkg{nn2poly} algorithm.}
+that will be forced in the final polynomial, discarding terms of higher order
+that would naturally arise using all the orders in \code{taylor_orders}.}
 
 \item{constraints}{Boolean parameter determining if the NN is constrained
 (TRUE) or not (FALSE). This only modifies de plots title to show

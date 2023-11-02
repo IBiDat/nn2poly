@@ -24,7 +24,7 @@ NULL
 #' It could also be a `keras.engine.training.Model` model.
 #'
 #' @param max_order Integer that determines the maximum order
-#' that we will force in the final polynomial, discarding terms of higher order
+#' that will be forced in the final polynomial, discarding terms of higher order
 #' that would naturally arise using all the orders in `taylor_orders`.
 #'
 #' @param taylor_orders \code{vector} of length L containing the degree
@@ -56,11 +56,11 @@ NULL
 #'
 #' @export
 nn2poly <- function(object,
-                    max_order    = NULL,
-                    keep_layers    = FALSE,
+                    max_order = 2,
+                    keep_layers = FALSE,
                     taylor_orders = NULL,
                     ...,
-                    all_partitions  = NULL) {
+                    all_partitions = NULL) {
   UseMethod("nn2poly")
 }
 
@@ -69,7 +69,8 @@ nn2poly.list <- function(object, ...) {
   if (!check_weights_dimensions(object)) {
     stop("The list of weights has incorrect dimensions.
          Please, check the  right dimmensions in the documentation.",
-         call. = FALSE)
+      call. = FALSE
+    )
   }
 
   result <- nn2poly_algorithm(object, names(object), ...)

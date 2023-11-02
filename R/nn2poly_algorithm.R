@@ -4,7 +4,6 @@
 #' Performs the full NN2Poly algorithm that obtains polynomial coefficients
 #' for a model that performs closely as a given already trained neural network
 #' using its weights and a Taylor approximation of its activation functions.
-#'
 #' @inheritParams nn2poly
 #'
 #' @param weights_list \code{list} of length L ( number of hidden layers + 1)
@@ -293,3 +292,34 @@ obtain_partitions_with_labels <- function(p, q_max) {
 
   return(list("labels" = labels, "partitions" = partitions))
 }
+
+
+
+#' Computes the maximum polynomial order allowed by \code{max_order} and
+#' Taylor orders at each layer
+#'AÑADIR TESTS
+#'
+#' @inheritParams nn2poly
+#' @return An integer with the final polynomial order
+#'
+#' @noRd
+obtain_final_poly_order <- function(max_order, taylor_orders){
+  if(is.numeric(max_order) & (max_order %% 1)==0){
+    # This condition allows for integers and also
+    # integers written as numeric
+    max_order <- as.integer(max_order)
+    poly_order <- min(prod(taylor_orders),max_order)
+
+    # Warning if max_order has not been reached. (Very rare situation)
+    if (poly_order < max_order){
+      warning("max_order has not been reached due to chosen taylor_orders")
+    }
+  } else {
+    stop("max_order is not an integer")
+  }
+
+  return(poly_order)
+}
+
+
+
