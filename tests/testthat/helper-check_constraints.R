@@ -1,14 +1,6 @@
-#' Check weight's vector constraints (including bias)
-#'
-#' @param weights List of matrices with the weights of each layer.
-#' @param maxnorm List of 2 elements: the name of the used norm and its max value.
-#'
-#' @return List across all layers with a vector containing the norms of each weight vector.
-#'
-#' @noRd
+
 check_weight_constraints <- function(weights, maxnorm) {
   #### Compute the norm for the full matrix ####
-
   n_weights <- length(weights)
   # Initialize an empty list of length n_weights, we will add the elements with a name
   weights_norms <- vector(mode = "list", length = n_weights)
