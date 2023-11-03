@@ -147,6 +147,7 @@ public:
         for (int j = f[i]; j < f[i + 1]; j++) {
           for (int k = 0; k < v[j]; k++)
             part.push_back(obj->comp[c[j]]);
+          Rcpp::checkUserInterrupt();
         }
         partition.push_back(part);
       }
