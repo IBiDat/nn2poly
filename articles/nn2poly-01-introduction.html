@@ -377,30 +377,30 @@ kernel weights matrices of dimension (input * output) and bias vectors
 algorithm:</p>
 <ul>
 <li>
-<code>q_taylor_vector</code>: A vector of integers containing the
+<code>taylor_orders</code>: A vector of integers containing the
 order of the Taylor expansion performed at each layer. If the output
 layer has a linear activation function, then the last value should be
 1.</li>
 </ul>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">q_taylor_vector</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">8</span>, <span class="fl">8</span>,  <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">taylor_orders</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">8</span>, <span class="fl">8</span>,  <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <ul>
 <li>
-<code>forced_max_Q</code>: (optional value) An integer value
-denoting the maximum order of the terms computed in the polynomial.
-Usually 2 or 3 should be enough in practice. Note that higher orders
-suppose an explosion in the possible combinations. If the user does not
-provide a value, the polynomial order grows multiplicatively with the
-Taylor order at each hidden layer, therefore its better to start with
-low values.</li>
+<code>max_order</code>: (optional value) An integer value denoting
+the maximum order of the terms computed in the polynomial. Usually 2 or
+3 should be enough in practice. Note that higher orders suppose an
+explosion in the possible combinations. If the user does not provide a
+value, the polynomial order grows multiplicatively with the Taylor order
+at each hidden layer, therefore its better to start with low
+values.</li>
 </ul>
 <p>When the input is in the desired shape, the nn2poly method can be
 applied:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">final_poly</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nn2poly.html">nn2poly</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">weights_object</span>,</span>
-<span>                      q_taylor_vector <span class="op">=</span> <span class="va">q_taylor_vector</span>,</span>
-<span>                      forced_max_Q <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+<span>                      taylor_orders <span class="op">=</span> <span class="va">taylor_orders</span>,</span>
+<span>                      max_order <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <p>We can have a glimpse at how the coefficients of the polynomial are
 stored. Note that the structure is the same as explained for the
 polynomial that generated the data, as a list with labels and values. In
@@ -534,8 +534,8 @@ activation potentials are not strictly centered around zero.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_taylor_and_activation_potentials.html">plot_taylor_and_activation_potentials</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">nn</span>,</span>
 <span>                                      data <span class="op">=</span> <span class="va">train</span>,</span>
-<span>                                    q_taylor_vector <span class="op">=</span> <span class="va">q_taylor_vector</span>,</span>
-<span>                                    forced_max_Q <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>                                    taylor_orders <span class="op">=</span> <span class="va">taylor_orders</span>,</span>
+<span>                                    max_order <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>                                    constraints <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [[1]]</span></span></code></pre></div>
 <p><img src="figure/nn2poly-01-reg-potentials-1.png"></p>

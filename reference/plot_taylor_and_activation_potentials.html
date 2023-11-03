@@ -69,8 +69,8 @@ be an approximation as Taylor expansion is not needed.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_taylor_and_activation_potentials</span><span class="op">(</span></span>
 <span>  <span class="va">object</span>,</span>
 <span>  <span class="va">data</span>,</span>
-<span>  <span class="va">q_taylor_vector</span>,</span>
-<span>  <span class="va">forced_max_Q</span>,</span>
+<span>  <span class="va">taylor_orders</span>,</span>
+<span>  <span class="va">max_order</span>,</span>
 <span>  <span class="va">constraints</span>,</span>
 <span>  taylor_interval <span class="op">=</span> <span class="fl">1.5</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -80,16 +80,20 @@ be an approximation as Taylor expansion is not needed.</p>
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>object</dt>
-<dd><p><code>list</code> of length L ( number of hidden layers + 1)
-containing the weights matrix for each layer.
-The expected shape of such matrices at any layer L is of the form
-$(h_(l-1) + 1)*(h_l)$, that is, the number of rows is the number of neurons
-in the previous layer plus the bias vector, and the number of columns is the
-number of neurons in the current layer L. Therefore, each column
+<dd><p>An object for which the computation of the NN2Poly algorithm is
+desired. Currently supports models from the following deep learning frameworks:</p><ul><li><p><code>tensorflow</code>/<code>keras</code> models built as a sequential model.</p></li>
+<li><p><code>torch</code>/<code>luz</code> models built as a sequential model.</p></li>
+</ul><p>It also supports a named <code>list</code> as input which allows to introduce by
+hand a model from any other source. This <code>list</code> should be of length L
+(number of hidden layers + 1) containing the weights matrix for each layer.
+Each element of the list should be names as the activation function used at
+each layer.</p>
+<p>At any layer \(l\), the expected shape of such matrices is of the form
+\((h_{(l-1)} + 1)*(h_l)\), that is, the number of rows is the number of
+neurons in the previous layer plus the bias vector, and the number of columns
+is the number of neurons in the current layer L. Therefore, each column
 corresponds to the weight vector affecting each neuron in that layer.
-The names of <code>object</code> should have length L and be <code>character</code>
-strings with the names of the activation function used at each layer, as
-used in the <span class="pkg">nn2poly</span> algorithm.</p></dd>
+The bias vector should be in the first row.</p></dd>
 
 
 <dt>data</dt>
@@ -98,17 +102,18 @@ to be used as input to compute their activation potentials. The response
 variable column should not be included.</p></dd>
 
 
-<dt>q_taylor_vector</dt>
-<dd><p><code>vector</code> of length L containing the degree
-(<code>numeric</code>) up to which Taylor expansion should be performed at each
-layer, as used in the <span class="pkg">nn2poly</span> algorithm.</p></dd>
+<dt>taylor_orders</dt>
+<dd><p><code>integer</code> or <code>vector</code> of length L that sets the
+degree at which Taylor expansion is truncated at each layer. If a single
+value is used, that value is set for each non linear layer and 1 for linear
+at each layer activation function. Default is set to 8.</p></dd>
 
 
-<dt>forced_max_Q</dt>
-<dd><p>Integer that determines the maximum order
-that we will force in the final polynomial, discarding terms of higher order
-that would naturally arise using all the orders in <code>q_taylor_vector</code>,
-as used in the <span class="pkg">nn2poly</span> algorithm.</p></dd>
+<dt>max_order</dt>
+<dd><p><code>integer</code> that determines the maximum order
+that will be forced in the final polynomial, discarding terms of higher order
+that would naturally arise when considering all Taylor expansions allowed by
+<code>taylor_orders</code>.</p></dd>
 
 
 <dt>constraints</dt>

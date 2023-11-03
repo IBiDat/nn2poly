@@ -390,10 +390,10 @@ the default case covered in
 <code><a href="../articles/nn2poly-01-introduction.html">vignette("nn2poly-01-introduction")</a></code>, and can benefit from
 the generic methods implemented for <code>keras</code> models.</p>
 <p>The only parameters that have to be added for nn2poly to work is the
-Taylor order expansion at each layer (<code>q_taylor_vector</code>),
-where we will choose 8 by default on non linear layers and 1 in the last
+Taylor order expansion at each layer (<code>taylor_orders</code>), where
+we will choose 8 by default on non linear layers and 1 in the last
 linear layer as Taylor is not used there. (The final polynomial order
-will be limited by <code>forced_max_Q=3</code>)</p>
+will be limited by <code>max_order=3</code>)</p>
 <p>Note that in this case, as we have 3 output neurons, there will be 3
 output polynomials. The polynomials will be stored in the same way as in
 the regression case, in a list with labels and values, but in this case
@@ -401,17 +401,17 @@ the values will be a matrix instead of a vector, where each row will be
 the polynomial obtained for each output neuron.</p>
 <p>We will do this for both neural networks and compare the results:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">q_taylor_vector</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">8</span>, <span class="fl">8</span>, <span class="fl">8</span>, <span class="fl">1</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">taylor_orders</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">8</span>, <span class="fl">8</span>, <span class="fl">8</span>, <span class="fl">1</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Polynomial for nn1</span></span>
 <span><span class="va">final_poly1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nn2poly.html">nn2poly</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">nn1</span>,</span>
-<span>                      q_taylor_vector <span class="op">=</span> <span class="va">q_taylor_vector</span>,</span>
-<span>                      forced_max_Q <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
+<span>                      taylor_orders <span class="op">=</span> <span class="va">taylor_orders</span>,</span>
+<span>                      max_order <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Polynomial for nn2</span></span>
 <span><span class="va">final_poly2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nn2poly.html">nn2poly</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">nn2</span>,</span>
-<span>                      q_taylor_vector <span class="op">=</span> <span class="va">q_taylor_vector</span>,</span>
-<span>                      forced_max_Q <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+<span>                      taylor_orders <span class="op">=</span> <span class="va">taylor_orders</span>,</span>
+<span>                      max_order <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="obtaining-polynomial-predictions">Obtaining polynomial predictions<a class="anchor" aria-label="anchor" href="#obtaining-polynomial-predictions"></a>
@@ -591,8 +591,8 @@ accurate Taylor expansion around zero.</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_taylor_and_activation_potentials.html">plot_taylor_and_activation_potentials</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">nn1</span>,</span>
 <span>                                      data <span class="op">=</span> <span class="va">train</span>,</span>
-<span>                                      q_taylor_vector <span class="op">=</span> <span class="va">q_taylor_vector</span>,</span>
-<span>                                      forced_max_Q <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>                                      taylor_orders <span class="op">=</span> <span class="va">taylor_orders</span>,</span>
+<span>                                      max_order <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>                                      constraints <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [[1]]</span></span></code></pre></div>
 <p><img src="figure/nn2poly-03-class-potentials-1.png"></p>
@@ -606,8 +606,8 @@ accurate Taylor expansion around zero.</p>
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/plot_taylor_and_activation_potentials.html">plot_taylor_and_activation_potentials</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">nn2</span>,</span>
 <span>                                      data <span class="op">=</span> <span class="va">train</span>,</span>
-<span>                                      q_taylor_vector <span class="op">=</span> <span class="va">q_taylor_vector</span>,</span>
-<span>                                      forced_max_Q <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>                                      taylor_orders <span class="op">=</span> <span class="va">taylor_orders</span>,</span>
+<span>                                      max_order <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>                                      constraints <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [[1]]</span></span></code></pre></div>
 <p><img src="figure/nn2poly-03-class-potentials-4.png"></p>
