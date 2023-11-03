@@ -1,9 +1,9 @@
 test_that("Test the plot for a polynomial generated `keep_layers = FALSE`", {
   # loading the example
-  nn2poly_example <- nn2poly_example0
-  object <- nn2poly_example$weights_list
-  names(object) <- nn2poly_example$af_string_list
-  taylor_orders <- nn2poly_example$q_taylor_vector
+  testing_data <- testing_helper_1()
+  object <- testing_data$weights_list
+  names(object) <- testing_data$af_string_list
+  taylor_orders <- testing_data$taylor_orders
 
   # computing the polynomial
   result <- nn2poly(
@@ -21,10 +21,10 @@ test_that("Test the plot for a polynomial generated `keep_layers = FALSE`", {
 
 test_that("Test the plot for a polynomial generated `keep_layers = TRUE`", {
   # loading the example
-  nn2poly_example <- nn2poly_example0
-  object <- nn2poly_example$weights_list
-  names(object) <- nn2poly_example$af_string_list
-  taylor_orders <- nn2poly_example$q_taylor_vector
+  testing_data <- testing_helper_1()
+  object <- testing_data$weights_list
+  names(object) <- testing_data$af_string_list
+  taylor_orders <- testing_data$taylor_orders
 
   # computing the polynomial
   result <- nn2poly(

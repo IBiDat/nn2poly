@@ -1,13 +1,11 @@
 test_that("nn2poly with list input against precomputed example with single
           output, check also that nn2poly class is given to the output", {
-  nn2poly_example <- nn2poly_example0
+  testing_data <- testing_helper_1()
 
   # Get the needed data
-  object <- nn2poly_example$weights_list
-  names(object) <- nn2poly_example$af_string_list
-
-  taylor_orders <- nn2poly_example$q_taylor_vector
-
+  object <- testing_data$weights_list
+  names(object) <- testing_data$af_string_list
+  taylor_orders <- testing_data$taylor_orders
 
   result <- nn2poly(
     object = object,
@@ -34,11 +32,11 @@ test_that("nn2poly with list input against precomputed example with single
 
 test_that("nn2poly with list input against precomputed example with
           default options", {
-  nn2poly_example <- nn2poly_example0
+  testing_data <- testing_helper_1()
 
   # Get the needed data
-  object <- nn2poly_example$weights_list
-  names(object) <- nn2poly_example$af_string_list
+  object <- testing_data$weights_list
+  names(object) <- testing_data$af_string_list
 
   result <- nn2poly(
     object = object
@@ -96,7 +94,9 @@ test_that("nn2poly for a nn_module object", {
   skip_if_not_installed("torch")
   skip_on_cran()
 
-  data <- luz_test_data(nn2poly_example0)
+  testing_data <- testing_helper_2()
+
+  data <- luz_test_data(testing_data)
 
   fitted <- luz_test_model() %>%
     luz::setup(
@@ -109,21 +109,20 @@ test_that("nn2poly for a nn_module object", {
     luz::fit(data$train, epochs = 5, valid_data = data$valid, verbose = FALSE)
 
   result <- nn2poly(fitted,
-                    taylor_orders = nn2poly_example0$q_taylor_vector,
+                    taylor_orders = testing_data$taylor_orders,
                     max_order = 3)
 
-  expect_equal(round(result$values[1,1],2), 0.11)
-  # expect_equal(result$values[2,1], -0.45410551)
+  expect_equal(round(result$values[1,1],2), 0.06)
   expect_equal(result$labels[[7]], c(1,1,1))
 
 })
 
 test_that("nn2poly error when wrong dimensions are given in weights", {
-  nn2poly_example <- nn2poly_example0
+  testing_data <- testing_helper_1()
 
   # Get the needed data
-  object <- nn2poly_example$weights_list
-  names(object) <- nn2poly_example$af_string_list
+  object <- testing_data$weights_list
+  names(object) <- testing_data$af_string_list
 
   # Add weights to one layer to create the problem
   object[[2]] <- rbind(object[[2]], c(1,1))

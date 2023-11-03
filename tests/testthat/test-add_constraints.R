@@ -50,6 +50,9 @@ test_that("The function works over an already trained network and the connstrain
   skip_if_not_installed("tensorflow")
   skip_on_cran()
 
+  testing_data <- testing_helper_2()
+  testing_data
+
   nn <- keras_test_model()
 
   # compile the model
@@ -60,10 +63,10 @@ test_that("The function works over an already trained network and the connstrain
 
   # train the model
   keras::fit(nn,
-             nn2poly_example0$train_x,
-             nn2poly_example0$train_y,
+             x = testing_data$train_x,
+             y = testing_data$train_y,
              verbose = 0,
-             epochs = 5,
+             epochs = 3,
              validation_split = 0.2
   )
 
@@ -79,10 +82,10 @@ test_that("The function works over an already trained network and the connstrain
 
   # train the model
   keras::fit(constrained_nn,
-             nn2poly_example0$train_x,
-             nn2poly_example0$train_y,
+             testing_data$train_x,
+             testing_data$train_y,
              verbose = 0,
-             epochs = 5,
+             epochs = 3,
              validation_split = 0.2
   )
 

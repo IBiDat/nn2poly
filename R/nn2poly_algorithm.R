@@ -27,7 +27,7 @@ nn2poly_algorithm <- function(weights_list,
                               all_partitions = NULL
                               ) {
 
-  if (!check_weights_dimensions(object)) {
+  if (!check_weights_dimensions(weights_list)) {
     stop("The list of weights has incorrect dimensions.
          Please, check the  right dimmensions in the documentation.",
          call. = FALSE

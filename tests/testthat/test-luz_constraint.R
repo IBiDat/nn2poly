@@ -3,7 +3,9 @@ test_that("The constranied training works using the l1 and l2 constraints", {
   skip_if_not_installed("torch")
   skip_on_cran()
 
-  data <- luz_test_data(nn2poly_example0)
+  testing_data <- testing_helper_2()
+
+  data <- luz_test_data(testing_data)
 
   # Do the constrained training with the l1 constraint
   fitted <- luz_test_model() %>%
@@ -12,7 +14,7 @@ test_that("The constranied training works using the l1 and l2 constraints", {
       optimizer = torch::optim_adam,
     ) %>%
     add_constraints("l1_norm") %>%
-    fit(data$train, epochs = 3, valid_data = data$valid)
+    fit(data$train, epochs = 3, valid_data = data$valid, verbose = FALSE)
 
   wb <- torch::torch_tensor(
     rbind(
@@ -36,7 +38,7 @@ test_that("The constranied training works using the l1 and l2 constraints", {
       optimizer = torch::optim_adam,
     ) %>%
     add_constraints("l2_norm") %>%
-    fit(data$train, epochs = 3, valid_data = data$valid)
+    fit(data$train, epochs = 3, valid_data = data$valid, verbose = FALSE)
 
   wb <- torch::torch_tensor(
     rbind(

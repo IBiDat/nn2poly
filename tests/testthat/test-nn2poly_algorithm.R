@@ -2,12 +2,12 @@
 
 test_that("nn2poly_algorithm against precomputed example", {
   # Load the example:
-  nn2poly_example <- nn2poly_example0
+  testing_data <- testing_helper_1()
 
   # Get the needed data
-  weights_list <- nn2poly_example$weights_list
-  af_string_list <- nn2poly_example$af_string_list
-  taylor_orders <- nn2poly_example$q_taylor_vector
+  weights_list <- testing_data$weights_list
+  af_string_list <- testing_data$af_string_list
+  taylor_orders <- testing_data$taylor_orders
 
   result <- nn2poly_algorithm(
     weights_list = weights_list,

@@ -45,5 +45,5 @@ test_that("The get_parameters function works for a torch model (nn_module)
   nn <- luz_test_model()
 
   params <- get_parameters(nn)
-  expect_equal(params$af_string_list, nn2poly_example0$af_string_list)
+  expect_equal(params$af_string_list, list("softplus", "softplus", "linear"))
 })
