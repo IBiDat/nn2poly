@@ -345,5 +345,28 @@ obtain_taylor_vector <- function(taylor_orders, af_string_list){
   return(taylor_orders)
 }
 
+#' Checks that the weights dimensions are correct.
+#'
+#' This means that each matrix has the same number of rows as the number
+#' of columns in the previous matrix + 1. This is because the number of
+#' output neurons in the previous layer is the same as the number of inputs
+#' to the current layer + the bias.
+#'
+#' @inheritParams nn2poly_algorithm
+#'
+#' @return `TRUE` if the dimensiones are correct, `FALSE` if not.
+#'
+#' @noRd
+check_weights_dimensions <- function(weights_list) {
+  for (matrix_index in 2:length(weights_list)) {
+    nrows_current <- nrow(weights_list[[matrix_index]])
+    ncols_prev    <- ncol(weights_list[[matrix_index - 1]])
+
+    if (nrows_current != ncols_prev + 1)
+      return(FALSE)
+  }
+  return(TRUE)
+}
+
 
 
