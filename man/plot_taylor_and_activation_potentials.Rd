@@ -7,37 +7,47 @@
 plot_taylor_and_activation_potentials(
   object,
   data,
-  q_taylor_vector,
-  forced_max_Q,
+  taylor_orders,
+  max_order,
   constraints,
   taylor_interval = 1.5,
   ...
 )
 }
 \arguments{
-\item{object}{\code{list} of length L ( number of hidden layers + 1)
-containing the weights matrix for each layer.
-The expected shape of such matrices at any layer L is of the form
-$(h_(l-1) + 1)*(h_l)$, that is, the number of rows is the number of neurons
-in the previous layer plus the bias vector, and the number of columns is the
-number of neurons in the current layer L. Therefore, each column
+\item{object}{An object for which the computation of the NN2Poly algorithm is
+desired. Currently supports models from the following deep learning frameworks:
+\itemize{
+\item \code{tensorflow}/\code{keras} models built as a sequential model.
+\item \code{torch}/\code{luz} models built as a sequential model.
+}
+
+It also supports a named \code{list} as input which allows to introduce by
+hand a model from any other source. This \code{list} should be of length L
+(number of hidden layers + 1) containing the weights matrix for each layer.
+Each element of the list should be names as the activation function used at
+each layer.
+
+At any layer \eqn{l}, the expected shape of such matrices is of the form
+\eqn{(h_{(l-1)} + 1)*(h_l)}, that is, the number of rows is the number of
+neurons in the previous layer plus the bias vector, and the number of columns
+is the number of neurons in the current layer L. Therefore, each column
 corresponds to the weight vector affecting each neuron in that layer.
-The names of \code{object} should have length L and be \code{character}
-strings with the names of the activation function used at each layer, as
-used in the \pkg{nn2poly} algorithm.}
+The bias vector should be in the first row.}
 
 \item{data}{Matrix or data frame containing the predictor variables (X)
 to be used as input to compute their activation potentials. The response
 variable column should not be included.}
 
-\item{q_taylor_vector}{\code{vector} of length L containing the degree
-(\code{numeric}) up to which Taylor expansion should be performed at each
-layer, as used in the \pkg{nn2poly} algorithm.}
+\item{taylor_orders}{\code{integer} or \code{vector} of length L that sets the
+degree at which Taylor expansion is truncated at each layer. If a single
+value is used, that value is set for each non linear layer and 1 for linear
+at each layer activation function. Default is set to 8.}
 
-\item{forced_max_Q}{Integer that determines the maximum order
-that we will force in the final polynomial, discarding terms of higher order
-that would naturally arise using all the orders in \code{q_taylor_vector},
-as used in the \pkg{nn2poly} algorithm.}
+\item{max_order}{\code{integer} that determines the maximum order
+that will be forced in the final polynomial, discarding terms of higher order
+that would naturally arise when considering all Taylor expansions allowed by
+\code{taylor_orders}.}
 
 \item{constraints}{Boolean parameter determining if the NN is constrained
 (TRUE) or not (FALSE). This only modifies de plots title to show

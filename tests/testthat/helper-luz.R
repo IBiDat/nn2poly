@@ -28,8 +28,8 @@ luz_test_data <- function(example) {
   data_val   <- torch::dataset_subset(data_full, val_indices)
 
   list(
-    train = torch::dataloader(data_train, batch_size = 32, shuffle = TRUE),
-    valid = torch::dataloader(data_val, batch_size = 32)
+    train = torch::dataloader(data_train, batch_size = 5, shuffle = TRUE),
+    valid = torch::dataloader(data_val, batch_size = 5)
   )
 }
 

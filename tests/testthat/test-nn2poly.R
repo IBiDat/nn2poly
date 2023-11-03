@@ -1,98 +1,58 @@
-test_that("nn2poly_algorithm:
-          Check algorithm against precomputed example", {
-  nn2poly_example <- nn2poly_example0
+test_that("nn2poly with list input against precomputed example with single
+          output, check also that nn2poly class is given to the output", {
+  testing_data <- testing_helper_1()
 
   # Get the needed data
-  object <- nn2poly_example$weights_list
-  names(object) <- nn2poly_example$af_string_list
-
-  q_taylor_vector <- nn2poly_example$q_taylor_vector
-
+  object <- testing_data$weights_list
+  names(object) <- testing_data$af_string_list
+  taylor_orders <- testing_data$taylor_orders
 
   result <- nn2poly(
     object = object,
-    q_taylor_vector = q_taylor_vector,
-    store_coeffs = TRUE
+    max_order = 3,
+    keep_layers = TRUE,
+    taylor_orders = taylor_orders
   )
 
-  # Output polynomial order is 4, as no order is forced and taylor
-  # vector is 2,2,1, so the product is 4:
-  n_terms <- length(result[[length(result)]]$labels)
-  order <- length(result[[length(result)]]$labels[[n_terms]])
-  expect_equal(order, 4)
-
-  # Desired coefficient is  output y at layer 2, neuron 1,
-  # coefficient "1,1"
-  label <- result[[4]]$labels[[4]]
-  coeff <- result[[4]]$values[1,4]
-  expect_equal(label,c(1,1))
-  expect_equal(coeff,0.63351833)
-})
-
-
-test_that("nn2poly_algorithm:
-          Check algorithm against precomputed example but with the default q_taylor_vector", {
-  nn2poly_example <- nn2poly_example0
-
-  # Get the needed data
-  object <- nn2poly_example$weights_list
-  names(object) <- nn2poly_example$af_string_list
-
-  result <- nn2poly(
-    object = object,
-    store_coeffs = TRUE,
-    forced_max_Q = 3
-
-  )
-
-  # Output polynomial order is 4, as no order is forced and taylor
-  # vector is 2,2,1, so the product is 4:
+  # Output polynomial order is 2, as no max_order is specified and default is 2
   n_terms <- length(result[[length(result)]]$labels)
   order <- length(result[[length(result)]]$labels[[n_terms]])
   expect_equal(order, 3)
 
-  # Desired coefficient is  output y at layer 2, neuron 1,
-  # coefficient "1,1"
+  # Desired coefficient in output polynomial at layer 2 (element 2*2=4 in list),
+  # neuron 1, coefficient "1,1"
   label <- result[[4]]$labels[[4]]
   coeff <- result[[4]]$values[1,4]
   expect_equal(label,c(1,1))
-  expect_equal(round(coeff,4),-2.2147)
+  expect_equal(round(coeff,4),0.6335)
+
+  # Check class is correctly assigned
+  expect_equal(class(result),"nn2poly")
 })
 
-test_that("nn2poly_algorithm:
-          Check that the algortihm provides a correct value for a certain
-          coefficient from a given example that has been computed manually,
-          using the optional parameter `forced_max_Q`", {
-
-  # Load the example:
-  nn2poly_example <- nn2poly_example0
+test_that("nn2poly with list input against precomputed example with
+          default options", {
+  testing_data <- testing_helper_1()
 
   # Get the needed data
-  object <- nn2poly_example$weights_list
-  names(object)   <- nn2poly_example$af_string_list
-  q_taylor_vector <- nn2poly_example$q_taylor_vector
+  object <- testing_data$weights_list
+  names(object) <- testing_data$af_string_list
 
   result <- nn2poly(
-    object = object,
-    q_taylor_vector = q_taylor_vector,
-    store_coeffs = TRUE,
-    forced_max_Q = 2
+    object = object
   )
 
-  # Output polynomial order is 2, as it is forced to be 2 instead of 4.
-  n_terms <- length(result[[length(result)]][[1]])
-  order <- length(result[[length(result)]][[1]][[n_terms]])
+  n_terms <- length(result$labels)
+  order <- length(result$labels[[n_terms]])
   expect_equal(order, 2)
 
-  # Desired coefficient is  output y at layer 2, neuron 1,
-  # coefficient "1,1"
-  label <- result[[4]][[1]][[4]]
-  coeff <- result[[4]]$values[1,4]
+
+  label <- result$labels[[4]]
+  coeff <- result$values[1,4]
   expect_equal(label,c(1,1))
-  expect_equal(coeff,0.63351833)
-
-
+  expect_equal(round(coeff,4),-4.4295)
 })
+
 
 test_that("nn2poly for a keras.engine.training.Model object", {
   skip_if_not_installed("keras")
@@ -102,8 +62,8 @@ test_that("nn2poly for a keras.engine.training.Model object", {
   nn <- keras_test_model()
 
   result <- nn2poly(nn,
-                    q_taylor_vector = c(2,2,1),
-                    forced_max_Q = 2)
+                    taylor_orders = c(2,2,1),
+                    max_order = 2)
 
   expect_equal(result$values[1,1],  0.18148204)
   expect_equal(result$values[2,3], -0.71466625)
@@ -120,8 +80,8 @@ test_that("nn2poly for a constrained keras.engine.training.Model object", {
   constrained_nn <- add_constraints(nn)
 
   result <- nn2poly(constrained_nn,
-                    q_taylor_vector = c(2,2,1),
-                    forced_max_Q = 2)
+                    taylor_orders = c(2,2,1),
+                    max_order = 2)
 
   expect_equal(result$values[1,1],  1.1253606)
   expect_equal(result$values[2,1], -0.45410551)
@@ -134,7 +94,9 @@ test_that("nn2poly for a nn_module object", {
   skip_if_not_installed("torch")
   skip_on_cran()
 
-  data <- luz_test_data(nn2poly_example0)
+  testing_data <- testing_helper_2()
+
+  data <- luz_test_data(testing_data)
 
   fitted <- luz_test_model() %>%
     luz::setup(
@@ -144,34 +106,26 @@ test_that("nn2poly for a nn_module object", {
         luz::luz_metric_mse()
       )
     ) %>%
-    luz::fit(data$train, epochs = 5, valid_data = data$valid)
+    luz::fit(data$train, epochs = 5, valid_data = data$valid, verbose = FALSE)
 
   result <- nn2poly(fitted,
-                    q_taylor_vector = nn2poly_example0$q_taylor_vector,
-                    forced_max_Q = 3)
+                    taylor_orders = testing_data$taylor_orders,
+                    max_order = 3)
 
-  expect_equal(round(result$values[1,1],2), 0.11)
-  # expect_equal(result$values[2,1], -0.45410551)
+  expect_equal(round(result$values[1,1],2), 0.06)
   expect_equal(result$labels[[7]], c(1,1,1))
 
 })
 
-test_that("Check that it throws an error when the dimensions of the weights list
-          are not right.", {
-  nn2poly_example <- nn2poly_example0
+test_that("nn2poly error when wrong dimensions are given in weights", {
+  testing_data <- testing_helper_1()
 
   # Get the needed data
-  object <- nn2poly_example$weights_list
-  names(object) <- nn2poly_example$af_string_list
+  object <- testing_data$weights_list
+  names(object) <- testing_data$af_string_list
+
+  # Add weights to one layer to create the problem
   object[[2]] <- rbind(object[[2]], c(1,1))
 
-  q_taylor_vector <- nn2poly_example$q_taylor_vector
-
-  expect_error(
-    nn2poly(
-      object = object,
-      q_taylor_vector = q_taylor_vector,
-      store_coeffs = TRUE
-    )
-  )
+  expect_error(nn2poly(object = object))
 })

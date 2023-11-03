@@ -245,7 +245,7 @@ fitted_2 %>% plot()
 
 After the NNs have been trained, we can directly call `nn2poly` on the `luz`/`torch` sequential model. Therefore, we do not need to build an object with weights and activation functions as in the default case covered in `vignette("nn2poly-01-introduction")`, and can benefit from the generic methods implemented for `torch` models.
 
-The only parameters that have to be added for nn2poly to work is the chosen limit for the polynomial order with `forced_max_Q=3`.
+The only parameters that have to be added for nn2poly to work is the chosen limit for the polynomial order with `max_order=3`.
 
 We will do this for both neural networks and compare the results:
 
@@ -253,11 +253,11 @@ We will do this for both neural networks and compare the results:
 
 # Polynomial for nn1
 final_poly1 <- nn2poly(object = fitted_1,
-                      forced_max_Q = 3)
+                      max_order = 3)
 
 # Polynomial for nn2
 final_poly2 <- nn2poly(object = fitted_2,
-                      forced_max_Q = 3)
+                      max_order = 3)
 
 ```
 
@@ -305,17 +305,17 @@ It can be clearly seen with the activation potentials density, in green, that it
 
 ```{r reg-potentials}
 
-q_taylor_vector <- c(8, 8, 8, 1) # Esto debería ser tomado de algun sitio o dejado como default igual que en el uso de nn2poly
+taylor_orders <- c(8, 8, 8, 1) # Esto debería ser tomado de algun sitio o dejado como default igual que en el uso de nn2poly
 
 plot_taylor_and_activation_potentials(object = fitted_1,
                                       data = train,
-                                      q_taylor_vector = q_taylor_vector,
-                                      forced_max_Q = 3,
+                                      taylor_orders = taylor_orders,
+                                      max_order = 3,
                                       constraints = FALSE)
 
 plot_taylor_and_activation_potentials(object = fitted_2,
                                       data = train,
-                                      q_taylor_vector = q_taylor_vector,
-                                      forced_max_Q = 3,
+                                      taylor_orders = taylor_orders,
+                                      max_order = 3,
                                       constraints = TRUE)
 ```

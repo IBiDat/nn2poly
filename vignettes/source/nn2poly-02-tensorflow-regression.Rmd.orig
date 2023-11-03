@@ -211,22 +211,22 @@ plot_diagonal(x_axis =  prediction_NN2, y_axis =  test_y, xlab = "NN 2 predictio
 
 After the NNs have been trained, we can directly call `nn2poly` on the `keras` model. Therefore, we do not need to build an object with weights and activation functions as in the default case covered in `vignette("nn2poly-01-introduction")`, and can benefit from the generic methods implemented for `keras` models.
 
-The only parameters that have to be added for nn2poly to work is the Taylor order expansion at each layer (`q_taylor_vector`), where we will choose 8 by default on non linear layers and 1 in the last linear layer as Taylor is not used there. (The final polynomial order will be limited by `forced_max_Q=3`)
+The only parameters that have to be added for nn2poly to work is the Taylor order expansion at each layer (`taylor_orders`), where we will choose 8 by default on non linear layers and 1 in the last linear layer as Taylor is not used there. (The final polynomial order will be limited by `max_order=3`)
 
 We will do this for both neural networks and compare the results:
 
 ```{r reg-apply-nn2poly}
-q_taylor_vector <- c(8, 8, 8, 1)
+taylor_orders <- c(8, 8, 8, 1)
 
 # Polynomial for nn1
 final_poly1 <- nn2poly(object = nn1,
-                      q_taylor_vector = q_taylor_vector,
-                      forced_max_Q = 3)
+                      taylor_orders = taylor_orders,
+                      max_order = 3)
 
 # Polynomial for nn2
 final_poly2 <- nn2poly(object = nn2,
-                      q_taylor_vector = q_taylor_vector,
-                      forced_max_Q = 3)
+                      taylor_orders = taylor_orders,
+                      max_order = 3)
 
 ```
 
@@ -275,13 +275,13 @@ It can be clearly seen with the activation potentials density, in green, that it
 ```{r reg-potentials}
 plot_taylor_and_activation_potentials(object = nn1,
                                       data = train,
-                                      q_taylor_vector = q_taylor_vector,
-                                      forced_max_Q = 3,
+                                      taylor_orders = taylor_orders,
+                                      max_order = 3,
                                       constraints = FALSE)
 
 plot_taylor_and_activation_potentials(object = nn2,
                                       data = train,
-                                      q_taylor_vector = q_taylor_vector,
-                                      forced_max_Q = 3,
+                                      taylor_orders = taylor_orders,
+                                      max_order = 3,
                                       constraints = TRUE)
 ```

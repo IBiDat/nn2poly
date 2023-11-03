@@ -5,8 +5,8 @@ select_allowed_partitions <- function(equivalent_label, q_previous_layer, labels
     .Call(`_nn2poly_select_allowed_partitions`, equivalent_label, q_previous_layer, labels, partitions)
 }
 
-alg_non_linear <- function(coeffs_input, labels_input, labels_output, q_taylor_vector, current_layer, g, partitions_labels, partitions) {
-    .Call(`_nn2poly_alg_non_linear`, coeffs_input, labels_input, labels_output, q_taylor_vector, current_layer, g, partitions_labels, partitions)
+alg_non_linear <- function(coeffs_input, labels_input, labels_output, taylor_orders, current_layer, g, partitions_labels, partitions) {
+    .Call(`_nn2poly_alg_non_linear`, coeffs_input, labels_input, labels_output, taylor_orders, current_layer, g, partitions_labels, partitions)
 }
 
 combinations_with_repetition <- function(n, k) {

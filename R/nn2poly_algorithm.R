@@ -1,62 +1,41 @@
-#' Computes one or several polynomials to represent a given neural network
-#' using the NN2Poly algorithm.
+#' NN2Poly algorithm full algorithm.
 #'
-#' Performs the full NN2Poly algorithm that obtains polynomial coefficients
-#' for a model that performs closely as a given already trained neural network
-#' using its weights and a Taylor approximation of its activation functions.
+#' Internal function that performs the full NN2Poly algorithm given a list of
+#' weights and a list of activation functions (af),
+#' used inside nn2poly S3 method.
 #'
-#' @param weights_list \code{list} of length L ( number of hidden layers + 1)
-#' containing the weights matrix for each layer.
-#' The expected shape of such matrices at any layer L is of the form
-#' $(h_(l-1) + 1)*(h_l)$, that is, the number of rows is the number of neurons
-#' in the previous layer plus one (as the bias vector is added in the first row),
-#' and the number of columns is the number of neurons in the current layer L.
-#' Therefore, each column corresponds to the weight vector affecting each neuron
-#' in that layer, from 0 (the bias) in row 1, to neuron h_l in row h_l +1.
+#' @inheritParams nn2poly
+#'
+#' @param weights_list \code{list} of length L (number of hidden layers + 1)
+#' containing the weights matrix for each layer. See nn2poly object argument
+#' documentation.
 #'
 #' @param af_string_list \code{list} of length L containing \code{character}
-#' strings with the names of the activation function used at each layer.
+#' strings with the names of the activation function used at each layer as the
+#' names of the list expected by nn2poly.
 #'
-#' @param q_taylor_vector \code{vector} of length L containing the degree
-#' (\code{numeric}) up to which Taylor expansion should be performed at each
-#' layer.
-#'
-#' @param all_partitions Optional argument containing the needed multipartitions
-#' as list of lists of lists. If \code{NULL}, the function computes it first. This
-#' step can be computationally expensive and it is encouraged that the
-#' multipartitions are stored and reused when possible.
-#'
-#' @param store_coeffs Boolean that determines if all polynomials computed in
-#' the internal layers have to be stored and given in the output (TRUE), or if
-#' only the last layer is needed (FALSE). Default is FALSE.
-#'
-#' @param forced_max_Q Optional argument: integer that determines the maximum order
-#' that we will force in the final polynomial, discarding terms of higher order
-#' that would naturally arise using all the orders in `q_taylor_vector`.
-#'
-#' @return If \code{store_coeffs = FALSE} (default case), it returns a list
-#' with an item named `labels` that is a list of integer vectors with each the
-#' variables index associated to each polynomial term, and a item named `values`
-#' which contains a matrix where each row are the coefficients of the polynomial
-#' associated with an output neuron.
-#'
-#' If \code{store_coeffs = TRUE}, it returns a list of length L that for each
-#' layer contains an item as explained before. The polynomials obtained at the
-#' hidden layers are not needed to represent the NN but can be used to explore
-#' how the method works.
+#' @return A list as expected in \code{nn2poly} output but without the nn2poly
+#' class.
 #'
 #' @noRd
 nn2poly_algorithm <- function(weights_list,
                               af_string_list,
-                              q_taylor_vector = NULL,
-                              all_partitions  = NULL,
-                              store_coeffs    = FALSE,
-                              forced_max_Q    = NULL,
-                              ...) {
+                              max_order = 2,
+                              keep_layers = FALSE,
+                              taylor_orders = 8,
+                              ...,
+                              all_partitions = NULL
+                              ) {
+
+  if (!check_weights_dimensions(weights_list)) {
+    stop("The list of weights has incorrect dimensions.
+         Please, check the  right dimmensions in the documentation.",
+         call. = FALSE
+    )
+  }
 
   # Obtain number of variables (dimension p)
   p <- dim(weights_list[[1]])[1] - 1
-
 
   # Obtain number of layers L (L-1 hidden + 1 output, input is denoted by 0)
   L <- length(af_string_list)
@@ -68,32 +47,27 @@ nn2poly_algorithm <- function(weights_list,
   last_linear <- (af_string_list[[L]] == "linear")
 
   # The list with the results of coefficients at each layer,
-  # depending the last layer being linear or not
+  # depending on the last layer being linear or not
   if (last_linear) {
     results <- vector(mode = "list", length = 2 * L - 1)
   } else {
     results <- vector(mode = "list", length = 2 * L)
   }
 
-  # Create a default q_taylor_vector if it is not given by the user
-  if (is.null(q_taylor_vector)) {
-    # 8 for the non-linear layers and 1 for the line
-    q_taylor_vector <- ifelse(af_string_list=="linear", 1, 8)
-  }
+  # Create a default taylor_orders if it is not given by the user
+  taylor_orders <- obtain_taylor_vector(
+    taylor_orders = taylor_orders,
+    af_string_list = af_string_list
+    )
 
   # Obtain all the derivatives up to the desired Taylor degree at each layer
   af_derivatives_list <- obtain_derivatives_list(
     af_string_list = af_string_list,
-    q_taylor_vector = q_taylor_vector
-  )
+    taylor_orders = taylor_orders
+    )
 
   # Obtain the maximum degree of the final polynomial:
-  if(is.null(forced_max_Q)){
-    q_max <- prod(q_taylor_vector)
-  } else {
-    q_max <- min(prod(q_taylor_vector),forced_max_Q)
-  }
-
+  q_max <- obtain_final_poly_order(max_order, taylor_orders)
 
   # Check if partitions have not been given as an input
   if (is.null(all_partitions)) {
@@ -167,7 +141,7 @@ nn2poly_algorithm <- function(weights_list,
 
       # Stop if last layer and the last layer is linear
       if (current_layer == L && last_linear) {
-        if (store_coeffs) {
+        if (keep_layers) {
           return(results)
         } else {
           return(coeffs_list_output)
@@ -184,7 +158,7 @@ nn2poly_algorithm <- function(weights_list,
     # Treat the previous coeff output as input
     coeffs_list_input <- coeffs_list_output
 
-    # In the non linear case the polynomial order increases (unless forced_max_Q is
+    # In the non linear case the polynomial order increases (unless max_order is
     # reached), so the new labels need to be computed. However, the previous
     # ones can be reused.
     # The new labels will be for monomials of orders between the total order
@@ -196,17 +170,17 @@ nn2poly_algorithm <- function(weights_list,
       previous_total_order <- new_total_order
     }
 
-    # Compute the new total order with the product of q_taylor_vector.
-    # If a forced_max_Q value is used, its taken as the minimum between both.
-    if (is.null(forced_max_Q)) {
-      new_total_order <- previous_total_order * q_taylor_vector[current_layer]
+    # Compute the new total order with the product of taylor_orders.
+    # If a max_order value is used, its taken as the minimum between both.
+    if (is.null(max_order)) {
+      new_total_order <- previous_total_order * taylor_orders[current_layer]
     } else {
-      new_total_order <- min(previous_total_order * q_taylor_vector[current_layer],
-                             forced_max_Q)
+      new_total_order <- min(previous_total_order * taylor_orders[current_layer],
+                             max_order)
     }
 
     # If the order has increased, create new needed labels.
-    # If not, forced_max_Q has been reached and no new labels are needed.
+    # If not, max_order has been reached and no new labels are needed.
     if (previous_total_order != new_total_order){
       # Loop over each of the new orders up to the maximum one
       for (order in (previous_total_order+1):new_total_order){
@@ -228,9 +202,6 @@ nn2poly_algorithm <- function(weights_list,
       }
     }
 
-
-
-
     # Parallel lapply
     # The output index is already computed in the linear case
     # but not for l=1 #REVISETHISLATER
@@ -238,7 +209,7 @@ nn2poly_algorithm <- function(weights_list,
       coeffs_list_input$values,
       labels_input = coeffs_list_input$labels,
       labels_output = coeffs_list_output$labels,
-      q_taylor_vector = q_taylor_vector,
+      taylor_orders = taylor_orders,
       current_layer = current_layer,
       g = af_derivatives_list[[current_layer]],
       partitions_labels = all_partitions$labels,
@@ -253,7 +224,7 @@ nn2poly_algorithm <- function(weights_list,
 
     # Check if this is the last layer and if the last layer is not linear
     if (current_layer == L && !last_linear) {
-      if (store_coeffs) {
+      if (keep_layers) {
         return(results)
       } else {
         return(coeffs_list_output)
@@ -307,3 +278,95 @@ obtain_partitions_with_labels <- function(p, q_max) {
 
   return(list("labels" = labels, "partitions" = partitions))
 }
+
+
+
+#' Computes the maximum polynomial order allowed by max_order and
+#' Taylor orders at each layer
+#'
+#' Internal function used in nn2poly_algorithm.
+#' Computes the final polynomial order by checking if max_order is an integer
+#' and that the product of the Taylor order values allows for it. If it is
+#' not reached, a warning is provided.
+#'
+#' @inheritParams nn2poly
+#' @return An integer with the final polynomial order
+#'
+#' @noRd
+obtain_final_poly_order <- function(max_order, taylor_orders){
+  if(is.numeric(max_order) & (max_order %% 1)==0){
+    # This condition allows for integers and also
+    # integers written as numeric
+    max_order <- as.integer(max_order)
+    poly_order <- min(prod(taylor_orders),max_order)
+
+    # Warning if max_order has not been reached. (Very rare situation)
+    if (poly_order < max_order){
+      warning("Argument `max_order` has not been reached due to chosen taylor_orders")
+    }
+  } else {
+    stop("Argument `max_order` is not an integer value", call. = FALSE)
+  }
+
+  return(poly_order)
+}
+
+
+#' Obtain a vector containing the Taylor order to be applied at each layer
+#'
+#' Internal function used in nn2poly_algorithm.
+#' It allows the user to specify a single numeric value, in which case that
+#' value will be employed at all no linear layers and 1 at linear layers. The
+#' user can also provide their own vector, where in that case the dimensions
+#' are checked so they match the number of layers provided by af_string_list.
+#'
+#' @inheritParams nn2poly
+#'
+#' @return An integer vector
+#'
+#' @noRd
+obtain_taylor_vector <- function(taylor_orders, af_string_list){
+  # Get the number of layers
+  L <- length(af_string_list)
+
+  # First check if taylor_orders are integers or numeric with no decimal part:
+  if(!(is.numeric(taylor_orders) & all((taylor_orders %% 1)==0))){
+    stop("Argument `taylor_orders` is non numeric", call. = FALSE)
+  } else if(length(taylor_orders)==1) {
+    # Single value case, set 1 in linear, 8 in other AF
+    taylor_orders <- ifelse(af_string_list=="linear", 1, taylor_orders)
+  } else {
+    # Vector provided by user, check if dimensions match
+    if(!(length(taylor_orders)==length(af_string_list))){
+      stop("Argument `taylor_orders` length does not match provided number of layers",
+           call. = FALSE)
+    }
+  }
+  return(taylor_orders)
+}
+
+#' Checks that the weights dimensions are correct.
+#'
+#' This means that each matrix has the same number of rows as the number
+#' of columns in the previous matrix + 1. This is because the number of
+#' output neurons in the previous layer is the same as the number of inputs
+#' to the current layer + the bias.
+#'
+#' @inheritParams nn2poly_algorithm
+#'
+#' @return `TRUE` if the dimensiones are correct, `FALSE` if not.
+#'
+#' @noRd
+check_weights_dimensions <- function(weights_list) {
+  for (matrix_index in 2:length(weights_list)) {
+    nrows_current <- nrow(weights_list[[matrix_index]])
+    ncols_prev    <- ncol(weights_list[[matrix_index - 1]])
+
+    if (nrows_current != ncols_prev + 1)
+      return(FALSE)
+  }
+  return(TRUE)
+}
+
+
+
