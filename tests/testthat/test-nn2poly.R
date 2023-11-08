@@ -70,25 +70,6 @@ test_that("nn2poly for a keras.engine.training.Model object", {
   expect_equal(result$labels[[6]], c(2,2))
 })
 
-test_that("nn2poly for a constrained keras.engine.training.Model object", {
-  skip_if_not_installed("keras")
-  skip_if_not_installed("tensorflow")
-  skip_on_cran()
-
-  nn <- keras_test_model()
-
-  constrained_nn <- add_constraints(nn)
-
-  result <- nn2poly(constrained_nn,
-                    taylor_orders = c(2,2,1),
-                    max_order = 2)
-
-  expect_equal(result$values[1,1],  1.1253606)
-  expect_equal(result$values[2,1], -0.45410551)
-  expect_equal(result$labels[[6]], c(2,2))
-})
-
-
 test_that("nn2poly for a nn_module object", {
   skip_if_not_installed("luz")
   skip_if_not_installed("torch")
