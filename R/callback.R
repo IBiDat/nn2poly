@@ -26,3 +26,24 @@ build_callback.luz_module_generator <- function(object,
 
   luz_callback()
 }
+
+build_callback.keras.engine.training.Model <- function(object,
+                                                       type = c("l1_norm", "l2_norm")) {
+
+  keras::`%py_class%`(
+    keras_callback(keras::keras$callbacks$Callback),
+    {
+      on_train_batch_end <- function(batch, logs = NULL) {
+        for (layer in utils::head(self$model$layers, -1)) {
+          layer$set_weights(
+            keras_constraint(layer = layer, type = type)
+          )
+        }
+      }
+    }
+  )
+
+  keras_callback()
+
+}
+

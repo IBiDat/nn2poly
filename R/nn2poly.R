@@ -1,7 +1,7 @@
 #' @useDynLib nn2poly, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
 #' @importFrom stats density
-utils::globalVariables(c(".data", "super", "self", "private", "ctx"))
+utils::globalVariables(c(".data", "super", "self", "private", "ctx", "keras_callback"))
 NULL
 
 #' Obtain a polynomial representation from a trained neural network
