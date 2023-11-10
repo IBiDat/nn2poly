@@ -17,7 +17,7 @@ keras_constraint <- function(layer,
   if (type == "l1_norm") {
     norms   <- keras::k_sum(keras::k_abs(wb), axis = 1, keepdims = TRUE)
     desired <- keras::k_clip(norms, 0, 1)
-    final   <- wb * (desired/(keras::k_epsilon() + norms))
+    final   <- wb * (desired / (keras::k_epsilon() + norms))
   } else if (type == "l2_norm") {
     final <- keras::constraint_maxnorm(max_value = 1, axis = 0)(wb)
   }
