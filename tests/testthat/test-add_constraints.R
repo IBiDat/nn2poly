@@ -24,7 +24,6 @@ test_that("The function works over an already trained network and the connstrain
   skip_on_cran()
 
   testing_data <- testing_helper_2()
-  testing_data
 
   nn <- keras_test_model()
 

@@ -28,9 +28,24 @@ test_that("The get_parameters functions returns the right list of activation
   skip_if_not_installed("tensorflow")
   skip_on_cran()
 
+  testing_data <- testing_helper_2()
   nn <- keras_test_model()
 
+  keras::compile(nn,
+                 loss = "mse",
+                 optimizer = keras::optimizer_adam(),
+                 metrics = "mse")
+
   constrained_nn <- add_constraints(nn)
+
+  fit(constrained_nn,
+      testing_data$train_x,
+      testing_data$train_y,
+      verbose = 0,
+      epochs = 3,
+      validation_split = 0.2
+  )
+
   params <- get_parameters(constrained_nn)
 
   expect_equal(params$af_string_list, list("tanh", "softplus", "linear"))

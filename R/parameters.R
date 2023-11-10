@@ -29,34 +29,18 @@ get_parameters.keras.engine.training.Model <- function(object) {
 
     neurons_previous_layer <- if (layer_index == 1) p else l_params[[list_index-1]][["n_neurons"]]
 
-    if (nrow(params[["weights"]]) == (neurons_previous_layer + 1)) {
-      params[["wb"]] <- params[["weights"]]
+    params[["bias"]]       <- object$layers[[layer_index]]$get_weights()[[2]]
+    params[["wb"]]         <- rbind(params[["bias"]], params[["weights"]])
+    params[["activation"]] <- object$layers[[layer_index]]$get_config()$activation
+    layer_index <- layer_index + 1
 
-      # Check if the layer is one of our custom layers
-      if (class(object$layers[[layer_index]])[[1]] == "R6type.Layer_Combined_L1" ||
-          class(object$layers[[layer_index]])[[1]] == "R6type.Layer_Combined_L2") {
-
-        params[["activation"]] <- object$layers[[layer_index]]$get_config()$activation
-        layer_index <- layer_index + 1
-
-      } else {
-        # We assume that the next layer is the activation
-        params[["activation"]] <- object$layers[[layer_index + 1]]$get_config()$activation
-        layer_index <- layer_index + 2
-      }
-    } else {
-      params[["bias"]]       <- object$layers[[layer_index]]$get_weights()[[2]]
-      params[["wb"]]         <- rbind(params[["bias"]],params[["weights"]])
-      params[["activation"]] <- object$layers[[layer_index]]$get_config()$activation
-      layer_index <- layer_index + 1
-    }
     l_params[[list_index]] <- params
     list_index <- list_index + 1
   }
 
-  weights_list    <- lapply(l_params, function(object) object[["wb"]])
-  af_string_list  <- lapply(l_params, function(object) object[["activation"]])
-  n_neurons       <- lapply(l_params, function(object) object[["n_neurons"]])
+  weights_list    <- lapply(l_params, "[[", "wb")
+  af_string_list  <- lapply(l_params, "[[", "activation")
+  n_neurons       <- lapply(l_params, "[[", "n_neurons")
 
   list(weights_list   = weights_list,
        af_string_list = af_string_list,
