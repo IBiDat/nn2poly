@@ -31,13 +31,17 @@ build_callback.keras.engine.training.Model <- function(object,
                                                        type = c("l1_norm", "l2_norm")) {
   keras::`%py_class%`(
     keras_callback(keras::keras$callbacks$Callback), {
+      initialize <- function() {
+        super$initialize()
+        self$constraint <- keras_constraint(norm_order(type))
+      }
+
       on_train_batch_end <- function(batch, logs = NULL) {
         for (layer in utils::head(self$model$layers, -1))
-          layer$set_weights(keras_constraint(layer = layer, type = type))
+          self$constraint(layer)
       }
     }
   )
+
   keras_callback()
-
 }
-

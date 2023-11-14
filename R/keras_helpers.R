@@ -1,27 +1,23 @@
-#' keras weights and bias constrainer
+#' keras constraint generator
 #'
-#' @param layer Layer of the keras model.
-#' @param type Constraint type.
+#' @param ord Order of norm (default: 1).
 #'
-#' @return Keras array with constrained weight and bias
+#' @return Constraint function.
 #'
 #' @noRd
-keras_constraint <- function(layer,
-                             type = c("l1_norm", "l2_norm")) {
-  type <- match.arg(type)
+keras_constraint <- function(ord = 1) function(object) {
+  wb <- do.call(rbind, object$get_weights())
 
-  w <- layer$get_weights()[[1]]
-  b <- layer$get_weights()[[2]]
-  wb <- rbind(b, w)
+  result <- switch(
+    ord, {
+      norms   <- keras::k_sum(keras::k_abs(wb), axis = 1, keepdims = TRUE)
+      desired <- keras::k_clip(norms, 0, 1)
+      wb * (desired / (keras::k_epsilon() + norms))
+    },
+    keras::constraint_maxnorm(max_value = 1, axis = 0)(wb)
+  )
 
-  if (type == "l1_norm") {
-    norms   <- keras::k_sum(keras::k_abs(wb), axis = 1, keepdims = TRUE)
-    desired <- keras::k_clip(norms, 0, 1)
-    final   <- wb * (desired / (keras::k_epsilon() + norms))
-  } else if (type == "l2_norm") {
-    final <- keras::constraint_maxnorm(max_value = 1, axis = 0)(wb)
-  }
+  object$set_weights(keras::keras_array(list(result[2:NULL, ], result[1, ])))
 
-  keras::keras_array(list(final[2:NULL, ], final[1, ]))
-
+  object
 }
