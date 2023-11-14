@@ -2,23 +2,21 @@
 % Please edit documentation in R/add_constraints.R
 \name{add_constraints}
 \alias{add_constraints}
-\title{Add custom constraints to the weights of a keras neural network.}
+\title{Add constraints to a neural network}
 \usage{
-add_constraints(model, type = c("l1_norm", "l2_norm"), ...)
+add_constraints(object, type = c("l1_norm", "l2_norm"), ...)
 }
 \arguments{
-\item{model}{A keras model to which the restrictions on the weights are to be applied.}
+\item{object}{A neural network object.}
 
-\item{type}{The type of constraint you want to apply on the model. Currently,
-'l1_norm' and 'l2_norm' can be applied.}
+\item{type}{Constraint type. Currently, \code{l1_norm} and \code{l2_norm} are supported.}
 
 \item{...}{Additional arguments (unused).}
 }
 \value{
-A keras model with the custom constraints applied.
+A \code{nn2poly} neural network object.
 }
 \description{
-This function is designed to transform a given keras NN (feed forward, dense),
-into a NN with the same structure, parameters and weights but with our custom
-layers that impose L1 and L2 norm constraints
+This function sets up a neural network object with the constraints required
+by the \code{\link{nn2poly}} algorithm.
 }
