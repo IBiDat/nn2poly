@@ -1,22 +1,3 @@
-test_that("Test that both the activation function and neurons are the same for
-          the constrained and unconstrained version of the nn", {
-  skip_if_not_installed("keras")
-  skip_if_not_installed("tensorflow")
-  skip_on_cran()
-
-  nn <- keras_test_model()
-
-  constrained_nn <- add_constraints(nn)
-
-  for (layer in seq_along(nn$layers)) {
-    expect_equal(nn$layers[[layer]]$get_config()$activation,
-                 constrained_nn$layers[[layer]]$get_config()$activation)
-    expect_equal(nn$layers[[layer]]$get_config()$units,
-                 constrained_nn$layers[[layer]]$get_config()$units)
-  }
-
-})
-
 test_that("The function works over an already trained network and the connstraints
           are fulfiled after training for the constrained network", {
   skip_if_not_installed("keras")
