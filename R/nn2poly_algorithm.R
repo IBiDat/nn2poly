@@ -354,21 +354,7 @@ obtain_taylor_vector <- function(taylor_orders, af_string_list){
 obtain_derivatives_list <- function(af_string_list, taylor_orders) {
 
   n <- length(af_string_list)
-
-  af_function_list <- vector(mode = "list", length = n)
-
-  for (i in 1:n) {
-    if (af_string_list[[i]] == "softplus") {
-      af_function_list[[i]] <- function(x) log(1 + exp(x)) # Softplus
-    } else if (af_string_list[[i]] == "tanh") {
-      af_function_list[[i]] <- function(x) tanh(x) # Hyperbolic Tangent
-    } else if (af_string_list[[i]] == "sigmoid") {
-      af_function_list[[i]] <- function(x) 1 / (1 + exp(-x)) # Sigmoid
-    } else if (af_string_list[[i]] == "linear") {
-      af_function_list[[i]] <- function(x) x # Linear
-    }
-  }
-
+  af_function_list <- string_to_function(af_string_list)
   af_derivatives_list <- vector(mode = "list", length = n)
 
   for (i in 1:n) {
