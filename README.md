@@ -30,6 +30,6 @@ The installation from GitHub requires the [remotes](https://cran.r-project.org/p
 
 ```r
 # install.packages("remotes")
-remotes::install_github(paste("IBiDat", c("nn2poly", "nn2poly.tools"), sep="/"))
+remotes::install_github("IBiDat/nn2poly")
 ```
 
