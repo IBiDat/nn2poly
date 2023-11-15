@@ -13,7 +13,8 @@ Authors@R: c(
 Description: Implements a method that builds the coefficients of a polynomial
     model that performs almost equivalently as a given neural network
     (densely connected). This is achieved using Taylor expansion at the
-    activation functions.
+    activation functions. See Morala et al. 2021 <doi:10.1016/j.neunet.2021.04.036>,
+    and 2023 <doi:10.1109/TNNLS.2023.3330328>.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
