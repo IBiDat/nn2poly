@@ -19,7 +19,6 @@ testing_helper_1 <- function(){
 # This data will be used in testing keras/tensorflow and luz/torch
 # Note that the data is random so the NN will not learn properly but
 # we can still test if the coefficients are as expected by nn2poly.
-
 testing_helper_2 <- function(){
   set.seed(42)
   n_sample <- 100

@@ -18,45 +18,27 @@ get_parameters.keras.engine.training.Model <- function(object) {
 
   p <- object$layers[[1]]$input_shape[[2]]
 
-  l_params <- list()
-  layer_index <- 1
+  l_params <- vector(mode = "list", length = nlayers - 1)
   list_index  <- 1
-  while(layer_index <= nlayers) {
-    params <- list()
 
-    params[["n_neurons"]] <- object$layers[[layer_index]]$get_config()$units
-    params[["weights"]]   <- object$layers[[layer_index]]$get_weights()[[1]]
+  for (layer in object$layers) {
+    params <- vector(mode = "list", length = 3)
+    names(params) <- c("n_neurons", "wb", "activation")
 
-    neurons_previous_layer <- if (layer_index == 1) p else l_params[[list_index-1]][["n_neurons"]]
+    params[["n_neurons"]] <- layer$get_config()$units
+    params[["wb"]] <- rbind(
+      layer$get_weights()[[2]],
+      layer$get_weights()[[1]]
+    )
+    params[["activation"]] <- layer$get_config()$activation
 
-    if (nrow(params[["weights"]]) == (neurons_previous_layer + 1)) {
-      params[["wb"]] <- params[["weights"]]
-
-      # Check if the layer is one of our custom layers
-      if (class(object$layers[[layer_index]])[[1]] == "R6type.Layer_Combined_L1" ||
-          class(object$layers[[layer_index]])[[1]] == "R6type.Layer_Combined_L2") {
-
-        params[["activation"]] <- object$layers[[layer_index]]$get_config()$activation
-        layer_index <- layer_index + 1
-
-      } else {
-        # We assume that the next layer is the activation
-        params[["activation"]] <- object$layers[[layer_index + 1]]$get_config()$activation
-        layer_index <- layer_index + 2
-      }
-    } else {
-      params[["bias"]]       <- object$layers[[layer_index]]$get_weights()[[2]]
-      params[["wb"]]         <- rbind(params[["bias"]],params[["weights"]])
-      params[["activation"]] <- object$layers[[layer_index]]$get_config()$activation
-      layer_index <- layer_index + 1
-    }
     l_params[[list_index]] <- params
     list_index <- list_index + 1
   }
 
-  weights_list    <- lapply(l_params, function(object) object[["wb"]])
-  af_string_list  <- lapply(l_params, function(object) object[["activation"]])
-  n_neurons       <- lapply(l_params, function(object) object[["n_neurons"]])
+  weights_list    <- lapply(l_params, "[[", "wb")
+  af_string_list  <- lapply(l_params, "[[", "activation")
+  n_neurons       <- lapply(l_params, "[[", "n_neurons")
 
   list(weights_list   = weights_list,
        af_string_list = af_string_list,

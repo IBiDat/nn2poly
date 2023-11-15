@@ -79,7 +79,7 @@ plot_taylor_and_activation_potentials.list <- function(object,
   p <- dim(data)[2] - 1
 
   # get the AF as R functions:
-  af_function_list <- change_string_to_function(af_string_list)
+  af_function_list <- string_to_function(af_string_list)
 
 
   # We have to store the output of each layer to use it as input in the next one

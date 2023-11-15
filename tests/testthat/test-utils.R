@@ -3,7 +3,7 @@ test_that("tests that the function to which it has been transformed is correct",
   # List with the four possible functions
   af_string_list   <- list("softplus", "tanh", "sigmoid", "linear")
   # List with the converted strings to functions
-  af_function_list <- change_string_to_function(af_string_list)
+  af_function_list <- string_to_function(af_string_list)
 
   # softplus
   expect_equal(
@@ -29,6 +29,8 @@ test_that("tests that the function to which it has been transformed is correct",
     deparse(function(x) x)
   )
 
+  expect_error(string_to_function(list("asdf")))
+
 })
 
 
@@ -38,7 +40,7 @@ test_that("test that the value of  each function is the expected for
   # List with the four possible functions
   af_string_list   <- list("softplus", "tanh", "sigmoid", "linear")
   # List with the converted strings to functions
-  af_function_list <- change_string_to_function(af_string_list)
+  af_function_list <- string_to_function(af_string_list)
 
   # Generating 1000 random numbers between -1 and 1
   random_numbers <- runif(1000, -1, 1)

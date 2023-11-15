@@ -234,9 +234,6 @@ nn2poly_algorithm <- function(weights_list,
   }
 }
 
-
-
-
 #' This functions will generate the partitions obtained with Knuth's algorithm,
 #' compute their labels and store both things in a list of length 2.
 #'
@@ -279,8 +276,6 @@ obtain_partitions_with_labels <- function(p, q_max) {
   return(list("labels" = labels, "partitions" = partitions))
 }
 
-
-
 #' Computes the maximum polynomial order allowed by max_order and
 #' Taylor orders at each layer
 #'
@@ -310,7 +305,6 @@ obtain_final_poly_order <- function(max_order, taylor_orders){
 
   return(poly_order)
 }
-
 
 #' Obtain a vector containing the Taylor order to be applied at each layer
 #'
@@ -345,6 +339,42 @@ obtain_taylor_vector <- function(taylor_orders, af_string_list){
   return(taylor_orders)
 }
 
+#' Obtain needed derivatives up to the chosen order (q Taylor)
+#'
+#' This function is internally used in nn2poly_algorithm to obtain the
+#' derivatives of the given activation function at 0 up to the desired order $q$
+#' for each layer.
+#'
+#' @inheritParams nn2poly
+#' @inheritParams nn2poly_algorithm
+#'
+#' @return list of vectors with the derivatives
+#'
+#' @noRd
+obtain_derivatives_list <- function(af_string_list, taylor_orders) {
+
+  n <- length(af_string_list)
+  af_function_list <- string_to_function(af_string_list)
+  af_derivatives_list <- vector(mode = "list", length = n)
+
+  for (i in 1:n) {
+    # Obtain the vector with the derivatives of the activation function up to the given degree:
+    # centered at 0
+    # and use rev to reverse and match our notation.
+    af_derivatives_list[[i]] <- rev(pracma::taylor(af_function_list[[i]], 0, taylor_orders[i]))
+
+    # here we have a problem: if the last term of the taylor expansion is 0,
+    # the previous method deletes that entry and then the dimensions willm not macth later
+    # therefore, we add 0's if needed:
+    diff_len <- (taylor_orders[i] + 1) - length(af_derivatives_list[[i]])
+    if (diff_len > 0) {
+      af_derivatives_list[[i]] <- c(af_derivatives_list[[i]], rep(0, diff_len))
+    }
+  }
+
+  return(af_derivatives_list)
+}
+
 #' Checks that the weights dimensions are correct.
 #'
 #' This means that each matrix has the same number of rows as the number
@@ -367,6 +397,3 @@ check_weights_dimensions <- function(weights_list) {
   }
   return(TRUE)
 }
-
-
-
