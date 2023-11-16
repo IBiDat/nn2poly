@@ -6,7 +6,7 @@ articles:
   nn2poly-02-tensorflow-regression: nn2poly-02-tensorflow-regression.html
   nn2poly-03-tensorflow-classification: nn2poly-03-tensorflow-classification.html
   nn2poly-04-torch-regression: nn2poly-04-torch-regression.html
-last_built: 2023-11-16T09:43Z
+last_built: 2023-11-16T09:46Z
 urls:
   reference: https://ibidat.github.io/nn2poly/reference
   article: https://ibidat.github.io/nn2poly/articles
