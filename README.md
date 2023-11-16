@@ -8,7 +8,7 @@
 [![DOI](https://img.shields.io/badge/doi-10.1109/TNNLS.2023.3330328-informational.svg)](https://doi.org/10.1109/TNNLS.2023.3330328)
 <!-- badges: end -->
 
-The **nn2poly** package implements the NN2Poly method that allows to transform an already trained deep feed-forward fully connected neural network into a polynomial representation that predicts as similar as possible to the original neural network.
+The **nn2poly** package implements the NN2Poly method that allows to transform an already trained deep feed-forward fully connected neural network into a polynomial representation that predicts as similar as possible to the original neural network. The obtained polynomial coefficients can be used to explain features (and their interactions) importance  in the neural network, therefore working as a tool for interpretability or eXplainable Artificial Intelligence (XAI).
 
 
 ## Related Papers:
