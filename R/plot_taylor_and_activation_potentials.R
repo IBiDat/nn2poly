@@ -23,8 +23,8 @@
 #' @export
 plot_taylor_and_activation_potentials <- function(object,
                                                   data,
-                                                  taylor_orders,
                                                   max_order,
+                                                  taylor_orders,
                                                   constraints,
                                                   taylor_interval = 1.5,
                                                   ...) {
