@@ -6,7 +6,7 @@
 #'
 #' @noRd
 keras_constraint <- function(ord = 1) function(object) {
-  wb <- do.call(rbind, rev(object$weights))
+  wb <- do.call(rbind, rev(object$get_weights()))
 
   result <- switch(
     ord, {
