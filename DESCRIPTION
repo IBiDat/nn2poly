@@ -34,6 +34,7 @@ Suggests:
     knitr,
     luz,
     patchwork,
+    reticulate,
     rmarkdown,
     R6,
     tensorflow,
