@@ -19,3 +19,8 @@ string_to_function <- function(af_string_list) {
     )
   })
 }
+
+py_load_class <- function(name) {
+  file <- system.file(paste0("python/", name, ".py"), package="nn2poly")
+  reticulate::py_run_file(file)[name]
+}
