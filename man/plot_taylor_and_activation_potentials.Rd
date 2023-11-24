@@ -7,8 +7,8 @@
 plot_taylor_and_activation_potentials(
   object,
   data,
-  taylor_orders,
   max_order,
+  taylor_orders = 8,
   constraints,
   taylor_interval = 1.5,
   ...
@@ -39,15 +39,15 @@ The bias vector should be in the first row.}
 to be used as input to compute their activation potentials. The response
 variable column should not be included.}
 
-\item{taylor_orders}{\code{integer} or \code{vector} of length L that sets the
-degree at which Taylor expansion is truncated at each layer. If a single
-value is used, that value is set for each non linear layer and 1 for linear
-at each layer activation function. Default is set to 8.}
-
 \item{max_order}{\code{integer} that determines the maximum order
 that will be forced in the final polynomial, discarding terms of higher order
 that would naturally arise when considering all Taylor expansions allowed by
 \code{taylor_orders}.}
+
+\item{taylor_orders}{\code{integer} or \code{vector} of length L that sets the
+degree at which Taylor expansion is truncated at each layer. If a single
+value is used, that value is set for each non linear layer and 1 for linear
+at each layer activation function. Default is set to 8.}
 
 \item{constraints}{Boolean parameter determining if the NN is constrained
 (TRUE) or not (FALSE). This only modifies de plots title to show

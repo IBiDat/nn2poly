@@ -97,18 +97,27 @@ First, we build the model. Note that in this case the NN has a linear output wit
 
 This NN will be built using standard tensorflow and keras practices, in this case with a sequential keras model without any constraint on the weights.
 
+We will define a function that creates the desired model and then use it to define two different networks, unconstrained/constrained.
+
+```{r reg-define-nn-model}
+
+keras_model <- function() {
+  tensorflow::set_random_seed(42)
+
+  nn <- keras::keras_model_sequential()
+  nn <- keras::layer_dense(nn, units = 100, activation = "tanh", input_shape = p)
+  nn <- keras::layer_dense(nn, units = 100, activation = "tanh")
+  nn <- keras::layer_dense(nn, units = n_class, activation = "linear")
+
+  nn
+}
+
+```
+
+Then we define `nn1`, which will be the unconstrained NN.
 
 ```{r class-nn1-build}
-nn1 <- keras_model_sequential()
-
-nn1 %>% layer_dense(units = 100,
-                  activation = "tanh",
-                  input_shape = p)
-
-nn1 %>% layer_dense(units = 100,
-                  activation = "tanh")
-
-nn1 %>% layer_dense(units = n_class)
+nn1 <- keras_model()
 
 nn1
 ```
@@ -122,8 +131,9 @@ Our implementation is such that the bias on each neuron is included in the weigh
 
 Note that L1 norm equal to 1 when scaling the input data to the $[-1,1]$ interval is the recommended option.
 
-```{r class-nn2-build}
-nn2 <- add_constraints(nn1, constraint_type = "l1_norm")
+```{r reg-nn2-build}
+nn2 <- keras_model()
+nn2 <- add_constraints(nn2, constraint_type = "l1_norm")
 nn2
 ```
 
@@ -233,23 +243,20 @@ cm2
 
 After the NNs have been trained, we can directly call `nn2poly` on the `keras` model. Therefore, we do not need to build an object with weights and activation functions as in the default case covered in `vignette("nn2poly-01-introduction")`, and can benefit from the generic methods implemented for `keras` models.
 
-The only parameters that have to be added for nn2poly to work is the Taylor order expansion at each layer (`taylor_orders`), where we will choose 8 by default on non linear layers and 1 in the last linear layer as Taylor is not used there. (The final polynomial order will be limited by `max_order=3`)
+The only parameter that has to be added for nn2poly to work is the final polynomial order that we want, limited by `max_order=3`.
 
 Note that in this case, as we have 3 output neurons, there will be 3 output polynomials. The polynomials will be stored in the same way as in the regression case, in a list with labels and values, but in this case the values will be a matrix instead of a vector, where each row will be the polynomial obtained for each output neuron.
 
 We will do this for both neural networks and compare the results:
 
 ```{r class-apply-nn2poly}
-taylor_orders <- c(8, 8, 8, 1)
 
 # Polynomial for nn1
 final_poly1 <- nn2poly(object = nn1,
-                      taylor_orders = taylor_orders,
                       max_order = 3)
 
 # Polynomial for nn2
 final_poly2 <- nn2poly(object = nn2,
-                      taylor_orders = taylor_orders,
                       max_order = 3)
 
 ```
@@ -358,13 +365,11 @@ It can be clearly seen with the activation potentials density, in green, that it
 ```{r class-potentials}
 plot_taylor_and_activation_potentials(object = nn1,
                                       data = train,
-                                      taylor_orders = taylor_orders,
                                       max_order = 3,
                                       constraints = FALSE)
 
 plot_taylor_and_activation_potentials(object = nn2,
                                       data = train,
-                                      taylor_orders = taylor_orders,
                                       max_order = 3,
                                       constraints = TRUE)
 ```

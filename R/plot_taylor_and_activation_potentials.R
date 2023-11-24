@@ -23,8 +23,8 @@
 #' @export
 plot_taylor_and_activation_potentials <- function(object,
                                                   data,
-                                                  taylor_orders,
                                                   max_order,
+                                                  taylor_orders = 8,
                                                   constraints,
                                                   taylor_interval = 1.5,
                                                   ...) {
@@ -43,8 +43,8 @@ plot_taylor_and_activation_potentials.default <- function(object, ...) {
 #' @export
 plot_taylor_and_activation_potentials.list <- function(object,
                                                        data,
-                                                       taylor_orders,
                                                        max_order,
+                                                       taylor_orders = 8,
                                                        constraints,
                                                        taylor_interval = 1.5,
                                                        ...) {
@@ -67,6 +67,12 @@ plot_taylor_and_activation_potentials.list <- function(object,
   #   print("The NN is not a regression")
   #   return(NULL)
   # }
+
+  # Create a default taylor_orders if it is not given by the user (as in nn2poly)
+  taylor_orders <- obtain_taylor_vector(
+    taylor_orders = taylor_orders,
+    af_string_list = af_string_list
+  )
 
   # The number of plots that we want to obtain is the number of hidden layers
   # (L-1) plus the output layer (L in total).

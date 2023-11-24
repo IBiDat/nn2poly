@@ -5,7 +5,7 @@ output:
   rmarkdown::html_vignette:
     toc: yes
     fig_width: 6
-date: "2023-07-14"
+date: "2023-11-24"
 vignette: >
   %\VignetteIndexEntry{02 - Regression example using tensorflow}
   %\VignetteEngine{knitr::rmarkdown}
@@ -104,38 +104,44 @@ Different constraints can be tested, but the suggested constraint based on our t
 
 This NN will be built using standard tensorflow and keras practices, in this case with a sequential keras model without any constraint on the weights.
 
+We will define a function that creates the desired model and then use it to define two different networks, unconstrained/constrained.
 
 
 ```r
-nn1 <- keras_model_sequential()
 
-nn1 %>% layer_dense(units = 100,
-                  activation = "tanh",
-                  input_shape = p)
+keras_model <- function() {
+  tensorflow::set_random_seed(42)
 
-nn1 %>% layer_dense(units = 100,
-                  activation = "tanh")
+  nn <- keras::keras_model_sequential()
+  nn <- keras::layer_dense(nn, units = 100, activation = "tanh", input_shape = p)
+  nn <- keras::layer_dense(nn, units = 100, activation = "tanh")
+  nn <- keras::layer_dense(nn, units = 100, activation = "tanh")
+  nn <- keras::layer_dense(nn, units = 1, activation = "linear")
 
-nn1 %>% layer_dense(units = 100,
-                  activation = "tanh")
+  nn
+}
+```
 
-nn1 %>% layer_dense(units = 1,
-                  activation = "linear")
+Then we define `nn1`, which will be the unconstrained NN.
+
+
+```r
+nn1 <- keras_model()
 
 nn1
 #> Model: "sequential_10"
-#> ________________________________________________________________________________________________________________________
-#>  Layer (type)                                         Output Shape                                    Param #           
-#> ========================================================================================================================
-#>  dense_15 (Dense)                                     (None, 100)                                     400               
-#>  dense_16 (Dense)                                     (None, 100)                                     10100             
-#>  dense_17 (Dense)                                     (None, 100)                                     10100             
-#>  dense_18 (Dense)                                     (None, 1)                                       101               
-#> ========================================================================================================================
+#> _________________________________________________________________________________________________________________
+#>  Layer (type)                                     Output Shape                                  Param #          
+#> =================================================================================================================
+#>  dense_20 (Dense)                                 (None, 100)                                   400              
+#>  dense_21 (Dense)                                 (None, 100)                                   10100            
+#>  dense_22 (Dense)                                 (None, 100)                                   10100            
+#>  dense_23 (Dense)                                 (None, 1)                                     101              
+#> =================================================================================================================
 #> Total params: 20,701
 #> Trainable params: 20,701
 #> Non-trainable params: 0
-#> ________________________________________________________________________________________________________________________
+#> _________________________________________________________________________________________________________________
 ```
 
 
@@ -149,24 +155,23 @@ Note that L1 norm equal to 1 when scaling the input data to the $[-1,1]$ interva
 
 
 ```r
-nn2 <- add_constraints(nn1, constraint_type = "l1_norm")
+nn2 <- keras_model()
+nn2 <- add_constraints(nn2, constraint_type = "l1_norm")
 nn2
 #> Model: "sequential_11"
-#> ________________________________________________________________________________________________________________________
-#>  Layer (type)                                         Output Shape                                    Param #           
-#> ========================================================================================================================
-#>  layer__combined_l1_5 (Layer_Combined_L1)             (None, 100)                                     400               
-#>  layer__combined_l1_6 (Layer_Combined_L1)             (None, 100)                                     10100             
-#>  layer__combined_l1_7 (Layer_Combined_L1)             (None, 100)                                     10100             
-#>  dense_19 (Dense)                                     (None, 1)                                       101               
-#> ========================================================================================================================
+#> _________________________________________________________________________________________________________________
+#>  Layer (type)                                     Output Shape                                  Param #          
+#> =================================================================================================================
+#>  dense_24 (Dense)                                 (None, 100)                                   400              
+#>  dense_25 (Dense)                                 (None, 100)                                   10100            
+#>  dense_26 (Dense)                                 (None, 100)                                   10100            
+#>  dense_27 (Dense)                                 (None, 1)                                     101              
+#> =================================================================================================================
 #> Total params: 20,701
 #> Trainable params: 20,701
 #> Non-trainable params: 0
-#> ________________________________________________________________________________________________________________________
+#> _________________________________________________________________________________________________________________
 ```
-Note how the parameters and structure are the same, but the layer type has been modified.
-
 
 ### Compile and train both NNs
 
@@ -211,7 +216,7 @@ history2 <- fit(nn2,
                train_x,
                train_y,
                verbose = 0,
-               epochs = 2000,
+               epochs = 1000,
                batch_size = 50,
                validation_split = 0.2
 )
@@ -253,22 +258,18 @@ plot_diagonal(x_axis =  prediction_NN2, y_axis =  test_y, xlab = "NN 2 predictio
 
 After the NNs have been trained, we can directly call `nn2poly` on the `keras` model. Therefore, we do not need to build an object with weights and activation functions as in the default case covered in `vignette("nn2poly-01-introduction")`, and can benefit from the generic methods implemented for `keras` models.
 
-The only parameters that have to be added for nn2poly to work is the Taylor order expansion at each layer (`taylor_orders`), where we will choose 8 by default on non linear layers and 1 in the last linear layer as Taylor is not used there. (The final polynomial order will be limited by `max_order=3`)
+The only parameter that has to be added for nn2poly to work is the final polynomial order that we want, limited by `max_order=3`.
 
 We will do this for both neural networks and compare the results:
 
 
 ```r
-taylor_orders <- c(8, 8, 8, 1)
-
 # Polynomial for nn1
 final_poly1 <- nn2poly(object = nn1,
-                      taylor_orders = taylor_orders,
                       max_order = 3)
 
 # Polynomial for nn2
 final_poly2 <- nn2poly(object = nn2,
-                      taylor_orders = taylor_orders,
                       max_order = 3)
 ```
 
@@ -333,7 +334,6 @@ It can be clearly seen with the activation potentials density, in green, that it
 ```r
 plot_taylor_and_activation_potentials(object = nn1,
                                       data = train,
-                                      taylor_orders = taylor_orders,
                                       max_order = 3,
                                       constraints = FALSE)
 #> [[1]]
@@ -366,7 +366,6 @@ plot_taylor_and_activation_potentials(object = nn1,
 
 plot_taylor_and_activation_potentials(object = nn2,
                                       data = train,
-                                      taylor_orders = taylor_orders,
                                       max_order = 3,
                                       constraints = TRUE)
 #> [[1]]
