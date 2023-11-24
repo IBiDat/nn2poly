@@ -8,8 +8,8 @@
 <meta name="description" content="nn2poly">
 <title>03 - Classification example using tensorflow • nn2poly</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="03 - Classification example using tensorflow">
 <meta property="og:description" content="nn2poly">
@@ -68,7 +68,7 @@
                         <h4 data-toc-skip class="author">Pablo
 Morala</h4>
             
-            <h4 data-toc-skip class="date">2023-07-14</h4>
+            <h4 data-toc-skip class="date">2023-11-24</h4>
       
       
       <div class="d-none name"><code>nn2poly-03-tensorflow-classification.Rmd</code></div>
@@ -166,31 +166,38 @@ probability class.</p>
 <p>This NN will be built using standard tensorflow and keras practices,
 in this case with a sequential keras model without any constraint on the
 weights.</p>
+<p>We will define a function that creates the desired model and then use
+it to define two different networks, unconstrained/constrained.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">nn1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/keras_model_sequential.html" class="external-link">keras_model_sequential</a></span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span></span>
+<span><span class="va">keras_model</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu">tensorflow</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tensorflow/man/set_random_seed.html" class="external-link">set_random_seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">nn1</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/layer_dense.html" class="external-link">layer_dense</a></span><span class="op">(</span>units <span class="op">=</span> <span class="fl">100</span>,</span>
-<span>                  activation <span class="op">=</span> <span class="st">"tanh"</span>,</span>
-<span>                  input_shape <span class="op">=</span> <span class="va">p</span><span class="op">)</span></span>
+<span>  <span class="va">nn</span> <span class="op">&lt;-</span> <span class="fu">keras</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/keras/man/keras_model_sequential.html" class="external-link">keras_model_sequential</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="va">nn</span> <span class="op">&lt;-</span> <span class="fu">keras</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/keras/man/layer_dense.html" class="external-link">layer_dense</a></span><span class="op">(</span><span class="va">nn</span>, units <span class="op">=</span> <span class="fl">100</span>, activation <span class="op">=</span> <span class="st">"tanh"</span>, input_shape <span class="op">=</span> <span class="va">p</span><span class="op">)</span></span>
+<span>  <span class="va">nn</span> <span class="op">&lt;-</span> <span class="fu">keras</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/keras/man/layer_dense.html" class="external-link">layer_dense</a></span><span class="op">(</span><span class="va">nn</span>, units <span class="op">=</span> <span class="fl">100</span>, activation <span class="op">=</span> <span class="st">"tanh"</span><span class="op">)</span></span>
+<span>  <span class="va">nn</span> <span class="op">&lt;-</span> <span class="fu">keras</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/keras/man/layer_dense.html" class="external-link">layer_dense</a></span><span class="op">(</span><span class="va">nn</span>, units <span class="op">=</span> <span class="va">n_class</span>, activation <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">nn1</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/layer_dense.html" class="external-link">layer_dense</a></span><span class="op">(</span>units <span class="op">=</span> <span class="fl">100</span>,</span>
-<span>                  activation <span class="op">=</span> <span class="st">"tanh"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">nn1</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/layer_dense.html" class="external-link">layer_dense</a></span><span class="op">(</span>units <span class="op">=</span> <span class="va">n_class</span><span class="op">)</span></span>
+<span>  <span class="va">nn</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>Then we define <code>nn1</code>, which will be the unconstrained
+NN.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">nn1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/keras_model.html" class="external-link">keras_model</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">nn1</span></span>
 <span><span class="co">#&gt; Model: "sequential_12"</span></span>
-<span><span class="co">#&gt; ________________________________________________________________________________________________________________________</span></span>
-<span><span class="co">#&gt;  Layer (type)                                         Output Shape                                    Param #           </span></span>
-<span><span class="co">#&gt; ========================================================================================================================</span></span>
-<span><span class="co">#&gt;  dense_20 (Dense)                                     (None, 100)                                     500               </span></span>
-<span><span class="co">#&gt;  dense_21 (Dense)                                     (None, 100)                                     10100             </span></span>
-<span><span class="co">#&gt;  dense_22 (Dense)                                     (None, 3)                                       303               </span></span>
-<span><span class="co">#&gt; ========================================================================================================================</span></span>
+<span><span class="co">#&gt; _________________________________________________________________________________________________________________</span></span>
+<span><span class="co">#&gt;  Layer (type)                                     Output Shape                                  Param #          </span></span>
+<span><span class="co">#&gt; =================================================================================================================</span></span>
+<span><span class="co">#&gt;  dense_28 (Dense)                                 (None, 100)                                   500              </span></span>
+<span><span class="co">#&gt;  dense_29 (Dense)                                 (None, 100)                                   10100            </span></span>
+<span><span class="co">#&gt;  dense_30 (Dense)                                 (None, 3)                                     303              </span></span>
+<span><span class="co">#&gt; =================================================================================================================</span></span>
 <span><span class="co">#&gt; Total params: 10,903</span></span>
 <span><span class="co">#&gt; Trainable params: 10,903</span></span>
 <span><span class="co">#&gt; Non-trainable params: 0</span></span>
-<span><span class="co">#&gt; ________________________________________________________________________________________________________________________</span></span></code></pre></div>
+<span><span class="co">#&gt; _________________________________________________________________________________________________________________</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="build-nn-2-constrained">Build NN 2, constrained<a class="anchor" aria-label="anchor" href="#build-nn-2-constrained"></a>
@@ -211,21 +218,22 @@ as it first element. Currently, L1 norm and L2 norm equal to 1 are
 implemented as options.</p>
 <p>Note that L1 norm equal to 1 when scaling the input data to the <span class="math inline">\([-1,1]\)</span> interval is the recommended
 option.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">nn2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_constraints.html">add_constraints</a></span><span class="op">(</span><span class="va">nn1</span>, constraint_type <span class="op">=</span> <span class="st">"l1_norm"</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">nn2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/keras_model.html" class="external-link">keras_model</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">nn2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_constraints.html">add_constraints</a></span><span class="op">(</span><span class="va">nn2</span>, constraint_type <span class="op">=</span> <span class="st">"l1_norm"</span><span class="op">)</span></span>
 <span><span class="va">nn2</span></span>
 <span><span class="co">#&gt; Model: "sequential_13"</span></span>
-<span><span class="co">#&gt; ________________________________________________________________________________________________________________________</span></span>
-<span><span class="co">#&gt;  Layer (type)                                         Output Shape                                    Param #           </span></span>
-<span><span class="co">#&gt; ========================================================================================================================</span></span>
-<span><span class="co">#&gt;  layer__combined_l1_8 (Layer_Combined_L1)             (None, 100)                                     500               </span></span>
-<span><span class="co">#&gt;  layer__combined_l1_9 (Layer_Combined_L1)             (None, 100)                                     10100             </span></span>
-<span><span class="co">#&gt;  dense_23 (Dense)                                     (None, 3)                                       303               </span></span>
-<span><span class="co">#&gt; ========================================================================================================================</span></span>
+<span><span class="co">#&gt; _________________________________________________________________________________________________________________</span></span>
+<span><span class="co">#&gt;  Layer (type)                                     Output Shape                                  Param #          </span></span>
+<span><span class="co">#&gt; =================================================================================================================</span></span>
+<span><span class="co">#&gt;  dense_31 (Dense)                                 (None, 100)                                   500              </span></span>
+<span><span class="co">#&gt;  dense_32 (Dense)                                 (None, 100)                                   10100            </span></span>
+<span><span class="co">#&gt;  dense_33 (Dense)                                 (None, 3)                                     303              </span></span>
+<span><span class="co">#&gt; =================================================================================================================</span></span>
 <span><span class="co">#&gt; Total params: 10,903</span></span>
 <span><span class="co">#&gt; Trainable params: 10,903</span></span>
 <span><span class="co">#&gt; Non-trainable params: 0</span></span>
-<span><span class="co">#&gt; ________________________________________________________________________________________________________________________</span></span></code></pre></div>
+<span><span class="co">#&gt; _________________________________________________________________________________________________________________</span></span></code></pre></div>
 <p>Note how the parameters and structure are the same, but the layer
 type has been modified.</p>
 </div>
@@ -239,7 +247,7 @@ learn from the data.</p>
 <p>In this case, we need to define a categorical crossentropy loss and
 use the accuracy as the chosen metric.</p>
 <p>Compile and train <code>nn1</code> the model, and visualize it:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://generics.r-lib.org/reference/compile.html" class="external-link">compile</a></span><span class="op">(</span><span class="va">nn1</span>,</span>
 <span>        loss <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/loss-functions.html" class="external-link">loss_sparse_categorical_crossentropy</a></span><span class="op">(</span>from_logits <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
 <span>        optimizer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/optimizer_adam.html" class="external-link">optimizer_adam</a></span><span class="op">(</span><span class="op">)</span>,</span>
@@ -256,7 +264,7 @@ use the accuracy as the chosen metric.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">history1</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figure/nn2poly-03-class-nn1-compile-1.png"></p>
 <p>Compile and train <code>nn2</code> the model, and visualize it:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://generics.r-lib.org/reference/compile.html" class="external-link">compile</a></span><span class="op">(</span><span class="va">nn2</span>,</span>
 <span>        loss <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/loss-functions.html" class="external-link">loss_sparse_categorical_crossentropy</a></span><span class="op">(</span>from_logits <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
 <span>        optimizer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/optimizer_adam.html" class="external-link">optimizer_adam</a></span><span class="op">(</span><span class="op">)</span>,</span>
@@ -278,12 +286,12 @@ use the accuracy as the chosen metric.</p>
 </h4>
 <p>In this case, to asses the NNs accuracy we have to transform their
 output into a probability:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">probability_model1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/keras_model_sequential.html" class="external-link">keras_model_sequential</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu">nn1</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/keras/man/layer_activation_softmax.html" class="external-link">layer_activation_softmax</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/keras/man/layer_lambda.html" class="external-link">layer_lambda</a></span><span class="op">(</span><span class="va">k_argmax</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">probability_model2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/keras_model_sequential.html" class="external-link">keras_model_sequential</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu">nn2</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/keras/man/layer_activation_softmax.html" class="external-link">layer_activation_softmax</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -291,13 +299,13 @@ output into a probability:</p>
 <p>And predict the results with the test data for each neural network.
 (We also predict and store the linear response of the NNs to be compared
 later with the polynomial output)</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Obtain the predicted classes with the NN to compare them</span></span>
 <span><span class="va">prediction_NN_class1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">probability_model1</span>, <span class="va">test_x</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Also, the linear output can be predicted before the probability model</span></span>
 <span><span class="va">prediction_NN1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">nn1</span>, <span class="va">test_x</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Obtain the predicted classes with the NN to compare them</span></span>
 <span><span class="va">prediction_NN_class2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">probability_model2</span>, <span class="va">test_x</span><span class="op">)</span></span>
 <span></span>
@@ -310,7 +318,7 @@ later with the polynomial output)</p>
 <p>We can use here a confusion matrix to visualize the results, where we
 can see that both NNs correctly predicts almost all of the classes in
 the test data:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create a confusion matrix</span></span>
 <span><span class="va">cm1</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu">confusionMatrix</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">prediction_NN_class1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">test_y</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">cm1</span></span>
@@ -319,32 +327,32 @@ the test data:</p>
 <span><span class="co">#&gt;           Reference</span></span>
 <span><span class="co">#&gt; Prediction  0  1  2</span></span>
 <span><span class="co">#&gt;          0 13  0  0</span></span>
-<span><span class="co">#&gt;          1  0 14  2</span></span>
-<span><span class="co">#&gt;          2  0  0  9</span></span>
+<span><span class="co">#&gt;          1  0 14  0</span></span>
+<span><span class="co">#&gt;          2  0  0 11</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Overall Statistics</span></span>
-<span><span class="co">#&gt;                                           </span></span>
-<span><span class="co">#&gt;                Accuracy : 0.9474          </span></span>
-<span><span class="co">#&gt;                  95% CI : (0.8225, 0.9936)</span></span>
-<span><span class="co">#&gt;     No Information Rate : 0.3684          </span></span>
-<span><span class="co">#&gt;     P-Value [Acc &gt; NIR] : 7.078e-14       </span></span>
-<span><span class="co">#&gt;                                           </span></span>
-<span><span class="co">#&gt;                   Kappa : 0.9202          </span></span>
-<span><span class="co">#&gt;                                           </span></span>
-<span><span class="co">#&gt;  Mcnemar's Test P-Value : NA              </span></span>
+<span><span class="co">#&gt;                                      </span></span>
+<span><span class="co">#&gt;                Accuracy : 1          </span></span>
+<span><span class="co">#&gt;                  95% CI : (0.9075, 1)</span></span>
+<span><span class="co">#&gt;     No Information Rate : 0.3684     </span></span>
+<span><span class="co">#&gt;     P-Value [Acc &gt; NIR] : &lt; 2.2e-16  </span></span>
+<span><span class="co">#&gt;                                      </span></span>
+<span><span class="co">#&gt;                   Kappa : 1          </span></span>
+<span><span class="co">#&gt;                                      </span></span>
+<span><span class="co">#&gt;  Mcnemar's Test P-Value : NA         </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Statistics by Class:</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                      Class: 0 Class: 1 Class: 2</span></span>
-<span><span class="co">#&gt; Sensitivity            1.0000   1.0000   0.8182</span></span>
-<span><span class="co">#&gt; Specificity            1.0000   0.9167   1.0000</span></span>
-<span><span class="co">#&gt; Pos Pred Value         1.0000   0.8750   1.0000</span></span>
-<span><span class="co">#&gt; Neg Pred Value         1.0000   1.0000   0.9310</span></span>
+<span><span class="co">#&gt; Sensitivity            1.0000   1.0000   1.0000</span></span>
+<span><span class="co">#&gt; Specificity            1.0000   1.0000   1.0000</span></span>
+<span><span class="co">#&gt; Pos Pred Value         1.0000   1.0000   1.0000</span></span>
+<span><span class="co">#&gt; Neg Pred Value         1.0000   1.0000   1.0000</span></span>
 <span><span class="co">#&gt; Prevalence             0.3421   0.3684   0.2895</span></span>
-<span><span class="co">#&gt; Detection Rate         0.3421   0.3684   0.2368</span></span>
-<span><span class="co">#&gt; Detection Prevalence   0.3421   0.4211   0.2368</span></span>
-<span><span class="co">#&gt; Balanced Accuracy      1.0000   0.9583   0.9091</span></span></code></pre></div>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<span><span class="co">#&gt; Detection Rate         0.3421   0.3684   0.2895</span></span>
+<span><span class="co">#&gt; Detection Prevalence   0.3421   0.3684   0.2895</span></span>
+<span><span class="co">#&gt; Balanced Accuracy      1.0000   1.0000   1.0000</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create a confusion matrix</span></span>
 <span><span class="va">cm2</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu">confusionMatrix</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">prediction_NN_class2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">test_y</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">cm2</span></span>
@@ -353,31 +361,31 @@ the test data:</p>
 <span><span class="co">#&gt;           Reference</span></span>
 <span><span class="co">#&gt; Prediction  0  1  2</span></span>
 <span><span class="co">#&gt;          0 13  0  0</span></span>
-<span><span class="co">#&gt;          1  0 14  3</span></span>
-<span><span class="co">#&gt;          2  0  0  8</span></span>
+<span><span class="co">#&gt;          1  0 14  1</span></span>
+<span><span class="co">#&gt;          2  0  0 10</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Overall Statistics</span></span>
 <span><span class="co">#&gt;                                           </span></span>
-<span><span class="co">#&gt;                Accuracy : 0.9211          </span></span>
-<span><span class="co">#&gt;                  95% CI : (0.7862, 0.9834)</span></span>
+<span><span class="co">#&gt;                Accuracy : 0.9737          </span></span>
+<span><span class="co">#&gt;                  95% CI : (0.8619, 0.9993)</span></span>
 <span><span class="co">#&gt;     No Information Rate : 0.3684          </span></span>
-<span><span class="co">#&gt;     P-Value [Acc &gt; NIR] : 1.482e-12       </span></span>
+<span><span class="co">#&gt;     P-Value [Acc &gt; NIR] : 2.196e-15       </span></span>
 <span><span class="co">#&gt;                                           </span></span>
-<span><span class="co">#&gt;                   Kappa : 0.8799          </span></span>
+<span><span class="co">#&gt;                   Kappa : 0.9602          </span></span>
 <span><span class="co">#&gt;                                           </span></span>
 <span><span class="co">#&gt;  Mcnemar's Test P-Value : NA              </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Statistics by Class:</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                      Class: 0 Class: 1 Class: 2</span></span>
-<span><span class="co">#&gt; Sensitivity            1.0000   1.0000   0.7273</span></span>
-<span><span class="co">#&gt; Specificity            1.0000   0.8750   1.0000</span></span>
-<span><span class="co">#&gt; Pos Pred Value         1.0000   0.8235   1.0000</span></span>
-<span><span class="co">#&gt; Neg Pred Value         1.0000   1.0000   0.9000</span></span>
+<span><span class="co">#&gt; Sensitivity            1.0000   1.0000   0.9091</span></span>
+<span><span class="co">#&gt; Specificity            1.0000   0.9583   1.0000</span></span>
+<span><span class="co">#&gt; Pos Pred Value         1.0000   0.9333   1.0000</span></span>
+<span><span class="co">#&gt; Neg Pred Value         1.0000   1.0000   0.9643</span></span>
 <span><span class="co">#&gt; Prevalence             0.3421   0.3684   0.2895</span></span>
-<span><span class="co">#&gt; Detection Rate         0.3421   0.3684   0.2105</span></span>
-<span><span class="co">#&gt; Detection Prevalence   0.3421   0.4474   0.2105</span></span>
-<span><span class="co">#&gt; Balanced Accuracy      1.0000   0.9375   0.8636</span></span></code></pre></div>
+<span><span class="co">#&gt; Detection Rate         0.3421   0.3684   0.2632</span></span>
+<span><span class="co">#&gt; Detection Prevalence   0.3421   0.3947   0.2632</span></span>
+<span><span class="co">#&gt; Balanced Accuracy      1.0000   0.9792   0.9545</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level3">
@@ -389,28 +397,23 @@ not need to build an object with weights and activation functions as in
 the default case covered in
 <code><a href="../articles/nn2poly-01-introduction.html">vignette("nn2poly-01-introduction")</a></code>, and can benefit from
 the generic methods implemented for <code>keras</code> models.</p>
-<p>The only parameters that have to be added for nn2poly to work is the
-Taylor order expansion at each layer (<code>taylor_orders</code>), where
-we will choose 8 by default on non linear layers and 1 in the last
-linear layer as Taylor is not used there. (The final polynomial order
-will be limited by <code>max_order=3</code>)</p>
+<p>The only parameter that has to be added for nn2poly to work is the
+final polynomial order that we want, limited by
+<code>max_order=3</code>.</p>
 <p>Note that in this case, as we have 3 output neurons, there will be 3
 output polynomials. The polynomials will be stored in the same way as in
 the regression case, in a list with labels and values, but in this case
 the values will be a matrix instead of a vector, where each row will be
 the polynomial obtained for each output neuron.</p>
 <p>We will do this for both neural networks and compare the results:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">taylor_orders</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">8</span>, <span class="fl">8</span>, <span class="fl">8</span>, <span class="fl">1</span><span class="op">)</span></span>
-<span></span>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="co"># Polynomial for nn1</span></span>
 <span><span class="va">final_poly1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nn2poly.html">nn2poly</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">nn1</span>,</span>
-<span>                      taylor_orders <span class="op">=</span> <span class="va">taylor_orders</span>,</span>
 <span>                      max_order <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Polynomial for nn2</span></span>
 <span><span class="va">final_poly2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nn2poly.html">nn2poly</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">nn2</span>,</span>
-<span>                      taylor_orders <span class="op">=</span> <span class="va">taylor_orders</span>,</span>
 <span>                      max_order <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -423,7 +426,7 @@ model that includes the class computation from the polynomial output.
 This polynomial output is obtained with <code><a href="../reference/eval_poly.html">eval_poly()</a></code>, in
 this case in matrix form, as the 3 polynomials are evaluated at the same
 time:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># Obtain the predicted values for the test data with our Polynomial Regression</span></span>
 <span><span class="va">prediction_poly_matrix1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/eval_poly.html">eval_poly</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">test_x</span>, poly <span class="op">=</span> <span class="va">final_poly1</span><span class="op">)</span></span>
@@ -435,7 +438,7 @@ time:</p>
 <span></span>
 <span><span class="co"># Class prediction with the polynomial outputs</span></span>
 <span><span class="va">prediction_poly_class1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">probability_poly1</span>,<span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">prediction_poly_matrix1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># Obtain the predicted values for the test data with our Polynomial Regression</span></span>
 <span><span class="va">prediction_poly_matrix2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/eval_poly.html">eval_poly</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">test_x</span>, poly <span class="op">=</span> <span class="va">final_poly2</span><span class="op">)</span></span>
@@ -460,7 +463,7 @@ predictions and not the original data, as <code>nn2poly</code>’s goal is
 to faithfully represent the NN behavior independently of how well the NN
 predicts.</p>
 <p>First, let’s observe the confusion matrix for both NNs:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># Confussion matrix between NN class prediction and polynomial class prediction</span></span>
 <span><span class="va">cm_poly1</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu">confusionMatrix</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">prediction_NN_class1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">prediction_poly_class1</span><span class="op">)</span><span class="op">)</span></span>
@@ -470,50 +473,15 @@ predicts.</p>
 <span><span class="co">#&gt;           Reference</span></span>
 <span><span class="co">#&gt; Prediction  0  1  2</span></span>
 <span><span class="co">#&gt;          0 13  0  0</span></span>
-<span><span class="co">#&gt;          1  0 14  2</span></span>
-<span><span class="co">#&gt;          2  0  0  9</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Overall Statistics</span></span>
-<span><span class="co">#&gt;                                           </span></span>
-<span><span class="co">#&gt;                Accuracy : 0.9474          </span></span>
-<span><span class="co">#&gt;                  95% CI : (0.8225, 0.9936)</span></span>
-<span><span class="co">#&gt;     No Information Rate : 0.3684          </span></span>
-<span><span class="co">#&gt;     P-Value [Acc &gt; NIR] : 7.078e-14       </span></span>
-<span><span class="co">#&gt;                                           </span></span>
-<span><span class="co">#&gt;                   Kappa : 0.9202          </span></span>
-<span><span class="co">#&gt;                                           </span></span>
-<span><span class="co">#&gt;  Mcnemar's Test P-Value : NA              </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Statistics by Class:</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;                      Class: 0 Class: 1 Class: 2</span></span>
-<span><span class="co">#&gt; Sensitivity            1.0000   1.0000   0.8182</span></span>
-<span><span class="co">#&gt; Specificity            1.0000   0.9167   1.0000</span></span>
-<span><span class="co">#&gt; Pos Pred Value         1.0000   0.8750   1.0000</span></span>
-<span><span class="co">#&gt; Neg Pred Value         1.0000   1.0000   0.9310</span></span>
-<span><span class="co">#&gt; Prevalence             0.3421   0.3684   0.2895</span></span>
-<span><span class="co">#&gt; Detection Rate         0.3421   0.3684   0.2368</span></span>
-<span><span class="co">#&gt; Detection Prevalence   0.3421   0.4211   0.2368</span></span>
-<span><span class="co">#&gt; Balanced Accuracy      1.0000   0.9583   0.9091</span></span></code></pre></div>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="co"># Confussion matrix between NN class prediction and polynomial class prediction</span></span>
-<span><span class="va">cm_poly2</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu">confusionMatrix</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">prediction_NN_class2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">prediction_poly_class2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">cm_poly2</span></span>
-<span><span class="co">#&gt; Confusion Matrix and Statistics</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;           Reference</span></span>
-<span><span class="co">#&gt; Prediction  0  1  2</span></span>
-<span><span class="co">#&gt;          0 13  0  0</span></span>
-<span><span class="co">#&gt;          1  0 17  0</span></span>
-<span><span class="co">#&gt;          2  0  0  8</span></span>
+<span><span class="co">#&gt;          1  0 14  0</span></span>
+<span><span class="co">#&gt;          2  0  0 11</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Overall Statistics</span></span>
 <span><span class="co">#&gt;                                      </span></span>
 <span><span class="co">#&gt;                Accuracy : 1          </span></span>
 <span><span class="co">#&gt;                  95% CI : (0.9075, 1)</span></span>
-<span><span class="co">#&gt;     No Information Rate : 0.4474     </span></span>
-<span><span class="co">#&gt;     P-Value [Acc &gt; NIR] : 5.312e-14  </span></span>
+<span><span class="co">#&gt;     No Information Rate : 0.3684     </span></span>
+<span><span class="co">#&gt;     P-Value [Acc &gt; NIR] : &lt; 2.2e-16  </span></span>
 <span><span class="co">#&gt;                                      </span></span>
 <span><span class="co">#&gt;                   Kappa : 1          </span></span>
 <span><span class="co">#&gt;                                      </span></span>
@@ -526,14 +494,49 @@ predicts.</p>
 <span><span class="co">#&gt; Specificity            1.0000   1.0000   1.0000</span></span>
 <span><span class="co">#&gt; Pos Pred Value         1.0000   1.0000   1.0000</span></span>
 <span><span class="co">#&gt; Neg Pred Value         1.0000   1.0000   1.0000</span></span>
-<span><span class="co">#&gt; Prevalence             0.3421   0.4474   0.2105</span></span>
-<span><span class="co">#&gt; Detection Rate         0.3421   0.4474   0.2105</span></span>
-<span><span class="co">#&gt; Detection Prevalence   0.3421   0.4474   0.2105</span></span>
+<span><span class="co">#&gt; Prevalence             0.3421   0.3684   0.2895</span></span>
+<span><span class="co">#&gt; Detection Rate         0.3421   0.3684   0.2895</span></span>
+<span><span class="co">#&gt; Detection Prevalence   0.3421   0.3684   0.2895</span></span>
+<span><span class="co">#&gt; Balanced Accuracy      1.0000   1.0000   1.0000</span></span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="co"># Confussion matrix between NN class prediction and polynomial class prediction</span></span>
+<span><span class="va">cm_poly2</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu">confusionMatrix</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">prediction_NN_class2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">prediction_poly_class2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">cm_poly2</span></span>
+<span><span class="co">#&gt; Confusion Matrix and Statistics</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;           Reference</span></span>
+<span><span class="co">#&gt; Prediction  0  1  2</span></span>
+<span><span class="co">#&gt;          0 13  0  0</span></span>
+<span><span class="co">#&gt;          1  0 15  0</span></span>
+<span><span class="co">#&gt;          2  0  0 10</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Overall Statistics</span></span>
+<span><span class="co">#&gt;                                      </span></span>
+<span><span class="co">#&gt;                Accuracy : 1          </span></span>
+<span><span class="co">#&gt;                  95% CI : (0.9075, 1)</span></span>
+<span><span class="co">#&gt;     No Information Rate : 0.3947     </span></span>
+<span><span class="co">#&gt;     P-Value [Acc &gt; NIR] : 4.568e-16  </span></span>
+<span><span class="co">#&gt;                                      </span></span>
+<span><span class="co">#&gt;                   Kappa : 1          </span></span>
+<span><span class="co">#&gt;                                      </span></span>
+<span><span class="co">#&gt;  Mcnemar's Test P-Value : NA         </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Statistics by Class:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;                      Class: 0 Class: 1 Class: 2</span></span>
+<span><span class="co">#&gt; Sensitivity            1.0000   1.0000   1.0000</span></span>
+<span><span class="co">#&gt; Specificity            1.0000   1.0000   1.0000</span></span>
+<span><span class="co">#&gt; Pos Pred Value         1.0000   1.0000   1.0000</span></span>
+<span><span class="co">#&gt; Neg Pred Value         1.0000   1.0000   1.0000</span></span>
+<span><span class="co">#&gt; Prevalence             0.3421   0.3947   0.2632</span></span>
+<span><span class="co">#&gt; Detection Rate         0.3421   0.3947   0.2632</span></span>
+<span><span class="co">#&gt; Detection Prevalence   0.3421   0.3947   0.2632</span></span>
 <span><span class="co">#&gt; Balanced Accuracy      1.0000   1.0000   1.0000</span></span></code></pre></div>
 <p>Then, we can extract a diagonal plot for each of the polynomials
 obtained for each NN, in total <span class="math inline">\(3\times
 2=6\)</span> diagonal plots.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="../reference/plot_diagonal.html">plot_diagonal</a></span><span class="op">(</span>x_axis <span class="op">=</span>  <span class="va">prediction_NN1</span><span class="op">[</span>,<span class="va">i</span><span class="op">]</span>,</span>
@@ -543,7 +546,7 @@ obtained for each NN, in total <span class="math inline">\(3\times
 <span>        <span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p><img src="figure/nn2poly-03-class-diagonal-plot1-1.png"><img src="figure/nn2poly-03-class-diagonal-plot1-2.png"><img src="figure/nn2poly-03-class-diagonal-plot1-3.png"></p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="../reference/plot_diagonal.html">plot_diagonal</a></span><span class="op">(</span>x_axis <span class="op">=</span>  <span class="va">prediction_NN2</span><span class="op">[</span>,<span class="va">i</span><span class="op">]</span>,</span>
@@ -573,10 +576,10 @@ the probability to be in each class.</p>
 being positive or negative between the <code>nn1</code>and
 <code>nn2</code> interpretations, as expected by how their predictions
 did not differ too much.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_n_important_coeffs.html">plot_n_important_coeffs</a></span><span class="op">(</span><span class="va">final_poly1</span>, n_important_coeffs <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figure/nn2poly-03-class-n-important-1.png"></p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_n_important_coeffs.html">plot_n_important_coeffs</a></span><span class="op">(</span><span class="va">final_poly2</span>, n_important_coeffs <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figure/nn2poly-03-class-n-important-2.png"></p>
 <p>Finally, the problem with Taylor expansion can be checked with the
@@ -588,10 +591,9 @@ layer.</p>
 green, that it expands over a wide range in the unconstrained NN while
 the it is kept closer to zero in the constrained one, thus having a more
 accurate Taylor expansion around zero.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_taylor_and_activation_potentials.html">plot_taylor_and_activation_potentials</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">nn1</span>,</span>
 <span>                                      data <span class="op">=</span> <span class="va">train</span>,</span>
-<span>                                      taylor_orders <span class="op">=</span> <span class="va">taylor_orders</span>,</span>
 <span>                                      max_order <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>                                      constraints <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [[1]]</span></span></code></pre></div>
@@ -602,11 +604,10 @@ accurate Taylor expansion around zero.</p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[3]]</span></span></code></pre>
 <p><img src="figure/nn2poly-03-class-potentials-3.png"></p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/plot_taylor_and_activation_potentials.html">plot_taylor_and_activation_potentials</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">nn2</span>,</span>
 <span>                                      data <span class="op">=</span> <span class="va">train</span>,</span>
-<span>                                      taylor_orders <span class="op">=</span> <span class="va">taylor_orders</span>,</span>
 <span>                                      max_order <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>                                      constraints <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [[1]]</span></span></code></pre></div>

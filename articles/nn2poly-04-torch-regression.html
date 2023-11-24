@@ -8,8 +8,8 @@
 <meta name="description" content="nn2poly">
 <title>04 - Regression example using torch • nn2poly</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="04 - Regression example using torch">
 <meta property="og:description" content="nn2poly">
@@ -68,7 +68,7 @@
                         <h4 data-toc-skip class="author">Pablo
 Morala</h4>
             
-            <h4 data-toc-skip class="date">2023-10-30</h4>
+            <h4 data-toc-skip class="date">2023-11-24</h4>
       
       
       <div class="d-none name"><code>nn2poly-04-torch-regression.Rmd</code></div>
@@ -203,8 +203,8 @@ loader:</p>
 <span></span>
 <span><span class="co"># Data loader</span></span>
 <span><span class="va">torch_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>  train <span class="op">=</span> <span class="fu">torch</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/torch/man/dataloader.html" class="external-link">dataloader</a></span><span class="op">(</span><span class="va">data_train</span>, batch_size <span class="op">=</span> <span class="fl">32</span>, shuffle <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
-<span>  valid <span class="op">=</span> <span class="fu">torch</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/torch/man/dataloader.html" class="external-link">dataloader</a></span><span class="op">(</span><span class="va">data_val</span>, batch_size <span class="op">=</span> <span class="fl">32</span><span class="op">)</span></span>
+<span>  train <span class="op">=</span> <span class="fu">torch</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/torch/man/dataloader.html" class="external-link">dataloader</a></span><span class="op">(</span><span class="va">data_train</span>, batch_size <span class="op">=</span> <span class="fl">50</span>, shuffle <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>  valid <span class="op">=</span> <span class="fu">torch</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/torch/man/dataloader.html" class="external-link">dataloader</a></span><span class="op">(</span><span class="va">data_val</span>, batch_size <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>Then, the NNs will be built using a sequential model with
 <code>luz</code>and <code>torch</code>. As we want to compare the
@@ -213,9 +213,11 @@ weights, we will create 2 identical NNs and then train them with and
 without constraints.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="va">luz_nn1</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span></span>
+<span></span>
+<span></span>
+<span><span class="va">luz_nn</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu">torch</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/torch/man/torch_manual_seed.html" class="external-link">torch_manual_seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span>
-<span>  </span>
+<span></span>
 <span>  <span class="fu"><a href="../reference/luz_model_sequential.html">luz_model_sequential</a></span><span class="op">(</span></span>
 <span>    <span class="fu">torch</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/torch/man/nn_linear.html" class="external-link">nn_linear</a></span><span class="op">(</span><span class="va">p</span>,<span class="fl">100</span><span class="op">)</span>,</span>
 <span>    <span class="fu">torch</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/torch/man/nn_tanh.html" class="external-link">nn_tanh</a></span><span class="op">(</span><span class="op">)</span>,</span>
@@ -227,19 +229,8 @@ without constraints.</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
-<span><span class="va">luz_nn2</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu">torch</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/torch/man/torch_manual_seed.html" class="external-link">torch_manual_seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="fu"><a href="../reference/luz_model_sequential.html">luz_model_sequential</a></span><span class="op">(</span></span>
-<span>    <span class="fu">torch</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/torch/man/nn_linear.html" class="external-link">nn_linear</a></span><span class="op">(</span><span class="va">p</span>,<span class="fl">100</span><span class="op">)</span>,</span>
-<span>    <span class="fu">torch</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/torch/man/nn_tanh.html" class="external-link">nn_tanh</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>    <span class="fu">torch</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/torch/man/nn_linear.html" class="external-link">nn_linear</a></span><span class="op">(</span><span class="fl">100</span>,<span class="fl">100</span><span class="op">)</span>,</span>
-<span>    <span class="fu">torch</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/torch/man/nn_tanh.html" class="external-link">nn_tanh</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>    <span class="fu">torch</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/torch/man/nn_linear.html" class="external-link">nn_linear</a></span><span class="op">(</span><span class="fl">100</span>,<span class="fl">100</span><span class="op">)</span>,</span>
-<span>    <span class="fu">torch</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/torch/man/nn_tanh.html" class="external-link">nn_tanh</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>    <span class="fu">torch</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/torch/man/nn_linear.html" class="external-link">nn_linear</a></span><span class="op">(</span><span class="fl">100</span>,<span class="fl">1</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
+<span><span class="va">nn1</span> <span class="op">&lt;-</span> <span class="fu">luz_nn</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">nn2</span> <span class="op">&lt;-</span> <span class="fu">luz_nn</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="nns-training">NNs training<a class="anchor" aria-label="anchor" href="#nns-training"></a>
@@ -247,7 +238,7 @@ without constraints.</p>
 <p>We will first train the first NN (<code>luz_nn1</code>) without
 constraints:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fitted_1</span> <span class="op">&lt;-</span> <span class="fu">luz_nn1</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<code class="sourceCode R"><span><span class="va">fitted_1</span> <span class="op">&lt;-</span> <span class="va">nn1</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>    <span class="fu">luz</span><span class="fu">::</span><span class="fu"><a href="https://mlverse.github.io/luz/reference/setup.html" class="external-link">setup</a></span><span class="op">(</span></span>
 <span>      loss <span class="op">=</span> <span class="fu">torch</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/torch/man/nn_mse_loss.html" class="external-link">nn_mse_loss</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>      optimizer <span class="op">=</span> <span class="fu">torch</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/torch/man/optim_adam.html" class="external-link">optim_adam</a></span>,</span>
@@ -270,13 +261,13 @@ equal to 1 are implemented as options.</p>
 option.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Do the constrained training with the l1 constraint</span></span>
-<span>  <span class="va">fitted_2</span> <span class="op">&lt;-</span> <span class="fu">luz_nn2</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="va">fitted_2</span> <span class="op">&lt;-</span> <span class="va">nn2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>    <span class="fu">luz</span><span class="fu">::</span><span class="fu"><a href="https://mlverse.github.io/luz/reference/setup.html" class="external-link">setup</a></span><span class="op">(</span></span>
 <span>      loss <span class="op">=</span> <span class="fu">torch</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/torch/man/nn_mse_loss.html" class="external-link">nn_mse_loss</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>      optimizer <span class="op">=</span> <span class="fu">torch</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/torch/man/optim_adam.html" class="external-link">optim_adam</a></span>,</span>
 <span>    <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>    <span class="fu"><a href="../reference/add_constraints.html">add_constraints</a></span><span class="op">(</span><span class="st">"l1_norm"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>    <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">torch_data</span><span class="op">$</span><span class="va">train</span>, epochs <span class="op">=</span> <span class="fl">600</span>, valid_data <span class="op">=</span> <span class="va">torch_data</span><span class="op">$</span><span class="va">valid</span><span class="op">)</span></span></code></pre></div>
+<span>    <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">torch_data</span><span class="op">$</span><span class="va">train</span>, epochs <span class="op">=</span> <span class="fl">700</span>, valid_data <span class="op">=</span> <span class="va">torch_data</span><span class="op">$</span><span class="va">valid</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="visualize-both-nn-predictions">Visualize both NN predictions<a class="anchor" aria-label="anchor" href="#visualize-both-nn-predictions"></a>
@@ -293,7 +284,7 @@ predictions (the values fall near the “perfect” diagonal red line).</p>
 <p><img src="figure/nn2poly-04-reg-comparison-y-nn1-1.png"></p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fitted_1</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="figure/nn2poly-04-unnamed-chunk-5-1.png"></p>
+<p><img src="figure/nn2poly-04-unnamed-chunk-2-1.png"></p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Obtain the predicted values with the NN to compare them</span></span>
 <span><span class="va">prediction_NN2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html" class="external-link">as.array</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fitted_2</span>, <span class="va">test_x</span><span class="op">)</span><span class="op">)</span></span>
@@ -303,7 +294,7 @@ predictions (the values fall near the “perfect” diagonal red line).</p>
 <p><img src="figure/nn2poly-04-reg-comparison-y-nn2-1.png"></p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fitted_2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="figure/nn2poly-04-unnamed-chunk-6-1.png"></p>
+<p><img src="figure/nn2poly-04-unnamed-chunk-3-1.png"></p>
 </div>
 </div>
 <div class="section level3">
@@ -389,11 +380,8 @@ the it is kept closer to zero in the constrained one, thus having a more
 accurate Taylor expansion around zero.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="va">taylor_orders</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">8</span>, <span class="fl">8</span>, <span class="fl">8</span>, <span class="fl">1</span><span class="op">)</span> <span class="co"># Esto debería ser tomado de algun sitio o dejado como default igual que en el uso de nn2poly</span></span>
-<span></span>
 <span><span class="fu"><a href="../reference/plot_taylor_and_activation_potentials.html">plot_taylor_and_activation_potentials</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">fitted_1</span>,</span>
 <span>                                      data <span class="op">=</span> <span class="va">train</span>,</span>
-<span>                                      taylor_orders <span class="op">=</span> <span class="va">taylor_orders</span>,</span>
 <span>                                      max_order <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>                                      constraints <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [[1]]</span></span></code></pre></div>
@@ -411,7 +399,6 @@ accurate Taylor expansion around zero.</p>
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/plot_taylor_and_activation_potentials.html">plot_taylor_and_activation_potentials</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">fitted_2</span>,</span>
 <span>                                      data <span class="op">=</span> <span class="va">train</span>,</span>
-<span>                                      taylor_orders <span class="op">=</span> <span class="va">taylor_orders</span>,</span>
 <span>                                      max_order <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>                                      constraints <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [[1]]</span></span></code></pre></div>

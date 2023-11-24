@@ -8,8 +8,8 @@
 <meta name="description" content="nn2poly">
 <title>02 - Regression example using tensorflow • nn2poly</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="02 - Regression example using tensorflow">
 <meta property="og:description" content="nn2poly">
@@ -68,7 +68,7 @@
                         <h4 data-toc-skip class="author">Pablo
 Morala</h4>
             
-            <h4 data-toc-skip class="date">2023-07-14</h4>
+            <h4 data-toc-skip class="date">2023-11-24</h4>
       
       
       <div class="d-none name"><code>nn2poly-02-tensorflow-regression.Rmd</code></div>
@@ -170,36 +170,40 @@ neuron to satisfy that their L1 norm is equal or less than 1.</p>
 <p>This NN will be built using standard tensorflow and keras practices,
 in this case with a sequential keras model without any constraint on the
 weights.</p>
+<p>We will define a function that creates the desired model and then use
+it to define two different networks, unconstrained/constrained.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">nn1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/keras_model_sequential.html" class="external-link">keras_model_sequential</a></span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span></span>
+<span><span class="va">keras_model</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu">tensorflow</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tensorflow/man/set_random_seed.html" class="external-link">set_random_seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">nn1</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/layer_dense.html" class="external-link">layer_dense</a></span><span class="op">(</span>units <span class="op">=</span> <span class="fl">100</span>,</span>
-<span>                  activation <span class="op">=</span> <span class="st">"tanh"</span>,</span>
-<span>                  input_shape <span class="op">=</span> <span class="va">p</span><span class="op">)</span></span>
+<span>  <span class="va">nn</span> <span class="op">&lt;-</span> <span class="fu">keras</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/keras/man/keras_model_sequential.html" class="external-link">keras_model_sequential</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="va">nn</span> <span class="op">&lt;-</span> <span class="fu">keras</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/keras/man/layer_dense.html" class="external-link">layer_dense</a></span><span class="op">(</span><span class="va">nn</span>, units <span class="op">=</span> <span class="fl">100</span>, activation <span class="op">=</span> <span class="st">"tanh"</span>, input_shape <span class="op">=</span> <span class="va">p</span><span class="op">)</span></span>
+<span>  <span class="va">nn</span> <span class="op">&lt;-</span> <span class="fu">keras</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/keras/man/layer_dense.html" class="external-link">layer_dense</a></span><span class="op">(</span><span class="va">nn</span>, units <span class="op">=</span> <span class="fl">100</span>, activation <span class="op">=</span> <span class="st">"tanh"</span><span class="op">)</span></span>
+<span>  <span class="va">nn</span> <span class="op">&lt;-</span> <span class="fu">keras</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/keras/man/layer_dense.html" class="external-link">layer_dense</a></span><span class="op">(</span><span class="va">nn</span>, units <span class="op">=</span> <span class="fl">100</span>, activation <span class="op">=</span> <span class="st">"tanh"</span><span class="op">)</span></span>
+<span>  <span class="va">nn</span> <span class="op">&lt;-</span> <span class="fu">keras</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/keras/man/layer_dense.html" class="external-link">layer_dense</a></span><span class="op">(</span><span class="va">nn</span>, units <span class="op">=</span> <span class="fl">1</span>, activation <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">nn1</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/layer_dense.html" class="external-link">layer_dense</a></span><span class="op">(</span>units <span class="op">=</span> <span class="fl">100</span>,</span>
-<span>                  activation <span class="op">=</span> <span class="st">"tanh"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">nn1</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/layer_dense.html" class="external-link">layer_dense</a></span><span class="op">(</span>units <span class="op">=</span> <span class="fl">100</span>,</span>
-<span>                  activation <span class="op">=</span> <span class="st">"tanh"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">nn1</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/layer_dense.html" class="external-link">layer_dense</a></span><span class="op">(</span>units <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>                  activation <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span></span>
+<span>  <span class="va">nn</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>Then we define <code>nn1</code>, which will be the unconstrained
+NN.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">nn1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/keras_model.html" class="external-link">keras_model</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">nn1</span></span>
 <span><span class="co">#&gt; Model: "sequential_10"</span></span>
-<span><span class="co">#&gt; ________________________________________________________________________________________________________________________</span></span>
-<span><span class="co">#&gt;  Layer (type)                                         Output Shape                                    Param #           </span></span>
-<span><span class="co">#&gt; ========================================================================================================================</span></span>
-<span><span class="co">#&gt;  dense_15 (Dense)                                     (None, 100)                                     400               </span></span>
-<span><span class="co">#&gt;  dense_16 (Dense)                                     (None, 100)                                     10100             </span></span>
-<span><span class="co">#&gt;  dense_17 (Dense)                                     (None, 100)                                     10100             </span></span>
-<span><span class="co">#&gt;  dense_18 (Dense)                                     (None, 1)                                       101               </span></span>
-<span><span class="co">#&gt; ========================================================================================================================</span></span>
+<span><span class="co">#&gt; _________________________________________________________________________________________________________________</span></span>
+<span><span class="co">#&gt;  Layer (type)                                     Output Shape                                  Param #          </span></span>
+<span><span class="co">#&gt; =================================================================================================================</span></span>
+<span><span class="co">#&gt;  dense_20 (Dense)                                 (None, 100)                                   400              </span></span>
+<span><span class="co">#&gt;  dense_21 (Dense)                                 (None, 100)                                   10100            </span></span>
+<span><span class="co">#&gt;  dense_22 (Dense)                                 (None, 100)                                   10100            </span></span>
+<span><span class="co">#&gt;  dense_23 (Dense)                                 (None, 1)                                     101              </span></span>
+<span><span class="co">#&gt; =================================================================================================================</span></span>
 <span><span class="co">#&gt; Total params: 20,701</span></span>
 <span><span class="co">#&gt; Trainable params: 20,701</span></span>
 <span><span class="co">#&gt; Non-trainable params: 0</span></span>
-<span><span class="co">#&gt; ________________________________________________________________________________________________________________________</span></span></code></pre></div>
+<span><span class="co">#&gt; _________________________________________________________________________________________________________________</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="build-nn-2-constrained">Build NN 2, constrained<a class="anchor" aria-label="anchor" href="#build-nn-2-constrained"></a>
@@ -220,24 +224,23 @@ as it first element. Currently, L1 norm and L2 norm equal to 1 are
 implemented as options.</p>
 <p>Note that L1 norm equal to 1 when scaling the input data to the <span class="math inline">\([-1,1]\)</span> interval is the recommended
 option.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">nn2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_constraints.html">add_constraints</a></span><span class="op">(</span><span class="va">nn1</span>, constraint_type <span class="op">=</span> <span class="st">"l1_norm"</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">nn2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/keras_model.html" class="external-link">keras_model</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">nn2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_constraints.html">add_constraints</a></span><span class="op">(</span><span class="va">nn2</span>, constraint_type <span class="op">=</span> <span class="st">"l1_norm"</span><span class="op">)</span></span>
 <span><span class="va">nn2</span></span>
 <span><span class="co">#&gt; Model: "sequential_11"</span></span>
-<span><span class="co">#&gt; ________________________________________________________________________________________________________________________</span></span>
-<span><span class="co">#&gt;  Layer (type)                                         Output Shape                                    Param #           </span></span>
-<span><span class="co">#&gt; ========================================================================================================================</span></span>
-<span><span class="co">#&gt;  layer__combined_l1_5 (Layer_Combined_L1)             (None, 100)                                     400               </span></span>
-<span><span class="co">#&gt;  layer__combined_l1_6 (Layer_Combined_L1)             (None, 100)                                     10100             </span></span>
-<span><span class="co">#&gt;  layer__combined_l1_7 (Layer_Combined_L1)             (None, 100)                                     10100             </span></span>
-<span><span class="co">#&gt;  dense_19 (Dense)                                     (None, 1)                                       101               </span></span>
-<span><span class="co">#&gt; ========================================================================================================================</span></span>
+<span><span class="co">#&gt; _________________________________________________________________________________________________________________</span></span>
+<span><span class="co">#&gt;  Layer (type)                                     Output Shape                                  Param #          </span></span>
+<span><span class="co">#&gt; =================================================================================================================</span></span>
+<span><span class="co">#&gt;  dense_24 (Dense)                                 (None, 100)                                   400              </span></span>
+<span><span class="co">#&gt;  dense_25 (Dense)                                 (None, 100)                                   10100            </span></span>
+<span><span class="co">#&gt;  dense_26 (Dense)                                 (None, 100)                                   10100            </span></span>
+<span><span class="co">#&gt;  dense_27 (Dense)                                 (None, 1)                                     101              </span></span>
+<span><span class="co">#&gt; =================================================================================================================</span></span>
 <span><span class="co">#&gt; Total params: 20,701</span></span>
 <span><span class="co">#&gt; Trainable params: 20,701</span></span>
 <span><span class="co">#&gt; Non-trainable params: 0</span></span>
-<span><span class="co">#&gt; ________________________________________________________________________________________________________________________</span></span></code></pre></div>
-<p>Note how the parameters and structure are the same, but the layer
-type has been modified.</p>
+<span><span class="co">#&gt; _________________________________________________________________________________________________________________</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="compile-and-train-both-nns">Compile and train both NNs<a class="anchor" aria-label="anchor" href="#compile-and-train-both-nns"></a>
@@ -248,7 +251,7 @@ the NN, the <code>nn2</code> needs a higher number of epochs to properly
 learn from the data.</p>
 <p>Compile and train <code>nn1</code> the model, and visualize its
 training history:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://generics.r-lib.org/reference/compile.html" class="external-link">compile</a></span><span class="op">(</span><span class="va">nn1</span>,</span>
 <span>        loss <span class="op">=</span> <span class="st">"mse"</span>,</span>
 <span>        optimizer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/optimizer_adam.html" class="external-link">optimizer_adam</a></span><span class="op">(</span><span class="op">)</span>,</span>
@@ -267,7 +270,7 @@ training history:</p>
 <p><img src="figure/nn2poly-02-reg-nn1-train-1.png"></p>
 <p>Compile and train <code>nn2</code> the model, and visualize its
 training history:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://generics.r-lib.org/reference/compile.html" class="external-link">compile</a></span><span class="op">(</span><span class="va">nn2</span>,</span>
 <span>        loss <span class="op">=</span> <span class="st">"mse"</span>,</span>
 <span>        optimizer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/optimizer_adam.html" class="external-link">optimizer_adam</a></span><span class="op">(</span><span class="op">)</span>,</span>
@@ -277,7 +280,7 @@ training history:</p>
 <span>               <span class="va">train_x</span>,</span>
 <span>               <span class="va">train_y</span>,</span>
 <span>               verbose <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>               epochs <span class="op">=</span> <span class="fl">2000</span>,</span>
+<span>               epochs <span class="op">=</span> <span class="fl">1000</span>,</span>
 <span>               batch_size <span class="op">=</span> <span class="fl">50</span>,</span>
 <span>               validation_split <span class="op">=</span> <span class="fl">0.2</span></span>
 <span><span class="op">)</span></span>
@@ -291,14 +294,14 @@ training history:</p>
 <p>We can visualize the NN predictions vs the original Y values for both
 neural networks and observe how both of them provide accurate
 predictions (the values fall near the “perfect” diagonal red line).</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Obtain the predicted values with the NN to compare them</span></span>
 <span><span class="va">prediction_NN1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">nn1</span>, <span class="va">test_x</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Diagonal plot implemented in the package to quickly visualize and compare predictions</span></span>
 <span><span class="fu"><a href="../reference/plot_diagonal.html">plot_diagonal</a></span><span class="op">(</span>x_axis <span class="op">=</span>  <span class="va">prediction_NN1</span>, y_axis <span class="op">=</span>  <span class="va">test_y</span>, xlab <span class="op">=</span> <span class="st">"NN 1 prediction"</span>, ylab <span class="op">=</span> <span class="st">"Original Y"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figure/nn2poly-02-reg-comparison-y-nn1-1.png"></p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Obtain the predicted values with the NN to compare them</span></span>
 <span><span class="va">prediction_NN2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">nn2</span>, <span class="va">test_x</span><span class="op">)</span></span>
 <span></span>
@@ -316,29 +319,23 @@ not need to build an object with weights and activation functions as in
 the default case covered in
 <code><a href="../articles/nn2poly-01-introduction.html">vignette("nn2poly-01-introduction")</a></code>, and can benefit from
 the generic methods implemented for <code>keras</code> models.</p>
-<p>The only parameters that have to be added for nn2poly to work is the
-Taylor order expansion at each layer (<code>taylor_orders</code>), where
-we will choose 8 by default on non linear layers and 1 in the last
-linear layer as Taylor is not used there. (The final polynomial order
-will be limited by <code>max_order=3</code>)</p>
+<p>The only parameter that has to be added for nn2poly to work is the
+final polynomial order that we want, limited by
+<code>max_order=3</code>.</p>
 <p>We will do this for both neural networks and compare the results:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">taylor_orders</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">8</span>, <span class="fl">8</span>, <span class="fl">8</span>, <span class="fl">1</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Polynomial for nn1</span></span>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Polynomial for nn1</span></span>
 <span><span class="va">final_poly1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nn2poly.html">nn2poly</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">nn1</span>,</span>
-<span>                      taylor_orders <span class="op">=</span> <span class="va">taylor_orders</span>,</span>
 <span>                      max_order <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Polynomial for nn2</span></span>
 <span><span class="va">final_poly2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nn2poly.html">nn2poly</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">nn2</span>,</span>
-<span>                      taylor_orders <span class="op">=</span> <span class="va">taylor_orders</span>,</span>
 <span>                      max_order <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="obtaining-polynomial-predictions">Obtaining polynomial predictions<a class="anchor" aria-label="anchor" href="#obtaining-polynomial-predictions"></a>
 </h3>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># Obtain the predicted values for the test data with our two polynomials</span></span>
 <span></span>
@@ -358,10 +355,10 @@ predicts.</p>
 <p>We can observe clearly how the polynomial obtained for the
 constrained network (<code>nn2</code>) is predicting almost the same,
 while the unconstrained network has significant errors.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_diagonal.html">plot_diagonal</a></span><span class="op">(</span>x_axis <span class="op">=</span>  <span class="va">prediction_NN1</span>, y_axis <span class="op">=</span>  <span class="va">prediction_poly1</span>, xlab <span class="op">=</span> <span class="st">"NN prediction"</span>, ylab <span class="op">=</span> <span class="st">"Polynomial prediction"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Polynomial for NN1"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figure/nn2poly-02-reg-comparison-polynomial-nn-1.png"></p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/plot_diagonal.html">plot_diagonal</a></span><span class="op">(</span>x_axis <span class="op">=</span>  <span class="va">prediction_NN2</span>, y_axis <span class="op">=</span>  <span class="va">prediction_poly2</span>, xlab <span class="op">=</span> <span class="st">"NN prediction"</span>, ylab <span class="op">=</span> <span class="st">"Polynomial prediction"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Polynomial for NN2"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figure/nn2poly-02-reg-comparison-polynomial-nn-2.png"></p>
@@ -379,10 +376,10 @@ positive one and the rest of variables and the intercept
 (<code>0</code>) are quite close to zero. However, in the polynomial
 from <code>nn1</code>, the obtained coefficients are not correct as
 Taylor expansion is failing because of the high weights.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_n_important_coeffs.html">plot_n_important_coeffs</a></span><span class="op">(</span><span class="va">final_poly1</span>, n_important_coeffs <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figure/nn2poly-02-reg-n-important-1.png"></p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_n_important_coeffs.html">plot_n_important_coeffs</a></span><span class="op">(</span><span class="va">final_poly2</span>, n_important_coeffs <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figure/nn2poly-02-reg-n-important-2.png"></p>
 <p>Finally, the problem with Taylor expansion can be checked with the
@@ -394,10 +391,9 @@ layer.</p>
 green, that it expands over a wide range in the unconstrained NN while
 the it is kept closer to zero in the constrained one, thus having a more
 accurate Taylor expansion around zero.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_taylor_and_activation_potentials.html">plot_taylor_and_activation_potentials</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">nn1</span>,</span>
 <span>                                      data <span class="op">=</span> <span class="va">train</span>,</span>
-<span>                                      taylor_orders <span class="op">=</span> <span class="va">taylor_orders</span>,</span>
 <span>                                      max_order <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>                                      constraints <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [[1]]</span></span></code></pre></div>
@@ -411,11 +407,10 @@ accurate Taylor expansion around zero.</p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[4]]</span></span></code></pre>
 <p><img src="figure/nn2poly-02-reg-potentials-4.png"></p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/plot_taylor_and_activation_potentials.html">plot_taylor_and_activation_potentials</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">nn2</span>,</span>
 <span>                                      data <span class="op">=</span> <span class="va">train</span>,</span>
-<span>                                      taylor_orders <span class="op">=</span> <span class="va">taylor_orders</span>,</span>
 <span>                                      max_order <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>                                      constraints <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [[1]]</span></span></code></pre></div>
