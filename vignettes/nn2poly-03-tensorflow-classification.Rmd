@@ -5,7 +5,7 @@ output:
   rmarkdown::html_vignette:
     toc: yes
     fig_width: 6
-date: "2023-07-14"
+date: "2023-11-24"
 vignette: >
   %\VignetteIndexEntry{03 - Classification example using tensorflow}
   %\VignetteEngine{knitr::rmarkdown}
@@ -92,33 +92,42 @@ First, we build the model. Note that in this case the NN has a linear output wit
 
 This NN will be built using standard tensorflow and keras practices, in this case with a sequential keras model without any constraint on the weights.
 
+We will define a function that creates the desired model and then use it to define two different networks, unconstrained/constrained.
 
 
 ```r
-nn1 <- keras_model_sequential()
 
-nn1 %>% layer_dense(units = 100,
-                  activation = "tanh",
-                  input_shape = p)
+keras_model <- function() {
+  tensorflow::set_random_seed(42)
 
-nn1 %>% layer_dense(units = 100,
-                  activation = "tanh")
+  nn <- keras::keras_model_sequential()
+  nn <- keras::layer_dense(nn, units = 100, activation = "tanh", input_shape = p)
+  nn <- keras::layer_dense(nn, units = 100, activation = "tanh")
+  nn <- keras::layer_dense(nn, units = n_class, activation = "linear")
 
-nn1 %>% layer_dense(units = n_class)
+  nn
+}
+```
+
+Then we define `nn1`, which will be the unconstrained NN.
+
+
+```r
+nn1 <- keras_model()
 
 nn1
 #> Model: "sequential_12"
-#> ________________________________________________________________________________________________________________________
-#>  Layer (type)                                         Output Shape                                    Param #           
-#> ========================================================================================================================
-#>  dense_20 (Dense)                                     (None, 100)                                     500               
-#>  dense_21 (Dense)                                     (None, 100)                                     10100             
-#>  dense_22 (Dense)                                     (None, 3)                                       303               
-#> ========================================================================================================================
+#> _________________________________________________________________________________________________________________
+#>  Layer (type)                                     Output Shape                                  Param #          
+#> =================================================================================================================
+#>  dense_28 (Dense)                                 (None, 100)                                   500              
+#>  dense_29 (Dense)                                 (None, 100)                                   10100            
+#>  dense_30 (Dense)                                 (None, 3)                                     303              
+#> =================================================================================================================
 #> Total params: 10,903
 #> Trainable params: 10,903
 #> Non-trainable params: 0
-#> ________________________________________________________________________________________________________________________
+#> _________________________________________________________________________________________________________________
 ```
 
 
@@ -132,20 +141,21 @@ Note that L1 norm equal to 1 when scaling the input data to the $[-1,1]$ interva
 
 
 ```r
-nn2 <- add_constraints(nn1, constraint_type = "l1_norm")
+nn2 <- keras_model()
+nn2 <- add_constraints(nn2, constraint_type = "l1_norm")
 nn2
 #> Model: "sequential_13"
-#> ________________________________________________________________________________________________________________________
-#>  Layer (type)                                         Output Shape                                    Param #           
-#> ========================================================================================================================
-#>  layer__combined_l1_8 (Layer_Combined_L1)             (None, 100)                                     500               
-#>  layer__combined_l1_9 (Layer_Combined_L1)             (None, 100)                                     10100             
-#>  dense_23 (Dense)                                     (None, 3)                                       303               
-#> ========================================================================================================================
+#> _________________________________________________________________________________________________________________
+#>  Layer (type)                                     Output Shape                                  Param #          
+#> =================================================================================================================
+#>  dense_31 (Dense)                                 (None, 100)                                   500              
+#>  dense_32 (Dense)                                 (None, 100)                                   10100            
+#>  dense_33 (Dense)                                 (None, 3)                                     303              
+#> =================================================================================================================
 #> Total params: 10,903
 #> Trainable params: 10,903
 #> Non-trainable params: 0
-#> ________________________________________________________________________________________________________________________
+#> _________________________________________________________________________________________________________________
 ```
 
 Note how the parameters and structure are the same, but the layer type has been modified.
@@ -254,31 +264,31 @@ cm1
 #>           Reference
 #> Prediction  0  1  2
 #>          0 13  0  0
-#>          1  0 14  2
-#>          2  0  0  9
+#>          1  0 14  0
+#>          2  0  0 11
 #> 
 #> Overall Statistics
-#>                                           
-#>                Accuracy : 0.9474          
-#>                  95% CI : (0.8225, 0.9936)
-#>     No Information Rate : 0.3684          
-#>     P-Value [Acc > NIR] : 7.078e-14       
-#>                                           
-#>                   Kappa : 0.9202          
-#>                                           
-#>  Mcnemar's Test P-Value : NA              
+#>                                      
+#>                Accuracy : 1          
+#>                  95% CI : (0.9075, 1)
+#>     No Information Rate : 0.3684     
+#>     P-Value [Acc > NIR] : < 2.2e-16  
+#>                                      
+#>                   Kappa : 1          
+#>                                      
+#>  Mcnemar's Test P-Value : NA         
 #> 
 #> Statistics by Class:
 #> 
 #>                      Class: 0 Class: 1 Class: 2
-#> Sensitivity            1.0000   1.0000   0.8182
-#> Specificity            1.0000   0.9167   1.0000
-#> Pos Pred Value         1.0000   0.8750   1.0000
-#> Neg Pred Value         1.0000   1.0000   0.9310
+#> Sensitivity            1.0000   1.0000   1.0000
+#> Specificity            1.0000   1.0000   1.0000
+#> Pos Pred Value         1.0000   1.0000   1.0000
+#> Neg Pred Value         1.0000   1.0000   1.0000
 #> Prevalence             0.3421   0.3684   0.2895
-#> Detection Rate         0.3421   0.3684   0.2368
-#> Detection Prevalence   0.3421   0.4211   0.2368
-#> Balanced Accuracy      1.0000   0.9583   0.9091
+#> Detection Rate         0.3421   0.3684   0.2895
+#> Detection Prevalence   0.3421   0.3684   0.2895
+#> Balanced Accuracy      1.0000   1.0000   1.0000
 ```
 
 
@@ -291,38 +301,38 @@ cm2
 #>           Reference
 #> Prediction  0  1  2
 #>          0 13  0  0
-#>          1  0 14  3
-#>          2  0  0  8
+#>          1  0 14  1
+#>          2  0  0 10
 #> 
 #> Overall Statistics
 #>                                           
-#>                Accuracy : 0.9211          
-#>                  95% CI : (0.7862, 0.9834)
+#>                Accuracy : 0.9737          
+#>                  95% CI : (0.8619, 0.9993)
 #>     No Information Rate : 0.3684          
-#>     P-Value [Acc > NIR] : 1.482e-12       
+#>     P-Value [Acc > NIR] : 2.196e-15       
 #>                                           
-#>                   Kappa : 0.8799          
+#>                   Kappa : 0.9602          
 #>                                           
 #>  Mcnemar's Test P-Value : NA              
 #> 
 #> Statistics by Class:
 #> 
 #>                      Class: 0 Class: 1 Class: 2
-#> Sensitivity            1.0000   1.0000   0.7273
-#> Specificity            1.0000   0.8750   1.0000
-#> Pos Pred Value         1.0000   0.8235   1.0000
-#> Neg Pred Value         1.0000   1.0000   0.9000
+#> Sensitivity            1.0000   1.0000   0.9091
+#> Specificity            1.0000   0.9583   1.0000
+#> Pos Pred Value         1.0000   0.9333   1.0000
+#> Neg Pred Value         1.0000   1.0000   0.9643
 #> Prevalence             0.3421   0.3684   0.2895
-#> Detection Rate         0.3421   0.3684   0.2105
-#> Detection Prevalence   0.3421   0.4474   0.2105
-#> Balanced Accuracy      1.0000   0.9375   0.8636
+#> Detection Rate         0.3421   0.3684   0.2632
+#> Detection Prevalence   0.3421   0.3947   0.2632
+#> Balanced Accuracy      1.0000   0.9792   0.9545
 ```
 
 ## Using nn2poly to obtain  the polynomial
 
 After the NNs have been trained, we can directly call `nn2poly` on the `keras` model. Therefore, we do not need to build an object with weights and activation functions as in the default case covered in `vignette("nn2poly-01-introduction")`, and can benefit from the generic methods implemented for `keras` models.
 
-The only parameters that have to be added for nn2poly to work is the Taylor order expansion at each layer (`taylor_orders`), where we will choose 8 by default on non linear layers and 1 in the last linear layer as Taylor is not used there. (The final polynomial order will be limited by `max_order=3`)
+The only parameter that has to be added for nn2poly to work is the final polynomial order that we want, limited by `max_order=3`.
 
 Note that in this case, as we have 3 output neurons, there will be 3 output polynomials. The polynomials will be stored in the same way as in the regression case, in a list with labels and values, but in this case the values will be a matrix instead of a vector, where each row will be the polynomial obtained for each output neuron.
 
@@ -330,16 +340,13 @@ We will do this for both neural networks and compare the results:
 
 
 ```r
-taylor_orders <- c(8, 8, 8, 1)
 
 # Polynomial for nn1
 final_poly1 <- nn2poly(object = nn1,
-                      taylor_orders = taylor_orders,
                       max_order = 3)
 
 # Polynomial for nn2
 final_poly2 <- nn2poly(object = nn2,
-                      taylor_orders = taylor_orders,
                       max_order = 3)
 ```
 
@@ -396,31 +403,31 @@ cm_poly1
 #>           Reference
 #> Prediction  0  1  2
 #>          0 13  0  0
-#>          1  0 14  2
-#>          2  0  0  9
+#>          1  0 14  0
+#>          2  0  0 11
 #> 
 #> Overall Statistics
-#>                                           
-#>                Accuracy : 0.9474          
-#>                  95% CI : (0.8225, 0.9936)
-#>     No Information Rate : 0.3684          
-#>     P-Value [Acc > NIR] : 7.078e-14       
-#>                                           
-#>                   Kappa : 0.9202          
-#>                                           
-#>  Mcnemar's Test P-Value : NA              
+#>                                      
+#>                Accuracy : 1          
+#>                  95% CI : (0.9075, 1)
+#>     No Information Rate : 0.3684     
+#>     P-Value [Acc > NIR] : < 2.2e-16  
+#>                                      
+#>                   Kappa : 1          
+#>                                      
+#>  Mcnemar's Test P-Value : NA         
 #> 
 #> Statistics by Class:
 #> 
 #>                      Class: 0 Class: 1 Class: 2
-#> Sensitivity            1.0000   1.0000   0.8182
-#> Specificity            1.0000   0.9167   1.0000
-#> Pos Pred Value         1.0000   0.8750   1.0000
-#> Neg Pred Value         1.0000   1.0000   0.9310
+#> Sensitivity            1.0000   1.0000   1.0000
+#> Specificity            1.0000   1.0000   1.0000
+#> Pos Pred Value         1.0000   1.0000   1.0000
+#> Neg Pred Value         1.0000   1.0000   1.0000
 #> Prevalence             0.3421   0.3684   0.2895
-#> Detection Rate         0.3421   0.3684   0.2368
-#> Detection Prevalence   0.3421   0.4211   0.2368
-#> Balanced Accuracy      1.0000   0.9583   0.9091
+#> Detection Rate         0.3421   0.3684   0.2895
+#> Detection Prevalence   0.3421   0.3684   0.2895
+#> Balanced Accuracy      1.0000   1.0000   1.0000
 ```
 
 
@@ -435,15 +442,15 @@ cm_poly2
 #>           Reference
 #> Prediction  0  1  2
 #>          0 13  0  0
-#>          1  0 17  0
-#>          2  0  0  8
+#>          1  0 15  0
+#>          2  0  0 10
 #> 
 #> Overall Statistics
 #>                                      
 #>                Accuracy : 1          
 #>                  95% CI : (0.9075, 1)
-#>     No Information Rate : 0.4474     
-#>     P-Value [Acc > NIR] : 5.312e-14  
+#>     No Information Rate : 0.3947     
+#>     P-Value [Acc > NIR] : 4.568e-16  
 #>                                      
 #>                   Kappa : 1          
 #>                                      
@@ -456,9 +463,9 @@ cm_poly2
 #> Specificity            1.0000   1.0000   1.0000
 #> Pos Pred Value         1.0000   1.0000   1.0000
 #> Neg Pred Value         1.0000   1.0000   1.0000
-#> Prevalence             0.3421   0.4474   0.2105
-#> Detection Rate         0.3421   0.4474   0.2105
-#> Detection Prevalence   0.3421   0.4474   0.2105
+#> Prevalence             0.3421   0.3947   0.2632
+#> Detection Rate         0.3421   0.3947   0.2632
+#> Detection Prevalence   0.3421   0.3947   0.2632
 #> Balanced Accuracy      1.0000   1.0000   1.0000
 ```
 
@@ -522,7 +529,6 @@ It can be clearly seen with the activation potentials density, in green, that it
 ```r
 plot_taylor_and_activation_potentials(object = nn1,
                                       data = train,
-                                      taylor_orders = taylor_orders,
                                       max_order = 3,
                                       constraints = FALSE)
 #> [[1]]
@@ -548,7 +554,6 @@ plot_taylor_and_activation_potentials(object = nn1,
 
 plot_taylor_and_activation_potentials(object = nn2,
                                       data = train,
-                                      taylor_orders = taylor_orders,
                                       max_order = 3,
                                       constraints = TRUE)
 #> [[1]]

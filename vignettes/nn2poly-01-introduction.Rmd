@@ -141,13 +141,13 @@ nn %>% layer_dense(units = 1,
                   activation = "linear")
 
 nn
-#> Model: "sequential"
+#> Model: "sequential_9"
 #> _________________________________________________________________________________________________________________
 #>  Layer (type)                                     Output Shape                                  Param #          
 #> =================================================================================================================
-#>  dense (Dense)                                    (None, 10)                                    40               
-#>  dense_1 (Dense)                                  (None, 10)                                    110              
-#>  dense_2 (Dense)                                  (None, 1)                                     11               
+#>  dense_17 (Dense)                                 (None, 10)                                    40               
+#>  dense_18 (Dense)                                 (None, 10)                                    110              
+#>  dense_19 (Dense)                                 (None, 1)                                     11               
 #> =================================================================================================================
 #> Total params: 161
 #> Trainable params: 161
@@ -421,6 +421,37 @@ plot_n_important_coeffs(final_poly, 8)
 Another convenient plot to show how the algorithm is affected by each layer can be obtained with `plot_taylor_and_activation_potentials()`, where the activation potentials at each neuron are computed and presented over the Taylor expansion approximation of the activation function at each layer.
 
 In this case, as we have not used constraints in the NN training, the activation potentials are not strictly centered around zero.
+
+
+
+```r
+plot_taylor_and_activation_potentials(object = nn,
+                                      data = train,
+                                      max_order = 3,
+                                      constraints = FALSE)
+#> [[1]]
+```
+
+![](figure/nn2poly-01-reg-potentials-1.png)
+
+```
+#> 
+#> [[2]]
+```
+
+![](figure/nn2poly-01-reg-potentials-2.png)
+
+```
+#> 
+#> [[3]]
+```
+
+![](figure/nn2poly-01-reg-potentials-3.png)
+
+
+
+
+
 
 
 
