@@ -141,18 +141,18 @@ nn %>% layer_dense(units = 1,
                   activation = "linear")
 
 nn
-#> Model: "sequential_9"
-#> ________________________________________________________________________________________________________________________
-#>  Layer (type)                                         Output Shape                                    Param #           
-#> ========================================================================================================================
-#>  dense_12 (Dense)                                     (None, 10)                                      40                
-#>  dense_13 (Dense)                                     (None, 10)                                      110               
-#>  dense_14 (Dense)                                     (None, 1)                                       11                
-#> ========================================================================================================================
+#> Model: "sequential"
+#> _________________________________________________________________________________________________________________
+#>  Layer (type)                                     Output Shape                                  Param #          
+#> =================================================================================================================
+#>  dense (Dense)                                    (None, 10)                                    40               
+#>  dense_1 (Dense)                                  (None, 10)                                    110              
+#>  dense_2 (Dense)                                  (None, 1)                                     11               
+#> =================================================================================================================
 #> Total params: 161
 #> Trainable params: 161
 #> Non-trainable params: 0
-#> ________________________________________________________________________________________________________________________
+#> _________________________________________________________________________________________________________________
 ```
 
 Compile the model:
@@ -232,11 +232,16 @@ names(weights_object) <- af_string_names
 
 weights_object
 #> $tanh
-#>            [,1]       [,2]      [,3]        [,4]        [,5]       [,6]       [,7]        [,8]        [,9]       [,10]
-#> [1,]  0.2637966 -0.1632335 0.4649245 -0.20589803  0.04730094 -0.3763387 -0.2124885 -0.08747434 -0.07051360 -0.37202930
-#> [2,]  0.2385524  0.1342811 0.2513933  0.48018309 -0.47788176  0.1631715  0.6607828 -0.31218216 -0.01426336 -0.01626668
-#> [3,] -0.7742428 -0.1097567 0.8174284  0.08418242  0.06163564  0.7477616 -0.8533844 -0.48116657  0.04514860 -0.70131820
-#> [4,] -0.6955228  0.5266028 0.5572206 -0.46307948  0.48515409 -0.7743985  0.1162070  0.35274017  0.04112899 -0.56946415
+#>            [,1]       [,2]      [,3]        [,4]        [,5]       [,6]       [,7]        [,8]        [,9]
+#> [1,]  0.2637966 -0.1632335 0.4649245 -0.20589803  0.04730094 -0.3763387 -0.2124885 -0.08747434 -0.07051360
+#> [2,]  0.2385524  0.1342811 0.2513933  0.48018309 -0.47788176  0.1631715  0.6607828 -0.31218216 -0.01426336
+#> [3,] -0.7742428 -0.1097567 0.8174284  0.08418242  0.06163564  0.7477616 -0.8533844 -0.48116657  0.04514860
+#> [4,] -0.6955228  0.5266028 0.5572206 -0.46307948  0.48515409 -0.7743985  0.1162070  0.35274017  0.04112899
+#>            [,10]
+#> [1,] -0.37202930
+#> [2,] -0.01626668
+#> [3,] -0.70131820
+#> [4,] -0.56946415
 #> 
 #> $tanh
 #>              [,1]        [,2]        [,3]        [,4]        [,5]       [,6]        [,7]        [,8]        [,9]
@@ -279,16 +284,7 @@ weights_object
 #> [11,] -0.91330308
 ```
 
-Additionally, there are other parameters affecting properties of the algorithm:
-
-* `taylor_orders`: A vector of integers containing the order of the Taylor expansion performed at each layer. If the output layer has a linear activation function, then the last value should be 1.
-
-
-```r
-taylor_orders <- c(8, 8,  1)
-```
-
-* `max_order`: (optional value) An integer value denoting the maximum order of the terms computed in the polynomial. Usually 2 or 3 should be enough in practice. Note that higher orders suppose an explosion in the possible combinations. If the user does not provide a value, the polynomial order grows multiplicatively with the Taylor order at each hidden layer, therefore its better to start with low values.
+Additionally, we need to specify the final order of our desired polynomial, `max_order`. It should be an integer value denoting the maximum order of the terms computed in the polynomial. Usually 2 or 3 should be enough in practice. Note that higher orders suppose an explosion in the possible combinations. If the user does not provide a value, the polynomial order grows multiplicatively with the Taylor order at each hidden layer, therefore its better to start with low values.
 
 When the input is in the desired shape, the nn2poly method can be applied:
 
@@ -297,7 +293,6 @@ When the input is in the desired shape, the nn2poly method can be applied:
 ```r
 
 final_poly <- nn2poly(object = weights_object,
-                      taylor_orders = taylor_orders,
                       max_order = 3)
 ```
 
@@ -370,10 +365,12 @@ final_poly
 #> 
 #> 
 #> $values
-#>            [,1]      [,2]       [,3]        [,4]       [,5]       [,6]        [,7]      [,8]      [,9]      [,10]
-#> [1,] -0.1617715 0.7475098 0.09908831 -0.08050417 0.07277049 0.03545956 0.009334022 0.3035036 -2.559723 0.02124509
-#>            [,11]     [,12]      [,13]     [,14]       [,15]      [,16]     [,17]     [,18]      [,19]       [,20]
-#> [1,] -0.08924709 0.2939184 0.01080101 0.6197476 -0.04956815 0.07802355 0.5294107 -1.012448 -0.7079898 -0.05140071
+#>            [,1]      [,2]       [,3]        [,4]       [,5]       [,6]        [,7]      [,8]      [,9]
+#> [1,] -0.1617715 0.7475098 0.09908831 -0.08050416 0.07277049 0.03545956 0.009334022 0.3035036 -2.559723
+#>           [,10]       [,11]     [,12]      [,13]     [,14]       [,15]      [,16]     [,17]     [,18]      [,19]
+#> [1,] 0.02124508 -0.08924709 0.2939184 0.01080101 0.6197476 -0.04956816 0.07802355 0.5294106 -1.012448 -0.7079897
+#>            [,20]
+#> [1,] -0.05140069
 #> 
 #> attr(,"class")
 #> [1] "nn2poly"
@@ -424,38 +421,6 @@ plot_n_important_coeffs(final_poly, 8)
 Another convenient plot to show how the algorithm is affected by each layer can be obtained with `plot_taylor_and_activation_potentials()`, where the activation potentials at each neuron are computed and presented over the Taylor expansion approximation of the activation function at each layer.
 
 In this case, as we have not used constraints in the NN training, the activation potentials are not strictly centered around zero.
-
-
-
-```r
-plot_taylor_and_activation_potentials(object = nn,
-                                      data = train,
-                                    taylor_orders = taylor_orders,
-                                    max_order = 3,
-                                    constraints = FALSE)
-#> [[1]]
-```
-
-![](figure/nn2poly-01-reg-potentials-1.png)
-
-```
-#> 
-#> [[2]]
-```
-
-![](figure/nn2poly-01-reg-potentials-2.png)
-
-```
-#> 
-#> [[3]]
-```
-
-![](figure/nn2poly-01-reg-potentials-3.png)
-
-
-
-
-
 
 
 
