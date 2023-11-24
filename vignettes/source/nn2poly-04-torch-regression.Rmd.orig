@@ -134,8 +134,8 @@ data_val   <- torch::dataset_subset(data_full, val_indices)
 
 # Data loader
 torch_data <- list(
-  train = torch::dataloader(data_train, batch_size = 32, shuffle = TRUE),
-  valid = torch::dataloader(data_val, batch_size = 32)
+  train = torch::dataloader(data_train, batch_size = 50, shuffle = TRUE),
+  valid = torch::dataloader(data_val, batch_size = 50)
 )
 
 ```
@@ -144,7 +144,9 @@ Then, the NNs will be built using a sequential model with `luz`and `torch`. As w
 
 ```{r reg-nn-build}
 
-luz_nn1 <- function() {
+
+
+luz_nn <- function() {
   torch::torch_manual_seed(42)
 
   luz_model_sequential(
@@ -158,19 +160,11 @@ luz_nn1 <- function() {
   )
 }
 
-luz_nn2 <- function() {
-  torch::torch_manual_seed(42)
+nn1 <- luz_nn()
+nn2 <- luz_nn()
 
-  luz_model_sequential(
-    torch::nn_linear(p,100),
-    torch::nn_tanh(),
-    torch::nn_linear(100,100),
-    torch::nn_tanh(),
-    torch::nn_linear(100,100),
-    torch::nn_tanh(),
-    torch::nn_linear(100,1)
-  )
-}
+
+
 ```
 
 
@@ -179,7 +173,7 @@ luz_nn2 <- function() {
 We will first train the first NN (`luz_nn1`) without constraints:
 
 ```{r reg-nn1-train}
-fitted_1 <- luz_nn1() %>%
+fitted_1 <- nn1 %>%
     luz::setup(
       loss = torch::nn_mse_loss(),
       optimizer = torch::optim_adam,
@@ -199,13 +193,13 @@ Note that L1 norm equal to 1 when scaling the input data to the $[-1,1]$ interva
 
 ```{r reg-nn2-train}
 # Do the constrained training with the l1 constraint
-  fitted_2 <- luz_nn2() %>%
+  fitted_2 <- nn2 %>%
     luz::setup(
       loss = torch::nn_mse_loss(),
       optimizer = torch::optim_adam,
     ) %>%
     add_constraints("l1_norm") %>%
-    fit(torch_data$train, epochs = 600, valid_data = torch_data$valid)
+    fit(torch_data$train, epochs = 700, valid_data = torch_data$valid)
 ```
 
 
@@ -222,6 +216,7 @@ prediction_NN1 <- as.array(predict(fitted_1, test_x))
 # Diagonal plot implemented in the package to quickly visualize and compare predictions
 plot_diagonal(x_axis =  prediction_NN1, y_axis =  test_y, xlab = "NN 1 prediction", ylab = "Original Y")
 ```
+
 ```{r}
 fitted_1 %>% plot()
 ```
@@ -305,17 +300,13 @@ It can be clearly seen with the activation potentials density, in green, that it
 
 ```{r reg-potentials}
 
-taylor_orders <- c(8, 8, 8, 1) # Esto debería ser tomado de algun sitio o dejado como default igual que en el uso de nn2poly
-
 plot_taylor_and_activation_potentials(object = fitted_1,
                                       data = train,
-                                      taylor_orders = taylor_orders,
                                       max_order = 3,
                                       constraints = FALSE)
 
 plot_taylor_and_activation_potentials(object = fitted_2,
                                       data = train,
-                                      taylor_orders = taylor_orders,
                                       max_order = 3,
                                       constraints = TRUE)
 ```
