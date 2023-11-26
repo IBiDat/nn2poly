@@ -31,8 +31,6 @@ plot_n_important_coeffs <- function(poly, n_important_coeffs) {
     poly$values <- matrix(poly$values, nrow = 1)
   }
 
-
-
   # a special case is needed for the case in which the polynomial was generated
   # with `keep_layers = TRUE`
 
@@ -72,6 +70,26 @@ plot_n_important_coeffs <- function(poly, n_important_coeffs) {
     all_df <- rbind(all_df, df)
   }
 
+  # If a coefficient is exactly 0, assign it to positive
+  if (any(all_df$sign == 0)){
+    all_df$sign[which(all_df$sign==0)] = 1
+  }
+
+
+
+  # Define different scale for multiple or single sign cases.
+  if (all(levels(all_df$sign) == c("-1", "1"))){
+    scale_values <- c("#F8766D", "#00BA38")
+    scale_labels <- c("-", "+")
+  } else if (levels(all_df$sign) == c("1")) {
+    scale_values <- c("#00BA38")
+    scale_labels <- c("+")
+  } else if (levels(all_df$sign) == c("-1")) {
+    scale_values <- c("#F8766D")
+    scale_labels <- c("-")
+  }
+
+
   plot_all <- ggplot2::ggplot(all_df,
                               ggplot2::aes(x = tidytext::reorder_within(x = .data$name,
                                                                         by = -.data$value,
@@ -84,7 +102,7 @@ plot_n_important_coeffs <- function(poly, n_important_coeffs) {
     cowplot::theme_half_open() +
     ggplot2::labs(y = "Coefficient (absolute) values", x = "Variables or interactions") +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust = 1)) +
-    ggplot2::scale_fill_manual(values = c("#F8766D", "#00BA38"), labels = c("-", "+")) +
+    ggplot2::scale_fill_manual(values = scale_values, labels = scale_labels) +
     ggplot2::theme(legend.direction = "horizontal") +
     ggplot2::labs(fill = "Sign")
 
