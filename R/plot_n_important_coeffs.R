@@ -26,6 +26,13 @@ plot_n_important_coeffs <- function(poly, n_important_coeffs) {
     stop("package 'patchwork' is required for this functionality", call. = FALSE)
   }
 
+  # Check if poly$values is a vector and transform it into a row matrix
+  if (is.vector(poly$values)){
+    poly$values <- matrix(poly$values, nrow = 1)
+  }
+
+
+
   # a special case is needed for the case in which the polynomial was generated
   # with `keep_layers = TRUE`
 
