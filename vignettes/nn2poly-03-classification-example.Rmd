@@ -1,0 +1,481 @@
+---
+title: "03 - Classification example using tensorflow"
+author: "Pablo Morala"
+output:
+  rmarkdown::html_vignette:
+    toc: yes
+    fig_width: 6
+date: "2023-12-11"
+vignette: >
+  %\VignetteIndexEntry{03 - Classification example using tensorflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+
+# Simple classification example
+
+After showing how to use `nn2poly` in a regression setting both in `vignette("nn2poly-01-introduction")` and `vignette("nn2poly-02-supported-DL-frameworks")`, we will see here a simple classification example using the iris dataset to showcase how nn2poly obtains a polynomial for each class (or output neuron).
+
+In order to train our model we will use in this case the `keras`/`tensorflow` framework, and we will benefit from the provided support for it in `nn2poly` as we saw in `vignette("nn2poly-02-supported-DL-frameworks")`.
+
+
+
+```r
+library(nn2poly)
+library(keras)
+
+# This sets all needed seeds
+tensorflow::set_random_seed(42)
+```
+
+## Data preparation
+
+First we load the `iris` dataset and scale the data to the $[-1,1]$ interval:
+
+
+```r
+# Load the data
+data(iris)
+
+# Change response to numeric. In this case, Species was already numeric,
+# but this step is needed if it is a factor variable.
+iris$Species <- as.numeric(iris$Species)
+
+# Define dimension p (number of predictor variables)
+p <- dim(iris)[2] - 1
+
+# Define objective classes
+n_class <- max(iris[,(p+1)])
+
+# Move objective classes from (1:3) to (0:2), needed for tensorflow
+iris[,(p+1)] <- iris[,(p+1)] - 1
+```
+
+
+```r
+# Scale the data in the [-1,1] interval and separate train and test
+# Only the predictor variables are scaled, not the response as those will be
+# the different classes.
+iris_x <- iris[,-(p+1)]
+maxs <- apply(iris_x, 2, max)
+mins <- apply(iris_x, 2, min)
+data_x_scaled <- as.data.frame(scale(iris_x, center = mins + (maxs - mins) / 2, scale = (maxs - mins) / 2))
+data <- cbind(data_x_scaled, iris[,(p+1)])
+
+# Divide in train (0.75) and test (0.25)
+index <- sample(1:nrow(data), round(0.75 * nrow(data)))
+train <- data[index, ]
+test <- data[-index, ]
+
+train_x <- as.matrix(train[,-(p+1)])
+train_y <- as.matrix(train[,(p+1)])
+
+test_x <- as.matrix(test[,-(p+1)])
+test_y <- as.matrix(test[,(p+1)])
+```
+
+
+## Neural network
+
+In this section we will create and train (imposing weight constraints) our original neural network that will be later explained by `nn2poly()`.
+
+### Build and train the NN
+
+First, we build the model. 
+
+
+```r
+
+keras_model <- function() {
+  tensorflow::set_random_seed(42)
+
+  nn <- keras::keras_model_sequential()
+  nn <- keras::layer_dense(nn, units = 100, activation = "tanh", input_shape = p)
+  nn <- keras::layer_dense(nn, units = 100, activation = "tanh")
+  nn <- keras::layer_dense(nn, units = n_class, activation = "linear")
+
+  nn
+}
+
+nn <- keras_model()
+# Impose weight constraints provided by nn2poly package
+nn <- add_constraints(nn, constraint_type = "l1_norm")
+nn
+#> Model: "sequential_8"
+#> _______________________________________________________________________________________________________________
+#>  Layer (type)                                    Output Shape                                 Param #          
+#> ===============================================================================================================
+#>  dense_17 (Dense)                                (None, 100)                                  500              
+#>  dense_18 (Dense)                                (None, 100)                                  10100            
+#>  dense_19 (Dense)                                (None, 3)                                    303              
+#> ===============================================================================================================
+#> Total params: 10,903
+#> Trainable params: 10,903
+#> Non-trainable params: 0
+#> _______________________________________________________________________________________________________________
+```
+
+> *Note*: In this case the NN has a *linear* output with the same number of neurons as the number of classes to predict (3 species, `n_class`). Then, the linear output will be transformed into a *probability* to find the most probable class but this step is done *after training*. Therefore, nn2poly will be used to obtain a polynomial that approximates this *nn with linear outputs* and then its results will also be transformed in probabilities to  predict the highest probability class.
+
+
+Then we compile and train the model, using a categorical crossentropy loss and  accuracy as the chosen metric.
+
+
+```r
+compile(nn,
+        loss = loss_sparse_categorical_crossentropy(from_logits = TRUE),
+        optimizer = optimizer_adam(),
+        metrics = "accuracy")
+
+history <- fit(nn,
+               train_x,
+               train_y,
+               verbose = 0,
+               epochs = 200,
+               validation_split = 0.3
+)
+
+plot(history)
+```
+
+![](figure/nn2poly-03-class-nn-compile-1.png)
+
+
+### NN Predictions
+
+In this case, to asses the NNs accuracy we have to transform their output into a probability, which we will do by using `layer_activation_softmax()` and then choosing the class with highest probability with `k_argmax`.
+
+
+
+```r
+# Define the model probability model using our previously trained nn
+probability_model <- keras_model_sequential() %>%
+  nn() %>%
+  layer_activation_softmax() %>%
+  layer_lambda(k_argmax)
+
+# Obtain the predicted classes with the NN to compare them
+prediction_NN_class <- predict(probability_model, test_x)
+```
+
+> *Note*: As said before, `nn2poly()` will approximate the linear output of the neural network, so we will need to perform these transformation also in the polynomial predictions to obtain a classification response.
+
+We can also compute the linear output of the model (before converting it to a probability) and store it to compare with the polynomial output later.
+
+
+```r
+# Also, the linear output can be predicted before the probability model
+prediction_NN <- predict(nn, test_x)
+```
+
+Finally We can use here a confusion matrix to visualize the results, where we can see that that the NN correctly predicts almost all of the classes in the test data:
+
+
+```r
+# Create a confusion matrix
+cm <- caret::confusionMatrix(as.factor(prediction_NN_class), as.factor(test_y))
+cm
+#> Confusion Matrix and Statistics
+#> 
+#>           Reference
+#> Prediction  0  1  2
+#>          0 11  0  0
+#>          1  0 11  1
+#>          2  0  1 14
+#> 
+#> Overall Statistics
+#>                                           
+#>                Accuracy : 0.9474          
+#>                  95% CI : (0.8225, 0.9936)
+#>     No Information Rate : 0.3947          
+#>     P-Value [Acc > NIR] : 7.82e-13        
+#>                                           
+#>                   Kappa : 0.9203          
+#>                                           
+#>  Mcnemar's Test P-Value : NA              
+#> 
+#> Statistics by Class:
+#> 
+#>                      Class: 0 Class: 1 Class: 2
+#> Sensitivity            1.0000   0.9167   0.9333
+#> Specificity            1.0000   0.9615   0.9565
+#> Pos Pred Value         1.0000   0.9167   0.9333
+#> Neg Pred Value         1.0000   0.9615   0.9565
+#> Prevalence             0.2895   0.3158   0.3947
+#> Detection Rate         0.2895   0.2895   0.3684
+#> Detection Prevalence   0.2895   0.3158   0.3947
+#> Balanced Accuracy      1.0000   0.9391   0.9449
+```
+
+## Polynomial representation
+
+### Using `nn2poly`
+
+After the NN has been trained, we can directly call `nn2poly()` on the model, where we only need to choose the value `max_order` which will limit the order of the computed coefficients in the final polynomial. In this case we will set it as `3`.
+
+Note that in this case, as we have 3 output neurons, there will be 3 output polynomials. The polynomials will be stored in the same way as in the regression case, in a list with labels and values, but in this case the values will be a matrix with 3 rows, where each row will be the polynomial obtained for each output neuron.
+
+
+```r
+# Polynomial for nn
+final_poly <- nn2poly(object = nn,
+                      max_order = 3)
+final_poly
+#> $labels
+#> $labels[[1]]
+#> [1] 0
+#> 
+#> $labels[[2]]
+#> [1] 1
+#> 
+#> $labels[[3]]
+#> [1] 2
+#> 
+#> $labels[[4]]
+#> [1] 3
+#> 
+#> $labels[[5]]
+#> [1] 4
+#> 
+#> $labels[[6]]
+#> [1] 1 1
+#> 
+#> $labels[[7]]
+#> [1] 1 2
+#> 
+#> $labels[[8]]
+#> [1] 1 3
+#> 
+#> $labels[[9]]
+#> [1] 1 4
+#> 
+#> $labels[[10]]
+#> [1] 2 2
+#> 
+#> $labels[[11]]
+#> [1] 2 3
+#> 
+#> $labels[[12]]
+#> [1] 2 4
+#> 
+#> $labels[[13]]
+#> [1] 3 3
+#> 
+#> $labels[[14]]
+#> [1] 3 4
+#> 
+#> $labels[[15]]
+#> [1] 4 4
+#> 
+#> $labels[[16]]
+#> [1] 1 1 1
+#> 
+#> $labels[[17]]
+#> [1] 1 1 2
+#> 
+#> $labels[[18]]
+#> [1] 1 1 3
+#> 
+#> $labels[[19]]
+#> [1] 1 1 4
+#> 
+#> $labels[[20]]
+#> [1] 1 2 2
+#> 
+#> $labels[[21]]
+#> [1] 1 2 3
+#> 
+#> $labels[[22]]
+#> [1] 1 2 4
+#> 
+#> $labels[[23]]
+#> [1] 1 3 3
+#> 
+#> $labels[[24]]
+#> [1] 1 3 4
+#> 
+#> $labels[[25]]
+#> [1] 1 4 4
+#> 
+#> $labels[[26]]
+#> [1] 2 2 2
+#> 
+#> $labels[[27]]
+#> [1] 2 2 3
+#> 
+#> $labels[[28]]
+#> [1] 2 2 4
+#> 
+#> $labels[[29]]
+#> [1] 2 3 3
+#> 
+#> $labels[[30]]
+#> [1] 2 3 4
+#> 
+#> $labels[[31]]
+#> [1] 2 4 4
+#> 
+#> $labels[[32]]
+#> [1] 3 3 3
+#> 
+#> $labels[[33]]
+#> [1] 3 3 4
+#> 
+#> $labels[[34]]
+#> [1] 3 4 4
+#> 
+#> $labels[[35]]
+#> [1] 4 4 4
+#> 
+#> 
+#> $values
+#>             [,1]       [,2]      [,3]       [,4]      [,5]        [,6]        [,7]        [,8]        [,9]
+#> [1,]  0.04067109 -1.0169295  3.826181 -4.8634327 -6.059082  0.02216647 -0.09821698  0.08146315  0.04337399
+#> [2,]  2.83869700  0.9222844 -1.532153 -0.3670297 -2.026010 -0.06865050  0.11592275 -0.07244360 -0.01937140
+#> [3,] -2.36676691  0.3067620 -2.683001  5.2018839  7.701675  0.03131845  0.00763844 -0.02552598 -0.02919825
+#>             [,10]        [,11]       [,12]       [,13]      [,14]      [,15]        [,16]       [,17]
+#> [1,]  0.087632121 -0.130909338 -0.03982065 -0.03990296 -0.2251886 -0.2153952  0.016408561 -0.08649215
+#> [2,] -0.122314949  0.160297202  0.11836324 -0.18611400 -0.3837065 -0.3407391 -0.015861053  0.05403539
+#> [3,]  0.007196786  0.008898167 -0.04774206  0.18244805  0.5174840  0.4760532 -0.004179781  0.04540790
+#>            [,18]       [,19]       [,20]       [,21]       [,22]       [,23]       [,24]       [,25]
+#> [1,]  0.08657797  0.10626455 -0.09226002 -0.12782353 -0.14300636  0.08681554  0.07906020  0.10751970
+#> [2,] -0.02080846  0.01683331  0.05872171  0.09922489  0.06137821 -0.01949566 -0.07109651  0.01994973
+#> [3,] -0.07145819 -0.12091730  0.04721160  0.05368183  0.09955636 -0.07269853 -0.02760976 -0.12459616
+#>            [,26]      [,27]      [,28]      [,29]      [,30]       [,31]        [,32]      [,33]      [,34]
+#> [1,] -0.12832404  0.3141076  0.3982239  0.3236611 -0.6417999  0.40593582  0.175612298  0.5176796  0.5139861
+#> [2,]  0.05707778 -0.1125715 -0.0721711 -0.1155516  0.1504292 -0.06925842  0.009076263  0.1093006  0.1018997
+#> [3,]  0.08624455 -0.2333241 -0.3510036 -0.2401710  0.5396407 -0.36060243 -0.185280705 -0.6098987 -0.6006942
+#>           [,35]
+#> [1,]  0.3452698
+#> [2,]  0.1464096
+#> [3,] -0.4618160
+#> 
+#> attr(,"class")
+#> [1] "nn2poly"
+```
+
+
+### Obtaining polynomial predictions
+
+As said before, the obtained polynomial represents the neural network before including the softmax function and computing the class assigned to each observation. Then, we need to define again a keras sequential model that includes the class computation from the polynomial output. This polynomial output is obtained with `eval_poly()`, in this case in matrix form, as the 3 polynomials are evaluated at the same time:
+
+
+```r
+
+# Obtain the predicted values for the test data with our Polynomial Regression
+prediction_poly_matrix <- eval_poly(x = test_x, poly = final_poly)
+
+# Define probability model with keras fro the polynomial outputs
+probability_poly <- keras_model_sequential() %>%
+  layer_activation_softmax() %>%
+  layer_lambda(k_argmax)
+
+# Class prediction with the polynomial outputs
+prediction_poly_class <- predict(probability_poly,
+                                 t(prediction_poly_matrix))
+```
+
+### Visualizing the results
+
+With the polynomial predictions, there are two options. We can represent in a diagonal line the linear outputs obtained directly from the polynomial and NN predictions, or compare the assigned classes after employing the probability models. Please note here that we compare the predictions (linear and classes) of the polynomials with the NN predictions and not the original data, as `nn2poly`'s goal is to faithfully represent the NN behavior independently of how well the NN predicts.
+
+First, let's observe the confusion matrix for the assigned classes:
+
+
+```r
+
+# Confussion matrix between NN class prediction and polynomial class prediction
+cm_poly <- caret::confusionMatrix(as.factor(prediction_NN_class), as.factor(prediction_poly_class))
+cm_poly
+#> Confusion Matrix and Statistics
+#> 
+#>           Reference
+#> Prediction  0  1  2
+#>          0 11  0  0
+#>          1  0 12  0
+#>          2  0  0 15
+#> 
+#> Overall Statistics
+#>                                      
+#>                Accuracy : 1          
+#>                  95% CI : (0.9075, 1)
+#>     No Information Rate : 0.3947     
+#>     P-Value [Acc > NIR] : 4.568e-16  
+#>                                      
+#>                   Kappa : 1          
+#>                                      
+#>  Mcnemar's Test P-Value : NA         
+#> 
+#> Statistics by Class:
+#> 
+#>                      Class: 0 Class: 1 Class: 2
+#> Sensitivity            1.0000   1.0000   1.0000
+#> Specificity            1.0000   1.0000   1.0000
+#> Pos Pred Value         1.0000   1.0000   1.0000
+#> Neg Pred Value         1.0000   1.0000   1.0000
+#> Prevalence             0.2895   0.3158   0.3947
+#> Detection Rate         0.2895   0.3158   0.3947
+#> Detection Prevalence   0.2895   0.3158   0.3947
+#> Balanced Accuracy      1.0000   1.0000   1.0000
+```
+The polynomials obtain the same results as the original NN.
+
+Then, we can extract a diagonal plot for each of the polynomials obtained, in total $3$ diagonal plots.
+
+
+```r
+for (i in 1:3){
+  print(
+    plot_diagonal(x_axis =  prediction_NN[,i],
+                  y_axis =  prediction_poly_matrix[i,],
+                  xlab = "NN prediction",
+                  ylab = "Polynomial prediction")
+        )
+}
+```
+
+![](figure/nn2poly-03-class-diagonal-plot-1.png)![](figure/nn2poly-03-class-diagonal-plot-2.png)![](figure/nn2poly-03-class-diagonal-plot-3.png)
+
+We can observe how all the polynomials obtain quite similar predictions to their equivalent NN predictions.
+
+We can also plot the $n$ most important coefficients in absolute value to compare which variables or interactions are more relevant in each polynomial. In this case, we will have 3 plots for each NN again, one per polynomial at each output neuron. In this case, the obtained coefficients will represent the most important variables when assigning the probability to be in each class.
+
+
+```r
+plot_n_important_coeffs(final_poly, n_important_coeffs = 8)
+```
+
+![](figure/nn2poly-03-class-n-important-1.png)
+
+> *Note*: The coefficients values are not in the same scale as the original polynomial due to the fact that we have scaled all the data before training, even the response variable Y. Furthermore, as data has been scaled to the $[-1,1]$ interval, interactions of order 2 or higher would usually need a higher absolute value than the lower order coefficients to be more relevant
+
+Finally, the problem with Taylor expansion can be checked with the following plots, where each layer is represented with their activation function, its Taylor expansion, the error and also the density of the activation potentials that the activation functions receives at that layer.
+
+It can be clearly seen with the activation potentials density, in green, that it is kept close to zero, thus having an accurate Taylor expansion  around zero at each hidden layer.
+
+
+```r
+plot_taylor_and_activation_potentials(object = nn,
+                                      data = train,
+                                      max_order = 3,
+                                      constraints = TRUE)
+#> [[1]]
+```
+
+![](figure/nn2poly-03-class-potentials-1.png)
+
+```
+#> 
+#> [[2]]
+```
+
+![](figure/nn2poly-03-class-potentials-2.png)
+
+```
+#> 
+#> [[3]]
+```
+
+![](figure/nn2poly-03-class-potentials-3.png)
