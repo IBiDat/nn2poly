@@ -1,5 +1,5 @@
 ---
-title: "03 - Classification example using tensorflow"
+title: "Classification example using tensorflow"
 author: "Pablo Morala"
 output:
   rmarkdown::html_vignette:
@@ -7,7 +7,7 @@ output:
     fig_width: 6
 date: "`r Sys.Date()`"
 vignette: >
-  %\VignetteIndexEntry{03 - Classification example using tensorflow}
+  %\VignetteIndexEntry{Classification example using tensorflow}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -24,7 +24,7 @@ knitr::opts_chunk$set(
 
 # Multiclass classification example
 
-After showing how to use `nn2poly` in a regression setting both in `vignette("nn2poly-01-introduction")` and `vignette("nn2poly-02-supported-DL-frameworks")`, we will see here a simple classification example using the iris dataset to showcase how nn2poly obtains a polynomial for each class (or output neuron).
+After showing how to use `nn2poly` in a regression setting both in `vignette("nn2poly-01-introduction")` and `vignette("nn2poly-02-supported-DL-frameworks")`, we will see here a multiclass classification example using the iris dataset to showcase how nn2poly obtains a polynomial for each class (or output neuron).
 
 In order to train our model we will use in this case the `keras`/`tensorflow` framework, and we will benefit from the provided support for it in `nn2poly` as we saw in `vignette("nn2poly-02-supported-DL-frameworks")`.
 
@@ -88,7 +88,7 @@ In this section we will create and train (imposing weight constraints) our origi
 
 ### Build and train the NN
 
-First, we build the model. 
+First, we build the model.
 
 ```{r keras-define-nn-model}
 

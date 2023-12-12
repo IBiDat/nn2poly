@@ -1,12 +1,12 @@
 ---
-title: "01 - Introduction to nn2poly"
+title: "Introduction to nn2poly"
 author: "Pablo Morala"
 output:
   rmarkdown::html_vignette:
     toc: yes
     fig_width: 6
 vignette: >
-  %\VignetteIndexEntry{01 - Introduction to nn2poly}
+  %\VignetteIndexEntry{Introduction to nn2poly}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -120,7 +120,7 @@ test_y <- as.matrix(test[,(p+1)])
 
 ## Original neural network
 
-With our simulated data ready, we can train our neural network. The method is expected to be applied to a given trained densely connected feed forward neural network (NN from now on), also referred as multilayer perceptron (MLP). Therefore, as explained before, any method can be used to train the NN as `nn2poly` only needs the weights and activation functions. 
+With our simulated data ready, we can train our neural network. The method is expected to be applied to a given trained densely connected feed forward neural network (NN from now on), also referred as multilayer perceptron (MLP). Therefore, as explained before, any method can be used to train the NN as `nn2poly` only needs the weights and activation functions.
 
 Here we will use `keras`/`tensorflow` to train it, but we will manually build the needed object with the weights and activation functions that has to be fed to the `nn2poly` algorithm **to show how to do it as if it was trained with any other framework**. However, recall that `keras`/`tensorflow` and `luz`/`torch` models have specific support in `nn2poly` with a more user-friendly approach than the default case covered here where we manually build the weights and activation functions object. For more information on the supported frameworks refer to `vignette("nn2poly-02-supported-DL-frameworks")`.
 
@@ -150,13 +150,13 @@ nn %>% layer_dense(units = 1,
                   activation = "linear")
 
 nn
-#> Model: "sequential"
+#> Model: "sequential_2"
 #> _______________________________________________________________________________________________________
 #>  Layer (type)                                 Output Shape                             Param #         
 #> =======================================================================================================
-#>  dense (Dense)                                (None, 10)                               40              
-#>  dense_1 (Dense)                              (None, 10)                               110             
-#>  dense_2 (Dense)                              (None, 1)                                11              
+#>  dense_8 (Dense)                              (None, 10)                               40              
+#>  dense_9 (Dense)                              (None, 10)                               110             
+#>  dense_10 (Dense)                             (None, 1)                                11              
 #> =======================================================================================================
 #> Total params: 161
 #> Trainable params: 161

@@ -1,5 +1,5 @@
 ---
-title: "02 - Supported DL frameworks"
+title: "Supported DL frameworks"
 author: "Pablo Morala"
 output:
   rmarkdown::html_vignette:
@@ -7,7 +7,7 @@ output:
     fig_width: 6
 date: "2023-12-12"
 vignette: >
-  %\VignetteIndexEntry{02 - Supported DL frameworks}
+  %\VignetteIndexEntry{Supported DL frameworks}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -99,7 +99,7 @@ With our common data generated, we are now ready to delve into the different dee
 
 ## `keras`/`tensorflow`
 
-In this section we will show how to use `nn2poly` with a `keras` neural network and how to impose the needed weight constraints during training. 
+In this section we will show how to use `nn2poly` with a `keras` neural network and how to impose the needed weight constraints during training.
 
 
 ```r
@@ -146,7 +146,7 @@ nn_con <- add_constraints(nn_con, constraint_type = "l1_norm")
 
 ### Training
 
-Now we can compile  and train both NNs using standard the `keras` approach. Note that we have to increase the number of needed epochs with the constrained NN to learn properly. 
+Now we can compile  and train both NNs using standard the `keras` approach. Note that we have to increase the number of needed epochs with the constrained NN to learn properly.
 
 
 ```r
@@ -287,47 +287,32 @@ library(luz)
 set.seed(42)
 ```
 
-### Data loader for torch
+### Data loader for `torch`
 
-In this framework, we need to input our data as a torch dataset
+In this framework, we need to manipulate a bit our data to use it as input for a `torch` model. This can be done dividing our `train_x` data intro only train and validation matrices and using `luz::as_dataloader()`
 
 
 ```r
-# torch dataset
-torch_dataset <- torch::dataset(
-  name = "nn2poly_dataset",
-  initialize = function(x, y) {
-    self$x <- torch::torch_tensor(x)
-    self$y <- torch::torch_tensor(y)
-  },
-  .getitem = function(i) {
-    x <- self$x[i,]
-    y <- self$y[i]
-    list(x = x,
-         y = y)
-  },
-  .length = function() {
-    self$y$size()[[1]]
-  }
-)
+# Divide in only train and validation
+all_indices   <- 1:nrow(train_x)
+only_train_indices <- sample(all_indices, size = round(length(data_full)) * 0.8)
+val_indices   <- setdiff(all_indices, only_train_indices)
 
-data_full <- torch_dataset(train_x, train_y)
+# Create lists with x and y values to feed luz::as_dataloader()
+only_train_x <- as.matrix(train_x[only_train_indices,])
+only_train_y <- as.matrix(train_y[only_train_indices,])
+val_x <- as.matrix(train_x[val_indices,])
+val_y <- as.matrix(train_y[val_indices,])
 
-# Divide in train and validation
-all_indices   <- 1:length(data_full)
-train_indices <- sample(all_indices, size = round(length(data_full)) * 0.8)
-val_indices   <- setdiff(all_indices, train_indices)
+only_train_list <- list(x = only_train_x, y = only_train_y)
+val_list <- list(x = val_x, y = val_y)
 
-data_train <- torch::dataset_subset(data_full, train_indices)
-data_val   <- torch::dataset_subset(data_full, val_indices)
-
-
-# Data loader
 torch_data <- list(
-  train = torch::dataloader(data_train, batch_size = 50, shuffle = TRUE),
-  valid = torch::dataloader(data_val, batch_size = 50)
+  train = luz::as_dataloader(only_train_list, batch_size = 50, shuffle = TRUE),
+  valid = luz::as_dataloader(val_list, batch_size = 50)
 )
 ```
+
 
 
 ### Model definition
@@ -364,7 +349,7 @@ nn_con <- luz_nn()
 
 ### Training
 
-First we train the unconstrained NN using ans standard `luz` approach. 
+First we train the unconstrained NN using ans standard `luz` approach.
 
 
 ```r
@@ -387,7 +372,7 @@ Then, we train the  constrained NN by using the function function `add_constrain
 
 Also, it is important to note that the weight constraints are imposed on all layers except for the last one, which is expected to be linear and not need a Taylor expansion.
 
-Note that we have to increase the number of needed epochs with the constrained NN to learn properly. 
+Note that we have to increase the number of needed epochs with the constrained NN to learn properly.
 
 
 ```r
