@@ -5,7 +5,7 @@ output:
   rmarkdown::html_vignette:
     toc: yes
     fig_width: 6
-date: "2023-12-11"
+date: "2023-12-12"
 vignette: >
   %\VignetteIndexEntry{02 - Supported DL frameworks}
   %\VignetteEngine{knitr::rmarkdown}
@@ -277,7 +277,7 @@ plot_n_important_coeffs(final_poly_con, n_important_coeffs = 8)
 
 ## `luz`/`torch`
 
-In this section we will show how to use `nn2poly` with a `torch` neural network, built with its higher level API `luz`, and how to impose the needed weight constraints during training. 
+In this section we will show how to use `nn2poly` with a `torch` neural network, built with its higher level API `luz`, and how to impose the needed weight constraints during training. Furthermore, we will explain how to use `luz_model_sequential()`, a helper needed to create a `torch` model in an adequate manner so that it can be easily recognized by `nn2poly`.
 
 
 ```r
@@ -332,7 +332,9 @@ torch_data <- list(
 
 ### Model definition
 
-Now we will set the structure of our neural networks using a sequential model in `torch`. This following function will be used to create both the constrained and unconstrained neural networks in the `torch` example.
+Now we will set the structure of our neural networks using a sequential model in `torch`. To do so we have implemented the helper `luz_model_sequential()`, which lets the user stack linear layers in a similar way as `keras` and allows `nn2poly()` to be directly used in the model without the need to extract weights and activation functions manually as in the default example of `vignette("nn2poly-01-introduction")`.
+
+This following function will be used to create both the constrained and unconstrained neural networks in the `torch` example.
 
 
 ```r

@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Simple classification example
+# Multiclass classification example
 
 After showing how to use `nn2poly` in a regression setting both in `vignette("nn2poly-01-introduction")` and `vignette("nn2poly-02-supported-DL-frameworks")`, we will see here a simple classification example using the iris dataset to showcase how nn2poly obtains a polynomial for each class (or output neuron).
 
