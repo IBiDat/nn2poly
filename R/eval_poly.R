@@ -1,31 +1,35 @@
-#' Evaluates one or several polynomials over one or more data points in the
-#' desired variables.
+#' Polynomial evaluation
 #'
-#' @param x Input data as matrix, vector or dataframe.
-#' The number of columns should be the number of variables in the polynomial
-#' (the dimension p). Response variable to be predicted should not be included.
+#' Evaluates one or several polynomials on the given data.
 #'
 #' @param poly List containing 2 items: \code{labels} and \code{values}.
-#' - \code{labels} List of integer vectors with same length (or number of rows)
+#' - \code{labels}: List of integer vectors with same length (or number of rows)
 #' as \code{values}, where each integer vector denotes the combination of
 #' variables associated to the coefficient value stored at the same position in
-#' \code{values}. Note that the variables are numbered from 1 to p.
-#' - \code{values} Matrix (or also a vector if single polynomial), where each
-#' row represents a polynomial, with same number of columns as the length of
-#' \code{labels}, containing at each column the value of the coefficient
-#' given by the equivalent label in that same position.
+#' \code{values}. That is, the monomials in the polynomial. Note that the
+#' variables are numbered from 1 to p.
+#' - \code{values}: Matrix (can also be a vector if single polynomial), where
+#' each row represents a polynomial, with same number of columns as the length
+#' of \code{labels}, containing at each column the value of the coefficient
+#' of the monomial given by the equivalent label in that same position.
 #'
 #' Example: If \code{labels} contains the integer vector c(1,1,3) at position
 #' 5, then the value stored in \code{values} at position 5 is the coefficient
 #' associated with the term x_1^2*x_3.
 #'
-#' @return Vector containing the evaluation of a single polynomial or
+#' @param x Input data as matrix, vector or dataframe.
+#' Number of columns (or elements in vector) should be the number of variables
+#' in the polynomial (dimension p). Response variable to be predicted should
+#' not be included.
+#'
+#' @return Returns a vector containing the evaluation of a single polynomial or
 #' matrix containing the evaluation of the polynomials. Each row
 #' corresponds to each polynomial used and each column to each observation,
 #' meaning that each row vector corresponds to the results of evaluating all the
 #' given data for each polynomial.
 #'
 #' @examples
+#' # Single polynomial evaluation
 #' # Create the polynomial 1 + (-1)·x_1 + 1·x_2 + 0.5·(x_1)^2 as a list
 #' poly <- list()
 #' poly$values <- c(1,-1,1,0.5)
@@ -33,10 +37,22 @@
 #' # Create two observations, (x_1,x_2) = (1,2) and (x_1,x_2) = (3,1)
 #' x <- rbind(c(1,2), c(3,1))
 #' # Evaluate the polynomial on both observations
-#' eval_poly(x,poly)
+#' eval_poly(poly = poly,x = x)
+#'
+#' # Multiple polynomial evaluation, with same terms but different coefficients
+#' # Create the polynomial 1 + (-1)·x_1 + 1·x_2 + 0.5·(x_1)^2 as a list
+#' poly <- list()
+#' coeff_matrix <- rbind(c(1,-1,1,0.5),
+#'                       c(2,-3,0,1.3))
+#' poly$values <- coeff_matrix
+#' poly$labels <- list(c(0),c(1),c(2),c(1,1))
+#' # Create two observations, (x_1,x_2) = (1,2) and (x_1,x_2) = (3,1)
+#' x <- rbind(c(1,2), c(3,1))
+#' # Evaluate the polynomial on both observations
+#' eval_poly(poly = poly, x = x)
 #'
 #' @export
-eval_poly <- function(x, poly) {
+eval_poly <- function(poly, x) {
 
   # Remove names and transform into matrix (variables as columns)
   x <- unname(as.matrix(x))
@@ -51,9 +67,14 @@ eval_poly <- function(x, poly) {
     poly$values <- t(as.matrix(poly$values))
   }
 
+  # Detect if the polynomial has intercept or not, needed in later steps
+  bool_intercept <- FALSE
+  if (c(0) %in% poly$labels) bool_intercept <- TRUE
+
+
   # If there is intercept and it is not the first element, reorder the
   # polynomial labels and values
-  if (c(0) %in% poly$labels){
+  if (bool_intercept){
     intercept_position <- which(sapply(poly$labels, function(x) c(0) %in% x))
     if (intercept_position != 1){
 
@@ -87,7 +108,7 @@ eval_poly <- function(x, poly) {
 
     # Intercept (label = 0) should always be the first element of labels at this
     # point of the function (labels reordered previously)
-    if (poly$labels[[1]] == c(0)){
+    if (bool_intercept){
       response_j <- rep(values_j[1], nrow(x))
       start_loop <- 2
     } else {

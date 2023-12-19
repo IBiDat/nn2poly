@@ -112,5 +112,5 @@ predict.nn2poly <- function(object, newdata, ...) {
   if (length(class(object)) > 1)
     return(NextMethod())
   # this happens after running nn2poly()
-  eval_poly(x = newdata, poly = object)
+  eval_poly(poly = object, x = newdata)
 }

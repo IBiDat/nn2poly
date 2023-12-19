@@ -5,7 +5,7 @@ output:
   rmarkdown::html_vignette:
     toc: yes
     fig_width: 6
-date: "2023-12-12"
+date: "2023-12-19"
 vignette: >
   %\VignetteIndexEntry{Classification example using tensorflow}
   %\VignetteEngine{knitr::rmarkdown}
@@ -103,18 +103,18 @@ nn <- keras_model()
 # Impose weight constraints provided by nn2poly package
 nn <- add_constraints(nn, constraint_type = "l1_norm")
 nn
-#> Model: "sequential_5"
-#> _______________________________________________________________________________________________________
-#>  Layer (type)                                 Output Shape                             Param #         
-#> =======================================================================================================
-#>  dense_19 (Dense)                             (None, 100)                              500             
-#>  dense_20 (Dense)                             (None, 100)                              10100           
-#>  dense_21 (Dense)                             (None, 3)                                303             
-#> =======================================================================================================
+#> Model: "sequential_15"
+#> ______________________________________________________________________________________________________
+#>  Layer (type)                                Output Shape                             Param #         
+#> ======================================================================================================
+#>  dense_49 (Dense)                            (None, 100)                              500             
+#>  dense_50 (Dense)                            (None, 100)                              10100           
+#>  dense_51 (Dense)                            (None, 3)                                303             
+#> ======================================================================================================
 #> Total params: 10,903
 #> Trainable params: 10,903
 #> Non-trainable params: 0
-#> _______________________________________________________________________________________________________
+#> ______________________________________________________________________________________________________
 ```
 
 > *Note*: In this case the NN has a *linear* output with the same number of neurons as the number of classes to predict (3 species, `n_class`). Then, the linear output will be transformed into a *probability* to find the most probable class but this step is done *after training*. Therefore, nn2poly will be used to obtain a polynomial that approximates this *nn with linear outputs* and then its results will also be transformed in probabilities to  predict the highest probability class.
@@ -359,13 +359,13 @@ final_poly
 
 ### Obtaining polynomial predictions
 
-As said before, the obtained polynomial represents the neural network before including the softmax function and computing the class assigned to each observation. Then, we need to define again a keras sequential model that includes the class computation from the polynomial output. This polynomial output is obtained with `eval_poly()`, in this case in matrix form, as the 3 polynomials are evaluated at the same time:
+As said before, the obtained polynomial represents the neural network before including the softmax function and computing the class assigned to each observation. Then, we need to define again a keras sequential model that includes the class computation from the polynomial output. This polynomial output is obtained with `predict()` used on the `nn2poly()` output, in this case in matrix form, as the 3 polynomials are evaluated at the same time:
 
 
 ```r
 
 # Obtain the predicted values for the test data with our Polynomial Regression
-prediction_poly_matrix <- eval_poly(x = test_x, poly = final_poly)
+prediction_poly_matrix <- predict(object = final_poly, newdata = test_x)
 
 # Define probability model with keras fro the polynomial outputs
 probability_poly <- keras_model_sequential() %>%

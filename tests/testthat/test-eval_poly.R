@@ -6,7 +6,7 @@ test_that("Single polynomial evaluation and single observation works", {
   poly$labels <- list(c(0),c(1),c(2),c(1,1))
 
   x <- c(1,1)
-  expect_equal(eval_poly(x,poly), as.vector(1.5))
+  expect_equal(eval_poly(poly, x), as.vector(1.5))
 
   # With intercept and unnordered labels
   poly <- list()
@@ -14,7 +14,7 @@ test_that("Single polynomial evaluation and single observation works", {
   poly$labels <- list(c(1),c(0),c(1,1),c(2))
 
   x <- c(2,-1)
-  expect_equal(eval_poly(x,poly), as.vector(4.5))
+  expect_equal(eval_poly(poly, x), as.vector(4.5))
 })
 
 test_that("Multiple polynomial evaluation and single observation works", {
@@ -26,7 +26,7 @@ test_that("Multiple polynomial evaluation and single observation works", {
   poly$labels <- list(c(1),c(2),c(1,1))
 
   x <- c(1,2)
-  expect_equal(eval_poly(x,poly), as.matrix(c(0,6)))
+  expect_equal(eval_poly(poly, x), as.matrix(c(0,6)))
 
   # With intercept and unnordered labels
   poly <- list()
@@ -35,7 +35,7 @@ test_that("Multiple polynomial evaluation and single observation works", {
   poly$labels <- list(c(2),c(0),c(2,1))
 
   x <- c(2,-1)
-  expect_equal(eval_poly(x,poly), as.matrix(c(-4,5)))
+  expect_equal(eval_poly(poly, x), as.matrix(c(-4,5)))
 })
 
 
@@ -47,7 +47,7 @@ test_that("Single polynomial evaluation and multiple observations (matrix) works
   poly$labels <- list(c(1),c(2),c(1,1))
 
   x <- rbind(c(1,2), c(1,1))
-  expect_equal(eval_poly(x,poly), as.vector(c(0,1)))
+  expect_equal(eval_poly(poly, x), as.vector(c(0,1)))
 })
 
 test_that("Multiple polynomial evaluation and multiple observations (matrix) works", {
@@ -59,7 +59,7 @@ test_that("Multiple polynomial evaluation and multiple observations (matrix) wor
   poly$labels <- list(c(1),c(2),c(1,1))
 
   x <- rbind(c(1,2), c(1,1))
-  expect_equal(eval_poly(x,poly), cbind(c(0,6),c(1,3)))
+  expect_equal(eval_poly(poly, x), cbind(c(0,6),c(1,3)))
 
   # With intercept and unnordered labels
   poly <- list()
@@ -68,7 +68,7 @@ test_that("Multiple polynomial evaluation and multiple observations (matrix) wor
   poly$labels <- list(c(2),c(0),c(2,1))
 
   x <- rbind(c(2,-1), c(1,1))
-  expect_equal(eval_poly(x,poly), cbind(c(-4,5),c(1,3)))
+  expect_equal(eval_poly(poly, x), cbind(c(-4,5),c(1,3)))
 })
 
 
@@ -81,7 +81,7 @@ test_that("Observation as dataframe works", {
 
   x <- c(1,2)
   x <- as.data.frame(x)
-  expect_equal(eval_poly(x,poly), as.matrix(c(0,6)))
+  expect_equal(eval_poly(poly, x), as.matrix(c(0,6)))
 
 
   # Multiple Observations
@@ -92,5 +92,22 @@ test_that("Observation as dataframe works", {
 
   x <- rbind(c(1,2), c(1,1))
   x <- as.data.frame(x)
-  expect_equal(eval_poly(x,poly), cbind(c(0,6),c(1,3)))
+  expect_equal(eval_poly(poly, x), cbind(c(0,6),c(1,3)))
+})
+
+
+test_that("Works with higher order elements at the start and no intercept", {
+
+  # This check is beacuse in an older version we had a problem if
+  # a multiple element label was at first position and no intercept was created.
+  # This should not be a problem with the new version but we'll keep the test.
+
+  # Without intercept
+  poly <- list()
+  poly$values <- matrix(c(1,-1,1,
+                          -2,3,2), nrow = 2, byrow = TRUE)
+  poly$labels <- list(c(1,1),c(2),c(1))
+
+  x <- rbind(c(1,2), c(1,1))
+  expect_equal(eval_poly(poly, x), cbind(c(0,6),c(1,3)))
 })

@@ -88,7 +88,7 @@ for (i in 1:p){
 }
 
 # Response variable + small error term
-Y <- as.vector(eval_poly(X,polynomial)) + stats::rnorm(n_sample, 0, 0.1)
+Y <- as.vector(eval_poly(poly = polynomial, x = X)) + stats::rnorm(n_sample, 0, 0.1)
 
 # Store all as a data frame
 data <- as.data.frame(cbind(X, Y))

@@ -5,7 +5,7 @@ output:
   rmarkdown::html_vignette:
     toc: yes
     fig_width: 6
-date: "2023-12-12"
+date: "2023-12-19"
 vignette: >
   %\VignetteIndexEntry{Supported DL frameworks}
   %\VignetteEngine{knitr::rmarkdown}
@@ -55,7 +55,7 @@ for (i in 1:p){
 }
 
 # Response variable + small error term
-Y <- as.vector(eval_poly(X,polynomial)) + stats::rnorm(n_sample, 0, 0.1)
+Y <- as.vector(eval_poly(poly = polynomial, x = X)) + stats::rnorm(n_sample, 0, 0.1)
 
 # Store all as a data frame
 data <- as.data.frame(cbind(X, Y))
@@ -240,8 +240,8 @@ We can visualize the polynomial predictions versus NN predictions
 ```r
 
 # Obtain the predicted values for the test data with our two polynomials
-prediction_poly_uncon <- eval_poly(x = test_x, poly = final_poly_uncon)
-prediction_poly_con <- eval_poly(x = test_x, poly = final_poly_con)
+prediction_poly_uncon <- predict(object = final_poly_uncon, newdata = test_x)
+prediction_poly_con <- predict(object = final_poly_con, newdata = test_x)
 
 plot_diagonal(x_axis =  prediction_nn_uncon, y_axis =  prediction_poly_uncon, xlab = "NN prediction", ylab = "Polynomial prediction") + ggplot2::ggtitle("Polynomial for nn_uncon")
 ```
@@ -295,7 +295,7 @@ In this framework, we need to manipulate a bit our data to use it as input for a
 ```r
 # Divide in only train and validation
 all_indices   <- 1:nrow(train_x)
-only_train_indices <- sample(all_indices, size = round(length(data_full)) * 0.8)
+only_train_indices <- sample(all_indices, size = round(nrow(train_x)) * 0.8)
 val_indices   <- setdiff(all_indices, only_train_indices)
 
 # Create lists with x and y values to feed luz::as_dataloader()
@@ -440,8 +440,8 @@ We can visualize the polynomial predictions versus NN predictions
 ```r
 
 # Obtain the predicted values for the test data with our two polynomials
-prediction_poly_uncon <- eval_poly(x = test_x, poly = final_poly_uncon)
-prediction_poly_con <- eval_poly(x = test_x, poly = final_poly_con)
+prediction_poly_uncon <- predict(object = final_poly_uncon, newdata = test_x)
+prediction_poly_con <- predict(object = final_poly_con, newdata = test_x)
 
 plot_diagonal(x_axis =  prediction_nn_uncon, y_axis =  prediction_poly_uncon, xlab = "NN prediction", ylab = "Polynomial prediction") + ggplot2::ggtitle("Polynomial for nn_uncon")
 ```

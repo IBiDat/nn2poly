@@ -185,12 +185,12 @@ final_poly
 
 ### Obtaining polynomial predictions
 
-As said before, the obtained polynomial represents the neural network before including the softmax function and computing the class assigned to each observation. Then, we need to define again a keras sequential model that includes the class computation from the polynomial output. This polynomial output is obtained with `eval_poly()`, in this case in matrix form, as the 3 polynomials are evaluated at the same time:
+As said before, the obtained polynomial represents the neural network before including the softmax function and computing the class assigned to each observation. Then, we need to define again a keras sequential model that includes the class computation from the polynomial output. This polynomial output is obtained with `predict()` used on the `nn2poly()` output, in this case in matrix form, as the 3 polynomials are evaluated at the same time:
 
 ```{r class-polynomial-prediction-nn}
 
 # Obtain the predicted values for the test data with our Polynomial Regression
-prediction_poly_matrix <- eval_poly(x = test_x, poly = final_poly)
+prediction_poly_matrix <- predict(object = final_poly, newdata = test_x)
 
 # Define probability model with keras fro the polynomial outputs
 probability_poly <- keras_model_sequential() %>%
