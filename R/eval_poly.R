@@ -7,7 +7,7 @@
 #' as \code{values}, where each integer vector denotes the combination of
 #' variables associated to the coefficient value stored at the same position in
 #' \code{values}. That is, the monomials in the polynomial. Note that the
-#' variables are numbered from 1 to p.
+#' variables are numbered from 1 to p, with the intercept represented by 0.
 #' - \code{values}: Matrix (can also be a vector if single polynomial), where
 #' each row represents a polynomial, with same number of columns as the length
 #' of \code{labels}, containing at each column the value of the coefficient
