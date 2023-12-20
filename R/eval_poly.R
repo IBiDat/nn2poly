@@ -28,6 +28,8 @@
 #' meaning that each row vector corresponds to the results of evaluating all the
 #' given data for each polynomial.
 #'
+#' @seealso \code{eval_poly()} is also used in [predict.nn2poly()].
+#'
 #' @examples
 #' # Single polynomial evaluation
 #' # Create the polynomial 1 + (-1)·x_1 + 1·x_2 + 0.5·(x_1)^2 as a list

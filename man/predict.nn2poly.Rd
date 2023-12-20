@@ -9,14 +9,55 @@
 \arguments{
 \item{object}{Object of class inheriting from 'nn2poly'.}
 
-\item{newdata}{a}
+\item{newdata}{Input data as matrix, vector or dataframe.
+Number of columns (or elements in vector) should be the number of variables
+in the polynomial (dimension p). Response variable to be predicted should
+not be included.}
 
 \item{...}{Further arguments passed to or from other methods.}
 }
 \value{
-\code{matrix} containing the predictions. There is one prediction for
-each row in \code{newdata}.
+Returns a vector containing the evaluation of a single polynomial or
+matrix containing the evaluation of the polynomials. Each row
+corresponds to each polynomial used and each column to each observation,
+meaning that each row vector corresponds to the results of evaluating all the
+given data for each polynomial.
 }
 \description{
-Predicted values obtained with an nn2poly object on some new data.
+Predicted values obtained with a nn2poly object on given data.
+}
+\details{
+Internally uses \code{eval_poly()} to obtain the predictions. However, this only
+works with a nn2poly object while \code{eval_poly()} can be used with a manually
+created polynomial in list form.
+}
+\examples{
+# Build a NN estructure with random weights, with 2 (+ bias) inputs,
+# 4 (+bias) neurons in the first hidden layer with "tanh" activation
+# function, 4 (+bias) neurons in the second hidden layer with "softplus",
+# and 1 "linear" output unit
+
+weights_layer_1 <- matrix(rnorm(12), nrow = 3, ncol = 4)
+weights_layer_2 <- matrix(rnorm(20), nrow = 5, ncol = 4)
+weights_layer_3 <- matrix(rnorm(5), nrow = 5, ncol = 1)
+
+# Set it as a list with activation functions as names
+nn_object = list("tanh" = weights_layer_1,
+                 "softplus" = weights_layer_2,
+                 "linear" = weights_layer_3)
+
+# Obtain the polynomial representation (order = 3) of that neural network
+final_poly <- nn2poly(nn_object, max_order = 3)
+
+# Define some new data, it can be vector, matrix or dataframe
+newdata <- matrix(rnorm(10), ncol = 2, nrow = 5)
+
+# Predict using the obtained polynomial
+predict(object = final_poly, newdata = newdata)
+
+
+}
+\seealso{
+The \code{\link[=nn2poly]{nn2poly()}} function that obtains the \code{nn2poly} polynomial
+object, \code{\link[=eval_poly]{eval_poly()}}, \code{\link[stats:predict]{stats::predict()}}
 }

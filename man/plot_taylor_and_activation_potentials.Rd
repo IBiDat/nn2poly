@@ -25,8 +25,9 @@ desired. Currently supports models from the following deep learning frameworks:
 It also supports a named \code{list} as input which allows to introduce by
 hand a model from any other source. This \code{list} should be of length L
 (number of hidden layers + 1) containing the weights matrix for each layer.
-Each element of the list should be names as the activation function used at
-each layer.
+Each element of the list should be named as the activation function used at
+each layer. Currently supported activation functions are \code{"tanh"},
+\code{"softplus"}, \code{"sigmoid"} and \code{"linear"}.
 
 At any layer \eqn{l}, the expected shape of such matrices is of the form
 \eqn{(h_{(l-1)} + 1)*(h_l)}, that is, the number of rows is the number of

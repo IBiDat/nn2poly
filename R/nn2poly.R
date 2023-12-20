@@ -4,7 +4,7 @@
 utils::globalVariables(c(".data", "super", "self", "private", "ctx"))
 NULL
 
-#' Obtain a polynomial representation from a trained neural network
+#' Obtain polynomial representation
 #'
 #' Implements the main NN2Poly algorithm to obtain a polynomial representation
 #' of a trained neural network using its weights and Taylor expansion of its
@@ -18,8 +18,9 @@ NULL
 #' It also supports a named \code{list} as input which allows to introduce by
 #' hand a model from any other source. This \code{list} should be of length L
 #' (number of hidden layers + 1) containing the weights matrix for each layer.
-#' Each element of the list should be names as the activation function used at
-#' each layer.
+#' Each element of the list should be named as the activation function used at
+#' each layer. Currently supported activation functions are \code{"tanh"},
+#' \code{"softplus"}, \code{"sigmoid"} and \code{"linear"}.
 #'
 #' At any layer \eqn{l}, the expected shape of such matrices is of the form
 #' \eqn{(h_{(l-1)} + 1)*(h_l)}, that is, the number of rows is the number of
@@ -36,12 +37,13 @@ NULL
 #' @param keep_layers Boolean that determines if all polynomials computed in
 #' the internal layers have to be stored and given in the output (\code{TRUE}),
 #' or if only the polynomials from the last layer are needed (\code{FALSE}).
+#' Default set to \code{FALSE}.
 #'
 #' @param taylor_orders \code{integer} or \code{vector} of length L that sets the
 #' degree at which Taylor expansion is truncated at each layer. If a single
 #' value is used, that value is set for each non linear layer and 1 for linear
 #  layers. If a vector is used, each value corresponds to the Taylor order used
-#' at each layer activation function. Default is set to 8.
+#' at each layer activation function. Default set to \code{8}.
 #'
 #' @param ... Ignored.
 #'
@@ -50,8 +52,10 @@ NULL
 #' multipartitions. This step can be computationally expensive when the chosen
 #' polynomial order or the dimension are too high. In such cases, it is
 #' encouraged that the multipartitions are stored and reused when possible.
+#' Default set to \code{NULL}.
 #'
-#' @return An object of class `nn2poly`.
+#' @return Returns an object of class `nn2poly`.
+#'
 #' If \code{keep_layers = FALSE} (default case), it returns a list with two
 #' items:
 #' - An item named `labels` that is a list of integer vectors. Those vectors
@@ -70,6 +74,43 @@ NULL
 #'
 #' The polynomials obtained at the hidden layers are not needed to represent the
 #' NN but can be used to explore other insights from the NN.
+#'
+#'
+#' @seealso Predict method for \code{nn2poly} output [predict.nn2poly()].
+#'
+#' @examples
+#' # Build a NN estructure with random weights, with 2 (+ bias) inputs,
+#' # 4 (+bias) neurons in the first hidden layer with "tanh" activation
+#' # function, 4 (+bias) neurons in the second hidden layer with "softplus",
+#' # and 1 "linear" output unit
+#'
+#' weights_layer_1 <- matrix(rnorm(12), nrow = 3, ncol = 4)
+#' weights_layer_2 <- matrix(rnorm(20), nrow = 5, ncol = 4)
+#' weights_layer_3 <- matrix(rnorm(5), nrow = 5, ncol = 1)
+#'
+#' # Set it as a list with activation functions as names
+#' nn_object = list("tanh" = weights_layer_1,
+#'                  "softplus" = weights_layer_2,
+#'                  "linear" = weights_layer_3)
+#'
+#' # Obtain the polynomial representation (order = 3) of that neural network
+#' final_poly <- nn2poly(nn_object, max_order = 3)
+#'
+#' # Change the last layer to have 3 outputs (as in a multiclass classification)
+#' # problem
+#' weights_layer_4 <- matrix(rnorm(20), nrow = 5, ncol = 4)
+#'
+#' # Set it as a list with activation functions as names
+#' nn_object = list("tanh" = weights_layer_1,
+#'                  "softplus" = weights_layer_2,
+#'                  "linear" = weights_layer_4)
+#' # Obtain the polynomial representation of that neural network
+#' # In this case the output is formed by several polynomials with the same
+#' # structure but different coefficient values
+#' final_poly <- nn2poly(nn_object, max_order = 3)
+#'
+#' # Polynomial representation of each hidden neuron is given by
+#' final_poly <- nn2poly(nn_object, max_order = 3, keep_layers = TRUE)
 #'
 #' @export
 nn2poly <- function(object,
@@ -98,19 +139,53 @@ nn2poly.default <- function(object, ...) {
   nn2poly(object, ...)
 }
 
-#' S3 method for class 'nn2poly'
+#' Predict method for \code{nn2poly} objects.
 #'
-#' @param object An object of class inheriting from 'nn2poly'.
-#' @param newdata Matrix for which predictions are to be made.
-#' @param ... Additional arguments.
+#' Predicted values obtained with a nn2poly object on given data.
 #'
-#' @return \code{matrix} containing the predictions. There is one prediction for
-#' each row in `newdata`.
+#' @inherit eval_poly
+#' @param object Object of class inheriting from 'nn2poly'.
+#' @param ... 	Further arguments passed to or from other methods.
+#'
+#' @details
+#' Internally uses `eval_poly()` to obtain the predictions. However, this only
+#' works with a \code{nn2poly} object while `eval_poly()` can be used with a
+#' manually created polynomial in list form.
+#'
+#' @seealso [nn2poly()]: function that obtains the \code{nn2poly} polynomial
+#' object, [eval_poly()]: function that can evaluate polynomials in general,
+#' [stats::predict()]: generic predict function.
+#'
+#'
+#' @examples
+#' # Build a NN estructure with random weights, with 2 (+ bias) inputs,
+#' # 4 (+bias) neurons in the first hidden layer with "tanh" activation
+#' # function, 4 (+bias) neurons in the second hidden layer with "softplus",
+#' # and 1 "linear" output unit
+#'
+#' weights_layer_1 <- matrix(rnorm(12), nrow = 3, ncol = 4)
+#' weights_layer_2 <- matrix(rnorm(20), nrow = 5, ncol = 4)
+#' weights_layer_3 <- matrix(rnorm(5), nrow = 5, ncol = 1)
+#'
+#' # Set it as a list with activation functions as names
+#' nn_object = list("tanh" = weights_layer_1,
+#'                  "softplus" = weights_layer_2,
+#'                  "linear" = weights_layer_3)
+#'
+#' # Obtain the polynomial representation (order = 3) of that neural network
+#' final_poly <- nn2poly(nn_object, max_order = 3)
+#'
+#' # Define some new data, it can be vector, matrix or dataframe
+#' newdata <- matrix(rnorm(10), ncol = 2, nrow = 5)
+#'
+#' # Predict using the obtained polynomial
+#' predict(object = final_poly, newdata = newdata)
+#'
 #'
 #' @export
 predict.nn2poly <- function(object, newdata, ...) {
   if (length(class(object)) > 1)
     return(NextMethod())
   # this happens after running nn2poly()
-  eval_poly(poly = object, x = newdata)
+  eval_poly(poly = object, newdata = newdata)
 }
