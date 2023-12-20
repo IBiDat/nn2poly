@@ -2,21 +2,21 @@
 % Please edit documentation in R/nn2poly.R
 \name{predict.nn2poly}
 \alias{predict.nn2poly}
-\title{S3 method for class 'nn2poly'}
+\title{Predict method for \code{nn2poly} objects.}
 \usage{
 \method{predict}{nn2poly}(object, newdata, ...)
 }
 \arguments{
-\item{object}{An object of class inheriting from 'nn2poly'.}
+\item{object}{Object of class inheriting from 'nn2poly'.}
 
-\item{newdata}{Matrix for which predictions are to be made.}
+\item{newdata}{a}
 
-\item{...}{Additional arguments.}
+\item{...}{Further arguments passed to or from other methods.}
 }
 \value{
 \code{matrix} containing the predictions. There is one prediction for
 each row in \code{newdata}.
 }
 \description{
-S3 method for class 'nn2poly'
+Predicted values obtained with an nn2poly object on some new data.
 }

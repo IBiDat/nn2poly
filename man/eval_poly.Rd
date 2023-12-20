@@ -4,7 +4,7 @@
 \alias{eval_poly}
 \title{Polynomial evaluation}
 \usage{
-eval_poly(poly, x)
+eval_poly(poly, newdata)
 }
 \arguments{
 \item{poly}{List containing 2 items: \code{labels} and \code{values}.
@@ -24,7 +24,7 @@ Example: If \code{labels} contains the integer vector c(1,1,3) at position
 5, then the value stored in \code{values} at position 5 is the coefficient
 associated with the term x_1^2*x_3.}
 
-\item{x}{Input data as matrix, vector or dataframe.
+\item{newdata}{Input data as matrix, vector or dataframe.
 Number of columns (or elements in vector) should be the number of variables
 in the polynomial (dimension p). Response variable to be predicted should
 not be included.}
@@ -48,7 +48,7 @@ poly$labels <- list(c(0),c(1),c(2),c(1,1))
 # Create two observations, (x_1,x_2) = (1,2) and (x_1,x_2) = (3,1)
 x <- rbind(c(1,2), c(3,1))
 # Evaluate the polynomial on both observations
-eval_poly(poly = poly,x = x)
+eval_poly(poly = poly,newdata = newdata)
 
 # Multiple polynomial evaluation, with same terms but different coefficients
 # Create the polynomial 1 + (-1)·x_1 + 1·x_2 + 0.5·(x_1)^2 as a list
@@ -58,8 +58,8 @@ coeff_matrix <- rbind(c(1,-1,1,0.5),
 poly$values <- coeff_matrix
 poly$labels <- list(c(0),c(1),c(2),c(1,1))
 # Create two observations, (x_1,x_2) = (1,2) and (x_1,x_2) = (3,1)
-x <- rbind(c(1,2), c(3,1))
+new_data <- rbind(c(1,2), c(3,1))
 # Evaluate the polynomial on both observations
-eval_poly(poly = poly, x = x)
+eval_poly(poly = poly, newdata = newdata)
 
 }

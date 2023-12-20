@@ -17,7 +17,7 @@
 #' 5, then the value stored in \code{values} at position 5 is the coefficient
 #' associated with the term x_1^2*x_3.
 #'
-#' @param x Input data as matrix, vector or dataframe.
+#' @param newdata Input data as matrix, vector or dataframe.
 #' Number of columns (or elements in vector) should be the number of variables
 #' in the polynomial (dimension p). Response variable to be predicted should
 #' not be included.
@@ -37,7 +37,7 @@
 #' # Create two observations, (x_1,x_2) = (1,2) and (x_1,x_2) = (3,1)
 #' x <- rbind(c(1,2), c(3,1))
 #' # Evaluate the polynomial on both observations
-#' eval_poly(poly = poly,x = x)
+#' eval_poly(poly = poly,newdata = newdata)
 #'
 #' # Multiple polynomial evaluation, with same terms but different coefficients
 #' # Create the polynomial 1 + (-1)·x_1 + 1·x_2 + 0.5·(x_1)^2 as a list
@@ -47,19 +47,19 @@
 #' poly$values <- coeff_matrix
 #' poly$labels <- list(c(0),c(1),c(2),c(1,1))
 #' # Create two observations, (x_1,x_2) = (1,2) and (x_1,x_2) = (3,1)
-#' x <- rbind(c(1,2), c(3,1))
+#' new_data <- rbind(c(1,2), c(3,1))
 #' # Evaluate the polynomial on both observations
-#' eval_poly(poly = poly, x = x)
+#' eval_poly(poly = poly, newdata = newdata)
 #'
 #' @export
-eval_poly <- function(poly, x) {
+eval_poly <- function(poly, newdata) {
 
   # Remove names and transform into matrix (variables as columns)
-  x <- unname(as.matrix(x))
+  newdata <- unname(as.matrix(newdata))
 
-  # If x is a single vector, transpose to have it as row vector:
-  if(ncol(x)==1){
-    x = t(x)
+  # If newdata is a single vector, transpose to have it as row vector:
+  if(ncol(newdata)==1){
+    newdata = t(newdata)
   }
 
   # If values is a single vector, transform into matrix
@@ -100,7 +100,7 @@ eval_poly <- function(poly, x) {
   # with rows equal to the rows of `poly$values`, that is, the number of
   # polynomials and columns equal to the number of observations evaluated.
   n_polynomials <- nrow(poly$values)
-  response <- matrix(0, nrow = n_polynomials, ncol = nrow(x))
+  response <- matrix(0, nrow = n_polynomials, ncol = nrow(newdata))
   for (j in 1:n_polynomials){
 
     # Select the desired polynomial values (row of poly$values)
@@ -109,10 +109,10 @@ eval_poly <- function(poly, x) {
     # Intercept (label = 0) should always be the first element of labels at this
     # point of the function (labels reordered previously)
     if (bool_intercept){
-      response_j <- rep(values_j[1], nrow(x))
+      response_j <- rep(values_j[1], nrow(newdata))
       start_loop <- 2
     } else {
-      response_j <- rep(0, nrow(x))
+      response_j <- rep(0, nrow(newdata))
       start_loop <- 1
     }
 
@@ -124,16 +124,16 @@ eval_poly <- function(poly, x) {
       # Need to differentiate between 1 single label or more to use rowProds
       if(length(label_i) == 1){
         # When single variable, it is included in 1:p, that are also the
-        # number of columns in x
-        var_prod <- x[,label_i]
+        # number of columns in newdata
+        var_prod <- newdata[,label_i]
       } else {
-        # Special case if x is a single observation.
-        # Selecting the vars in x returns a column instead of row in this case
-        if(nrow(x)==1){
-          var_prod <- matrixStats::colProds(as.matrix(x[,label_i]))
+        # Special case if newdata is a single observation.
+        # Selecting the vars in newdata returns a column instead of row in this case
+        if(nrow(newdata)==1){
+          var_prod <- matrixStats::colProds(as.matrix(newdata[,label_i]))
         } else {
           # Obtain the product of each variable as many times as label_i indicates
-          var_prod <- matrixStats::rowProds(x[,label_i])
+          var_prod <- matrixStats::rowProds(newdata[,label_i])
         }
 
       }

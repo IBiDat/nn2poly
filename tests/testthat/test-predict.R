@@ -6,8 +6,8 @@ test_that("eval_poly: Single polynomial evaluation and single observation works"
   poly$labels <- list(c(0),c(1),c(2),c(1,1))
   class(poly) <- "nn2poly"
 
-  x <- c(1,1)
-  expect_equal(predict(poly, x), as.vector(1.5))
+  newdata <- c(1,1)
+  expect_equal(predict(poly, newdata), as.vector(1.5))
 
   # With intercept and unnordered labels
   poly <- list()
@@ -15,8 +15,8 @@ test_that("eval_poly: Single polynomial evaluation and single observation works"
   poly$labels <- list(c(1),c(0),c(1,1),c(2))
   class(poly) <- "nn2poly"
 
-  x <- c(2,-1)
-  expect_equal(predict(poly, x), as.vector(4.5))
+  newdata <- c(2,-1)
+  expect_equal(predict(poly, newdata), as.vector(4.5))
 })
 
 
@@ -29,8 +29,8 @@ test_that("eval_poly: Multiple polynomial evaluation and single observation work
   poly$labels <- list(c(1),c(2),c(1,1))
   class(poly) <- "nn2poly"
 
-  x <- c(1,2)
-  expect_equal(predict(poly, x), as.matrix(c(0,6)))
+  newdata <- c(1,2)
+  expect_equal(predict(poly, newdata), as.matrix(c(0,6)))
 
   # With intercept and unnordered labels
   poly <- list()
@@ -39,8 +39,8 @@ test_that("eval_poly: Multiple polynomial evaluation and single observation work
   poly$labels <- list(c(2),c(0),c(2,1))
   class(poly) <- "nn2poly"
 
-  x <- c(2,-1)
-  expect_equal(predict(poly, x), as.matrix(c(-4,5)))
+  newdata <- c(2,-1)
+  expect_equal(predict(poly, newdata), as.matrix(c(-4,5)))
 })
 
 test_that("eval_poly: Observation as dataframe works", {
@@ -51,10 +51,10 @@ test_that("eval_poly: Observation as dataframe works", {
   poly$labels <- list(c(1),c(2),c(1,1))
   class(poly) <- "nn2poly"
 
-  x <- c(1,2)
-  x <- as.data.frame(x)
+  newdata <- c(1,2)
+  newdata <- as.data.frame(x)
 
-  expect_equal(predict(poly, x), as.matrix(c(0,6)))
+  expect_equal(predict(poly, newdata), as.matrix(c(0,6)))
 
 
   # Multiple Observations
@@ -65,8 +65,8 @@ test_that("eval_poly: Observation as dataframe works", {
   poly$labels <- list(c(1),c(2),c(1,1))
   class(poly) <- "nn2poly"
 
-  x <- rbind(c(1,2), c(1,1))
-  x <- as.data.frame(x)
+  newdata <- rbind(c(1,2), c(1,1))
+  newdata <- as.data.frame(x)
 
-  expect_equal(predict(poly, x), cbind(c(0,6),c(1,3)))
+  expect_equal(predict(poly, newdata), cbind(c(0,6),c(1,3)))
 })
