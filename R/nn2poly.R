@@ -180,7 +180,7 @@ nn2poly.default <- function(object, ...) {
 #' If \code{object} contains all the internal polynomials also, as given by
 #' \code{nn2poly(object, keep_layers = TRUE)}, then the output is a list of
 #' layers (represented by \code{layer_i}), where each one is another list with
-#' \code{input} and \output{elements}, where each one contains a matrix with the
+#' \code{input} and \code{output} elements, where each one contains a matrix with the
 #' evaluation of the "input" or "output" polynomial at the given layer.
 #'
 #'
