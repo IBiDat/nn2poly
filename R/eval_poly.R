@@ -22,11 +22,10 @@
 #' in the polynomial (dimension p). Response variable to be predicted should
 #' not be included.
 #'
-#' @return Returns a vector containing the evaluation of a single polynomial or
-#' matrix containing the evaluation of the polynomials. Each row
-#' corresponds to each polynomial used and each column to each observation,
-#' meaning that each row vector corresponds to the results of evaluating all the
-#' given data for each polynomial.
+#' @return Returns a matrix containing the evaluation of the polynomials.
+#' Each row corresponds to each polynomial used and each column to each
+#' observation, meaning that each row vector corresponds to the results of
+#' evaluating all the given data for each polynomial.
 #'
 #' @seealso \code{eval_poly()} is also used in [predict.nn2poly()].
 #'
@@ -37,7 +36,7 @@
 #' poly$values <- c(1,-1,1,0.5)
 #' poly$labels <- list(c(0),c(1),c(2),c(1,1))
 #' # Create two observations, (x_1,x_2) = (1,2) and (x_1,x_2) = (3,1)
-#' x <- rbind(c(1,2), c(3,1))
+#' newdata <- rbind(c(1,2), c(3,1))
 #' # Evaluate the polynomial on both observations
 #' eval_poly(poly = poly,newdata = newdata)
 #'
@@ -79,9 +78,6 @@ eval_poly <- function(poly, newdata) {
   if (bool_intercept){
     intercept_position <- which(sapply(poly$labels, function(x) c(0) %in% x))
     if (intercept_position != 1){
-
-      # Divide again in single observation or matrix form:
-
 
       # Store the value
       intercept_value <- poly$values[,intercept_position]
@@ -148,7 +144,7 @@ eval_poly <- function(poly, newdata) {
     response[j,] <- response_j
   }
 
-  # Check if it is a single polynomial:
+  # Check if it is a single polynomial and transform to vector:
   if (dim(response)[1]==1){
     response <- as.vector(response)
   }

@@ -58,7 +58,7 @@ test_that("Multiple polynomial evaluation and multiple observations (matrix) wor
                           2,3,-2), nrow = 2, byrow = TRUE)
   poly$labels <- list(c(1),c(2),c(1,1))
 
- newdata <- rbind(c(1,2), c(1,1))
+  newdata <- rbind(c(1,2), c(1,1))
   expect_equal(eval_poly(poly, newdata), cbind(c(0,6),c(1,3)))
 
   # With intercept and unnordered labels
@@ -80,7 +80,7 @@ test_that("Observation as dataframe works", {
   poly$labels <- list(c(1),c(2),c(1,1))
 
   newdata <- c(1,2)
-  newdata <- as.data.frame(x)
+  newdata <- as.data.frame(newdata)
   expect_equal(eval_poly(poly, newdata), as.matrix(c(0,6)))
 
 
@@ -91,7 +91,7 @@ test_that("Observation as dataframe works", {
   poly$labels <- list(c(1),c(2),c(1,1))
 
   newdata <- rbind(c(1,2), c(1,1))
-  newdata <- as.data.frame(x)
+  newdata <- as.data.frame(newdata)
   expect_equal(eval_poly(poly, newdata), cbind(c(0,6),c(1,3)))
 })
 

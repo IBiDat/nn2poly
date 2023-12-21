@@ -30,11 +30,10 @@ in the polynomial (dimension p). Response variable to be predicted should
 not be included.}
 }
 \value{
-Returns a vector containing the evaluation of a single polynomial or
-matrix containing the evaluation of the polynomials. Each row
-corresponds to each polynomial used and each column to each observation,
-meaning that each row vector corresponds to the results of evaluating all the
-given data for each polynomial.
+Returns a matrix containing the evaluation of the polynomials.
+Each row corresponds to each polynomial used and each column to each
+observation, meaning that each row vector corresponds to the results of
+evaluating all the given data for each polynomial.
 }
 \description{
 Evaluates one or several polynomials on the given data.
@@ -46,7 +45,7 @@ poly <- list()
 poly$values <- c(1,-1,1,0.5)
 poly$labels <- list(c(0),c(1),c(2),c(1,1))
 # Create two observations, (x_1,x_2) = (1,2) and (x_1,x_2) = (3,1)
-x <- rbind(c(1,2), c(3,1))
+newdata <- rbind(c(1,2), c(3,1))
 # Evaluate the polynomial on both observations
 eval_poly(poly = poly,newdata = newdata)
 
@@ -62,4 +61,7 @@ new_data <- rbind(c(1,2), c(3,1))
 # Evaluate the polynomial on both observations
 eval_poly(poly = poly, newdata = newdata)
 
+}
+\seealso{
+\code{eval_poly()} is also used in \code{\link[=predict.nn2poly]{predict.nn2poly()}}.
 }

@@ -48,7 +48,7 @@ that would naturally arise when considering all Taylor expansions allowed by
 \item{taylor_orders}{\code{integer} or \code{vector} of length L that sets the
 degree at which Taylor expansion is truncated at each layer. If a single
 value is used, that value is set for each non linear layer and 1 for linear
-at each layer activation function. Default set to 8.}
+at each layer activation function. Default set to \code{8}.}
 
 \item{constraints}{Boolean parameter determining if the NN is constrained
 (TRUE) or not (FALSE). This only modifies de plots title to show

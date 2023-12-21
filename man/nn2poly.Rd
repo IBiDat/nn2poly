@@ -48,7 +48,7 @@ Default set to \code{FALSE}.}
 \item{taylor_orders}{\code{integer} or \code{vector} of length L that sets the
 degree at which Taylor expansion is truncated at each layer. If a single
 value is used, that value is set for each non linear layer and 1 for linear
-at each layer activation function. Default set to 8.}
+at each layer activation function. Default set to \code{8}.}
 
 \item{...}{Ignored.}
 
@@ -60,7 +60,8 @@ encouraged that the multipartitions are stored and reused when possible.
 Default set to \code{NULL}.}
 }
 \value{
-An object of class \code{nn2poly}.
+Returns an object of class \code{nn2poly}.
+
 If \code{keep_layers = FALSE} (default case), it returns a list with two
 items:
 \itemize{
@@ -103,7 +104,7 @@ nn_object = list("tanh" = weights_layer_1,
                  "linear" = weights_layer_3)
 
 # Obtain the polynomial representation (order = 3) of that neural network
-nn2poly(nn_object, max_order = 3)
+final_poly <- nn2poly(nn_object, max_order = 3)
 
 # Change the last layer to have 3 outputs (as in a multiclass classification)
 # problem
@@ -116,12 +117,12 @@ nn_object = list("tanh" = weights_layer_1,
 # Obtain the polynomial representation of that neural network
 # In this case the output is formed by several polynomials with the same
 # structure but different coefficient values
-nn2poly(nn_object, max_order = 3)
+final_poly <- nn2poly(nn_object, max_order = 3)
 
 # Polynomial representation of each hidden neuron is given by
-nn2poly(nn_object, max_order = 3, keep_layers = TRUE)
+final_poly <- nn2poly(nn_object, max_order = 3, keep_layers = TRUE)
 
 }
 \seealso{
-\code{\link[=predict.nn2poly]{predict.nn2poly()}}
+Predict method for \code{nn2poly} output \code{\link[=predict.nn2poly]{predict.nn2poly()}}.
 }

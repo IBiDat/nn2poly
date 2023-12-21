@@ -4,7 +4,7 @@
 \alias{predict.nn2poly}
 \title{Predict method for \code{nn2poly} objects.}
 \usage{
-\method{predict}{nn2poly}(object, newdata, ...)
+\method{predict}{nn2poly}(object, newdata, layers = NULL, ...)
 }
 \arguments{
 \item{object}{Object of class inheriting from 'nn2poly'.}
@@ -17,19 +17,40 @@ not be included.}
 \item{...}{Further arguments passed to or from other methods.}
 }
 \value{
-Returns a vector containing the evaluation of a single polynomial or
-matrix containing the evaluation of the polynomials. Each row
-corresponds to each polynomial used and each column to each observation,
-meaning that each row vector corresponds to the results of evaluating all the
-given data for each polynomial.
+Returns a matrix or list of matrices with the evaluation of each
+polynomial at each layer as given by the provided \code{object} of class
+\code{nn2poly}.
+
+If \code{object} contains the polynomials of the last layer, as given by
+\code{nn2poly(object, keep_layers = FALSE)}, then the output is a matrix with
+the evaluation of each data point on each polynomial.
+
+If \code{object} contains all the internal polynomials also, as given by
+\code{nn2poly(object, keep_layers = TRUE)}, then the output is a list of
+layers (represented by \code{layer_i}), where each one is another list with
+\code{input} and \output{elements}, where each one contains a matrix with the
+evaluation of the "input" or "output" polynomial at the given layer.
 }
 \description{
 Predicted values obtained with a nn2poly object on given data.
 }
 \details{
 Internally uses \code{eval_poly()} to obtain the predictions. However, this only
-works with a nn2poly object while \code{eval_poly()} can be used with a manually
-created polynomial in list form.
+works with a objects of class \code{nn2poly} while \code{eval_poly()} can be used
+with a manually created polynomial in list form.
+
+When \code{object} contains all the internal polynomials also, as given by
+\code{nn2poly(object, keep_layers = TRUE)}, it is important to note that there
+are two polynomial items per layer (input/output). These polynomial items will
+also contain several polynomials of the same structure, one per neuron in the
+layer, stored as matrix rows in \code{$values}. Please see the NN2Poly
+original paper for more details.
+
+Note also that "linear" layers will contain the same input and output results
+as Taylor expansion is not used and thus the polynomials are also the same.
+Because of this, in the situation of evaluating multiple layers we provide
+the final layer with "input" and "output" even if they are the same, for
+consistency.
 }
 \examples{
 # Build a NN estructure with random weights, with 2 (+ bias) inputs,
@@ -55,9 +76,31 @@ newdata <- matrix(rnorm(10), ncol = 2, nrow = 5)
 # Predict using the obtained polynomial
 predict(object = final_poly, newdata = newdata)
 
+# Change the last layer to have 3 outputs (as in a multiclass classification)
+# problem
+weights_layer_4 <- matrix(rnorm(20), nrow = 5, ncol = 4)
+
+# Set it as a list with activation functions as names
+nn_object = list("tanh" = weights_layer_1,
+                 "softplus" = weights_layer_2,
+                 "linear" = weights_layer_4)
+
+# Obtain the polynomial representation of that neural network
+# Polynomial representation of each hidden neuron is given by
+final_poly <- nn2poly(nn_object, max_order = 3, keep_layers = TRUE)
+
+# Define some new data, it can be vector, matrix or dataframe
+newdata <- matrix(rnorm(10), ncol = 2, nrow = 5)
+
+# Predict using the obtained polynomials (for all layers)
+predict(object = final_poly, newdata = newdata)
+
+# Predict using the obtained polynomials (for chosen layers)
+predict(object = final_poly, newdata = newdata, layers = c(2,3))
 
 }
 \seealso{
-The \code{\link[=nn2poly]{nn2poly()}} function that obtains the \code{nn2poly} polynomial
-object, \code{\link[=eval_poly]{eval_poly()}}, \code{\link[stats:predict]{stats::predict()}}
+\code{\link[=nn2poly]{nn2poly()}}: function that obtains the \code{nn2poly} polynomial
+object, \code{\link[=eval_poly]{eval_poly()}}: function that can evaluate polynomials in general,
+\code{\link[stats:predict]{stats::predict()}}: generic predict function.
 }
