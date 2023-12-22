@@ -145,6 +145,9 @@ nn2poly.default <- function(object, ...) {
 #'
 #' @inherit eval_poly
 #' @param object Object of class inheriting from 'nn2poly'.
+#' @param layers Vector containing the chosen layers from \code{object} to be
+#' evaluated. If set to \code{NULL}, all layers are computed. Defaul is set
+#' to \code{NULL}.
 #' @param ... 	Further arguments passed to or from other methods.
 #'
 #' @details

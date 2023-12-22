@@ -14,6 +14,10 @@ Number of columns (or elements in vector) should be the number of variables
 in the polynomial (dimension p). Response variable to be predicted should
 not be included.}
 
+\item{layers}{Vector containing the chosen layers from \code{object} to be
+evaluated. If set to \code{NULL}, all layers are computed. Defaul is set
+to \code{NULL}.}
+
 \item{...}{Further arguments passed to or from other methods.}
 }
 \value{
