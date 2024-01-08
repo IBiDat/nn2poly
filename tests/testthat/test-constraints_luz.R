@@ -1,6 +1,7 @@
 test_that("The constranied training works using the l1 and l2 constraints", {
   skip_if_not_installed("luz")
   skip_if_not_installed("torch")
+  skip_on_os("mac") # Runner out of memory
   skip_on_cran()
 
   testing_data <- testing_helper_2()
