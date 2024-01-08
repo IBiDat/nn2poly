@@ -20,6 +20,8 @@
 #'
 #' @return A `nn2poly` neural network object.
 #'
+#' @seealso [luz_model_seuqential()]
+#'
 #' @export
 add_constraints <- function(object, type = c("l1_norm", "l2_norm"), ...) {
   UseMethod("add_constraints")

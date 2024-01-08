@@ -2,7 +2,7 @@
 % Please edit documentation in R/helpers.R
 \name{luz_model_sequential}
 \alias{luz_model_sequential}
-\title{Luz Model composed of a linear stack of layers}
+\title{Build a \code{luz} model composed of a linear stack of layers}
 \usage{
 luz_model_sequential(...)
 }
@@ -13,5 +13,15 @@ luz_model_sequential(...)
 A \code{nn_sequential} module.
 }
 \description{
-Luz Model composed of a linear stack of layers
+Helper function to build \code{luz} models as a sequential model, by feeding
+it a stack of \code{luz} layers.
+}
+\details{
+This step is needed so we can get the activation functions and
+layers and neurons architecture easily with \code{nn2poly:::get_parameters()}.
+Furthermore, this step is also needed to be able to impose the needed
+constraints when using the \code{luz/torch} framework.
+}
+\seealso{
+\code{\link[=add_constraints]{add_constraints()}}
 }
