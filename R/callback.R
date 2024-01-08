@@ -37,6 +37,7 @@ build_callback.luz_module_generator <- function(object,
   luz_callback()
 }
 
+# Keras callback is built in Python due to performance problems if built in R
 build_callback.keras.engine.training.Model <- function(object,
                                                        type = c("l1_norm", "l2_norm")) {
   keras_callback <- py_load_class("KerasCallback")

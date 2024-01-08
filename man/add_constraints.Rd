@@ -7,7 +7,8 @@
 add_constraints(object, type = c("l1_norm", "l2_norm"), ...)
 }
 \arguments{
-\item{object}{A neural network object.}
+\item{object}{A neural network object in sequential form from one of the
+supported frameworks.}
 
 \item{type}{Constraint type. Currently, \code{l1_norm} and \code{l2_norm} are supported.}
 
@@ -18,5 +19,15 @@ A \code{nn2poly} neural network object.
 }
 \description{
 This function sets up a neural network object with the constraints required
-by the \code{\link{nn2poly}} algorithm.
+by the \code{\link{nn2poly}} algorithm. Currently supported neural network
+frameworks are \code{keras/tensorflow} and \code{luz/torch}.
+}
+\details{
+Constraints are added to the model object using callbacks in their specific
+framework. These callbacks are used during training when calling fit on the
+model. Specifically we are using callbacks that are applied at the end of
+each train batch.
+
+Models in \code{luz/torch} need to use the \code{\link{luz_model_sequential}}
+helper in order to have a sequential model in the appropriate form.
 }

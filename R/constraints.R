@@ -1,11 +1,22 @@
 #' Add constraints to a neural network
 #'
 #' This function sets up a neural network object with the constraints required
-#' by the \code{\link{nn2poly}} algorithm.
+#' by the \code{\link{nn2poly}} algorithm. Currently supported neural network
+#' frameworks are \code{keras/tensorflow} and \code{luz/torch}.
 #'
-#' @param object A neural network object.
+#' @param object A neural network object in sequential form from one of the
+#' supported frameworks.
 #' @param type Constraint type. Currently, `l1_norm` and `l2_norm` are supported.
 #' @param ... Additional arguments (unused).
+#'
+#' @details
+#' Constraints are added to the model object using callbacks in their specific
+#' framework. These callbacks are used during training when calling fit on the
+#' model. Specifically we are using callbacks that are applied at the end of
+#' each train batch.
+#'
+#' Models in \code{luz/torch} need to use the \code{\link{luz_model_sequential}}
+#' helper in order to have a sequential model in the appropriate form.
 #'
 #' @return A `nn2poly` neural network object.
 #'
