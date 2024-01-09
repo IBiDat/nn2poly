@@ -7,18 +7,18 @@
 #' needed to simulate data by using \code{nn2poly:::eval_poly()}
 #'
 #' @param poly List containing 2 items: \code{labels} and \code{values}.
-#' - \code{labels}: List of integer vectors with same length (or number of rows)
+#' - \code{labels}: List of integer vectors with same length (or number of cols)
 #' as \code{values}, where each integer vector denotes the combination of
 #' variables associated to the coefficient value stored at the same position in
 #' \code{values}. That is, the monomials in the polynomial. Note that the
-#' variables are numbered from 1 to p, with the intercept represented by 0.
+#' variables are numbered from 1 to p, with the intercept is represented by 0.
 #' - \code{values}: Matrix (can also be a vector if single polynomial), where
-#' each row represents a polynomial, with same number of columns as the length
-#' of \code{labels}, containing at each column the value of the coefficient
+#' each column represents a polynomial, with same number of rows as the length
+#' of \code{labels}, containing at each row the value of the coefficient
 #' of the monomial given by the equivalent label in that same position.
 #'
 #' Example: If \code{labels} contains the integer vector c(1,1,3) at position
-#' 5, then the value stored in \code{values} at position 5 is the coefficient
+#' 5, then the value stored in \code{values} at row 5 is the coefficient
 #' associated with the term x_1^2*x_3.
 #'
 #' @param newdata Input data as matrix, vector or dataframe.
@@ -27,8 +27,8 @@
 #' not be included.
 #'
 #' @return Returns a matrix containing the evaluation of the polynomials.
-#' Each row corresponds to each polynomial used and each column to each
-#' observation, meaning that each row vector corresponds to the results of
+#' Each column corresponds to each polynomial used and each row to each
+#' observation, meaning that each column vector corresponds to the results of
 #' evaluating all the given data for each polynomial.
 #'
 #' @seealso \code{eval_poly()} is also used in [predict.nn2poly()].
@@ -42,19 +42,19 @@
 #' # Create two observations, (x_1,x_2) = (1,2) and (x_1,x_2) = (3,1)
 #' newdata <- rbind(c(1,2), c(3,1))
 #' # Evaluate the polynomial on both observations
-#' eval_poly(poly = poly,newdata = newdata)
+#' nn2poly:::eval_poly(poly = poly,newdata = newdata)
 #'
 #' # Multiple polynomial evaluation, with same terms but different coefficients
 #' # Create the polynomial 1 + (-1)·x_1 + 1·x_2 + 0.5·(x_1)^2 as a list
 #' poly <- list()
-#' coeff_matrix <- rbind(c(1,-1,1,0.5),
+#' coeff_matrix <- cbind(c(1,-1,1,0.5),
 #'                       c(2,-3,0,1.3))
 #' poly$values <- coeff_matrix
 #' poly$labels <- list(c(0),c(1),c(2),c(1,1))
 #' # Create two observations, (x_1,x_2) = (1,2) and (x_1,x_2) = (3,1)
 #' new_data <- rbind(c(1,2), c(3,1))
 #' # Evaluate the polynomial on both observations
-#' eval_poly(poly = poly, newdata = newdata)
+#' nn2poly:::eval_poly(poly = poly, newdata = newdata)
 eval_poly <- function(poly, newdata) {
 
   # Remove names and transform into matrix (variables as columns)
@@ -67,7 +67,7 @@ eval_poly <- function(poly, newdata) {
 
   # If values is a single vector, transform into matrix
   if (!is.matrix(poly$values)){
-    poly$values <- t(as.matrix(poly$values))
+    poly$values <- as.matrix(poly$values)
   }
 
   # Detect if the polynomial has intercept or not, needed in later steps
@@ -82,29 +82,29 @@ eval_poly <- function(poly, newdata) {
     if (intercept_position != 1){
 
       # Store the value
-      intercept_value <- poly$values[,intercept_position]
+      intercept_value <- poly$values[intercept_position,]
 
       # Remove label and value
       poly$labels <- poly$labels[-intercept_position]
-      poly$values <- poly$values[,-intercept_position, drop = FALSE]
+      poly$values <- poly$values[-intercept_position,, drop = FALSE]
 
       # Add label and value back at start of list
       poly$labels <- append(poly$labels, c(0), after=0)
-      poly$values <- unname(cbind(intercept_value, poly$values))
+      poly$values <- unname(rbind(intercept_value, poly$values))
     }
   }
 
 
 
   # Initialize matrix which will contain results for each desired polynomial,
-  # with rows equal to the rows of `poly$values`, that is, the number of
-  # polynomials and columns equal to the number of observations evaluated.
-  n_polynomials <- nrow(poly$values)
-  response <- matrix(0, nrow = n_polynomials, ncol = nrow(newdata))
+  # with columns equal to the columns of `poly$values`, that is, the number of
+  # polynomials and rows equal to the number of observations evaluated.
+  n_polynomials <- ncol(poly$values)
+  response <- matrix(0, nrow = nrow(newdata), ncol = n_polynomials)
   for (j in 1:n_polynomials){
 
     # Select the desired polynomial values (row of poly$values)
-    values_j <- poly$values[j,]
+    values_j <- poly$values[,j]
 
     # Intercept (label = 0) should always be the first element of labels at this
     # point of the function (labels reordered previously)
@@ -143,11 +143,11 @@ eval_poly <- function(poly, newdata) {
       # with their associated coefficient value
       response_j <- response_j + values_j[i] * var_prod
     }
-    response[j,] <- response_j
+    response[,j] <- response_j
   }
 
   # Check if it is a single polynomial and transform to vector:
-  if (dim(response)[1]==1){
+  if (dim(response)[2]==1){
     response <- as.vector(response)
   }
 

@@ -26,9 +26,9 @@ plot_n_important_coeffs <- function(poly, n_important_coeffs) {
     stop("package 'patchwork' is required for this functionality", call. = FALSE)
   }
 
-  # Check if poly$values is a vector and transform it into a row matrix
+  # Check if poly$values is a vector and transform it into a column matrix
   if (is.vector(poly$values)){
-    poly$values <- matrix(poly$values, nrow = 1)
+    poly$values <- matrix(poly$values, ncol = 1)
   }
 
   # a special case is needed for the case in which the polynomial was generated
@@ -38,7 +38,9 @@ plot_n_important_coeffs <- function(poly, n_important_coeffs) {
     poly <- poly[[length(poly)]][["output"]]
   }
 
-  M <- poly$values
+  # Transpose values to be polynomials as rows instead of columns
+  # Needed to work as in previous nn2poly output format
+  M <- t(poly$values)
   all_labels <- poly$labels
 
   all_df <- data.frame()

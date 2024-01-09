@@ -22,20 +22,20 @@ test_that("Multiple polynomial evaluation and single observation works", {
   # Without intercept
   poly <- list()
   poly$values <- matrix(c(1,-1,1,
-                          2,3,-2), nrow = 2, byrow = TRUE)
+                          2,3,-2), ncol = 2, byrow = FALSE)
   poly$labels <- list(c(1),c(2),c(1,1))
 
   newdata <- c(1,2)
-  expect_equal(eval_poly(poly, newdata), as.matrix(c(0,6)))
+  expect_equal(eval_poly(poly, newdata), t(as.matrix(c(0,6))))
 
   # With intercept and unnordered labels
   poly <- list()
   poly$values <- matrix(c(1,-1,1,
-                          2,3,-2), nrow = 2, byrow = TRUE)
+                          2,3,-2), ncol = 2, byrow = FALSE)
   poly$labels <- list(c(2),c(0),c(2,1))
 
   newdata <- c(2,-1)
-  expect_equal(eval_poly(poly, newdata), as.matrix(c(-4,5)))
+  expect_equal(eval_poly(poly, newdata), t(as.matrix(c(-4,5))))
 })
 
 
@@ -55,20 +55,20 @@ test_that("Multiple polynomial evaluation and multiple observations (matrix) wor
   # Without intercept
   poly <- list()
   poly$values <- matrix(c(1,-1,1,
-                          2,3,-2), nrow = 2, byrow = TRUE)
+                          2,3,-2), ncol = 2, byrow = FALSE)
   poly$labels <- list(c(1),c(2),c(1,1))
 
   newdata <- rbind(c(1,2), c(1,1))
-  expect_equal(eval_poly(poly, newdata), cbind(c(0,6),c(1,3)))
+  expect_equal(eval_poly(poly, newdata), cbind(c(0,1),c(6,3)))
 
   # With intercept and unnordered labels
   poly <- list()
   poly$values <- matrix(c(1,-1,1,
-                          2,3,-2), nrow = 2, byrow = TRUE)
+                          2,3,-2), ncol = 2, byrow = FALSE)
   poly$labels <- list(c(2),c(0),c(2,1))
 
   newdata <- rbind(c(2,-1), c(1,1))
-  expect_equal(eval_poly(poly, newdata), cbind(c(-4,5),c(1,3)))
+  expect_equal(eval_poly(poly, newdata), cbind(c(-4,1),c(5,3)))
 })
 
 
@@ -76,23 +76,23 @@ test_that("Observation as dataframe works", {
   # Single Observation, multiple polynomials
   poly <- list()
   poly$values <- matrix(c(1,-1,1,
-                          2,3,-2), nrow = 2, byrow = TRUE)
+                          2,3,-2), ncol = 2, byrow = FALSE)
   poly$labels <- list(c(1),c(2),c(1,1))
 
   newdata <- c(1,2)
   newdata <- as.data.frame(newdata)
-  expect_equal(eval_poly(poly, newdata), as.matrix(c(0,6)))
+  expect_equal(eval_poly(poly, newdata), t(as.matrix(c(0,6))))
 
 
   # Multiple Observations
   poly <- list()
   poly$values <- matrix(c(1,-1,1,
-                          2,3,-2), nrow = 2, byrow = TRUE)
+                          2,3,-2), ncol = 2, byrow = FALSE)
   poly$labels <- list(c(1),c(2),c(1,1))
 
   newdata <- rbind(c(1,2), c(1,1))
   newdata <- as.data.frame(newdata)
-  expect_equal(eval_poly(poly, newdata), cbind(c(0,6),c(1,3)))
+  expect_equal(eval_poly(poly, newdata), cbind(c(0,1),c(6,3)))
 })
 
 
@@ -105,9 +105,9 @@ test_that("Works with higher order elements at the start and no intercept", {
   # Without intercept
   poly <- list()
   poly$values <- matrix(c(1,-1,1,
-                          -2,3,2), nrow = 2, byrow = TRUE)
+                          -2,3,2), ncol = 2, byrow = FALSE)
   poly$labels <- list(c(1,1),c(2),c(1))
 
   newdata <- rbind(c(1,2), c(1,1))
-  expect_equal(eval_poly(poly, newdata), cbind(c(0,6),c(1,3)))
+  expect_equal(eval_poly(poly, newdata), cbind(c(0,1),c(6,3)))
 })

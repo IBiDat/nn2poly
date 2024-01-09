@@ -22,7 +22,7 @@ test_that("nn2poly with list input against precomputed example with single
   # Desired coefficient in output polynomial at layer 2 (element 2*2=4 in list),
   # neuron 1, coefficient "1,1"
   label <- result$layer_2$output$labels[[4]]
-  coeff <- result$layer_2$output$values[1,4]
+  coeff <- result$layer_2$output$values[4,1]
   expect_equal(label,c(1,1))
   expect_equal(round(coeff,4),0.6335)
 
@@ -48,7 +48,7 @@ test_that("nn2poly with list input against precomputed example with
 
 
   label <- result$labels[[4]]
-  coeff <- result$values[1,4]
+  coeff <- result$values[4,1]
   expect_equal(label,c(1,1))
   expect_equal(round(coeff,4),-4.4295)
 })
@@ -66,7 +66,7 @@ test_that("nn2poly for a keras.engine.training.Model object", {
                     max_order = 2)
 
   expect_equal(result$values[1,1],  0.18148204)
-  expect_equal(result$values[2,3], -0.71466625)
+  expect_equal(result$values[3,2], -0.71466625)
   expect_equal(result$labels[[6]], c(2,2))
 })
 

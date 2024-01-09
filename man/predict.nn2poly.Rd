@@ -27,13 +27,16 @@ polynomial at each layer as given by the provided \code{object} of class
 
 If \code{object} contains the polynomials of the last layer, as given by
 \code{nn2poly(object, keep_layers = FALSE)}, then the output is a matrix with
-the evaluation of each data point on each polynomial.
+the evaluation of each data point on each polynomial. In this matrix, each
+column represents the evaluation of a polynomial and each column corresponds
+to each point in the new data to be evaluated.
 
 If \code{object} contains all the internal polynomials also, as given by
 \code{nn2poly(object, keep_layers = TRUE)}, then the output is a list of
 layers (represented by \code{layer_i}), where each one is another list with
-\code{input} and \code{output} elements, where each one contains a matrix with the
-evaluation of the "input" or "output" polynomial at the given layer.
+\code{input} and \code{output} elements, where each one contains a matrix
+with the evaluation of the "input" or "output" polynomial at the given layer,
+as explained in the case without internal polynomials.
 }
 \description{
 Predicted values obtained with a nn2poly object on given data.

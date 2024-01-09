@@ -61,12 +61,15 @@ NULL
 #' - An item named `labels` that is a list of integer vectors. Those vectors
 #' represent each monomial in the polynomial, where each integer in the vector
 #' represents each time one of the original variables appears in that term.
-#' As an example, vector c(1,1,2) represents the term \eqn{x_1^2x_2}.
-#' - An item named `values` which contains a matrix in which each row contains
+#' As an example, vector c(1,1,2) represents the term \eqn{x_1^2x_2}. Note that
+#' the variables are numbered from 1 to p, with the intercept is represented by
+#' 0.
+#' - An item named `values` which contains a matrix in which each column contains
 #' the coefficients of the polynomial associated with an output neuron. That is,
 #' if the neural network has a single output unit, the matrix `values` will have
-#' a single row and if it has multiple output units, the matrix `values` will
-#' have several rows.
+#' a single column and if it has multiple output units, the matrix `values` will
+#' have several columns. Each row will be the coefficient associated with the
+#' label in the same position in the labels list.
 #'
 #' If \code{keep_layers = TRUE}, it returns a list of length the number of
 #' layers (represented by \code{layer_i}), where each one is another list with
@@ -140,8 +143,14 @@ nn2poly.list <- function(object, ...) {
       layer_name <- paste0("layer_", i)
       result[[layer_name]] <- list()
       result[[layer_name]][["input"]] <- result_raw[[(2*i-1)]]
+      # Transpose to have polynomials as columns
+      result[[layer_name]][["input"]][["values"]] <-
+        t(result[[layer_name]][["input"]][["values"]])
       if (2*i <= n_items){
         result[[layer_name]][["output"]] <- result_raw[[(2*i)]]
+        # Transpose to have polynomials as columns
+        result[[layer_name]][["output"]][["values"]] <-
+          t(result[[layer_name]][["output"]][["values"]])
       } else {
         # If there is a linear output, i.e. single polynomial in final layer
         # and odd number of items, then we repeat the input as the output, as
@@ -151,6 +160,7 @@ nn2poly.list <- function(object, ...) {
     }
 
   } else {
+    result_raw$values <- t(result_raw$values)
     result = result_raw
   }
 
@@ -206,13 +216,16 @@ nn2poly.default <- function(object, ...) {
 #'
 #' If \code{object} contains the polynomials of the last layer, as given by
 #' \code{nn2poly(object, keep_layers = FALSE)}, then the output is a matrix with
-#' the evaluation of each data point on each polynomial.
+#' the evaluation of each data point on each polynomial. In this matrix, each
+#' column represents the evaluation of a polynomial and each column corresponds
+#' to each point in the new data to be evaluated.
 #'
 #' If \code{object} contains all the internal polynomials also, as given by
 #' \code{nn2poly(object, keep_layers = TRUE)}, then the output is a list of
 #' layers (represented by \code{layer_i}), where each one is another list with
-#' \code{input} and \code{output} elements, where each one contains a matrix with the
-#' evaluation of the "input" or "output" polynomial at the given layer.
+#' \code{input} and \code{output} elements, where each one contains a matrix
+#' with the evaluation of the "input" or "output" polynomial at the given layer,
+#' as explained in the case without internal polynomials.
 #'
 #'
 #' @examples

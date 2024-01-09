@@ -82,8 +82,8 @@ test_that("Test the plot for a polynomial generated with  0 valued coeff and pos
     keep_layers = FALSE
   )
 
-  result$values[,2] <- 0
-  result$values[,4] <- -5
+  result$values[2,] <- 0
+  result$values[4,] <- -5
 
   # computing the plot with 5 important coefficients
   p <- plot_n_important_coeffs(result, n_important_coeffs = 5)

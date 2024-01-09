@@ -25,50 +25,50 @@ test_that("eval_poly: Multiple polynomial evaluation and single observation work
   # Without intercept
   poly <- list()
   poly$values <- matrix(c(1,-1,1,
-                          2,3,-2), nrow = 2, byrow = TRUE)
+                          2,3,-2), ncol = 2, byrow = FALSE)
   poly$labels <- list(c(1),c(2),c(1,1))
   class(poly) <- "nn2poly"
 
   newdata <- c(1,2)
-  expect_equal(predict(poly, newdata), as.matrix(c(0,6)))
+  expect_equal(predict(poly, newdata), t(as.matrix(c(0,6))))
 
   # With intercept and unnordered labels
   poly <- list()
   poly$values <- matrix(c(1,-1,1,
-                          2,3,-2), nrow = 2, byrow = TRUE)
+                          2,3,-2), ncol = 2, byrow = FALSE)
   poly$labels <- list(c(2),c(0),c(2,1))
   class(poly) <- "nn2poly"
 
   newdata <- c(2,-1)
-  expect_equal(predict(poly, newdata), as.matrix(c(-4,5)))
+  expect_equal(predict(poly, newdata), t(as.matrix(c(-4,5))))
 })
 
 test_that("eval_poly: Observation as dataframe works", {
   # Single observation, multiple polynomials
   poly <- list()
   poly$values <- matrix(c(1,-1,1,
-                          2,3,-2), nrow = 2, byrow = TRUE)
+                          2,3,-2), ncol = 2, byrow = FALSE)
   poly$labels <- list(c(1),c(2),c(1,1))
   class(poly) <- "nn2poly"
 
   newdata <- c(1,2)
   newdata <- as.data.frame(newdata)
 
-  expect_equal(predict(poly, newdata), as.matrix(c(0,6)))
+  expect_equal(predict(poly, newdata), t(as.matrix(c(0,6))))
 
 
   # Multiple Observations
 
   poly <- list()
   poly$values <- matrix(c(1,-1,1,
-                          2,3,-2), nrow = 2, byrow = TRUE)
+                          2,3,-2), ncol = 2, byrow = FALSE)
   poly$labels <- list(c(1),c(2),c(1,1))
   class(poly) <- "nn2poly"
 
   newdata <- rbind(c(1,2), c(1,1))
   newdata <- as.data.frame(newdata)
 
-  expect_equal(predict(poly, newdata), cbind(c(0,6),c(1,3)))
+  expect_equal(predict(poly, newdata), cbind(c(0,1),c(6,3)))
 })
 
 
@@ -76,7 +76,7 @@ test_that("Multiple layers: eval_poly works on each layer(input/output)", {
   # Define a poly object with 2 polynomials
   poly <- list()
   poly$values <- matrix(c(1,-1,1,
-                          2,3,-2), nrow = 2, byrow = TRUE)
+                          2,3,-2), ncol = 2, byrow = FALSE)
   poly$labels <- list(c(1),c(2),c(1,1))
 
   # Replicate that polynomial 4 times as if it was the output
@@ -94,7 +94,7 @@ test_that("Multiple layers: eval_poly works on each layer(input/output)", {
   # All polys are the same so we loop over them
   for (pred_layer in prediction){
     for (pred_layer_i in pred_layer)
-      expect_equal(pred_layer_i, as.matrix(c(0,6)))
+      expect_equal(pred_layer_i, t(as.matrix(c(0,6))))
   }
 
 })
@@ -105,7 +105,7 @@ test_that("Multiple layers: choosing last layer returns the same as evaluation
   # Define a poly object with 2 polynomials
   poly <- list()
   poly$values <- matrix(c(1,-1,1,
-                          2,3,-2), nrow = 2, byrow = TRUE)
+                          2,3,-2), ncol = 2, byrow = FALSE)
   poly$labels <- list(c(1),c(2),c(1,1))
 
   # Replicate that polynomial 4 times as if it was the output
@@ -137,7 +137,7 @@ test_that("Multiple layers: layers argument testing", {
   # Define a poly object with 2 polynomials
   poly <- list()
   poly$values <- matrix(c(1,-1,1,
-                          2,3,-2), nrow = 2, byrow = TRUE)
+                          2,3,-2), ncol = 2, byrow = FALSE)
   poly$labels <- list(c(1),c(2),c(1,1))
 
   # Replicate that polynomial 4 times as if it was the output
