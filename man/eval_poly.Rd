@@ -38,6 +38,11 @@ evaluating all the given data for each polynomial.
 \description{
 Evaluates one or several polynomials on the given data.
 }
+\details{
+Note that this function is unstable and subject to change. Therefore it is
+not exported but this documentations is left available so users can use it if
+needed to simulate data by using \code{nn2poly:::eval_poly()}
+}
 \examples{
 # Single polynomial evaluation
 # Create the polynomial 1 + (-1)·x_1 + 1·x_2 + 0.5·(x_1)^2 as a list
@@ -60,7 +65,6 @@ poly$labels <- list(c(0),c(1),c(2),c(1,1))
 new_data <- rbind(c(1,2), c(3,1))
 # Evaluate the polynomial on both observations
 eval_poly(poly = poly, newdata = newdata)
-
 }
 \seealso{
 \code{eval_poly()} is also used in \code{\link[=predict.nn2poly]{predict.nn2poly()}}.

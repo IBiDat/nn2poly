@@ -51,7 +51,7 @@ library(nn2poly)
 set.seed(42)
 ```
 
-As the final output of using `nn2poly` on a neural network is a polynomial (or several ones in classification problems), the package uses a certain structure to represent those polynomials and it also provides `eval_poly()`, a function to evaluate polynomials in that structure. As we will use it to generate the simulated data in this example, we first define a polynomial using the format needed in `nn2poly`, which consists of a list containing:
+As the final output of using `nn2poly` on a neural network is a polynomial (or several ones in classification problems), the package uses a certain structure to represent those polynomials and it also provides `nn2poly:::eval_poly()`, a function to evaluate polynomials in that structure. As we will use it to generate the simulated data in this example, we first define a polynomial using the format needed in `nn2poly`, which consists of a list containing:
   * Labels: A list of integer vectors denoting the combinations of variables that appear on each term of the polynomial. Variables are numbered from `1` to `p` where `p` is the dimension of the problem. As an example, `c(1,1,3)` would represent the term $x_1^2x_3$. An special case is the intercept term, which is represented by `0`
   * Values: Vector containing the numerical values of the coefficients denoted by labels. If multiple polynomials with the same labels but different coefficient values are wanted, a matrix can be employed, where each row represents a polynomial.
 
@@ -82,7 +82,7 @@ for (i in 1:p){
 }
 
 # Response variable + small error term
-Y <- as.vector(eval_poly(poly = polynomial, newdata = X)) + stats::rnorm(n_sample, 0, 0.1)
+Y <- as.vector(nn2poly:::eval_poly(poly = polynomial, newdata = X)) + stats::rnorm(n_sample, 0, 0.1)
 
 # Store all as a data frame
 data <- as.data.frame(cbind(X, Y))

@@ -2,6 +2,10 @@
 #'
 #' Evaluates one or several polynomials on the given data.
 #'
+#' Note that this function is unstable and subject to change. Therefore it is
+#' not exported but this documentations is left available so users can use it if
+#' needed to simulate data by using \code{nn2poly:::eval_poly()}
+#'
 #' @param poly List containing 2 items: \code{labels} and \code{values}.
 #' - \code{labels}: List of integer vectors with same length (or number of rows)
 #' as \code{values}, where each integer vector denotes the combination of
@@ -51,8 +55,6 @@
 #' new_data <- rbind(c(1,2), c(3,1))
 #' # Evaluate the polynomial on both observations
 #' eval_poly(poly = poly, newdata = newdata)
-#'
-#' @export
 eval_poly <- function(poly, newdata) {
 
   # Remove names and transform into matrix (variables as columns)
