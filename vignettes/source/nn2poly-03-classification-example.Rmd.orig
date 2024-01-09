@@ -192,14 +192,14 @@ As said before, the obtained polynomial represents the neural network before inc
 # Obtain the predicted values for the test data with our Polynomial Regression
 prediction_poly_matrix <- predict(object = final_poly, newdata = test_x)
 
-# Define probability model with keras fro the polynomial outputs
+# Define probability model with keras for the polynomial outputs
 probability_poly <- keras_model_sequential() %>%
   layer_activation_softmax() %>%
   layer_lambda(k_argmax)
 
 # Class prediction with the polynomial outputs
 prediction_poly_class <- predict(probability_poly,
-                                 t(prediction_poly_matrix))
+                                 prediction_poly_matrix)
 
 ```
 
@@ -224,7 +224,7 @@ Then, we can extract a diagonal plot for each of the polynomials obtained, in to
 for (i in 1:3){
   print(
     plot_diagonal(x_axis =  prediction_NN[,i],
-                  y_axis =  prediction_poly_matrix[i,],
+                  y_axis =  prediction_poly_matrix[,i],
                   xlab = "NN prediction",
                   ylab = "Polynomial prediction")
         )
