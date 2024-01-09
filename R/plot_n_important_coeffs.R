@@ -35,7 +35,7 @@ plot_n_important_coeffs <- function(poly, n_important_coeffs) {
   # with `keep_layers = TRUE`
 
   if (is.null(poly$values)) {
-    poly <- poly[[length(poly)]]
+    poly <- poly[[length(poly)]][["output"]]
   }
 
   M <- poly$values

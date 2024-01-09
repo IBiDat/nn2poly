@@ -39,7 +39,7 @@ test_that("Test the plot for a polynomial generated with  `keep_layers = TRUE`",
   p <- plot_n_important_coeffs(result, n_important_coeffs = 5)
 
   # testing the plot
-  vdiffr::expect_doppelganger("top 5 important coefficients", p)
+  vdiffr::expect_doppelganger("top 5", p)
 })
 
 
@@ -64,7 +64,7 @@ test_that("Test the plot for a polynomial generated with  vector values input, a
   p <- plot_n_important_coeffs(result, n_important_coeffs = 5)
 
   # testing the plot
-  vdiffr::expect_doppelganger("top 5 important coefficients", p)
+  vdiffr::expect_doppelganger("top 5", p)
 })
 
 
@@ -89,7 +89,7 @@ test_that("Test the plot for a polynomial generated with  0 valued coeff and pos
   p <- plot_n_important_coeffs(result, n_important_coeffs = 5)
 
   # testing the plot
-  vdiffr::expect_doppelganger("top 5 important coefficients positive and negative", p)
+  vdiffr::expect_doppelganger("top 5 mixed", p)
 })
 
 
@@ -113,5 +113,5 @@ test_that("Test the plot for a polynomial generated with  all negative coefficie
   p <- plot_n_important_coeffs(result, n_important_coeffs = 5)
 
   # testing the plot
-  vdiffr::expect_doppelganger("top 5 important coefficients negative", p)
+  vdiffr::expect_doppelganger("top 5 neg", p)
 })

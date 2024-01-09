@@ -79,27 +79,19 @@ test_that("Multiple layers: eval_poly works on each layer(input/output)", {
                           2,3,-2), nrow = 2, byrow = TRUE)
   poly$labels <- list(c(1),c(2),c(1,1))
 
-  # Replicate that polynomial 3 times as if it was the output
-  # of a 1 hidden layer NN with linear output (2+1)
+  # Replicate that polynomial 4 times as if it was the output
+  # of a 1 hidden layer NN
   object <- list()
-  object[[1]] <- poly
-  object[[2]] <- poly
-  object[[3]] <- poly
+  object[["layer_1"]][["input"]] <- poly
+  object[["layer_1"]][["output"]] <- poly
+  object[["layer_2"]][["input"]] <- poly
+  object[["layer_2"]][["output"]] <- poly
 
   class(object) <- "nn2poly"
 
   newdata <- c(1,2)
   prediction <- predict(object, newdata)
-  # All pollys are the same so we loop over them
-  for (pred_layer in prediction){
-    for (pred_layer_i in pred_layer)
-      expect_equal(pred_layer_i, as.matrix(c(0,6)))
-  }
-
-  # Same but with 2 outputs in final layer
-  object[[4]] <- poly
-  prediction <- predict(object, newdata)
-  # All pollys are the same so we loop over them
+  # All polys are the same so we loop over them
   for (pred_layer in prediction){
     for (pred_layer_i in pred_layer)
       expect_equal(pred_layer_i, as.matrix(c(0,6)))
@@ -116,12 +108,13 @@ test_that("Multiple layers: choosing last layer returns the same as evaluation
                           2,3,-2), nrow = 2, byrow = TRUE)
   poly$labels <- list(c(1),c(2),c(1,1))
 
-  # Replicate that polynomial 3 times as if it was the output
-  # of a 1 hidden layer NN with linear output (2+1)
+  # Replicate that polynomial 4 times as if it was the output
+  # of a 1 hidden layer NN
   object <- list()
-  object[[1]] <- poly
-  object[[2]] <- poly
-  object[[3]] <- poly
+  object[["layer_1"]][["input"]] <- poly
+  object[["layer_1"]][["output"]] <- poly
+  object[["layer_2"]][["input"]] <- poly
+  object[["layer_2"]][["output"]] <- poly
 
   class(object) <- "nn2poly"
 
@@ -147,12 +140,13 @@ test_that("Multiple layers: layers argument testing", {
                           2,3,-2), nrow = 2, byrow = TRUE)
   poly$labels <- list(c(1),c(2),c(1,1))
 
-  # Replicate that polynomial 3 times as if it was the output
-  # of a 1 hidden layer NN with linear output (2+1)
+  # Replicate that polynomial 4 times as if it was the output
+  # of a 1 hidden layer NN
   object <- list()
-  object[[1]] <- poly
-  object[[2]] <- poly
-  object[[3]] <- poly
+  object[["layer_1"]][["input"]] <- poly
+  object[["layer_1"]][["output"]] <- poly
+  object[["layer_2"]][["input"]] <- poly
+  object[["layer_2"]][["output"]] <- poly
 
   class(object) <- "nn2poly"
 
@@ -171,6 +165,47 @@ test_that("Multiple layers: layers argument testing", {
   expect_equal(prediction1$layer_2$output, prediction2)
 
   # Also test that layer_1 ins null if not chosen
+  expect_null(prediction1$layer_1)
+
+})
+
+
+test_that("Multiple layers: output from nn2poly also works", {
+  # This tests is here to detect if nn2poly output changes, as the previous
+  # multiple layers tests are created with manual polynomials (needed to control)
+  # the output.
+
+  # In this test we instead obtain the polynomial from using nn2poly
+
+  testing_data <- testing_helper_1()
+
+  # Get the needed data
+  object <- testing_data$weights_list
+  names(object) <- testing_data$af_string_list
+  taylor_orders <- testing_data$taylor_orders
+
+  result <- nn2poly(
+    object = object,
+    max_order = 3,
+    keep_layers = TRUE,
+    taylor_orders = taylor_orders
+  )
+
+  newdata <- c(1,2)
+
+  # Some errors
+  expect_error(predict(result, newdata, layers = c(1,4)))
+  expect_error(predict(result, newdata, layers = FALSE))
+
+  # Choose a layer and obtain the same as with full layers:
+  prediction1 <- predict(result, newdata, layers = 2)
+
+  # Get prediction for a single polynomial
+  prediction2 <- eval_poly(result$layer_2$output, newdata)
+
+  expect_equal(prediction1$layer_2$output, prediction2)
+
+  # Also test that layer_1 is null if not chosen
   expect_null(prediction1$layer_1)
 
 })

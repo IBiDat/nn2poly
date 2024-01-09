@@ -76,9 +76,11 @@ a single row and if it has multiple output units, the matrix \code{values} will
 have several rows.
 }
 
-If \code{keep_layers = TRUE}, it returns a list of length L that for each
-layer contains an item as explained before. The last element of the list will
-be the same element as if \code{keep_layers = FALSE}.
+If \code{keep_layers = TRUE}, it returns a list of length the number of
+layers (represented by \code{layer_i}), where each one is another list with
+\code{input} and \code{output} elements. Each of those elements contains an
+item as explained before. The last layer output item will be the same element
+as if \code{keep_layers = FALSE}.
 
 The polynomials obtained at the hidden layers are not needed to represent the
 NN but can be used to explore other insights from the NN.

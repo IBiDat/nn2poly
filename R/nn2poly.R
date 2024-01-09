@@ -68,13 +68,14 @@ NULL
 #' a single row and if it has multiple output units, the matrix `values` will
 #' have several rows.
 #'
-#' If \code{keep_layers = TRUE}, it returns a list of length L that for each
-#' layer contains an item as explained before. The last element of the list will
-#' be the same element as if \code{keep_layers = FALSE}.
+#' If \code{keep_layers = TRUE}, it returns a list of length the number of
+#' layers (represented by \code{layer_i}), where each one is another list with
+#' \code{input} and \code{output} elements. Each of those elements contains an
+#' item as explained before. The last layer output item will be the same element
+#' as if \code{keep_layers = FALSE}.
 #'
 #' The polynomials obtained at the hidden layers are not needed to represent the
 #' NN but can be used to explore other insights from the NN.
-#'
 #'
 #' @seealso Predict method for \code{nn2poly} output [predict.nn2poly()].
 #'
@@ -125,7 +126,34 @@ nn2poly <- function(object,
 
 #' @export
 nn2poly.list <- function(object, ...) {
-  result <- nn2poly_algorithm(object, names(object), ...)
+  result_raw <- nn2poly_algorithm(object, names(object), ...)
+
+  # Check if object is a single polynomial or a list of polynomials.
+  # This is controlled by keep_layers.
+  bool_layers = is.null(result_raw$labels)
+
+  if(bool_layers){
+    n_items <- length(result_raw)
+    n_layers <- ceiling(n_items/2)
+    result <- list()
+    for (i in 1:n_layers){
+      layer_name <- paste0("layer_", i)
+      result[[layer_name]] <- list()
+      result[[layer_name]][["input"]] <- result_raw[[(2*i-1)]]
+      if (2*i <= n_items){
+        result[[layer_name]][["output"]] <- result_raw[[(2*i)]]
+      } else {
+        # If there is a linear output, i.e. single polynomial in final layer
+        # and odd number of items, then we repeat the input as the output, as
+        # the activation functions takes no effect on the polynomial
+        result[[layer_name]][["output"]] <- result[[layer_name]][["input"]]
+      }
+    }
+
+  } else {
+    result = result_raw
+  }
+
   class(result) <- "nn2poly"
   result
 }
@@ -146,7 +174,7 @@ nn2poly.default <- function(object, ...) {
 #' @inherit eval_poly
 #' @param object Object of class inheriting from 'nn2poly'.
 #' @param layers Vector containing the chosen layers from \code{object} to be
-#' evaluated. If set to \code{NULL}, all layers are computed. Defaul is set
+#' evaluated. If set to \code{NULL}, all layers are computed. Default is set
 #' to \code{NULL}.
 #' @param ... 	Further arguments passed to or from other methods.
 #'
@@ -188,7 +216,7 @@ nn2poly.default <- function(object, ...) {
 #'
 #'
 #' @examples
-#' # Build a NN estructure with random weights, with 2 (+ bias) inputs,
+#' # Build a NN structure with random weights, with 2 (+ bias) inputs,
 #' # 4 (+bias) neurons in the first hidden layer with "tanh" activation
 #' # function, 4 (+bias) neurons in the second hidden layer with "softplus",
 #' # and 1 "linear" output unit
@@ -241,64 +269,49 @@ predict.nn2poly <- function(object, newdata, layers = NULL, ...) {
   # Check if object is a single polynomial or a list of polynomials.
   # If we get only the output layer, then it has to be a list with 2 elements,
   # values and labels. We check one of them:
-  bool_final_output  = !is.null(object$labels)
+  if (!is.null(object$labels)){
+    # If we have a final polynomial, directly evaluate the results:
+    result <- eval_poly(poly = object, newdata = newdata)
+  } else {
+    # Multiple layer case:
 
-  if (bool_final_output){
-    # If we have a final polynomial, get it inside a list to replicate
-    # keep_layers=TRUE output structure
-    aux <- object
-    object <- list()
-    object[[1]] <- aux
-  }
+    # If layer = NULL, set all layers to be used
+    if (is.null(layers)){
+      layers <- 1:length(object)
+    }
 
-  # Obtain layers number and elements
-  n_elements = length(object)
-  n_total_layers = ceiling(n_elements/2)
+    # Check if a vector or number is given
+    if (!(is.atomic(layers) & is.numeric(layers))){
+      stop("Argument layers is neither a numeric vector nor NULL.",
+           call. = FALSE
+      )
+    }
+    # Check that selected layers are within object dimension
+    # To do so, we need to check if "layer_maxvalue" exists:
+    final_layer <- paste0("layer_", max(layers))
+    if (is.null(object[[final_layer]])){
+      stop("Argument layers contains elements that exceed number of layers in nn2poly object.",
+           call. = FALSE
+      )
+    }
 
-  # If layer = NULL, set all layers to be used
-  if (is.null(layers)){
-    layers <- 1:n_total_layers
-  }
+    # Make sure layers are ordered, just for consistent output
+    layers <- sort(layers)
 
-  # Check if a vector or number is given
-  if (!(is.atomic(layers) & is.numeric(layers))){
-    stop("Argument layers is neither a numeric vector nor NULL.",
-         call. = FALSE
-    )
-  }
-  # Check that selected layers are within object dimension
-  # Selected layers should be multiplied by 2 to include input output layer
-  if ((max(layers)*2-1) > n_elements){
-    stop("Argument layers contains elements that exceed number of layers in nn2poly object.",
-         call. = FALSE
-    )
-  }
-
-  # Make sure layers are ordered, just for consistent output
-  layers <- sort(layers)
-
-  # Compute results for the given layers,
-  # taking into account that we need 2* layer in the internal ones
-  # and 1 or 2 in the output depending on if it was linear or not
-  result <- list()
-  for (i in layers){
-    layer_name <- paste0("layer_", i)
-    result[[layer_name]] <- list()
-    result[[layer_name]][["input"]] <- eval_poly(poly = object[[2*i-1]], newdata = newdata)
-    if (2*i <= n_elements){
-      # Skip this if final layer has only one polynomial, i.e. linear output
-      result[[layer_name]][["output"]] <- eval_poly(poly = object[[2*i]], newdata = newdata)
-    } else {
-      result[[layer_name]][["output"]] <- result[[layer_name]][["input"]]
+    # Compute results for the given layers.
+    result <- list()
+    for (i in layers){
+      layer_name <- paste0("layer_", i)
+      result[[layer_name]] <- list()
+      result[[layer_name]][["input"]] <- eval_poly(
+        poly = object[[layer_name]][["input"]],
+        newdata = newdata)
+      result[[layer_name]][["output"]] <- eval_poly(
+        poly = object[[layer_name]][["output"]],
+        newdata = newdata)
     }
   }
 
-  # If we are in the only final polynomial case, remove the need to use lists,
-  # layer_name and "output"
-  if (bool_final_output){
-    # layer_name is already the last one at this point
-    result <- result[[layer_name]][["output"]]
-  }
-
 return(result)
+
 }

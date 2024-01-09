@@ -15,14 +15,14 @@ test_that("nn2poly with list input against precomputed example with single
   )
 
   # Output polynomial order is 2, as no max_order is specified and default is 2
-  n_terms <- length(result[[length(result)]]$labels)
-  order <- length(result[[length(result)]]$labels[[n_terms]])
+  n_terms <- length(result$layer_3$output$labels)
+  order <- length(result$layer_3$output$labels[[n_terms]])
   expect_equal(order, 3)
 
   # Desired coefficient in output polynomial at layer 2 (element 2*2=4 in list),
   # neuron 1, coefficient "1,1"
-  label <- result[[4]]$labels[[4]]
-  coeff <- result[[4]]$values[1,4]
+  label <- result$layer_2$output$labels[[4]]
+  coeff <- result$layer_2$output$values[1,4]
   expect_equal(label,c(1,1))
   expect_equal(round(coeff,4),0.6335)
 

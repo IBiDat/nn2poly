@@ -15,7 +15,7 @@ in the polynomial (dimension p). Response variable to be predicted should
 not be included.}
 
 \item{layers}{Vector containing the chosen layers from \code{object} to be
-evaluated. If set to \code{NULL}, all layers are computed. Defaul is set
+evaluated. If set to \code{NULL}, all layers are computed. Default is set
 to \code{NULL}.}
 
 \item{...}{Further arguments passed to or from other methods.}
@@ -57,7 +57,7 @@ the final layer with "input" and "output" even if they are the same, for
 consistency.
 }
 \examples{
-# Build a NN estructure with random weights, with 2 (+ bias) inputs,
+# Build a NN structure with random weights, with 2 (+ bias) inputs,
 # 4 (+bias) neurons in the first hidden layer with "tanh" activation
 # function, 4 (+bias) neurons in the second hidden layer with "softplus",
 # and 1 "linear" output unit

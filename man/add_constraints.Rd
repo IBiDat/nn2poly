@@ -32,5 +32,5 @@ Models in \code{luz/torch} need to use the \code{\link{luz_model_sequential}}
 helper in order to have a sequential model in the appropriate form.
 }
 \seealso{
-\code{\link[=luz_model_seuqential]{luz_model_seuqential()}}
+\code{\link[=luz_model_sequential]{luz_model_sequential()}}
 }

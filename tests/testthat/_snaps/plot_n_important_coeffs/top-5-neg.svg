@@ -68,6 +68,6 @@
 <text x='651.72' y='292.74' style='font-size: 14.00px; font-family: sans;' textLength='28.02px' lengthAdjust='spacingAndGlyphs'>Sign</text>
 <rect x='687.42' y='280.96' width='13.93' height='13.93' style='stroke-width: 1.07; stroke-linecap: butt; stroke-linejoin: miter; fill: #F8766D;' />
 <text x='709.03' y='292.05' style='font-size: 12.00px; font-family: sans;' textLength='4.00px' lengthAdjust='spacingAndGlyphs'>-</text>
-<text x='46.16' y='17.99' style='font-size: 16.00px; font-weight: bold; font-family: sans;' textLength='256.18px' lengthAdjust='spacingAndGlyphs'>top 5 important coefficients negative</text>
+<text x='46.16' y='17.99' style='font-size: 16.00px; font-weight: bold; font-family: sans;' textLength='66.73px' lengthAdjust='spacingAndGlyphs'>top 5 neg</text>
 </g>
 </svg>
