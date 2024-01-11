@@ -4,6 +4,6 @@ knitr::knit("vignettes/source/nn2poly-02-supported-DL-frameworks.Rmd.orig", "vig
 knitr::knit("vignettes/source/nn2poly-03-classification-example.Rmd.orig", "vignettes/nn2poly-03-classification-example.Rmd")
 
 # move figures under the vignettes dir
-file.copy("figure", "vignettes", recursive=TRUE)
-unlink("figure", recursive=TRUE, force=TRUE)
+file.copy("includes", "vignettes", recursive=TRUE)
+unlink("includes", recursive=TRUE, force=TRUE)
 

@@ -140,7 +140,7 @@ history <- fit(nn,
 plot(history)
 ```
 
-![](figure/nn2poly-03-class-nn-compile-1.png)
+![](includes/nn2poly-03-class-nn-compile-1.png)
 
 
 ### NN Predictions
@@ -452,7 +452,7 @@ for (i in 1:3){
 }
 ```
 
-![](figure/nn2poly-03-class-diagonal-plot-1.png)![](figure/nn2poly-03-class-diagonal-plot-2.png)![](figure/nn2poly-03-class-diagonal-plot-3.png)
+![](includes/nn2poly-03-class-diagonal-plot-1.png)![](includes/nn2poly-03-class-diagonal-plot-2.png)![](includes/nn2poly-03-class-diagonal-plot-3.png)
 
 We can observe how all the polynomials obtain quite similar predictions to their equivalent NN predictions.
 
@@ -463,7 +463,7 @@ We can also plot the $n$ most important coefficients in absolute value to compar
 plot_n_important_coeffs(final_poly, n_important_coeffs = 8)
 ```
 
-![](figure/nn2poly-03-class-n-important-1.png)
+![](includes/nn2poly-03-class-n-important-1.png)
 
 > *Note*: The coefficients values are not in the same scale as the original polynomial due to the fact that we have scaled all the data before training, even the response variable Y. Furthermore, as data has been scaled to the $[-1,1]$ interval, interactions of order 2 or higher would usually need a higher absolute value than the lower order coefficients to be more relevant
 
@@ -480,18 +480,18 @@ plot_taylor_and_activation_potentials(object = nn,
 #> [[1]]
 ```
 
-![](figure/nn2poly-03-class-potentials-1.png)
+![](includes/nn2poly-03-class-potentials-1.png)
 
 ```
 #> 
 #> [[2]]
 ```
 
-![](figure/nn2poly-03-class-potentials-2.png)
+![](includes/nn2poly-03-class-potentials-2.png)
 
 ```
 #> 
 #> [[3]]
 ```
 
-![](figure/nn2poly-03-class-potentials-3.png)
+![](includes/nn2poly-03-class-potentials-3.png)

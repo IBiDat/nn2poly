@@ -168,7 +168,7 @@ history1 <- fit(nn_uncon,
 plot(history1)
 ```
 
-![](figure/nn2poly-02-keras-nn_uncon-train-1.png)
+![](includes/nn2poly-02-keras-nn_uncon-train-1.png)
 
 
 
@@ -190,7 +190,7 @@ history2 <- fit(nn_con,
 plot(history2)
 ```
 
-![](figure/nn2poly-02-keras-nn_con-train-1.png)
+![](includes/nn2poly-02-keras-nn_con-train-1.png)
 
 
 ### NN predictions
@@ -206,7 +206,7 @@ prediction_nn_uncon <- predict(nn_uncon, test_x)
 plot_diagonal(x_axis =  prediction_nn_uncon, y_axis =  test_y, xlab = "Unconstrained NN prediction", ylab = "Original Y")
 ```
 
-![](figure/nn2poly-02-keras-comparison-y-nn_uncon-1.png)
+![](includes/nn2poly-02-keras-comparison-y-nn_uncon-1.png)
 
 
 
@@ -218,7 +218,7 @@ prediction_nn_con <- predict(nn_con, test_x)
 plot_diagonal(x_axis =  prediction_nn_con, y_axis =  test_y, xlab = "Constrained NN prediction", ylab = "Original Y")
 ```
 
-![](figure/nn2poly-02-keras-comparison-y-nn_con-1.png)
+![](includes/nn2poly-02-keras-comparison-y-nn_con-1.png)
 
 ### Using nn2poly
 
@@ -247,14 +247,14 @@ prediction_poly_con <- predict(object = final_poly_con, newdata = test_x)
 plot_diagonal(x_axis =  prediction_nn_uncon, y_axis =  prediction_poly_uncon, xlab = "NN prediction", ylab = "Polynomial prediction") + ggplot2::ggtitle("Polynomial for nn_uncon")
 ```
 
-![](figure/nn2poly-02-keras-polynomial-prediction-1.png)
+![](includes/nn2poly-02-keras-polynomial-prediction-1.png)
 
 ```r
 
 plot_diagonal(x_axis =  prediction_nn_con, y_axis =  prediction_poly_con, xlab = "NN prediction", ylab = "Polynomial prediction") + ggplot2::ggtitle("Polynomial for nn_con")
 ```
 
-![](figure/nn2poly-02-keras-polynomial-prediction-2.png)
+![](includes/nn2poly-02-keras-polynomial-prediction-2.png)
 
 We can clearly see how the constrained NN allows to obtain a close approximation with `nn2poly` while the polynomial obtained for the unconstrained one is not a good representation.
 
@@ -267,13 +267,13 @@ We can also represent the obtained polynomial coefficients and observe how the c
 plot_n_important_coeffs(final_poly_uncon, n_important_coeffs = 8)
 ```
 
-![](figure/nn2poly-02-keras-n-important-1.png)
+![](includes/nn2poly-02-keras-n-important-1.png)
 
 ```r
 plot_n_important_coeffs(final_poly_con, n_important_coeffs = 8)
 ```
 
-![](figure/nn2poly-02-keras-n-important-2.png)
+![](includes/nn2poly-02-keras-n-important-2.png)
 
 
 ## `luz`/`torch`
@@ -367,7 +367,7 @@ fitted_uncon <- nn_uncon %>%
 fitted_uncon %>% plot()
 ```
 
-![](figure/nn2poly-02-torch-nn_uncon-train-1.png)
+![](includes/nn2poly-02-torch-nn_uncon-train-1.png)
 
 Then, we train the  constrained NN by using the function function `add_constraints()` before calling `fit()`. The constraints currently accept two possible types, `"l1_norm"` and `"l2_norm"`. In both cases, the norm for each weight vector (including the bias) incident on a neuron will be constrained to be less or equal than 1. Using data scaled to the $[-1,1]$ interval, the l1-norm is the one that guarantees best results.
 
@@ -388,7 +388,7 @@ fitted_con <- nn_con %>%
 fitted_con %>% plot()
 ```
 
-![](figure/nn2poly-02-torch-nn_con-train-1.png)
+![](includes/nn2poly-02-torch-nn_con-train-1.png)
 
 
 > *Note*: Our implementation uses a custom callback that is applied at the end of each batch.
@@ -406,7 +406,7 @@ prediction_NN_uncon <- as.array(predict(fitted_uncon, test_x))
 plot_diagonal(x_axis =  prediction_NN_uncon, y_axis =  test_y, xlab = "Unconstrained NN prediction", ylab = "Original Y")
 ```
 
-![](figure/nn2poly-02-torch-comparison-y-nn_uncon-1.png)
+![](includes/nn2poly-02-torch-comparison-y-nn_uncon-1.png)
 
 
 
@@ -418,7 +418,7 @@ prediction_NN_con <- as.array(predict(fitted_con, test_x))
 plot_diagonal(x_axis =  prediction_NN_con, y_axis =  test_y, xlab = "Constrained NN prediction", ylab = "Original Y")
 ```
 
-![](figure/nn2poly-02-torch-comparison-y-nn_con-1.png)
+![](includes/nn2poly-02-torch-comparison-y-nn_con-1.png)
 
 ### Using nn2poly
 
@@ -447,14 +447,14 @@ prediction_poly_con <- predict(object = final_poly_con, newdata = test_x)
 plot_diagonal(x_axis =  prediction_nn_uncon, y_axis =  prediction_poly_uncon, xlab = "NN prediction", ylab = "Polynomial prediction") + ggplot2::ggtitle("Polynomial for nn_uncon")
 ```
 
-![](figure/nn2poly-02-reg-polynomial-prediction-1.png)
+![](includes/nn2poly-02-reg-polynomial-prediction-1.png)
 
 ```r
 
 plot_diagonal(x_axis =  prediction_nn_con, y_axis =  prediction_poly_con, xlab = "NN prediction", ylab = "Polynomial prediction") + ggplot2::ggtitle("Polynomial for nn_con")
 ```
 
-![](figure/nn2poly-02-reg-polynomial-prediction-2.png)
+![](includes/nn2poly-02-reg-polynomial-prediction-2.png)
 
 We can clearly see how the constrained NN allows to obtain a close approximation with `nn2poly` while the polynomial obtained for the unconstrained one is not a good representation.
 
@@ -467,10 +467,10 @@ We can also represent the obtained polynomial coefficients and observe how the c
 plot_n_important_coeffs(final_poly_uncon, n_important_coeffs = 8)
 ```
 
-![](figure/nn2poly-02-reg-n-important-1.png)
+![](includes/nn2poly-02-reg-n-important-1.png)
 
 ```r
 plot_n_important_coeffs(final_poly_con, n_important_coeffs = 8)
 ```
 
-![](figure/nn2poly-02-reg-n-important-2.png)
+![](includes/nn2poly-02-reg-n-important-2.png)

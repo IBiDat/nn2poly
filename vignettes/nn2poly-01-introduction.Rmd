@@ -195,7 +195,7 @@ We can visualize the training process:
 plot(history)
 ```
 
-![](figure/nn2poly-01-reg-history-1.png)
+![](includes/nn2poly-01-reg-history-1.png)
 
 And we can also visualize the NN predictions vs the original Y values.
 
@@ -208,7 +208,7 @@ prediction_NN <- predict(nn, test_x)
 plot_diagonal(x_axis =  prediction_NN, y_axis =  test_y, xlab = "NN prediction", ylab = "Original Y")
 ```
 
-![](figure/nn2poly-01-reg-comparison-y-nn-1.png)
+![](includes/nn2poly-01-reg-comparison-y-nn-1.png)
 
 > *Note*: Recall that the NN performance is not addressed by `nn2poly`, meaning that this performance could be either good or bad and `nn2poly`'s goal would still be to represent the NN behavior and predict as good or as bad as the NN.
 
@@ -433,7 +433,7 @@ A simple plot comparing the polynomial and NN predictions can be obtained with `
 plot_diagonal(x_axis =  prediction_NN, y_axis =  prediction_poly, xlab = "NN prediction", ylab = "Polynomial prediction")
 ```
 
-![](figure/nn2poly-01-reg-comparison-polynomial-nn-1.png)
+![](includes/nn2poly-01-reg-comparison-polynomial-nn-1.png)
 
 We can also plot the $n$ most important coefficients in absolute value to compare which variables or interactions are more relevant in the polynomial. Note that, as data should be scaled to the $[-1,1]$ interval, interactions of order 2 or higher would usually need a higher absolute value than the lower order coefficients to be more relevant.
 
@@ -444,7 +444,7 @@ In this case we can see how the two most important obtained coefficients are `2,
 plot_n_important_coeffs(final_poly, 8)
 ```
 
-![](figure/nn2poly-01-reg-n-important-1.png)
+![](includes/nn2poly-01-reg-n-important-1.png)
 
 
 Another convenient plot to show how the algorithm is affected by each layer can be obtained with `plot_taylor_and_activation_potentials()`, where the activation potentials at each neuron are computed and presented over the Taylor expansion approximation of the activation function at each layer.
@@ -461,21 +461,21 @@ plot_taylor_and_activation_potentials(object = nn,
 #> [[1]]
 ```
 
-![](figure/nn2poly-01-reg-potentials-1.png)
+![](includes/nn2poly-01-reg-potentials-1.png)
 
 ```
 #> 
 #> [[2]]
 ```
 
-![](figure/nn2poly-01-reg-potentials-2.png)
+![](includes/nn2poly-01-reg-potentials-2.png)
 
 ```
 #> 
 #> [[3]]
 ```
 
-![](figure/nn2poly-01-reg-potentials-3.png)
+![](includes/nn2poly-01-reg-potentials-3.png)
 
 
 

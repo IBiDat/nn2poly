@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
   comment = "#>",
   message = FALSE, warning = FALSE, error = FALSE,
   fig.cap = "",
-  fig.path = "figure/nn2poly-03-"
+  fig.path = "includes/nn2poly-03-"
 )
 ```
 
