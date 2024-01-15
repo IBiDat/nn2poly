@@ -16,13 +16,10 @@
     <loc>https://ibidat.github.io/nn2poly/articles/nn2poly-01-introduction.html</loc>
   </url>
   <url>
-    <loc>https://ibidat.github.io/nn2poly/articles/nn2poly-02-tensorflow-regression.html</loc>
+    <loc>https://ibidat.github.io/nn2poly/articles/nn2poly-02-supported-DL-frameworks.html</loc>
   </url>
   <url>
-    <loc>https://ibidat.github.io/nn2poly/articles/nn2poly-03-tensorflow-classification.html</loc>
-  </url>
-  <url>
-    <loc>https://ibidat.github.io/nn2poly/articles/nn2poly-04-torch-regression.html</loc>
+    <loc>https://ibidat.github.io/nn2poly/articles/nn2poly-03-classification-example.html</loc>
   </url>
   <url>
     <loc>https://ibidat.github.io/nn2poly/authors.html</loc>

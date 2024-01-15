@@ -6,12 +6,12 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="description" content="nn2poly">
-<title>01 - Introduction to nn2poly • nn2poly</title>
+<title>Introduction to nn2poly • nn2poly</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="01 - Introduction to nn2poly">
+<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Introduction to nn2poly">
 <meta property="og:description" content="nn2poly">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -41,10 +41,9 @@
 <li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/nn2poly-01-introduction.html">01 - Introduction to nn2poly</a>
-    <a class="dropdown-item" href="../articles/nn2poly-02-tensorflow-regression.html">02 - Regression example using tensorflow</a>
-    <a class="dropdown-item" href="../articles/nn2poly-03-tensorflow-classification.html">03 - Classification example using tensorflow</a>
-    <a class="dropdown-item" href="../articles/nn2poly-04-torch-regression.html">04 - Regression example using torch</a>
+    <a class="dropdown-item" href="../articles/nn2poly-01-introduction.html">Introduction to nn2poly</a>
+    <a class="dropdown-item" href="../articles/nn2poly-02-supported-DL-frameworks.html">Supported DL frameworks</a>
+    <a class="dropdown-item" href="../articles/nn2poly-03-classification-example.html">Classification example using tensorflow</a>
   </div>
 </li>
       </ul>
@@ -64,7 +63,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="" class="logo" alt=""><h1>01 - Introduction to nn2poly</h1>
+      <img src="" class="logo" alt=""><h1>Introduction to nn2poly</h1>
                         <h4 data-toc-skip class="author">Pablo
 Morala</h4>
             
@@ -76,84 +75,100 @@ Morala</h4>
     
     
 <div class="section level2">
-<h2 id="overall-package-goal">Overall package goal<a class="anchor" aria-label="anchor" href="#overall-package-goal"></a>
+<h2 id="nn2poly-package-goal">
+<code>nn2poly</code> package goal<a class="anchor" aria-label="anchor" href="#nn2poly-package-goal"></a>
 </h2>
 <p>The main objective of <code>nn2poly</code> is to obtain a
 representation of a feed forward artificial neural network (like a
 multilayered perceptron) in terms of a polynomial representation. The
 coefficients of such polynomials are obtained by applying first a Taylor
-expansion at each activation function in the neural network. Then this
+expansion at each activation function in the neural network. Then, this
 expansions and the given neural network weights are joint using
 combinatorial properties, obtaining a final value for the polynomial
-coefficients.</p>
+coefficients. The main goal of this new representation is to obtain an
+interpretable model, serving thus as an eXplainable Artificial
+Intelligence (XAI) tool to overcome the black box nature of neural
+networks by means of interpreting the effect of those obtained
+polynomial coefficients.</p>
 <p>More information with the theoretical insights about the underlying
 mathematical process used to build this relationship can be found in the
-following references: * Initial development of the idea for a single
-hidden layer neural network in this <a href="https://doi.org/10.1016/j.neunet.2021.04.036" class="external-link">article</a> or its
-free access <a href="https://doi.org/10.48550/arXiv.2102.03865" class="external-link">arXiv
-preprint version</a>. * Extension to deeper layers and proper
-formulation of the <em>NN2Poly</em> method in this <a href="https://doi.org/10.48550/arXiv.2112.11397" class="external-link">arXiv preprint</a>.</p>
-<p><em>Important remark 1</em>: The approximations made by the NN2poly
-method rely on Taylor expansions and therefore require some constraints
-to be imposed when training the original neural network. The
-implementation of these constraints depend on the deep learning
-framework used to train the neural networks. Currently, this package
-supports constraints implementation for <em>keras/tensorflow</em>,
-covered in <code><a href="../articles/nn2poly-02-tensorflow-regression.html">vignette("nn2poly-02-tensorflow-regression")</a></code> and
-<code><a href="../articles/nn2poly-03-tensorflow-classification.html">vignette("nn2poly-03-tensorflow-classification")</a></code>.
-Implementation for <em>pytorch</em> networks is in development. However,
-the <code>nn2poly</code> can work by default with any kind of neural
-network by manually feeding the neural network weights and activation
-functions to the algorithm. Therefore, <code>nn2poly</code> is not
-limited to a special deep learning framework.</p>
+following references:</p>
+<ul>
+<li><p>Pablo Morala, J. Alexandra Cifuentes, Rosa E. Lillo, Iñaki Ucar
+(2021). “Towards a mathematical framework to inform neural network
+modelling via polynomial regression.” <em>Neural Networks</em>,
+<em>142</em>, 57-72. doi: <a href="https://doi.org/10.1016/j.neunet.2021.04.036" class="external-link">10.1016/j.neunet.2021.04.036</a></p></li>
+<li><p>Pablo Morala, J. Alexandra Cifuentes, Rosa E. Lillo, Iñaki Ucar
+(2023). “NNN2Poly: A Polynomial Representation for Deep Feed-Forward
+Artificial Neural Networks.” <em>IEEE Transactions on Neural Networks
+and Learning Systems</em>, (Early Access). doi: <a href="https://doi.org/10.1109/TNNLS.2023.3330328" class="external-link">10.1109/TNNLS.2023.3330328</a></p></li>
+</ul>
+<blockquote>
+<p><em>Important remark</em>: The approximations made by NN2Poly rely on
+Taylor expansions and therefore require some constraints to be imposed
+when training the original neural network in order to have those
+expansions controlled. The implementation of these constraints depends
+on the deep learning framework used to train the neural networks.
+Frameworks currently supported are <em>tensorflow</em> and
+<em>torch</em>. Details on how constraints are applied on each framework
+are covered in
+<code><a href="../articles/nn2poly-02-supported-DL-frameworks.html">vignette("nn2poly-02-supported-DL-frameworks")</a></code>. However,
+<code>nn2poly</code> can work by default with any kind of neural network
+by manually feeding the neural network weights and activation functions
+to the algorithm. Therefore, <code>nn2poly</code> is not limited to any
+of the supported deep learning frameworks.</p>
+</blockquote>
 </div>
 <div class="section level2">
-<h2 id="this-vignettes-goal">This vignette’s goal<a class="anchor" aria-label="anchor" href="#this-vignettes-goal"></a>
+<h2 id="this-vignette-a-first-example">This vignette: a first example<a class="anchor" aria-label="anchor" href="#this-vignette-a-first-example"></a>
 </h2>
-<p>Here we present the basic behavior of <code>nn2poly</code> when used
-in its default version, without specifying any deep learning framework
-as explained in the previous remark. For that matter, we will showcase
-an example where we will get the weights from a trained neural network
-and manually create the object with the needed information to use
-<code>nn2poly</code>.</p>
+<p>In this vignette we present the basic behavior of
+<code>nn2poly</code> when used in its default version, without
+specifying any deep learning framework as explained in the previous
+remark. For that matter, we will showcase an example where we will get
+the weights from a trained neural network and manually create the object
+with the needed information to use <code>nn2poly</code>.</p>
 <p>The result will be a polynomial that tries to approximate the neural
 network behavior. In this case the neural network training will not have
-any constraint imposed. Then, as explained previously, the final
+any constraints imposed. Then, as explained previously, the final
 approximation by the polynomial may not be accurate enough.</p>
-<p>This example is focused in the default version, but we need to build
-a NN under some framework, we will use <code>keras</code> and
+<p>This example is focused in the default version, but, as we need to
+build a NN under some framework, we will use <code>keras</code> and
 <code>tensorflow</code> for that matter. In any case, the needed
 parameters will be extracted and used under the default version of
 <code>nn2poly</code>, so this can be extrapolated to any other
 framework.</p>
+<p>In particular, we will solve a really simple regression problem using
+simulated data from a polynomial, which allows us to have a ground truth
+and control if the final polynomial coefficients obtained with
+<code>nn2poly</code> are similar to those from the polynomial that
+originates the data.</p>
+<blockquote>
+<p><em>Note</em>: For a classification example please refer to
+<code><a href="../articles/nn2poly-03-classification-example.html">vignette("nn2poly-03-classification-example")</a></code></p>
+</blockquote>
+<div class="section level3">
+<h3 id="polynomial-structure-in-nn2poly">Polynomial structure in <code>nn2poly</code><a class="anchor" aria-label="anchor" href="#polynomial-structure-in-nn2poly"></a>
+</h3>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ibidat.github.io/nn2poly/">nn2poly</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tensorflow.rstudio.com/" class="external-link">keras</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># This sets all needed seeds</span></span>
-<span><span class="fu">tensorflow</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tensorflow/man/set_random_seed.html" class="external-link">set_random_seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="simple-regression-example">Simple regression example<a class="anchor" aria-label="anchor" href="#simple-regression-example"></a>
-</h2>
-<p>This example will solve a regression problem using simulated data
-from a polynomial, which allows to control if the final polynomial
-coefficients obtained with <code>nn2poly</code> are similar to those
-from the polynomial that originates the data.</p>
-<div class="section level3">
-<h3 id="simulated-data-generation">Simulated data generation<a class="anchor" aria-label="anchor" href="#simulated-data-generation"></a>
-</h3>
-<p>We will simulate polynomial data as follows. First we define a
-polynomial using the format needed in <code>nn2poly</code>, specifically
-to use the function <code>eval_poly</code>, which consists of a list
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span></code></pre></div>
+<p>As the final output of using <code>nn2poly</code> on a neural network
+is a polynomial (or several ones in classification problems), the
+package uses a certain structure to represent those polynomials and it
+also provides <code>nn2poly:::eval_poly()</code>, a function to evaluate
+polynomials in that structure. As we will use it to generate the
+simulated data in this example, we first define a polynomial using the
+format needed in <code>nn2poly</code>, which consists of a list
 containing: * Labels: A list of integer vectors denoting the
 combinations of variables that appear on each term of the polynomial.
 Variables are numbered from <code>1</code> to <code>p</code> where
 <code>p</code> is the dimension of the problem. As an example,
-<code>c(1,1,3)</code> would represent the term <span class="math inline">\(x_1^2x_3\)</span> * Values: Vector containing the
-numerical values of the coefficients denoted by labels. If multiple
-polynomials with the same terms but different coefficients want to be
-represented, a matrix can be employed, where each row is a
+<code>c(1,1,3)</code> would represent the term <span class="math inline">\(x_1^2x_3\)</span>. An special case is the
+intercept term, which is represented by <code>0</code> * Values: Vector
+containing the numerical values of the coefficients denoted by labels.
+If multiple polynomials with the same labels but different coefficient
+values are wanted, a matrix can be employed, where each row represents a
 polynomial.</p>
 <p>Here we create the polynomial <span class="math inline">\(4x_1 - 3
 x_2x_3\)</span>:</p>
@@ -162,6 +177,10 @@ x_2x_3\)</span>:</p>
 <span><span class="va">polynomial</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">polynomial</span><span class="op">$</span><span class="va">labels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">polynomial</span><span class="op">$</span><span class="va">values</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>,<span class="op">-</span><span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="simulated-data">Simulated data<a class="anchor" aria-label="anchor" href="#simulated-data"></a>
+</h3>
 <p>With said polynomial, we can now generate the desired data that will
 train the NN for our example. We will employ a normal distribution to
 generate variables <span class="math inline">\(x_1, x_2, x_3\)</span>
@@ -170,7 +189,7 @@ Therefore, the response variable <span class="math inline">\(y\)</span>
 will be generated as: <span class="math inline">\(y = 4x_1 - 3 x_2x_3 +
 \epsilon\)</span></p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Define number of variables p and sample n</span></span>
+<code class="sourceCode R"><span><span class="co"># Define number of variables and sample size</span></span>
 <span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">3</span></span>
 <span><span class="va">n_sample</span> <span class="op">&lt;-</span> <span class="fl">500</span></span>
 <span></span>
@@ -181,7 +200,8 @@ will be generated as: <span class="math inline">\(y = 4x_1 - 3 x_2x_3 +
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="co"># Response variable + small error term</span></span>
-<span><span class="va">Y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="fu"><a href="../reference/eval_poly.html">eval_poly</a></span><span class="op">(</span><span class="va">X</span>,<span class="va">polynomial</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n_sample</span>, <span class="fl">0</span>, <span class="fl">0.1</span><span class="op">)</span></span>
+<span><span class="va">Y</span> <span class="op">&lt;-</span> <span class="fu">nn2poly</span><span class="fu">:::</span><span class="fu"><a href="../reference/eval_poly.html">eval_poly</a></span><span class="op">(</span>poly <span class="op">=</span> <span class="va">polynomial</span>, newdata <span class="op">=</span> <span class="va">X</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n_sample</span>, <span class="fl">0</span>, <span class="fl">0.1</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Store all as a data frame</span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">X</span>, <span class="va">Y</span><span class="op">)</span><span class="op">)</span></span>
@@ -194,9 +214,9 @@ will be generated as: <span class="math inline">\(y = 4x_1 - 3 x_2x_3 +
 <span><span class="co">#&gt; 5  0.4042683 -0.720153545 -0.9959334 -0.6141076</span></span>
 <span><span class="co">#&gt; 6 -0.1061245 -0.198124330 -0.5974829 -0.7455793</span></span></code></pre></div>
 <p>Then we will scale the data to have everything in the <span class="math inline">\([-1,1]\)</span> interval and divide it in train
-and test datasets.</p>
+and test.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Data scaling</span></span>
+<code class="sourceCode R"><span><span class="co"># Data scaling to [-1,1]</span></span>
 <span><span class="va">maxs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">data</span>, <span class="fl">2</span>, <span class="va">max</span><span class="op">)</span></span>
 <span><span class="va">mins</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">data</span>, <span class="fl">2</span>, <span class="va">min</span><span class="op">)</span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/scale.html" class="external-link">scale</a></span><span class="op">(</span><span class="va">data</span>, center <span class="op">=</span> <span class="va">mins</span> <span class="op">+</span> <span class="op">(</span><span class="va">maxs</span> <span class="op">-</span> <span class="va">mins</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span>, scale <span class="op">=</span> <span class="op">(</span><span class="va">maxs</span> <span class="op">-</span> <span class="va">mins</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
@@ -218,22 +238,27 @@ and test datasets.</p>
 <p>With our simulated data ready, we can train our neural network. The
 method is expected to be applied to a given trained densely connected
 feed forward neural network (NN from now on), also referred as
-multilayer perceptron (MLP). Therefore, as explained before, the method
-used to train the NN can be used. Here we will use <code>keras</code>to
-train it, but we will manually build the needed object with the weights
-that has to be fed to the <code>nn2poly</code> algorithm <strong>as if
-it was trained with any other framework</strong>. For more information
-on the specific <code>keras</code> methods implemented in the package,
-please refer to
-<code><a href="../articles/nn2poly-02-tensorflow-regression.html">vignette("nn2poly-02-tensorflow-regression")</a></code> and
-<code>vignette("nn2poly-02-tensorflow-classification")</code>.</p>
-<p><em>Note</em>: Once again, note that, in order to avoid asymptotic
-behavior of the method, it is important to impose some kind of
-constraints when training the neural network weights. Details on how to
-do this depend on the chosen deep learning framework and are covered in
-the next vignettes.</p>
-<p>First, we build the model.</p>
+multilayer perceptron (MLP). Therefore, as explained before, any method
+can be used to train the NN as <code>nn2poly</code> only needs the
+weights and activation functions.</p>
+<p>Here we will use <code>keras</code>/<code>tensorflow</code> to train
+it, but we will manually build the needed object with the weights and
+activation functions that has to be fed to the <code>nn2poly</code>
+algorithm <strong>to show how to do it as if it was trained with any
+other framework</strong>. However, recall that
+<code>keras</code>/<code>tensorflow</code> and
+<code>luz</code>/<code>torch</code> models have specific support in
+<code>nn2poly</code> with a more user-friendly approach than the default
+case covered here where we manually build the weights and activation
+functions object. For more information on the supported frameworks refer
+to <code><a href="../articles/nn2poly-02-supported-DL-frameworks.html">vignette("nn2poly-02-supported-DL-frameworks")</a></code>.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tensorflow.rstudio.com/" class="external-link">keras</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># This sets all needed seeds</span></span>
+<span><span class="fu">tensorflow</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tensorflow/man/set_random_seed.html" class="external-link">set_random_seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span></code></pre></div>
+<p>First, we build the model.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">nn</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/keras_model_sequential.html" class="external-link">keras_model_sequential</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">nn</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/layer_dense.html" class="external-link">layer_dense</a></span><span class="op">(</span>units <span class="op">=</span> <span class="fl">10</span>,</span>
@@ -247,69 +272,87 @@ the next vignettes.</p>
 <span>                  activation <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">nn</span></span>
-<span><span class="co">#&gt; Model: "sequential_9"</span></span>
+<span><span class="co">#&gt; Model: "sequential_61"</span></span>
 <span><span class="co">#&gt; _________________________________________________________________________________________________________________</span></span>
 <span><span class="co">#&gt;  Layer (type)                                     Output Shape                                  Param #          </span></span>
 <span><span class="co">#&gt; =================================================================================================================</span></span>
-<span><span class="co">#&gt;  dense_17 (Dense)                                 (None, 10)                                    40               </span></span>
-<span><span class="co">#&gt;  dense_18 (Dense)                                 (None, 10)                                    110              </span></span>
-<span><span class="co">#&gt;  dense_19 (Dense)                                 (None, 1)                                     11               </span></span>
+<span><span class="co">#&gt;  dense_174 (Dense)                                (None, 10)                                    40               </span></span>
+<span><span class="co">#&gt;  dense_175 (Dense)                                (None, 10)                                    110              </span></span>
+<span><span class="co">#&gt;  dense_176 (Dense)                                (None, 1)                                     11               </span></span>
 <span><span class="co">#&gt; =================================================================================================================</span></span>
 <span><span class="co">#&gt; Total params: 161</span></span>
 <span><span class="co">#&gt; Trainable params: 161</span></span>
 <span><span class="co">#&gt; Non-trainable params: 0</span></span>
 <span><span class="co">#&gt; _________________________________________________________________________________________________________________</span></span></code></pre></div>
 <p>Compile the model:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://generics.r-lib.org/reference/compile.html" class="external-link">compile</a></span><span class="op">(</span><span class="va">nn</span>,</span>
 <span>        loss <span class="op">=</span> <span class="st">"mse"</span>,</span>
 <span>        optimizer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/keras/man/optimizer_adam.html" class="external-link">optimizer_adam</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>        metrics <span class="op">=</span> <span class="st">"mse"</span><span class="op">)</span></span></code></pre></div>
 <p>And train it:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">history</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">nn</span>,</span>
 <span>               <span class="va">train_x</span>,</span>
 <span>               <span class="va">train_y</span>,</span>
 <span>               verbose <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>               epochs <span class="op">=</span> <span class="fl">300</span>,</span>
+<span>               epochs <span class="op">=</span> <span class="fl">250</span>,</span>
 <span>               validation_split <span class="op">=</span> <span class="fl">0.3</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>We can visualize the training process:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">history</span><span class="op">)</span></span></code></pre></div>
-<p><img src="figure/nn2poly-01-reg-history-1.png"></p>
+<p><img src="includes/nn2poly-01-reg-history-1.png"></p>
 <p>And we can also visualize the NN predictions vs the original Y
 values.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Obtain the predicted values with the NN to compare them</span></span>
 <span><span class="va">prediction_NN</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">nn</span>, <span class="va">test_x</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Diagonal plot implemented in the package to quickly visualize and compare predictions</span></span>
 <span><span class="fu"><a href="../reference/plot_diagonal.html">plot_diagonal</a></span><span class="op">(</span>x_axis <span class="op">=</span>  <span class="va">prediction_NN</span>, y_axis <span class="op">=</span>  <span class="va">test_y</span>, xlab <span class="op">=</span> <span class="st">"NN prediction"</span>, ylab <span class="op">=</span> <span class="st">"Original Y"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="figure/nn2poly-01-reg-comparison-y-nn-1.png"></p>
+<p><img src="includes/nn2poly-01-reg-comparison-y-nn-1.png"></p>
+<blockquote>
 <p><em>Note</em>: Recall that the NN performance is not addressed by
 <code>nn2poly</code>, meaning that this performance could be either good
-or bad and <code>nn2poly</code> still represent the NN behavior.</p>
+or bad and <code>nn2poly</code>’s goal would still be to represent the
+NN behavior and predict as good or as bad as the NN.</p>
+</blockquote>
 </div>
 <div class="section level3">
-<h3 id="using-nn2poly-to-obtain-the-polynomial">Using nn2poly to obtain the polynomial<a class="anchor" aria-label="anchor" href="#using-nn2poly-to-obtain-the-polynomial"></a>
+<h3 id="building-the-needed-input-for-default-nn2poly">Building the needed input for default <code>nn2poly</code><a class="anchor" aria-label="anchor" href="#building-the-needed-input-for-default-nn2poly"></a>
 </h3>
-<p>After the NN has been trained, using any chosen method by the user,
-the parameters have to be extracted and reshaped, if needed, to match
-the expected input of the function <code>nn2poly_algorithm()</code>.</p>
-<p>This input should be an <code>object</code> formed by a list of
-matrices with a weight matrix at each layer. The weights matrices should
-be of dimension ((1+input) * output) where the first row corresponds to
-the bias vector, and the rest of the rows correspond to each of the
-ordered vector weights associated to each input.</p>
-<p>In that list, the name of each element has to be the activation
-function names of each layer. Currently supported activation functions
-are <code>"tanh", "sigmoid", "softplus", "linear"</code>.</p>
-<p>Particularly, the <code>keras</code> framework by default separates
+<p>Once the NN has been trained, using any chosen method by the user,
+the default version of using <code>nn2poly</code> requires to set up the
+weight matrices and activation functions from the neural network in the
+expected input form. This should be a list of matrices such that:</p>
+<ul>
+<li>There is a weight matrix per layer. The weights matrices should be
+of dimension <span class="math inline">\(((1+input) * output)\)</span>
+where the first row corresponds to the bias vector, and the rest of the
+rows correspond to each of the ordered vector weights associated to each
+neuron input.</li>
+<li>The name of each element in the list (i.e. each weight matrix) has
+to be the name of the activation function employed at that layer.
+Currently supported activation functions are
+<code>"tanh", "sigmoid", "softplus", "linear"</code>.</li>
+<li>Then, the total size of the list has to be equal to the numer of
+hidden layers plus one.</li>
+</ul>
+<p>In particular, the <code>keras</code> framework by default separates
 kernel weights matrices of dimension (input * output) and bias vectors
 (1 * output), so we need to add the bias as the first row of a matrix
 ((1+input) * output).</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<blockquote>
+<p><em>Note</em>: Please note again that
+<code>keras</code>/<code>tensorflow</code> and
+<code>luz</code>/<code>torch</code> models have specific support in
+<code>nn2poly</code> with a more user-friendly approach than manually
+building the weights and activation functions list. For more information
+on the supported frameworks refer to
+<code><a href="../articles/nn2poly-02-supported-DL-frameworks.html">vignette("nn2poly-02-supported-DL-frameworks")</a></code>.</p>
+</blockquote>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">keras_weights</span> <span class="op">&lt;-</span> <span class="fu">keras</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/keras/man/get_weights.html" class="external-link">get_weights</a></span><span class="op">(</span><span class="va">nn</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Due to keras giving weights separated from the bias, we have twice the</span></span>
@@ -328,67 +371,73 @@ kernel weights matrices of dimension (input * output) and bias vectors
 <span></span>
 <span><span class="va">weights_object</span></span>
 <span><span class="co">#&gt; $tanh</span></span>
-<span><span class="co">#&gt;            [,1]       [,2]      [,3]        [,4]        [,5]       [,6]       [,7]        [,8]        [,9]</span></span>
-<span><span class="co">#&gt; [1,]  0.2637966 -0.1632335 0.4649245 -0.20589803  0.04730094 -0.3763387 -0.2124885 -0.08747434 -0.07051360</span></span>
-<span><span class="co">#&gt; [2,]  0.2385524  0.1342811 0.2513933  0.48018309 -0.47788176  0.1631715  0.6607828 -0.31218216 -0.01426336</span></span>
-<span><span class="co">#&gt; [3,] -0.7742428 -0.1097567 0.8174284  0.08418242  0.06163564  0.7477616 -0.8533844 -0.48116657  0.04514860</span></span>
-<span><span class="co">#&gt; [4,] -0.6955228  0.5266028 0.5572206 -0.46307948  0.48515409 -0.7743985  0.1162070  0.35274017  0.04112899</span></span>
-<span><span class="co">#&gt;            [,10]</span></span>
-<span><span class="co">#&gt; [1,] -0.37202930</span></span>
-<span><span class="co">#&gt; [2,] -0.01626668</span></span>
-<span><span class="co">#&gt; [3,] -0.70131820</span></span>
-<span><span class="co">#&gt; [4,] -0.56946415</span></span>
+<span><span class="co">#&gt;            [,1]       [,2]      [,3]       [,4]        [,5]       [,6]       [,7]        [,8]        [,9]</span></span>
+<span><span class="co">#&gt; [1,]  0.2468006 -0.1615576 0.4128721 -0.2022066  0.04867206 -0.3397017 -0.1973533 -0.08864177 -0.06979843</span></span>
+<span><span class="co">#&gt; [2,]  0.2653632  0.1291278 0.1464561  0.5171605 -0.47153816  0.1952459  0.6991890 -0.34414759 -0.01077842</span></span>
+<span><span class="co">#&gt; [3,] -0.7783106 -0.1182964 0.8215331  0.0756740  0.06914742  0.7492308 -0.8363205 -0.46379340  0.04437404</span></span>
+<span><span class="co">#&gt; [4,] -0.7159964  0.5072741 0.6033612 -0.4585148  0.49232438 -0.7474106  0.1091831  0.34101799  0.04305385</span></span>
+<span><span class="co">#&gt;             [,10]</span></span>
+<span><span class="co">#&gt; [1,] -0.359030366</span></span>
+<span><span class="co">#&gt; [2,]  0.006373413</span></span>
+<span><span class="co">#&gt; [3,] -0.698476076</span></span>
+<span><span class="co">#&gt; [4,] -0.571668506</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $tanh</span></span>
-<span><span class="co">#&gt;              [,1]        [,2]        [,3]        [,4]        [,5]       [,6]        [,7]        [,8]        [,9]</span></span>
-<span><span class="co">#&gt;  [1,] -0.06261473  0.01255261  0.42954829  0.06141516  0.08550595  0.2265693  0.08071607  0.16983804  0.08445328</span></span>
-<span><span class="co">#&gt;  [2,]  0.61023968 -0.15460493  0.32420215  0.16633785  0.25600886 -0.2739864  0.06122208 -0.04379337 -0.57018125</span></span>
-<span><span class="co">#&gt;  [3,] -0.25070983 -0.05766810 -0.50344008  0.13009298 -0.03173310 -0.4047118  0.28472036  0.23372132 -0.47447795</span></span>
-<span><span class="co">#&gt;  [4,]  0.40872586  0.46675542  0.11527456  0.43078154  0.15864335  0.6346628  0.01778316 -0.29318872  0.07777876</span></span>
-<span><span class="co">#&gt;  [5,] -0.24814591  0.01059229  0.40011716  0.27607894 -0.46360433 -0.3692199 -0.53746992 -0.42425549 -0.48620722</span></span>
-<span><span class="co">#&gt;  [6,] -0.26658243  0.51526904 -0.09131107  0.37373766  0.26082405  0.4299564 -0.41601449 -0.25669649 -0.28299403</span></span>
-<span><span class="co">#&gt;  [7,]  0.51186675  0.12881947  0.67951459 -0.17605777  0.15393135  0.4613117 -0.22281407  0.40243641 -0.12623918</span></span>
-<span><span class="co">#&gt;  [8,]  0.40394908 -0.42659599 -0.98550946 -0.15839998  0.02221864  0.3011585 -0.04859665 -0.38288346  0.25072047</span></span>
-<span><span class="co">#&gt;  [9,]  0.50324774  0.11122702 -0.84318024 -0.02784178  0.31848624  0.2643846  0.48137835 -0.40863025  0.01616014</span></span>
-<span><span class="co">#&gt; [10,]  0.27406499 -0.11159007  0.02285146  0.35646623  0.25075704 -0.1359648 -0.32286894  0.09449039 -0.06011314</span></span>
-<span><span class="co">#&gt; [11,] -0.52268207  0.45537508 -0.56030786  0.49129054 -0.03669148 -0.7891714  0.14410253 -0.21469988  0.24569559</span></span>
-<span><span class="co">#&gt;               [,10]</span></span>
-<span><span class="co">#&gt;  [1,]  0.0732324421</span></span>
-<span><span class="co">#&gt;  [2,] -0.3144004941</span></span>
-<span><span class="co">#&gt;  [3,]  0.0003889628</span></span>
-<span><span class="co">#&gt;  [4,] -0.0302867368</span></span>
-<span><span class="co">#&gt;  [5,] -0.1922566146</span></span>
-<span><span class="co">#&gt;  [6,] -0.2540818155</span></span>
-<span><span class="co">#&gt;  [7,] -0.4014825821</span></span>
-<span><span class="co">#&gt;  [8,] -0.3935797811</span></span>
-<span><span class="co">#&gt;  [9,] -0.5411312580</span></span>
-<span><span class="co">#&gt; [10,] -0.4011713266</span></span>
-<span><span class="co">#&gt; [11,]  0.3822859824</span></span>
+<span><span class="co">#&gt;              [,1]          [,2]        [,3]        [,4]        [,5]       [,6]        [,7]        [,8]</span></span>
+<span><span class="co">#&gt;  [1,] -0.06682093  1.354177e-02  0.41062176  0.06204464  0.08612972  0.2199472  0.07406761  0.16231309</span></span>
+<span><span class="co">#&gt;  [2,]  0.61209673 -1.587261e-01  0.33286688  0.16685191  0.25638032 -0.2960541  0.06451954 -0.04405669</span></span>
+<span><span class="co">#&gt;  [3,] -0.24969149 -5.748887e-02 -0.46696794  0.12622431 -0.03608320 -0.3931088  0.28291187  0.24243380</span></span>
+<span><span class="co">#&gt;  [4,]  0.38323382  4.771161e-01  0.11585876  0.44199020  0.16203447  0.6357560  0.01491554 -0.29491946</span></span>
+<span><span class="co">#&gt;  [5,] -0.24755152  6.043483e-06  0.41534948  0.27495798 -0.46539015 -0.3829005 -0.53592098 -0.42729110</span></span>
+<span><span class="co">#&gt;  [6,] -0.26591998  5.250556e-01 -0.10562975  0.37414369  0.26212201  0.4499114 -0.41681677 -0.25272584</span></span>
+<span><span class="co">#&gt;  [7,]  0.49481559  1.359816e-01  0.67004895 -0.15929574  0.16280667  0.4475754 -0.20691858  0.40582910</span></span>
+<span><span class="co">#&gt;  [8,]  0.40330765 -4.343324e-01 -0.92225003 -0.15942611  0.01812540  0.2977643 -0.04585903 -0.37514219</span></span>
+<span><span class="co">#&gt;  [9,]  0.51166564  1.184353e-01 -0.82071930 -0.02945352  0.31787610  0.2762571  0.48814669 -0.39470875</span></span>
+<span><span class="co">#&gt; [10,]  0.27744713 -1.118216e-01  0.02931483  0.35466376  0.24984393 -0.1250943 -0.32097501  0.09834206</span></span>
+<span><span class="co">#&gt; [11,] -0.50523925  4.479433e-01 -0.55034703  0.48515356 -0.03854835 -0.8001245  0.15069254 -0.20994137</span></span>
+<span><span class="co">#&gt;              [,9]        [,10]</span></span>
+<span><span class="co">#&gt;  [1,]  0.08528626  0.074458212</span></span>
+<span><span class="co">#&gt;  [2,] -0.57139808 -0.314788640</span></span>
+<span><span class="co">#&gt;  [3,] -0.47687724 -0.002060457</span></span>
+<span><span class="co">#&gt;  [4,]  0.09033196 -0.017912282</span></span>
+<span><span class="co">#&gt;  [5,] -0.48928314 -0.197884247</span></span>
+<span><span class="co">#&gt;  [6,] -0.28060704 -0.249755934</span></span>
+<span><span class="co">#&gt;  [7,] -0.11089712 -0.387193263</span></span>
+<span><span class="co">#&gt;  [8,]  0.24891976 -0.395170867</span></span>
+<span><span class="co">#&gt;  [9,]  0.01584071 -0.538033605</span></span>
+<span><span class="co">#&gt; [10,] -0.06148605 -0.403377086</span></span>
+<span><span class="co">#&gt; [11,]  0.23820342  0.375222772</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $linear</span></span>
 <span><span class="co">#&gt;              [,1]</span></span>
-<span><span class="co">#&gt;  [1,] -0.07251097</span></span>
-<span><span class="co">#&gt;  [2,]  0.95829737</span></span>
-<span><span class="co">#&gt;  [3,] -0.07316440</span></span>
-<span><span class="co">#&gt;  [4,] -0.35980642</span></span>
-<span><span class="co">#&gt;  [5,] -0.43944517</span></span>
-<span><span class="co">#&gt;  [6,] -0.07012334</span></span>
-<span><span class="co">#&gt;  [7,]  0.60509491</span></span>
-<span><span class="co">#&gt;  [8,] -0.66404337</span></span>
-<span><span class="co">#&gt;  [9,] -0.04713812</span></span>
-<span><span class="co">#&gt; [10,] -0.79189116</span></span>
-<span><span class="co">#&gt; [11,] -0.91330308</span></span></code></pre></div>
-<p>Additionally, we need to specify the final order of our desired
-polynomial, <code>max_order</code>. It should be an integer value
-denoting the maximum order of the terms computed in the polynomial.
-Usually 2 or 3 should be enough in practice. Note that higher orders
-suppose an explosion in the possible combinations. If the user does not
-provide a value, the polynomial order grows multiplicatively with the
-Taylor order at each hidden layer, therefore its better to start with
-low values.</p>
-<p>When the input is in the desired shape, the nn2poly method can be
-applied:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<span><span class="co">#&gt;  [1,] -0.07325488</span></span>
+<span><span class="co">#&gt;  [2,]  0.92378414</span></span>
+<span><span class="co">#&gt;  [3,] -0.08239315</span></span>
+<span><span class="co">#&gt;  [4,] -0.32572412</span></span>
+<span><span class="co">#&gt;  [5,] -0.43841833</span></span>
+<span><span class="co">#&gt;  [6,] -0.08093655</span></span>
+<span><span class="co">#&gt;  [7,]  0.59904134</span></span>
+<span><span class="co">#&gt;  [8,] -0.65850627</span></span>
+<span><span class="co">#&gt;  [9,] -0.04606140</span></span>
+<span><span class="co">#&gt; [10,] -0.79061949</span></span>
+<span><span class="co">#&gt; [11,] -0.89735550</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="polynomial-obtained-with-nn2poly-from-weights-and-activation-functions">Polynomial obtained with <code>nn2poly</code> from weights and
+activation functions<a class="anchor" aria-label="anchor" href="#polynomial-obtained-with-nn2poly-from-weights-and-activation-functions"></a>
+</h3>
+<p>After setting up the NN information in our desired input shape, we
+are ready to employ <code>nn2poly</code>. The only last parameter that
+we need to specify is the final order of our desired polynomial,
+<code>max_order</code>. It should be an integer value denoting the
+maximum order of the terms computed in the polynomial. Usually 2 or 3
+should be enough in real data and default value is set up to 2,
+capturing pairwise interactions. Note that higher orders suppose an
+explosion in the possible combinations of variables and therefore the
+number of terms in the polynomial.</p>
+<p>In this example we will set <code>max_order = 3</code> and obtain our
+final polynomial:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">final_poly</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nn2poly.html">nn2poly</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">weights_object</span>,</span>
 <span>                      max_order <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
@@ -396,7 +445,7 @@ applied:</p>
 stored. Note that the structure is the same as explained for the
 polynomial that generated the data, as a list with labels and values. In
 this case, the obtained polynomial is up to order 3.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">final_poly</span></span>
 <span><span class="co">#&gt; $labels</span></span>
 <span><span class="co">#&gt; $labels[[1]]</span></span>
@@ -461,25 +510,40 @@ this case, the obtained polynomial is up to order 3.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $values</span></span>
-<span><span class="co">#&gt;            [,1]      [,2]       [,3]        [,4]       [,5]       [,6]        [,7]      [,8]      [,9]</span></span>
-<span><span class="co">#&gt; [1,] -0.1617715 0.7475098 0.09908831 -0.08050416 0.07277049 0.03545956 0.009334022 0.3035036 -2.559723</span></span>
-<span><span class="co">#&gt;           [,10]       [,11]     [,12]      [,13]     [,14]       [,15]      [,16]     [,17]     [,18]      [,19]</span></span>
-<span><span class="co">#&gt; [1,] 0.02124508 -0.08924709 0.2939184 0.01080101 0.6197476 -0.04956816 0.07802355 0.5294106 -1.012448 -0.7079897</span></span>
-<span><span class="co">#&gt;            [,20]</span></span>
-<span><span class="co">#&gt; [1,] -0.05140069</span></span>
+<span><span class="co">#&gt;               [,1]</span></span>
+<span><span class="co">#&gt;  [1,] -0.152201327</span></span>
+<span><span class="co">#&gt;  [2,]  0.750790396</span></span>
+<span><span class="co">#&gt;  [3,]  0.096754449</span></span>
+<span><span class="co">#&gt;  [4,] -0.055312169</span></span>
+<span><span class="co">#&gt;  [5,]  0.087070907</span></span>
+<span><span class="co">#&gt;  [6,]  0.184542875</span></span>
+<span><span class="co">#&gt;  [7,]  0.056719718</span></span>
+<span><span class="co">#&gt;  [8,]  0.117868180</span></span>
+<span><span class="co">#&gt;  [9,] -2.316887421</span></span>
+<span><span class="co">#&gt; [10,] -0.111600389</span></span>
+<span><span class="co">#&gt; [11,] -0.106978125</span></span>
+<span><span class="co">#&gt; [12,]  0.335722744</span></span>
+<span><span class="co">#&gt; [13,]  0.007464716</span></span>
+<span><span class="co">#&gt; [14,]  0.580397844</span></span>
+<span><span class="co">#&gt; [15,] -0.072672555</span></span>
+<span><span class="co">#&gt; [16,]  0.064910409</span></span>
+<span><span class="co">#&gt; [17,]  0.274290026</span></span>
+<span><span class="co">#&gt; [18,] -0.474785464</span></span>
+<span><span class="co">#&gt; [19,] -0.242252638</span></span>
+<span><span class="co">#&gt; [20,]  0.013870973</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; attr(,"class")</span></span>
 <span><span class="co">#&gt; [1] "nn2poly"</span></span></code></pre></div>
-<p>Note that the output has the <code>nn2poly</code> class.</p>
 </div>
 <div class="section level3">
-<h3 id="obtaining-polynomial-predictions">Obtaining polynomial predictions<a class="anchor" aria-label="anchor" href="#obtaining-polynomial-predictions"></a>
+<h3 id="predictions-using-the-obtained-polynomial">Predictions using the obtained polynomial<a class="anchor" aria-label="anchor" href="#predictions-using-the-obtained-polynomial"></a>
 </h3>
-<p>After obtaining the polynomial coefficients, we can use them to
-predict the response variable <span class="math inline">\(Y\)</span>.
-This is done by employing function <code>predcit</code>on an
-<code>nn2poly</code> object and providing the new data to predict.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<p>With the obtained polynomial coefficients, we can use them to predict
+the response variable <span class="math inline">\(Y\)</span> using the
+polynomial. This can be done using <code>predcit</code> on the output of
+<code>nn2poly</code> (object with class <code>"nn2poly"</code>) together
+with the desired values for the predictor variables.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># Obtain the predicted values for the test data with our polynomial</span></span>
 <span><span class="va">prediction_poly</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">final_poly</span>,</span>
@@ -488,21 +552,29 @@ This is done by employing function <code>predcit</code>on an
 <div class="section level3">
 <h3 id="visualizing-the-results">Visualizing the results<a class="anchor" aria-label="anchor" href="#visualizing-the-results"></a>
 </h3>
+<blockquote>
+<p><em>Note</em>: Once again note that, in order to avoid asymptotic
+behavior of the method, it is important to impose some kind of
+constraints when training the neural network weights, something which we
+are not doing here to simplify this first example. Details on how to do
+this depend on the chosen deep learning framework and are covered in the
+next vignettes.</p>
+</blockquote>
 <p>It is advisable to always check that the predictions obtained with
-the new polynomial do not differ too much from the original neural
-network predictions (and in case they differ, we can also try to find
-why by checking the Taylor expansions). To help with that, a couple of
-functions are included that allow us to plot the results.</p>
+the new polynomial are close to the original NN predictions (and in case
+they differ, we can also try to find why by checking the Taylor
+expansions). To help with that, a couple of functions are included that
+allow us to plot the results.</p>
 <p>A simple plot comparing the polynomial and NN predictions can be
 obtained with <code><a href="../reference/plot_diagonal.html">plot_diagonal()</a></code>, where the red diagonal line
 represents where a perfect relationship between the NN and the
 polynomial predictions would be obtained. In this example, as the
-theoretical weights constraints have not been imposed, we can observe
-how the approximation is not perfect.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+theoretical weight constraints have not been imposed, we can observe how
+the approximation is not perfect.</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/plot_diagonal.html">plot_diagonal</a></span><span class="op">(</span>x_axis <span class="op">=</span>  <span class="va">prediction_NN</span>, y_axis <span class="op">=</span>  <span class="va">prediction_poly</span>, xlab <span class="op">=</span> <span class="st">"NN prediction"</span>, ylab <span class="op">=</span> <span class="st">"Polynomial prediction"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="figure/nn2poly-01-reg-comparison-polynomial-nn-1.png"></p>
+<p><img src="includes/nn2poly-01-reg-comparison-polynomial-nn-1.png"></p>
 <p>We can also plot the <span class="math inline">\(n\)</span> most
 important coefficients in absolute value to compare which variables or
 interactions are more relevant in the polynomial. Note that, as data
@@ -510,12 +582,15 @@ should be scaled to the <span class="math inline">\([-1,1]\)</span>
 interval, interactions of order 2 or higher would usually need a higher
 absolute value than the lower order coefficients to be more
 relevant.</p>
-<p>In this case we can see how the coefficients differ from the original
-polynomial <span class="math inline">\(4x_1 - 3 x_2x_3\)</span>, as
-there were no constraints on the neural network weights training.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<p>In this case we can see how the two most important obtained
+coefficients are <code>2,3</code> and <code>1</code>, precisely the two
+terms appearing in the original polynomial <span class="math inline">\(4x_1 - 3 x_2x_3\)</span>. However, other
+interactions of order 3 appear to be also relevant, which is caused by
+the Taylor expansions not being controlled as we have not imposed
+constraints on the neural network weights training.</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_n_important_coeffs.html">plot_n_important_coeffs</a></span><span class="op">(</span><span class="va">final_poly</span>, <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
-<p><img src="figure/nn2poly-01-reg-n-important-1.png"></p>
+<p><img src="includes/nn2poly-01-reg-n-important-1.png"></p>
 <p>Another convenient plot to show how the algorithm is affected by each
 layer can be obtained with
 <code><a href="../reference/plot_taylor_and_activation_potentials.html">plot_taylor_and_activation_potentials()</a></code>, where the
@@ -524,19 +599,19 @@ Taylor expansion approximation of the activation function at each
 layer.</p>
 <p>In this case, as we have not used constraints in the NN training, the
 activation potentials are not strictly centered around zero.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_taylor_and_activation_potentials.html">plot_taylor_and_activation_potentials</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">nn</span>,</span>
 <span>                                      data <span class="op">=</span> <span class="va">train</span>,</span>
 <span>                                      max_order <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>                                      constraints <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [[1]]</span></span></code></pre></div>
-<p><img src="figure/nn2poly-01-reg-potentials-1.png"></p>
+<p><img src="includes/nn2poly-01-reg-potentials-1.png"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[2]]</span></span></code></pre>
-<p><img src="figure/nn2poly-01-reg-potentials-2.png"></p>
+<p><img src="includes/nn2poly-01-reg-potentials-2.png"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[3]]</span></span></code></pre>
-<p><img src="figure/nn2poly-01-reg-potentials-3.png"></p>
+<p><img src="includes/nn2poly-01-reg-potentials-3.png"></p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

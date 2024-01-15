@@ -3,10 +3,9 @@ pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
   nn2poly-01-introduction: nn2poly-01-introduction.html
-  nn2poly-02-tensorflow-regression: nn2poly-02-tensorflow-regression.html
-  nn2poly-03-tensorflow-classification: nn2poly-03-tensorflow-classification.html
-  nn2poly-04-torch-regression: nn2poly-04-torch-regression.html
-last_built: 2023-11-26T21:01Z
+  nn2poly-02-supported-DL-frameworks: nn2poly-02-supported-DL-frameworks.html
+  nn2poly-03-classification-example: nn2poly-03-classification-example.html
+last_built: 2024-01-15T16:33Z
 urls:
   reference: https://ibidat.github.io/nn2poly/reference
   article: https://ibidat.github.io/nn2poly/articles

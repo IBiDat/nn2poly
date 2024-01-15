@@ -34,10 +34,9 @@ be an approximation as Taylor expansion is not needed."><!-- mathjax --><script 
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/nn2poly-01-introduction.html">01 - Introduction to nn2poly</a>
-    <a class="dropdown-item" href="../articles/nn2poly-02-tensorflow-regression.html">02 - Regression example using tensorflow</a>
-    <a class="dropdown-item" href="../articles/nn2poly-03-tensorflow-classification.html">03 - Classification example using tensorflow</a>
-    <a class="dropdown-item" href="../articles/nn2poly-04-torch-regression.html">04 - Regression example using torch</a>
+    <a class="dropdown-item" href="../articles/nn2poly-01-introduction.html">Introduction to nn2poly</a>
+    <a class="dropdown-item" href="../articles/nn2poly-02-supported-DL-frameworks.html">Supported DL frameworks</a>
+    <a class="dropdown-item" href="../articles/nn2poly-03-classification-example.html">Classification example using tensorflow</a>
   </div>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -86,8 +85,9 @@ desired. Currently supports models from the following deep learning frameworks:<
 </ul><p>It also supports a named <code>list</code> as input which allows to introduce by
 hand a model from any other source. This <code>list</code> should be of length L
 (number of hidden layers + 1) containing the weights matrix for each layer.
-Each element of the list should be names as the activation function used at
-each layer.</p>
+Each element of the list should be named as the activation function used at
+each layer. Currently supported activation functions are <code>"tanh"</code>,
+<code>"softplus"</code>, <code>"sigmoid"</code> and <code>"linear"</code>.</p>
 <p>At any layer \(l\), the expected shape of such matrices is of the form
 \((h_{(l-1)} + 1)*(h_l)\), that is, the number of rows is the number of
 neurons in the previous layer plus the bias vector, and the number of columns
@@ -113,7 +113,7 @@ that would naturally arise when considering all Taylor expansions allowed by
 <dd><p><code>integer</code> or <code>vector</code> of length L that sets the
 degree at which Taylor expansion is truncated at each layer. If a single
 value is used, that value is set for each non linear layer and 1 for linear
-at each layer activation function. Default is set to 8.</p></dd>
+at each layer activation function. Default set to <code>8</code>.</p></dd>
 
 
 <dt>constraints</dt>
