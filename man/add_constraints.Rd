@@ -89,14 +89,14 @@ nn <- luz_model_sequential(
 
 # Train the model adding the constraints inside the pipe
 # (equivalent to the approach used in the previous example)
-fitted <- nn \%>\%
+fitted <- nn |>
    luz::setup(
      loss = torch::nn_mse_loss(),
      optimizer = torch::optim_adam,
      metrics = list(
        luz::luz_metric_mse()
      )
-   ) \%>\%
+   ) |>
    luz::fit(torch_data$train, epochs = 2, valid_data = torch_data$valid)
 
 
