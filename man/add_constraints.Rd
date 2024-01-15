@@ -46,7 +46,6 @@ if (requireNamespace("keras", quietly=TRUE)) {
   # Check that class of the constrained nn is "nn2poly"
   class(nn_constrained)[1]
 }
-}
 
 if (requireNamespace("luz", quietly=TRUE)) {
   # ---- Example with a luz/torch network ----
@@ -69,6 +68,7 @@ if (requireNamespace("luz", quietly=TRUE)) {
 
   # Check that class of the constrained nn is "nn2poly"
   class(nn)[1]
+}
 }
 
 }

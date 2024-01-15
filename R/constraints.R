@@ -37,7 +37,6 @@
 #'   # Check that class of the constrained nn is "nn2poly"
 #'   class(nn_constrained)[1]
 #' }
-#' }
 #'
 #' if (requireNamespace("luz", quietly=TRUE)) {
 #'   # ---- Example with a luz/torch network ----
@@ -60,6 +59,7 @@
 #'
 #'   # Check that class of the constrained nn is "nn2poly"
 #'   class(nn)[1]
+#' }
 #' }
 #'
 #' @export
