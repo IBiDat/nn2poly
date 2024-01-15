@@ -14,6 +14,23 @@
 #'
 #' @seealso [add_constraints()]
 #'
+#' @examples
+#' # Create a NN using luz/torch as a sequential model
+#' # with 3 fully connected linear layers,
+#' # the first one with input = 5 variables,
+#' # 100 neurons and tanh activation function, the second
+#' # one with 50 neurons and softplus activation function
+#' # and the last one with 1 linear output.
+#' nn <- luz_model_sequential(
+#'   torch::nn_linear(5,100),
+#'   torch::nn_tanh(),
+#'   torch::nn_linear(100,50),
+#'   torch::nn_softplus(),
+#'   torch::nn_linear(50,1)
+#' )
+#'
+#' nn
+#'
 #'
 #' @export
 luz_model_sequential <- function(...) {
