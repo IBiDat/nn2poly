@@ -15,6 +15,7 @@
 #' @seealso [add_constraints()]
 #'
 #' @examples
+#' \dontrun{
 #' if (requireNamespace("luz", quietly=TRUE)) {
 #' # Create a NN using luz/torch as a sequential model
 #' # with 3 fully connected linear layers,
@@ -35,7 +36,7 @@
 #' # Check that the nn is of class nn_squential
 #' class(nn)
 #' }
-#'
+#' }
 #'
 #' @export
 luz_model_sequential <- function(...) {
