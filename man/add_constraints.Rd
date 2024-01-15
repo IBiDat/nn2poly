@@ -33,6 +33,7 @@ helper in order to have a sequential model in the appropriate form.
 }
 \examples{
 \dontrun{
+if (requireNamespace("keras", quietly=TRUE)) {
   # ---- Example with a keras/tensorflow network ----
   # Build a small nn:
   nn <- keras::keras_model_sequential()
@@ -44,6 +45,7 @@ helper in order to have a sequential model in the appropriate form.
 
   # Check that class of the constrained nn is "nn2poly"
   class(nn_constrained)[1]
+}
 }
 
 if (requireNamespace("luz", quietly=TRUE)) {
