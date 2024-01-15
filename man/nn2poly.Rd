@@ -2,7 +2,7 @@
 % Please edit documentation in R/nn2poly.R
 \name{nn2poly}
 \alias{nn2poly}
-\title{Obtain a polynomial representation from a trained neural network}
+\title{Obtain polynomial representation}
 \usage{
 nn2poly(
   object,
@@ -24,8 +24,9 @@ desired. Currently supports models from the following deep learning frameworks:
 It also supports a named \code{list} as input which allows to introduce by
 hand a model from any other source. This \code{list} should be of length L
 (number of hidden layers + 1) containing the weights matrix for each layer.
-Each element of the list should be names as the activation function used at
-each layer.
+Each element of the list should be named as the activation function used at
+each layer. Currently supported activation functions are \code{"tanh"},
+\code{"softplus"}, \code{"sigmoid"} and \code{"linear"}.
 
 At any layer \eqn{l}, the expected shape of such matrices is of the form
 \eqn{(h_{(l-1)} + 1)*(h_l)}, that is, the number of rows is the number of
@@ -41,12 +42,13 @@ that would naturally arise when considering all Taylor expansions allowed by
 
 \item{keep_layers}{Boolean that determines if all polynomials computed in
 the internal layers have to be stored and given in the output (\code{TRUE}),
-or if only the polynomials from the last layer are needed (\code{FALSE}).}
+or if only the polynomials from the last layer are needed (\code{FALSE}).
+Default set to \code{FALSE}.}
 
 \item{taylor_orders}{\code{integer} or \code{vector} of length L that sets the
 degree at which Taylor expansion is truncated at each layer. If a single
 value is used, that value is set for each non linear layer and 1 for linear
-at each layer activation function. Default is set to 8.}
+at each layer activation function. Default set to \code{8}.}
 
 \item{...}{Ignored.}
 
@@ -54,27 +56,38 @@ at each layer activation function. Default is set to 8.}
 as list of lists of lists. If set to \code{NULL}, nn2poly will compute said
 multipartitions. This step can be computationally expensive when the chosen
 polynomial order or the dimension are too high. In such cases, it is
-encouraged that the multipartitions are stored and reused when possible.}
+encouraged that the multipartitions are stored and reused when possible.
+Default set to \code{NULL}.}
 }
 \value{
-An object of class \code{nn2poly}.
+Returns an object of class \code{nn2poly}.
+
 If \code{keep_layers = FALSE} (default case), it returns a list with two
 items:
 \itemize{
 \item An item named \code{labels} that is a list of integer vectors. Those vectors
 represent each monomial in the polynomial, where each integer in the vector
 represents each time one of the original variables appears in that term.
-As an example, vector c(1,1,2) represents the term \eqn{x_1^2x_2}.
-\item An item named \code{values} which contains a matrix in which each row contains
+As an example, vector c(1,1,2) represents the term \eqn{x_1^2x_2}. Note that
+the variables are numbered from 1 to p, with the intercept is represented by
+}
+\enumerate{
+\item 
+}
+\itemize{
+\item An item named \code{values} which contains a matrix in which each column contains
 the coefficients of the polynomial associated with an output neuron. That is,
 if the neural network has a single output unit, the matrix \code{values} will have
-a single row and if it has multiple output units, the matrix \code{values} will
-have several rows.
+a single column and if it has multiple output units, the matrix \code{values} will
+have several columns. Each row will be the coefficient associated with the
+label in the same position in the labels list.
 }
 
-If \code{keep_layers = TRUE}, it returns a list of length L that for each
-layer contains an item as explained before. The last element of the list will
-be the same element as if \code{keep_layers = FALSE}.
+If \code{keep_layers = TRUE}, it returns a list of length the number of
+layers (represented by \code{layer_i}), where each one is another list with
+\code{input} and \code{output} elements. Each of those elements contains an
+item as explained before. The last layer output item will be the same element
+as if \code{keep_layers = FALSE}.
 
 The polynomials obtained at the hidden layers are not needed to represent the
 NN but can be used to explore other insights from the NN.
@@ -83,4 +96,42 @@ NN but can be used to explore other insights from the NN.
 Implements the main NN2Poly algorithm to obtain a polynomial representation
 of a trained neural network using its weights and Taylor expansion of its
 activation functions.
+}
+\examples{
+# Build a NN estructure with random weights, with 2 (+ bias) inputs,
+# 4 (+bias) neurons in the first hidden layer with "tanh" activation
+# function, 4 (+bias) neurons in the second hidden layer with "softplus",
+# and 1 "linear" output unit
+
+weights_layer_1 <- matrix(rnorm(12), nrow = 3, ncol = 4)
+weights_layer_2 <- matrix(rnorm(20), nrow = 5, ncol = 4)
+weights_layer_3 <- matrix(rnorm(5), nrow = 5, ncol = 1)
+
+# Set it as a list with activation functions as names
+nn_object = list("tanh" = weights_layer_1,
+                 "softplus" = weights_layer_2,
+                 "linear" = weights_layer_3)
+
+# Obtain the polynomial representation (order = 3) of that neural network
+final_poly <- nn2poly(nn_object, max_order = 3)
+
+# Change the last layer to have 3 outputs (as in a multiclass classification)
+# problem
+weights_layer_4 <- matrix(rnorm(20), nrow = 5, ncol = 4)
+
+# Set it as a list with activation functions as names
+nn_object = list("tanh" = weights_layer_1,
+                 "softplus" = weights_layer_2,
+                 "linear" = weights_layer_4)
+# Obtain the polynomial representation of that neural network
+# In this case the output is formed by several polynomials with the same
+# structure but different coefficient values
+final_poly <- nn2poly(nn_object, max_order = 3)
+
+# Polynomial representation of each hidden neuron is given by
+final_poly <- nn2poly(nn_object, max_order = 3, keep_layers = TRUE)
+
+}
+\seealso{
+Predict method for \code{nn2poly} output \code{\link[=predict.nn2poly]{predict.nn2poly()}}.
 }

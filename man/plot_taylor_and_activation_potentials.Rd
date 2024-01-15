@@ -25,8 +25,9 @@ desired. Currently supports models from the following deep learning frameworks:
 It also supports a named \code{list} as input which allows to introduce by
 hand a model from any other source. This \code{list} should be of length L
 (number of hidden layers + 1) containing the weights matrix for each layer.
-Each element of the list should be names as the activation function used at
-each layer.
+Each element of the list should be named as the activation function used at
+each layer. Currently supported activation functions are \code{"tanh"},
+\code{"softplus"}, \code{"sigmoid"} and \code{"linear"}.
 
 At any layer \eqn{l}, the expected shape of such matrices is of the form
 \eqn{(h_{(l-1)} + 1)*(h_l)}, that is, the number of rows is the number of
@@ -47,7 +48,7 @@ that would naturally arise when considering all Taylor expansions allowed by
 \item{taylor_orders}{\code{integer} or \code{vector} of length L that sets the
 degree at which Taylor expansion is truncated at each layer. If a single
 value is used, that value is set for each non linear layer and 1 for linear
-at each layer activation function. Default is set to 8.}
+at each layer activation function. Default set to \code{8}.}
 
 \item{constraints}{Boolean parameter determining if the NN is constrained
 (TRUE) or not (FALSE). This only modifies de plots title to show
