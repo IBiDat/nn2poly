@@ -32,74 +32,42 @@ Models in \code{luz/torch} need to use the \code{\link{luz_model_sequential}}
 helper in order to have a sequential model in the appropriate form.
 }
 \examples{
-# Generate random data:
-train_x = matrix(rnorm(200), ncol=2)
-train_y = rnorm(100)
-# ---- Example with a keras/tensorflow network ----
-# Build a small nn:
-nn <- keras::keras_model_sequential()
-nn <- keras::layer_dense(nn, units = 10, activation = "tanh", input_shape = 2)
-nn <- keras::layer_dense(nn, units = 1, activation = "linear")
+\dontrun{
+  # ---- Example with a keras/tensorflow network ----
+  # Build a small nn:
+  nn <- keras::keras_model_sequential()
+  nn <- keras::layer_dense(nn, units = 10, activation = "tanh", input_shape = 2)
+  nn <- keras::layer_dense(nn, units = 1, activation = "linear")
 
-# Add constraints
-nn_constrained <- add_constraints(nn, constraint_type = "l1_norm")
+  # Add constraints
+  nn_constrained <- add_constraints(nn, constraint_type = "l1_norm")
 
-# Compile and train (2 epochs )
-keras::compile(nn_constrained,
-               loss = "mse",
-               optimizer = keras::optimizer_adam(),
-               metrics = "mse")
+  # Check that class of the constrained nn is "nn2poly"
+  class(nn_constrained)[1]
+}
 
-history <- keras::fit(nn_constrained,
-                      train_x,
-                      train_y,
-                      verbose = 0,
-                      epochs = 2,
-                      batch_size = 50,
-                      validation_split = 0.2
-)
+if (requireNamespace("luz", quietly=TRUE)) {
+  # ---- Example with a luz/torch network ----
 
-#' # ---- Example with a luz/torch network ----
-# Create a torch data loader to be able to train the NN:
-# Divide in only train and validation
-all_indices   <- 1:nrow(train_x)
-only_train_indices <- sample(all_indices, size = round(nrow(train_x)) * 0.8)
-val_indices   <- setdiff(all_indices, only_train_indices)
+  # Build a small nn
+  nn <- luz_model_sequential(
+    torch::nn_linear(2,10),
+    torch::nn_tanh(),
+    torch::nn_linear(10,1)
+  )
 
-# Create lists with x and y values to feed luz::as_dataloader()
-only_train_x <- as.matrix(train_x[only_train_indices,])
-only_train_y <- as.matrix(train_y[only_train_indices])
-val_x <- as.matrix(train_x[val_indices,])
-val_y <- as.matrix(train_y[val_indices])
+  # With luz/torch we need to setup the nn before adding the constraints
+  nn <- luz::setup(module = nn,
+    loss = torch::nn_mse_loss(),
+    optimizer = torch::optim_adam,
+  )
 
-only_train_list <- list(x = only_train_x, y = only_train_y)
-val_list <- list(x = val_x, y = val_y)
+  # Add constraints
+  nn <- add_constraints(nn)
 
-torch_data <- list(
-  train = luz::as_dataloader(only_train_list, batch_size = 50, shuffle = TRUE),
-  valid = luz::as_dataloader(val_list, batch_size = 50)
-)
-
-# Build a small nn:
-nn <- luz_model_sequential(
-        torch::nn_linear(2,10),
-        torch::nn_tanh(),
-        torch::nn_linear(10,1)
-)
-
-# Train the model adding the constraints inside the pipe
-# (equivalent to the approach used in the previous example)
-fitted <- nn |>
-   luz::setup(
-     loss = torch::nn_mse_loss(),
-     optimizer = torch::optim_adam,
-     metrics = list(
-       luz::luz_metric_mse()
-     )
-   ) |>
-   luz::fit(torch_data$train, epochs = 2, valid_data = torch_data$valid)
-
-
+  # Check that class of the constrained nn is "nn2poly"
+  class(nn)[1]
+}
 
 }
 \seealso{
