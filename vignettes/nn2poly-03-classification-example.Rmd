@@ -460,7 +460,7 @@ We can also plot the $n$ most important coefficients in absolute value to compar
 
 
 ```r
-plot_n_important_coeffs(final_poly, n_important_coeffs = 8)
+plot(final_poly, n = 8)
 ```
 
 ![](includes/nn2poly-03-class-n-important-1.png)

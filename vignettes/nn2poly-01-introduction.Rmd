@@ -441,7 +441,7 @@ In this case we can see how the two most important obtained coefficients are `2,
 
 
 ```r
-plot_n_important_coeffs(final_poly, 8)
+plot(final_poly, n=8)
 ```
 
 ![](includes/nn2poly-01-reg-n-important-1.png)

@@ -88,7 +88,7 @@ for (i in 1:p){
 }
 
 # Response variable + small error term
-Y <- nn2poly:::eval_poly(poly = polynomial, newdata = X) + 
+Y <- nn2poly:::eval_poly(poly = polynomial, newdata = X) +
   stats::rnorm(n_sample, 0, 0.1)
 
 # Store all as a data frame
@@ -274,7 +274,7 @@ We can also plot the $n$ most important coefficients in absolute value to compar
 In this case we can see how the two most important obtained coefficients are `2,3` and `1`, precisely the two terms appearing in the original polynomial $4x_1 - 3 x_2x_3$. However, other interactions of order 3 appear to be also relevant, which is caused by the Taylor expansions not being controlled as we have not imposed constraints on the neural network weights training.
 
 ```{r reg-n-important}
-plot_n_important_coeffs(final_poly, 8)
+plot(final_poly, n=8)
 ```
 
 

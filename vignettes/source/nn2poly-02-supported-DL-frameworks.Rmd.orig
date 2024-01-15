@@ -61,7 +61,7 @@ for (i in 1:p){
 }
 
 # Response variable + small error term
-Y <- nn2poly:::eval_poly(poly = polynomial, newdata = X) + 
+Y <- nn2poly:::eval_poly(poly = polynomial, newdata = X) +
   stats::rnorm(n_sample, 0, 0.1)
 
 # Store all as a data frame
@@ -241,8 +241,8 @@ We can also represent the obtained polynomial coefficients and observe how the c
 > *Note*: The coefficients values are not in the same scale as the original polynomial due to the fact that we have scaled all the data before training, even the response variable Y. Furthermore, as data has been scaled to the $[-1,1]$ interval, interactions of order 2 or higher would usually need a higher absolute value than the lower order coefficients to be more relevant
 
 ```{r keras-n-important}
-plot_n_important_coeffs(final_poly_uncon, n_important_coeffs = 8)
-plot_n_important_coeffs(final_poly_con, n_important_coeffs = 8)
+plot(final_poly_uncon, n = 8)
+plot(final_poly_con, n = 8)
 ```
 
 
@@ -411,6 +411,6 @@ We can also represent the obtained polynomial coefficients and observe how the c
 > *Note*: The coefficients values are not in the same scale as the original polynomial due to the fact that we have scaled all the data before training, even the response variable Y. Furthermore, as data has been scaled to the $[-1,1]$ interval, interactions of order 2 or higher would usually need a higher absolute value than the lower order coefficients to be more relevant
 
 ```{r reg-n-important}
-plot_n_important_coeffs(final_poly_uncon, n_important_coeffs = 8)
-plot_n_important_coeffs(final_poly_con, n_important_coeffs = 8)
+plot(final_poly_uncon, n = 8)
+plot(final_poly_con, n = 8)
 ```

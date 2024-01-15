@@ -264,13 +264,13 @@ We can also represent the obtained polynomial coefficients and observe how the c
 
 
 ```r
-plot_n_important_coeffs(final_poly_uncon, n_important_coeffs = 8)
+plot(final_poly_uncon, n = 8)
 ```
 
 ![](includes/nn2poly-02-keras-n-important-1.png)
 
 ```r
-plot_n_important_coeffs(final_poly_con, n_important_coeffs = 8)
+plot(final_poly_con, n = 8)
 ```
 
 ![](includes/nn2poly-02-keras-n-important-2.png)
@@ -464,13 +464,13 @@ We can also represent the obtained polynomial coefficients and observe how the c
 
 
 ```r
-plot_n_important_coeffs(final_poly_uncon, n_important_coeffs = 8)
+plot(final_poly_uncon, n = 8)
 ```
 
 ![](includes/nn2poly-02-reg-n-important-1.png)
 
 ```r
-plot_n_important_coeffs(final_poly_con, n_important_coeffs = 8)
+plot(final_poly_con, n = 8)
 ```
 
 ![](includes/nn2poly-02-reg-n-important-2.png)
