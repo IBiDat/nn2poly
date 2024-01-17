@@ -227,10 +227,6 @@ plot.nn2poly <- function(x, ..., n=NULL) {
     stop("package 'ggplot2' is required for this functionality", call. = FALSE)
   }
 
-  if (!requireNamespace("tidytext", quietly = TRUE)) {
-    stop("package 'tidytext' is required for this functionality", call. = FALSE)
-  }
-
   if (!requireNamespace("patchwork", quietly = TRUE)) {
     stop("package 'patchwork' is required for this functionality", call. = FALSE)
   }
@@ -307,13 +303,19 @@ plot.nn2poly <- function(x, ..., n=NULL) {
   new_x <- do.call(paste, c(list(all_df$name, sep = "___"), list(all_df$type)))
   reorder_aux <- stats::reorder(new_x, all_df$value, FUN = mean, decreasing = TRUE)
 
+  # inspired by tidytext::scale_x_reordered and tidtytext::reorder_func
+  reorder_func <- function(x, sep = "___") {
+    reg <- paste0(sep, ".+$")
+    gsub(reg, "", x)
+  }
+
 
   plot_all <- ggplot2::ggplot(all_df,
                               ggplot2::aes(x = reorder_aux,
                                            y = .data$value,
                                            fill = .data$sign)) +
     ggplot2::geom_bar(stat = "identity", colour = "black", alpha = 1) +
-    tidytext::scale_x_reordered() +
+    ggplot2::scale_x_discrete(labels = reorder_func) +
     ggplot2::facet_wrap(~type, scales = "free_x") +
     cowplot::theme_half_open() +
     ggplot2::labs(y = "Coefficient (absolute) values", x = "Variables or interactions") +

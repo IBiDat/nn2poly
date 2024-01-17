@@ -30,7 +30,7 @@ Imports:
 Suggests:
     keras, tensorflow, reticulate,
     luz, torch,
-    cowplot, ggplot2, patchwork, tidytext,
+    cowplot, ggplot2, patchwork,
     testthat (>= 3.0.0), vdiffr,
     knitr, rmarkdown
 LinkingTo:
