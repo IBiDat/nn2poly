@@ -13,7 +13,7 @@
 #' to be used as input to compute their activation potentials. The response
 #' variable column should not be included.
 #' @param constraints Boolean parameter determining if the NN is constrained
-#' (TRUE) or not (FALSE). This only modifies de plots title to show
+#' (TRUE) or not (FALSE). This only modifies the plots title to show
 #' "constrained" or "unconstrained" respectively.
 #' @param taylor_interval optional parameter determining the interval in which
 #' the Taylor expansion is represented. Default is 1.5.

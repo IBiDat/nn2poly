@@ -19,7 +19,7 @@ The **nn2poly** package implements the NN2Poly method that allows to transform a
   doi: [10.1016/j.neunet.2021.04.036](https://doi.org/10.1016/j.neunet.2021.04.036)
 
 - Pablo Morala, J. Alexandra Cifuentes, Rosa E. Lillo, Iñaki Ucar (2023).
-  "NNN2Poly: A Polynomial Representation for Deep Feed-Forward Artificial Neural Networks."
+  "NN2Poly: A Polynomial Representation for Deep Feed-Forward Artificial Neural Networks."
   _IEEE Transactions on Neural Networks and Learning Systems_, (Early Access).
   doi: [10.1109/TNNLS.2023.3330328](https://doi.org/10.1109/TNNLS.2023.3330328)
 

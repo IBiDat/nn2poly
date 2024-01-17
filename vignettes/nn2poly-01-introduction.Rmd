@@ -219,7 +219,7 @@ Once the NN has been trained, using any chosen method by the user, the default v
 
 - There is a weight matrix per layer. The weights matrices should be of dimension $((1+input) * output)$ where the first row corresponds to the bias vector, and the rest of the rows correspond to each of the ordered vector weights associated to each neuron input.
 - The name of each element in the list (i.e. each weight matrix) has to be the name of the activation function employed at that layer. Currently supported activation functions are `"tanh", "sigmoid", "softplus", "linear"`.
-- Then, the total size of the list has to be equal to the numer of hidden layers plus one.
+- Then, the total size of the list has to be equal to the number of hidden layers plus one.
 
 In particular, the `keras` framework by default separates kernel weights matrices of dimension (input * output) and bias vectors (1 * output), so we need to add the bias as the first row of a matrix ((1+input) * output).
 

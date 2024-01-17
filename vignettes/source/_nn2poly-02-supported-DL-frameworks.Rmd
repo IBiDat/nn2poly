@@ -26,7 +26,7 @@ In this vignette we will explore the supported deep learning frameworks in `nn2p
 
 If you are interested in having support for another deep learning framework, please open an issue in our [GitHub repo](https://github.com/IBiDat/nn2poly)!
 
-> *Note*: Using the provided constraints when training a model increaes the number of needed epochs to converge, which is an expected trade off between learning speed and control over the weights for easier explainability.
+> *Note*: Using the provided constraints when training a model increases the number of needed epochs to converge, which is an expected trade off between learning speed and control over the weights for easier explainability.
 
 # Data generation
 
@@ -133,7 +133,7 @@ Now we define both NNs. The only needed step to impose our implemented weight co
 
 Also, it is important to note that the weight constraints are imposed on all layers except for the last one, which is expected to be linear and not need a Taylor expansion.
 
-> *Note*: Our implementation differs sligthly from the constraints provided by `keras` because in our implementation we join the bias with the rest of the weights while `keras` default constraints allow only for bias or kernel constraints. Our implementation uses a custom callback that is applied at the end of each batch.
+> *Note*: Our implementation differs slightly from the constraints provided by `keras` because in our implementation we join the bias with the rest of the weights while `keras` default constraints allow only for bias or kernel constraints. Our implementation uses a custom callback that is applied at the end of each batch.
 
 ```{r keras-build}
 nn_uncon <- keras_model()
