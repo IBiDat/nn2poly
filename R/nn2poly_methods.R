@@ -171,11 +171,11 @@ predict.nn2poly <- function(object, newdata, layers = NULL, ...) {
 #' # Build a NN structure with random weights, with 2 (+ bias) inputs,
 #' # 4 (+bias) neurons in the first hidden layer with "tanh" activation
 #' # function, 4 (+bias) neurons in the second hidden layer with "softplus",
-#' # and 1 "linear" output unit
+#' # and 2 "linear" output units
 #'
 #' weights_layer_1 <- matrix(rnorm(12), nrow = 3, ncol = 4)
 #' weights_layer_2 <- matrix(rnorm(20), nrow = 5, ncol = 4)
-#' weights_layer_3 <- matrix(rnorm(5), nrow = 5, ncol = 1)
+#' weights_layer_3 <- matrix(rnorm(10), nrow = 5, ncol = 2)
 #'
 #' # Set it as a list with activation functions as names
 #' nn_object = list("tanh" = weights_layer_1,
@@ -185,10 +185,11 @@ predict.nn2poly <- function(object, newdata, layers = NULL, ...) {
 #' # Obtain the polynomial representation (order = 3) of that neural network
 #' final_poly <- nn2poly(nn_object, max_order = 3)
 #'
-#' # Plot all the coefficients
+#' # Plot all the coefficients, one plot per output unit
 #' plot(final_poly)
 #'
 #' # Plot only the 5 most important coeffcients (by absolute magnitude)
+#' # one plot per output unit
 #' plot(final_poly, n = 5)
 #'
 #' @export
@@ -208,11 +209,6 @@ plot.nn2poly <- function(x, ..., n=NULL) {
     stop("package 'patchwork' is required for this functionality", call. = FALSE)
   }
 
-  # Check if x$values is a vector and transform it into a column matrix
-  if (is.vector(x$values)){
-    x$values <- matrix(x$values, ncol = 1)
-  }
-
   # a special case is needed for the case in which the polynomial was generated
   # with `keep_layers = TRUE`
 
@@ -220,8 +216,13 @@ plot.nn2poly <- function(x, ..., n=NULL) {
     x <- x[[length(x)]][["output"]]
   }
 
+  # Check if x$values is a vector and transform it into a column matrix
+  if (is.vector(x$values)){
+    x$values <- matrix(x$values, ncol = 1)
+  }
+
   if (is.null(n)) {
-    n <- length(x$values)
+    n <- dim(x$values)[1]
   }
 
   # Transpose values to be polynomials as rows instead of columns
@@ -257,7 +258,6 @@ plot.nn2poly <- function(x, ..., n=NULL) {
 
     all_df <- rbind(all_df, df)
   }
-
   # If a coefficient is exactly 0, assign it to positive
   if (any(all_df$sign == 0)){
     all_df$sign[which(all_df$sign==0)] = 1

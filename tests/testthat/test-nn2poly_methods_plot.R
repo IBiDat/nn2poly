@@ -16,7 +16,7 @@ test_that("Test the plot for a polynomial generated with `keep_layers = FALSE`",
   p <- plot(result, n = 5)
 
   # testing the plot
-  vdiffr::expect_doppelganger("top 5 important coefficients", p)
+  vdiffr::expect_doppelganger("top 5", p)
 })
 
 
@@ -38,7 +38,7 @@ test_that("Test the plot for a polynomial generated with n = NULL", {
   p <- plot(result)
 
   # testing the plot
-  vdiffr::expect_doppelganger("top NULL important coefficients", p)
+  vdiffr::expect_doppelganger("top NULL", p)
 })
 
 
@@ -61,6 +61,28 @@ test_that("Test the plot for a polynomial generated with  `keep_layers = TRUE`",
 
   # testing the plot
   vdiffr::expect_doppelganger("top 5", p)
+})
+
+test_that("Test the plot for a polynomial generated with  `keep_layers = TRUE`
+          and n=NULL", {
+  # loading the example
+  testing_data <- testing_helper_1()
+  object <- testing_data$weights_list
+  names(object) <- testing_data$af_string_list
+  taylor_orders <- testing_data$taylor_orders
+
+  # computing the polynomial
+  result <- nn2poly(
+    object = object,
+    taylor_orders = taylor_orders,
+    keep_layers = TRUE
+  )
+
+  # computing the plot with 5 important coefficients
+  p <- plot(result, n = NULL)
+
+  # testing the plot
+  vdiffr::expect_doppelganger("top NULL", p)
 })
 
 
