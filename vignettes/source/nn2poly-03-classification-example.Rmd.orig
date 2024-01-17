@@ -223,7 +223,7 @@ Then, we can extract a diagonal plot for each of the polynomials obtained, in to
 ```{r class-diagonal-plot}
 for (i in 1:3){
   print(
-    plot_diagonal(x_axis =  prediction_NN[,i],
+    nn2poly:::plot_diagonal(x_axis =  prediction_NN[,i],
                   y_axis =  prediction_poly_matrix[,i],
                   xlab = "NN prediction",
                   ylab = "Polynomial prediction")
@@ -246,9 +246,9 @@ Finally, the problem with Taylor expansion can be checked with the following plo
 It can be clearly seen with the activation potentials density, in green, that it is kept close to zero, thus having an accurate Taylor expansion  around zero at each hidden layer.
 
 ```{r class-potentials}
-plot_taylor_and_activation_potentials(object = nn,
-                                      data = train,
-                                      max_order = 3,
-                                      constraints = TRUE)
+nn2poly:::plot_taylor_and_activation_potentials(object = nn,
+                                                data = train,
+                                                max_order = 3,
+                                                constraints = TRUE)
 
 ```

@@ -193,7 +193,7 @@ We can visualize the NN predictions vs the original Y values for both neural net
 prediction_nn_uncon <- predict(nn_uncon, test_x)
 
 # Diagonal plot implemented in the package to quickly visualize and compare predictions
-plot_diagonal(x_axis =  prediction_nn_uncon, y_axis =  test_y, xlab = "Unconstrained NN prediction", ylab = "Original Y")
+nn2poly:::plot_diagonal(x_axis =  prediction_nn_uncon, y_axis =  test_y, xlab = "Unconstrained NN prediction", ylab = "Original Y")
 ```
 
 
@@ -202,7 +202,7 @@ plot_diagonal(x_axis =  prediction_nn_uncon, y_axis =  test_y, xlab = "Unconstra
 prediction_nn_con <- predict(nn_con, test_x)
 
 # Diagonal plot implemented in the package to quickly visualize and compare predictions
-plot_diagonal(x_axis =  prediction_nn_con, y_axis =  test_y, xlab = "Constrained NN prediction", ylab = "Original Y")
+nn2poly:::plot_diagonal(x_axis =  prediction_nn_con, y_axis =  test_y, xlab = "Constrained NN prediction", ylab = "Original Y")
 ```
 
 ### Using nn2poly
@@ -228,9 +228,9 @@ We can visualize the polynomial predictions versus NN predictions
 prediction_poly_uncon <- predict(object = final_poly_uncon, newdata = test_x)
 prediction_poly_con <- predict(object = final_poly_con, newdata = test_x)
 
-plot_diagonal(x_axis =  prediction_nn_uncon, y_axis =  prediction_poly_uncon, xlab = "NN prediction", ylab = "Polynomial prediction") + ggplot2::ggtitle("Polynomial for nn_uncon")
+nn2poly:::plot_diagonal(x_axis =  prediction_nn_uncon, y_axis =  prediction_poly_uncon, xlab = "NN prediction", ylab = "Polynomial prediction") + ggplot2::ggtitle("Polynomial for nn_uncon")
 
-plot_diagonal(x_axis =  prediction_nn_con, y_axis =  prediction_poly_con, xlab = "NN prediction", ylab = "Polynomial prediction") + ggplot2::ggtitle("Polynomial for nn_con")
+nn2poly:::plot_diagonal(x_axis =  prediction_nn_con, y_axis =  prediction_poly_con, xlab = "NN prediction", ylab = "Polynomial prediction") + ggplot2::ggtitle("Polynomial for nn_con")
 
 ```
 
@@ -363,7 +363,7 @@ We can visualize the NN predictions vs the original Y values for both neural net
 prediction_NN_uncon <- as.array(predict(fitted_uncon, test_x))
 
 # Diagonal plot implemented in the package to quickly visualize and compare predictions
-plot_diagonal(x_axis =  prediction_NN_uncon, y_axis =  test_y, xlab = "Unconstrained NN prediction", ylab = "Original Y")
+nn2poly:::plot_diagonal(x_axis =  prediction_NN_uncon, y_axis =  test_y, xlab = "Unconstrained NN prediction", ylab = "Original Y")
 ```
 
 
@@ -372,7 +372,7 @@ plot_diagonal(x_axis =  prediction_NN_uncon, y_axis =  test_y, xlab = "Unconstra
 prediction_NN_con <- as.array(predict(fitted_con, test_x))
 
 # Diagonal plot implemented in the package to quickly visualize and compare predictions
-plot_diagonal(x_axis =  prediction_NN_con, y_axis =  test_y, xlab = "Constrained NN prediction", ylab = "Original Y")
+nn2poly:::plot_diagonal(x_axis =  prediction_NN_con, y_axis =  test_y, xlab = "Constrained NN prediction", ylab = "Original Y")
 ```
 
 ### Using nn2poly
@@ -398,9 +398,9 @@ We can visualize the polynomial predictions versus NN predictions
 prediction_poly_uncon <- predict(object = final_poly_uncon, newdata = test_x)
 prediction_poly_con <- predict(object = final_poly_con, newdata = test_x)
 
-plot_diagonal(x_axis =  prediction_nn_uncon, y_axis =  prediction_poly_uncon, xlab = "NN prediction", ylab = "Polynomial prediction") + ggplot2::ggtitle("Polynomial for nn_uncon")
+nn2poly:::plot_diagonal(x_axis =  prediction_nn_uncon, y_axis =  prediction_poly_uncon, xlab = "NN prediction", ylab = "Polynomial prediction") + ggplot2::ggtitle("Polynomial for nn_uncon")
 
-plot_diagonal(x_axis =  prediction_nn_con, y_axis =  prediction_poly_con, xlab = "NN prediction", ylab = "Polynomial prediction") + ggplot2::ggtitle("Polynomial for nn_con")
+nn2poly:::plot_diagonal(x_axis =  prediction_nn_con, y_axis =  prediction_poly_con, xlab = "NN prediction", ylab = "Polynomial prediction") + ggplot2::ggtitle("Polynomial for nn_con")
 
 ```
 

@@ -5,7 +5,7 @@ output:
   rmarkdown::html_vignette:
     toc: yes
     fig_width: 6
-date: "2024-01-09"
+date: "2024-01-17"
 vignette: >
   %\VignetteIndexEntry{Classification example using tensorflow}
   %\VignetteEngine{knitr::rmarkdown}
@@ -103,18 +103,18 @@ nn <- keras_model()
 # Impose weight constraints provided by nn2poly package
 nn <- add_constraints(nn, constraint_type = "l1_norm")
 nn
-#> Model: "sequential_64"
-#> _________________________________________________________________________________________________________________
-#>  Layer (type)                                     Output Shape                                  Param #          
-#> =================================================================================================================
-#>  dense_185 (Dense)                                (None, 100)                                   500              
-#>  dense_186 (Dense)                                (None, 100)                                   10100            
-#>  dense_187 (Dense)                                (None, 3)                                     303              
-#> =================================================================================================================
-#> Total params: 10,903
-#> Trainable params: 10,903
-#> Non-trainable params: 0
-#> _________________________________________________________________________________________________________________
+#> Model: "sequential"
+#> ________________________________________________________________________________
+#>  Layer (type)                       Output Shape                    Param #     
+#> ================================================================================
+#>  dense (Dense)                      (None, 100)                     500         
+#>  dense_1 (Dense)                    (None, 100)                     10100       
+#>  dense_2 (Dense)                    (None, 3)                       303         
+#> ================================================================================
+#> Total params: 10903 (42.59 KB)
+#> Trainable params: 10903 (42.59 KB)
+#> Non-trainable params: 0 (0.00 Byte)
+#> ________________________________________________________________________________
 ```
 
 > *Note*: In this case the NN has a *linear* output with the same number of neurons as the number of classes to predict (3 species, `n_class`). Then, the linear output will be transformed into a *probability* to find the most probable class but this step is done *after training*. Therefore, nn2poly will be used to obtain a polynomial that approximates this *nn with linear outputs* and then its results will also be transformed in probabilities to  predict the highest probability class.
@@ -158,6 +158,7 @@ probability_model <- keras_model_sequential() %>%
 
 # Obtain the predicted classes with the NN to compare them
 prediction_NN_class <- predict(probability_model, test_x)
+#> 2/2 - 0s - 70ms/epoch - 35ms/step
 ```
 
 > *Note*: As said before, `nn2poly()` will approximate the linear output of the neural network, so we will need to perform these transformation also in the polynomial predictions to obtain a classification response.
@@ -168,6 +169,7 @@ We can also compute the linear output of the model (before converting it to a pr
 ```r
 # Also, the linear output can be predicted before the probability model
 prediction_NN <- predict(nn, test_x)
+#> 2/2 - 0s - 40ms/epoch - 20ms/step
 ```
 
 Finally We can use here a confusion matrix to visualize the results, where we can see that that the NN correctly predicts almost all of the classes in the test data:
@@ -391,6 +393,7 @@ probability_poly <- keras_model_sequential() %>%
 # Class prediction with the polynomial outputs
 prediction_poly_class <- predict(probability_poly,
                                  prediction_poly_matrix)
+#> 2/2 - 0s - 121ms/epoch - 60ms/step
 ```
 
 ### Visualizing the results
@@ -444,7 +447,7 @@ Then, we can extract a diagonal plot for each of the polynomials obtained, in to
 ```r
 for (i in 1:3){
   print(
-    plot_diagonal(x_axis =  prediction_NN[,i],
+    nn2poly:::plot_diagonal(x_axis =  prediction_NN[,i],
                   y_axis =  prediction_poly_matrix[,i],
                   xlab = "NN prediction",
                   ylab = "Polynomial prediction")
@@ -473,10 +476,10 @@ It can be clearly seen with the activation potentials density, in green, that it
 
 
 ```r
-plot_taylor_and_activation_potentials(object = nn,
-                                      data = train,
-                                      max_order = 3,
-                                      constraints = TRUE)
+nn2poly:::plot_taylor_and_activation_potentials(object = nn,
+                                                data = train,
+                                                max_order = 3,
+                                                constraints = TRUE)
 #> [[1]]
 ```
 

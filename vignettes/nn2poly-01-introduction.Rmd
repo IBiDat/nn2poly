@@ -82,7 +82,7 @@ for (i in 1:p){
 }
 
 # Response variable + small error term
-Y <- nn2poly:::eval_poly(poly = polynomial, newdata = X) + 
+Y <- nn2poly:::eval_poly(poly = polynomial, newdata = X) +
   stats::rnorm(n_sample, 0, 0.1)
 
 # Store all as a data frame
@@ -151,18 +151,18 @@ nn %>% layer_dense(units = 1,
                   activation = "linear")
 
 nn
-#> Model: "sequential_61"
-#> _________________________________________________________________________________________________________________
-#>  Layer (type)                                     Output Shape                                  Param #          
-#> =================================================================================================================
-#>  dense_174 (Dense)                                (None, 10)                                    40               
-#>  dense_175 (Dense)                                (None, 10)                                    110              
-#>  dense_176 (Dense)                                (None, 1)                                     11               
-#> =================================================================================================================
-#> Total params: 161
-#> Trainable params: 161
-#> Non-trainable params: 0
-#> _________________________________________________________________________________________________________________
+#> Model: "sequential"
+#> ____________________________________________________________________________________________________________________
+#>  Layer (type)                                       Output Shape                                  Param #           
+#> ====================================================================================================================
+#>  dense (Dense)                                      (None, 10)                                    40                
+#>  dense_1 (Dense)                                    (None, 10)                                    110               
+#>  dense_2 (Dense)                                    (None, 1)                                     11                
+#> ====================================================================================================================
+#> Total params: 161 (644.00 Byte)
+#> Trainable params: 161 (644.00 Byte)
+#> Non-trainable params: 0 (0.00 Byte)
+#> ____________________________________________________________________________________________________________________
 ```
 
 Compile the model:
@@ -203,9 +203,10 @@ And we can also visualize the NN predictions vs the original Y values.
 ```r
 # Obtain the predicted values with the NN to compare them
 prediction_NN <- predict(nn, test_x)
+#> 4/4 - 0s - 64ms/epoch - 16ms/step
 
 # Diagonal plot implemented in the package to quickly visualize and compare predictions
-plot_diagonal(x_axis =  prediction_NN, y_axis =  test_y, xlab = "NN prediction", ylab = "Original Y")
+nn2poly:::plot_diagonal(x_axis =  prediction_NN, y_axis =  test_y, xlab = "NN prediction", ylab = "Original Y")
 ```
 
 ![](includes/nn2poly-01-reg-comparison-y-nn-1.png)
@@ -424,13 +425,13 @@ prediction_poly <- predict(object = final_poly,
 
 It is advisable to always check that the predictions obtained with the new polynomial are close to the original NN predictions (and in case they differ, we can also try to find why by checking the Taylor expansions). To help with that, a couple of functions are included that allow us to plot the results.
 
-A simple plot comparing the polynomial and NN predictions can be obtained with `plot_diagonal()`, where the red diagonal line represents where a perfect relationship between the NN and the polynomial predictions would be obtained. In this example, as the theoretical weight constraints have not been imposed, we can observe how the approximation is not perfect.
+A simple plot comparing the polynomial and NN predictions can be obtained with `nn2poly:::plot_diagonal()`, where the red diagonal line represents where a perfect relationship between the NN and the polynomial predictions would be obtained. In this example, as the theoretical weight constraints have not been imposed, we can observe how the approximation is not perfect.
 
 
 
 ```r
 
-plot_diagonal(x_axis =  prediction_NN, y_axis =  prediction_poly, xlab = "NN prediction", ylab = "Polynomial prediction")
+nn2poly:::plot_diagonal(x_axis =  prediction_NN, y_axis =  prediction_poly, xlab = "NN prediction", ylab = "Polynomial prediction")
 ```
 
 ![](includes/nn2poly-01-reg-comparison-polynomial-nn-1.png)
@@ -447,17 +448,17 @@ plot(final_poly, n=8)
 ![](includes/nn2poly-01-reg-n-important-1.png)
 
 
-Another convenient plot to show how the algorithm is affected by each layer can be obtained with `plot_taylor_and_activation_potentials()`, where the activation potentials at each neuron are computed and presented over the Taylor expansion approximation of the activation function at each layer.
+Another convenient plot to show how the algorithm is affected by each layer can be obtained with `nn2poly:::plot_taylor_and_activation_potentials()`, where the activation potentials at each neuron are computed and presented over the Taylor expansion approximation of the activation function at each layer.
 
 In this case, as we have not used constraints in the NN training, the activation potentials are not strictly centered around zero.
 
 
 
 ```r
-plot_taylor_and_activation_potentials(object = nn,
-                                      data = train,
-                                      max_order = 3,
-                                      constraints = FALSE)
+nn2poly:::plot_taylor_and_activation_potentials(object = nn,
+                                                data = train,
+                                                max_order = 3,
+                                                constraints = FALSE)
 #> [[1]]
 ```
 
