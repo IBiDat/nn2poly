@@ -23,25 +23,16 @@ Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.5.0)
 Imports:
+    Rcpp,
     generics,
     matrixStats,
-    pracma,
-    Rcpp
+    pracma
 Suggests:
-    cowplot,
-    ggplot2,
-    keras,
-    knitr,
-    luz,
-    patchwork,
-    reticulate,
-    rmarkdown,
-    R6,
-    tensorflow,
-    testthat (>= 3.0.0),
-    tidytext,
-    torch,
-    vdiffr
+    keras, tensorflow, reticulate,
+    luz, torch,
+    cowplot, ggplot2, patchwork, tidytext,
+    testthat (>= 3.0.0), vdiffr,
+    knitr, rmarkdown
 LinkingTo:
     Rcpp,
     RcppArmadillo
