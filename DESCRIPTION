@@ -3,7 +3,7 @@ Title: Neural Network Weights Transformation into Polynomial Coefficients
 Version: 0.1.0
 Authors@R: c(
     person(given = "Pablo", family = "Morala", role = c("aut", "cre"),
-           email = "pablo.morala@uc3m.es",
+           email = "moralapablo@gmail.com",
            comment = c(ORCID = "0000-0002-4109-2330")),
     person(given = "Iñaki", family = "Ucar", role = c("aut"),
            email = "iucar@fedoraproject.org",
