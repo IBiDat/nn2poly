@@ -163,6 +163,10 @@ predict.nn2poly <- function(object, newdata, layers = NULL, ...) {
 #'
 #' @return A plot showing the \code{n} most important coefficients.
 #'
+#' @details
+#' The plot method represents only the polynomials at the final layer, even if
+#' `x` is generated using `nn2poly()` with `keep_layers=TRUE`.
+#'
 #' @examples
 #' # Build a NN structure with random weights, with 2 (+ bias) inputs,
 #' # 4 (+bias) neurons in the first hidden layer with "tanh" activation
@@ -181,7 +185,11 @@ predict.nn2poly <- function(object, newdata, layers = NULL, ...) {
 #' # Obtain the polynomial representation (order = 3) of that neural network
 #' final_poly <- nn2poly(nn_object, max_order = 3)
 #'
+#' # Plot all the coefficients
 #' plot(final_poly)
+#'
+#' # Plot only the 5 most important coeffcients (by absolute magnitude)
+#' plot(final_poly, n = 5)
 #'
 #' @export
 plot.nn2poly <- function(x, ..., n=NULL) {
