@@ -23,6 +23,7 @@ Furthermore, this step is also needed to be able to impose the needed
 constraints when using the \code{luz/torch} framework.
 }
 \examples{
+\dontrun{
 if (requireNamespace("luz", quietly=TRUE)) {
 # Create a NN using luz/torch as a sequential model
 # with 3 fully connected linear layers,
@@ -43,7 +44,7 @@ nn
 # Check that the nn is of class nn_squential
 class(nn)
 }
-
+}
 
 }
 \seealso{

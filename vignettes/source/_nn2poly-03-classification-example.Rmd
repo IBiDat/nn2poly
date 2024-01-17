@@ -223,7 +223,7 @@ Then, we can extract a diagonal plot for each of the polynomials obtained, in to
 ```{r class-diagonal-plot}
 for (i in 1:3){
   print(
-    plot_diagonal(x_axis =  prediction_NN[,i],
+    nn2poly:::plot_diagonal(x_axis =  prediction_NN[,i],
                   y_axis =  prediction_poly_matrix[,i],
                   xlab = "NN prediction",
                   ylab = "Polynomial prediction")
@@ -236,7 +236,7 @@ We can observe how all the polynomials obtain quite similar predictions to their
 We can also plot the $n$ most important coefficients in absolute value to compare which variables or interactions are more relevant in each polynomial. In this case, we will have 3 plots for each NN again, one per polynomial at each output neuron. In this case, the obtained coefficients will represent the most important variables when assigning the probability to be in each class.
 
 ```{r class-n-important}
-plot_n_important_coeffs(final_poly, n_important_coeffs = 8)
+plot(final_poly, n = 8)
 ```
 
 > *Note*: The coefficients values are not in the same scale as the original polynomial due to the fact that we have scaled all the data before training, even the response variable Y. Furthermore, as data has been scaled to the $[-1,1]$ interval, interactions of order 2 or higher would usually need a higher absolute value than the lower order coefficients to be more relevant
@@ -246,9 +246,9 @@ Finally, the problem with Taylor expansion can be checked with the following plo
 It can be clearly seen with the activation potentials density, in green, that it is kept close to zero, thus having an accurate Taylor expansion  around zero at each hidden layer.
 
 ```{r class-potentials}
-plot_taylor_and_activation_potentials(object = nn,
-                                      data = train,
-                                      max_order = 3,
-                                      constraints = TRUE)
+nn2poly:::plot_taylor_and_activation_potentials(object = nn,
+                                                data = train,
+                                                max_order = 3,
+                                                constraints = TRUE)
 
 ```

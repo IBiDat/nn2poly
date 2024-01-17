@@ -20,7 +20,7 @@
 #' @param ... Additional parameters.
 #'
 #' @return A list of plots.
-#' @export
+#'
 plot_taylor_and_activation_potentials <- function(object,
                                                   data,
                                                   max_order,
@@ -28,19 +28,14 @@ plot_taylor_and_activation_potentials <- function(object,
                                                   constraints,
                                                   taylor_interval = 1.5,
                                                   ...) {
-  UseMethod("plot_taylor_and_activation_potentials")
-}
-
-#' @export
-plot_taylor_and_activation_potentials.default <- function(object, ...) {
   params <- get_parameters(object)
   object <- params$weights_list
   names(object) <- params$af_string_list
 
-  plot_taylor_and_activation_potentials(object, ...)
+  plot_taylor_and_activation_potentials.list(
+    object, data, max_order, taylor_orders, constraints, taylor_interval, ...)
 }
 
-#' @export
 plot_taylor_and_activation_potentials.list <- function(object,
                                                        data,
                                                        max_order,
