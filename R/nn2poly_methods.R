@@ -251,10 +251,11 @@ plot.nn2poly <- function(x, ..., n=NULL) {
   # Needed to work as in previous nn2poly output format
   M <- t(x$values)
   all_labels <- x$labels
+  n_polys <- nrow(M)
 
   all_df <- data.frame()
 
-  for (r in 1:nrow(M)) {
+  for (r in 1:n_polys) {
     Mr <- M[r, ]
     aux_total <- sort(abs(Mr), decreasing = TRUE, index.return = TRUE)
     aux_values <- aux_total$x[1:n]
@@ -315,8 +316,13 @@ plot.nn2poly <- function(x, ..., n=NULL) {
                                            y = .data$value,
                                            fill = .data$sign)) +
     ggplot2::geom_bar(stat = "identity", colour = "black", alpha = 1) +
-    ggplot2::scale_x_discrete(labels = reorder_func) +
-    ggplot2::facet_wrap(~type, scales = "free_x") +
+    ggplot2::scale_x_discrete(labels = reorder_func)
+
+  if (n_polys >1){
+    plot_all <- plot_all + ggplot2::facet_wrap(~type, scales = "free_x")
+  }
+
+  plot_all <- plot_all +
     cowplot::theme_half_open() +
     ggplot2::labs(y = "Coefficient (absolute) values", x = "Variables or interactions") +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust = 1)) +
