@@ -163,6 +163,26 @@ predict.nn2poly <- function(object, newdata, layers = NULL, ...) {
 #'
 #' @return A plot showing the \code{n} most important coefficients.
 #'
+#' @examples
+#' # Build a NN structure with random weights, with 2 (+ bias) inputs,
+#' # 4 (+bias) neurons in the first hidden layer with "tanh" activation
+#' # function, 4 (+bias) neurons in the second hidden layer with "softplus",
+#' # and 1 "linear" output unit
+#'
+#' weights_layer_1 <- matrix(rnorm(12), nrow = 3, ncol = 4)
+#' weights_layer_2 <- matrix(rnorm(20), nrow = 5, ncol = 4)
+#' weights_layer_3 <- matrix(rnorm(5), nrow = 5, ncol = 1)
+#'
+#' # Set it as a list with activation functions as names
+#' nn_object = list("tanh" = weights_layer_1,
+#'                  "softplus" = weights_layer_2,
+#'                  "linear" = weights_layer_3)
+#'
+#' # Obtain the polynomial representation (order = 3) of that neural network
+#' final_poly <- nn2poly(nn_object, max_order = 3)
+#'
+#' plot(final_poly)
+#'
 #' @export
 plot.nn2poly <- function(x, ..., n=NULL) {
   if (length(class(x)) > 1)
@@ -193,7 +213,7 @@ plot.nn2poly <- function(x, ..., n=NULL) {
   }
 
   if (is.null(n)) {
-    n <- length(x)
+    n <- length(x$values)
   }
 
   # Transpose values to be polynomials as rows instead of columns
