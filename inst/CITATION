@@ -1,0 +1,26 @@
+bibentry(
+  bibtype = "Article",
+  title   = "Towards a mathematical framework to inform neural network modelling via polynomial regression",
+  author  = c(person("Pablo", "Morala"),
+              person("J. Alexandra", "Cifuentes"),
+              person("Rosa E.", "Lillo"),
+              person("I{\\~n}aki", "Ucar")),
+  journal = "Neural Networks",
+  month   = "October",
+  year    = "2021",
+  volume  = "142",
+  pages   = "57--72",
+  doi     = "10.1016/j.neunet.2021.04.036"
+)
+
+bibentry(
+  bibtype = "Article",
+  title   = "NNN2Poly: A Polynomial Representation for Deep Feed-Forward Artificial Neural Networks",
+  author  = c(person("Pablo", "Morala"),
+              person("J. Alexandra", "Cifuentes"),
+              person("Rosa E.", "Lillo"),
+              person("I{\\~n}aki", "Ucar")),
+  journal = "IEEE Transactions on Neural Networks and Learning Systems",
+  year    = "2023",
+  doi     = "10.1109/TNNLS.2023.3330328"
+)

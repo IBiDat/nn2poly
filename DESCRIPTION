@@ -1,6 +1,6 @@
 Package: nn2poly
 Title: Neural Network Weights Transformation into Polynomial Coefficients
-Version: 0.0.0.9000
+Version: 0.1.0
 Authors@R: c(
     person(given = "Pablo", family = "Morala", role = c("aut", "cre"),
            email = "pablo.morala@uc3m.es",
@@ -20,7 +20,6 @@ Description: Implements a method that builds the coefficients of a polynomial
     and 2023 <doi:10.1109/TNNLS.2023.3330328>.
 License: MIT + file LICENSE
 Encoding: UTF-8
-LazyData: true
 Depends: R (>= 3.5.0)
 Imports:
     Rcpp,
