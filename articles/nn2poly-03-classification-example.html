@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">nn2poly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,6 +45,9 @@
     <a class="dropdown-item" href="../articles/nn2poly-02-supported-DL-frameworks.html">Supported DL frameworks</a>
     <a class="dropdown-item" href="../articles/nn2poly-03-classification-example.html">Classification example using tensorflow</a>
   </div>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="../news/index.html">Changelog</a>
 </li>
       </ul>
 <form class="form-inline my-2 my-lg-0" role="search">
@@ -67,7 +70,7 @@
                         <h4 data-toc-skip class="author">Pablo
 Morala</h4>
             
-            <h4 data-toc-skip class="date">2024-01-09</h4>
+            <h4 data-toc-skip class="date">2024-01-17</h4>
       
       
       <div class="d-none name"><code>nn2poly-03-classification-example.Rmd</code></div>
@@ -163,18 +166,18 @@ constraints) our original neural network that will be later explained by
 <span><span class="co"># Impose weight constraints provided by nn2poly package</span></span>
 <span><span class="va">nn</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_constraints.html">add_constraints</a></span><span class="op">(</span><span class="va">nn</span>, constraint_type <span class="op">=</span> <span class="st">"l1_norm"</span><span class="op">)</span></span>
 <span><span class="va">nn</span></span>
-<span><span class="co">#&gt; Model: "sequential_64"</span></span>
-<span><span class="co">#&gt; _________________________________________________________________________________________________________________</span></span>
-<span><span class="co">#&gt;  Layer (type)                                     Output Shape                                  Param #          </span></span>
-<span><span class="co">#&gt; =================================================================================================================</span></span>
-<span><span class="co">#&gt;  dense_185 (Dense)                                (None, 100)                                   500              </span></span>
-<span><span class="co">#&gt;  dense_186 (Dense)                                (None, 100)                                   10100            </span></span>
-<span><span class="co">#&gt;  dense_187 (Dense)                                (None, 3)                                     303              </span></span>
-<span><span class="co">#&gt; =================================================================================================================</span></span>
-<span><span class="co">#&gt; Total params: 10,903</span></span>
-<span><span class="co">#&gt; Trainable params: 10,903</span></span>
-<span><span class="co">#&gt; Non-trainable params: 0</span></span>
-<span><span class="co">#&gt; _________________________________________________________________________________________________________________</span></span></code></pre></div>
+<span><span class="co">#&gt; Model: "sequential"</span></span>
+<span><span class="co">#&gt; ________________________________________________________________________________</span></span>
+<span><span class="co">#&gt;  Layer (type)                       Output Shape                    Param #     </span></span>
+<span><span class="co">#&gt; ================================================================================</span></span>
+<span><span class="co">#&gt;  dense (Dense)                      (None, 100)                     500         </span></span>
+<span><span class="co">#&gt;  dense_1 (Dense)                    (None, 100)                     10100       </span></span>
+<span><span class="co">#&gt;  dense_2 (Dense)                    (None, 3)                       303         </span></span>
+<span><span class="co">#&gt; ================================================================================</span></span>
+<span><span class="co">#&gt; Total params: 10903 (42.59 KB)</span></span>
+<span><span class="co">#&gt; Trainable params: 10903 (42.59 KB)</span></span>
+<span><span class="co">#&gt; Non-trainable params: 0 (0.00 Byte)</span></span>
+<span><span class="co">#&gt; ________________________________________________________________________________</span></span></code></pre></div>
 <blockquote>
 <p><em>Note</em>: In this case the NN has a <em>linear</em> output with
 the same number of neurons as the number of classes to predict (3
@@ -219,7 +222,8 @@ highest probability with <code>k_argmax</code>.</p>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/keras/man/layer_lambda.html" class="external-link">layer_lambda</a></span><span class="op">(</span><span class="va">k_argmax</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Obtain the predicted classes with the NN to compare them</span></span>
-<span><span class="va">prediction_NN_class</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">probability_model</span>, <span class="va">test_x</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">prediction_NN_class</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">probability_model</span>, <span class="va">test_x</span><span class="op">)</span></span>
+<span><span class="co">#&gt; 2/2 - 0s - 70ms/epoch - 35ms/step</span></span></code></pre></div>
 <blockquote>
 <p><em>Note</em>: As said before, <code><a href="../reference/nn2poly.html">nn2poly()</a></code> will
 approximate the linear output of the neural network, so we will need to
@@ -231,7 +235,8 @@ it to a probability) and store it to compare with the polynomial output
 later.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Also, the linear output can be predicted before the probability model</span></span>
-<span><span class="va">prediction_NN</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">nn</span>, <span class="va">test_x</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">prediction_NN</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">nn</span>, <span class="va">test_x</span><span class="op">)</span></span>
+<span><span class="co">#&gt; 2/2 - 0s - 40ms/epoch - 20ms/step</span></span></code></pre></div>
 <p>Finally We can use here a confusion matrix to visualize the results,
 where we can see that that the NN correctly predicts almost all of the
 classes in the test data:</p>
@@ -462,7 +467,8 @@ polynomials are evaluated at the same time:</p>
 <span></span>
 <span><span class="co"># Class prediction with the polynomial outputs</span></span>
 <span><span class="va">prediction_poly_class</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">probability_poly</span>,</span>
-<span>                                 <span class="va">prediction_poly_matrix</span><span class="op">)</span></span></code></pre></div>
+<span>                                 <span class="va">prediction_poly_matrix</span><span class="op">)</span></span>
+<span><span class="co">#&gt; 2/2 - 0s - 121ms/epoch - 60ms/step</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="visualizing-the-results">Visualizing the results<a class="anchor" aria-label="anchor" href="#visualizing-the-results"></a>
@@ -519,7 +525,7 @@ plots.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="../reference/plot_diagonal.html">plot_diagonal</a></span><span class="op">(</span>x_axis <span class="op">=</span>  <span class="va">prediction_NN</span><span class="op">[</span>,<span class="va">i</span><span class="op">]</span>,</span>
+<span>    <span class="fu">nn2poly</span><span class="fu">:::</span><span class="fu"><a href="../reference/plot_diagonal.html">plot_diagonal</a></span><span class="op">(</span>x_axis <span class="op">=</span>  <span class="va">prediction_NN</span><span class="op">[</span>,<span class="va">i</span><span class="op">]</span>,</span>
 <span>                  y_axis <span class="op">=</span>  <span class="va">prediction_poly_matrix</span><span class="op">[</span>,<span class="va">i</span><span class="op">]</span>,</span>
 <span>                  xlab <span class="op">=</span> <span class="st">"NN prediction"</span>,</span>
 <span>                  ylab <span class="op">=</span> <span class="st">"Polynomial prediction"</span><span class="op">)</span></span>
@@ -536,7 +542,7 @@ neuron. In this case, the obtained coefficients will represent the most
 important variables when assigning the probability to be in each
 class.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_n_important_coeffs.html">plot_n_important_coeffs</a></span><span class="op">(</span><span class="va">final_poly</span>, n_important_coeffs <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">final_poly</span>, n <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
 <p><img src="includes/nn2poly-03-class-n-important-1.png"></p>
 <blockquote>
 <p><em>Note</em>: The coefficients values are not in the same scale as
@@ -555,10 +561,10 @@ layer.</p>
 green, that it is kept close to zero, thus having an accurate Taylor
 expansion around zero at each hidden layer.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_taylor_and_activation_potentials.html">plot_taylor_and_activation_potentials</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">nn</span>,</span>
-<span>                                      data <span class="op">=</span> <span class="va">train</span>,</span>
-<span>                                      max_order <span class="op">=</span> <span class="fl">3</span>,</span>
-<span>                                      constraints <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu">nn2poly</span><span class="fu">:::</span><span class="fu"><a href="../reference/plot_taylor_and_activation_potentials.html">plot_taylor_and_activation_potentials</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">nn</span>,</span>
+<span>                                                data <span class="op">=</span> <span class="va">train</span>,</span>
+<span>                                                max_order <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>                                                constraints <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [[1]]</span></span></code></pre></div>
 <p><img src="includes/nn2poly-03-class-potentials-1.png"></p>
 <pre><code><span><span class="co">#&gt; </span></span>

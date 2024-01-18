@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">nn2poly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,6 +45,9 @@
     <a class="dropdown-item" href="../articles/nn2poly-02-supported-DL-frameworks.html">Supported DL frameworks</a>
     <a class="dropdown-item" href="../articles/nn2poly-03-classification-example.html">Classification example using tensorflow</a>
   </div>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="../news/index.html">Changelog</a>
 </li>
       </ul>
 <form class="form-inline my-2 my-lg-0" role="search">
@@ -67,7 +70,7 @@
                         <h4 data-toc-skip class="author">Pablo
 Morala</h4>
             
-            <h4 data-toc-skip class="date">2024-01-09</h4>
+            <h4 data-toc-skip class="date">2024-01-17</h4>
       
       
       <div class="d-none name"><code>nn2poly-02-supported-DL-frameworks.Rmd</code></div>
@@ -90,7 +93,7 @@ with weights and activation functions as explained in
 framework, please open an issue in our <a href="https://github.com/IBiDat/nn2poly" class="external-link">GitHub repo</a>!</p>
 <blockquote>
 <p><em>Note</em>: Using the provided constraints when training a model
-increaes the number of needed epochs to converge, which is an expected
+increases the number of needed epochs to converge, which is an expected
 trade off between learning speed and control over the weights for easier
 explainability.</p>
 </blockquote>
@@ -125,7 +128,7 @@ x_2x_3\)</span>:</p>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="co"># Response variable + small error term</span></span>
-<span><span class="va">Y</span> <span class="op">&lt;-</span> <span class="fu">nn2poly</span><span class="fu">:::</span><span class="fu"><a href="../reference/eval_poly.html">eval_poly</a></span><span class="op">(</span>poly <span class="op">=</span> <span class="va">polynomial</span>, newdata <span class="op">=</span> <span class="va">X</span><span class="op">)</span> <span class="op">+</span> </span>
+<span><span class="va">Y</span> <span class="op">&lt;-</span> <span class="fu">nn2poly</span><span class="fu">:::</span><span class="fu"><a href="../reference/eval_poly.html">eval_poly</a></span><span class="op">(</span>poly <span class="op">=</span> <span class="va">polynomial</span>, newdata <span class="op">=</span> <span class="va">X</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n_sample</span>, <span class="fl">0</span>, <span class="fl">0.1</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Store all as a data frame</span></span>
@@ -213,7 +216,7 @@ one that guarantees best results.</p>
 on all layers except for the last one, which is expected to be linear
 and not need a Taylor expansion.</p>
 <blockquote>
-<p><em>Note</em>: Our implementation differs sligthly from the
+<p><em>Note</em>: Our implementation differs slightly from the
 constraints provided by <code>keras</code> because in our implementation
 we join the bias with the rest of the weights while <code>keras</code>
 default constraints allow only for bias or kernel constraints. Our
@@ -276,16 +279,18 @@ predictions (the values fall near the “perfect” diagonal red line).</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Obtain the predicted values with the NN to compare them</span></span>
 <span><span class="va">prediction_nn_uncon</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">nn_uncon</span>, <span class="va">test_x</span><span class="op">)</span></span>
+<span><span class="co">#&gt; 4/4 - 0s - 48ms/epoch - 12ms/step</span></span>
 <span></span>
 <span><span class="co"># Diagonal plot implemented in the package to quickly visualize and compare predictions</span></span>
-<span><span class="fu"><a href="../reference/plot_diagonal.html">plot_diagonal</a></span><span class="op">(</span>x_axis <span class="op">=</span>  <span class="va">prediction_nn_uncon</span>, y_axis <span class="op">=</span>  <span class="va">test_y</span>, xlab <span class="op">=</span> <span class="st">"Unconstrained NN prediction"</span>, ylab <span class="op">=</span> <span class="st">"Original Y"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">nn2poly</span><span class="fu">:::</span><span class="fu"><a href="../reference/plot_diagonal.html">plot_diagonal</a></span><span class="op">(</span>x_axis <span class="op">=</span>  <span class="va">prediction_nn_uncon</span>, y_axis <span class="op">=</span>  <span class="va">test_y</span>, xlab <span class="op">=</span> <span class="st">"Unconstrained NN prediction"</span>, ylab <span class="op">=</span> <span class="st">"Original Y"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="includes/nn2poly-02-keras-comparison-y-nn_uncon-1.png"></p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Obtain the predicted values with the NN to compare them</span></span>
 <span><span class="va">prediction_nn_con</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">nn_con</span>, <span class="va">test_x</span><span class="op">)</span></span>
+<span><span class="co">#&gt; 4/4 - 0s - 91ms/epoch - 23ms/step</span></span>
 <span></span>
 <span><span class="co"># Diagonal plot implemented in the package to quickly visualize and compare predictions</span></span>
-<span><span class="fu"><a href="../reference/plot_diagonal.html">plot_diagonal</a></span><span class="op">(</span>x_axis <span class="op">=</span>  <span class="va">prediction_nn_con</span>, y_axis <span class="op">=</span>  <span class="va">test_y</span>, xlab <span class="op">=</span> <span class="st">"Constrained NN prediction"</span>, ylab <span class="op">=</span> <span class="st">"Original Y"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">nn2poly</span><span class="fu">:::</span><span class="fu"><a href="../reference/plot_diagonal.html">plot_diagonal</a></span><span class="op">(</span>x_axis <span class="op">=</span>  <span class="va">prediction_nn_con</span>, y_axis <span class="op">=</span>  <span class="va">test_y</span>, xlab <span class="op">=</span> <span class="st">"Constrained NN prediction"</span>, ylab <span class="op">=</span> <span class="st">"Original Y"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="includes/nn2poly-02-keras-comparison-y-nn_con-1.png"></p>
 </div>
 <div class="section level4">
@@ -308,11 +313,11 @@ predictions (the values fall near the “perfect” diagonal red line).</p>
 <span><span class="va">prediction_poly_uncon</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">final_poly_uncon</span>, newdata <span class="op">=</span> <span class="va">test_x</span><span class="op">)</span></span>
 <span><span class="va">prediction_poly_con</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">final_poly_con</span>, newdata <span class="op">=</span> <span class="va">test_x</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/plot_diagonal.html">plot_diagonal</a></span><span class="op">(</span>x_axis <span class="op">=</span>  <span class="va">prediction_nn_uncon</span>, y_axis <span class="op">=</span>  <span class="va">prediction_poly_uncon</span>, xlab <span class="op">=</span> <span class="st">"NN prediction"</span>, ylab <span class="op">=</span> <span class="st">"Polynomial prediction"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Polynomial for nn_uncon"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">nn2poly</span><span class="fu">:::</span><span class="fu"><a href="../reference/plot_diagonal.html">plot_diagonal</a></span><span class="op">(</span>x_axis <span class="op">=</span>  <span class="va">prediction_nn_uncon</span>, y_axis <span class="op">=</span>  <span class="va">prediction_poly_uncon</span>, xlab <span class="op">=</span> <span class="st">"NN prediction"</span>, ylab <span class="op">=</span> <span class="st">"Polynomial prediction"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Polynomial for nn_uncon"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="includes/nn2poly-02-keras-polynomial-prediction-1.png"></p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="fu"><a href="../reference/plot_diagonal.html">plot_diagonal</a></span><span class="op">(</span>x_axis <span class="op">=</span>  <span class="va">prediction_nn_con</span>, y_axis <span class="op">=</span>  <span class="va">prediction_poly_con</span>, xlab <span class="op">=</span> <span class="st">"NN prediction"</span>, ylab <span class="op">=</span> <span class="st">"Polynomial prediction"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Polynomial for nn_con"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">nn2poly</span><span class="fu">:::</span><span class="fu"><a href="../reference/plot_diagonal.html">plot_diagonal</a></span><span class="op">(</span>x_axis <span class="op">=</span>  <span class="va">prediction_nn_con</span>, y_axis <span class="op">=</span>  <span class="va">prediction_poly_con</span>, xlab <span class="op">=</span> <span class="st">"NN prediction"</span>, ylab <span class="op">=</span> <span class="st">"Polynomial prediction"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Polynomial for nn_con"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="includes/nn2poly-02-keras-polynomial-prediction-2.png"></p>
 <p>We can clearly see how the constrained NN allows to obtain a close
 approximation with <code>nn2poly</code> while the polynomial obtained
@@ -330,10 +335,10 @@ interactions of order 2 or higher would usually need a higher absolute
 value than the lower order coefficients to be more relevant</p>
 </blockquote>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_n_important_coeffs.html">plot_n_important_coeffs</a></span><span class="op">(</span><span class="va">final_poly_uncon</span>, n_important_coeffs <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">final_poly_uncon</span>, n <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
 <p><img src="includes/nn2poly-02-keras-n-important-1.png"></p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_n_important_coeffs.html">plot_n_important_coeffs</a></span><span class="op">(</span><span class="va">final_poly_con</span>, n_important_coeffs <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">final_poly_con</span>, n <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
 <p><img src="includes/nn2poly-02-keras-n-important-2.png"></p>
 </div>
 </div>
@@ -472,14 +477,14 @@ predictions (the values fall near the “perfect” diagonal red line).</p>
 <span><span class="va">prediction_NN_uncon</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html" class="external-link">as.array</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fitted_uncon</span>, <span class="va">test_x</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Diagonal plot implemented in the package to quickly visualize and compare predictions</span></span>
-<span><span class="fu"><a href="../reference/plot_diagonal.html">plot_diagonal</a></span><span class="op">(</span>x_axis <span class="op">=</span>  <span class="va">prediction_NN_uncon</span>, y_axis <span class="op">=</span>  <span class="va">test_y</span>, xlab <span class="op">=</span> <span class="st">"Unconstrained NN prediction"</span>, ylab <span class="op">=</span> <span class="st">"Original Y"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">nn2poly</span><span class="fu">:::</span><span class="fu"><a href="../reference/plot_diagonal.html">plot_diagonal</a></span><span class="op">(</span>x_axis <span class="op">=</span>  <span class="va">prediction_NN_uncon</span>, y_axis <span class="op">=</span>  <span class="va">test_y</span>, xlab <span class="op">=</span> <span class="st">"Unconstrained NN prediction"</span>, ylab <span class="op">=</span> <span class="st">"Original Y"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="includes/nn2poly-02-torch-comparison-y-nn_uncon-1.png"></p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Obtain the predicted values with the NN to compare them</span></span>
 <span><span class="va">prediction_NN_con</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html" class="external-link">as.array</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fitted_con</span>, <span class="va">test_x</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Diagonal plot implemented in the package to quickly visualize and compare predictions</span></span>
-<span><span class="fu"><a href="../reference/plot_diagonal.html">plot_diagonal</a></span><span class="op">(</span>x_axis <span class="op">=</span>  <span class="va">prediction_NN_con</span>, y_axis <span class="op">=</span>  <span class="va">test_y</span>, xlab <span class="op">=</span> <span class="st">"Constrained NN prediction"</span>, ylab <span class="op">=</span> <span class="st">"Original Y"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">nn2poly</span><span class="fu">:::</span><span class="fu"><a href="../reference/plot_diagonal.html">plot_diagonal</a></span><span class="op">(</span>x_axis <span class="op">=</span>  <span class="va">prediction_NN_con</span>, y_axis <span class="op">=</span>  <span class="va">test_y</span>, xlab <span class="op">=</span> <span class="st">"Constrained NN prediction"</span>, ylab <span class="op">=</span> <span class="st">"Original Y"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="includes/nn2poly-02-torch-comparison-y-nn_con-1.png"></p>
 </div>
 <div class="section level4">
@@ -502,11 +507,11 @@ predictions (the values fall near the “perfect” diagonal red line).</p>
 <span><span class="va">prediction_poly_uncon</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">final_poly_uncon</span>, newdata <span class="op">=</span> <span class="va">test_x</span><span class="op">)</span></span>
 <span><span class="va">prediction_poly_con</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">final_poly_con</span>, newdata <span class="op">=</span> <span class="va">test_x</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/plot_diagonal.html">plot_diagonal</a></span><span class="op">(</span>x_axis <span class="op">=</span>  <span class="va">prediction_nn_uncon</span>, y_axis <span class="op">=</span>  <span class="va">prediction_poly_uncon</span>, xlab <span class="op">=</span> <span class="st">"NN prediction"</span>, ylab <span class="op">=</span> <span class="st">"Polynomial prediction"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Polynomial for nn_uncon"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">nn2poly</span><span class="fu">:::</span><span class="fu"><a href="../reference/plot_diagonal.html">plot_diagonal</a></span><span class="op">(</span>x_axis <span class="op">=</span>  <span class="va">prediction_nn_uncon</span>, y_axis <span class="op">=</span>  <span class="va">prediction_poly_uncon</span>, xlab <span class="op">=</span> <span class="st">"NN prediction"</span>, ylab <span class="op">=</span> <span class="st">"Polynomial prediction"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Polynomial for nn_uncon"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="includes/nn2poly-02-reg-polynomial-prediction-1.png"></p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="fu"><a href="../reference/plot_diagonal.html">plot_diagonal</a></span><span class="op">(</span>x_axis <span class="op">=</span>  <span class="va">prediction_nn_con</span>, y_axis <span class="op">=</span>  <span class="va">prediction_poly_con</span>, xlab <span class="op">=</span> <span class="st">"NN prediction"</span>, ylab <span class="op">=</span> <span class="st">"Polynomial prediction"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Polynomial for nn_con"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">nn2poly</span><span class="fu">:::</span><span class="fu"><a href="../reference/plot_diagonal.html">plot_diagonal</a></span><span class="op">(</span>x_axis <span class="op">=</span>  <span class="va">prediction_nn_con</span>, y_axis <span class="op">=</span>  <span class="va">prediction_poly_con</span>, xlab <span class="op">=</span> <span class="st">"NN prediction"</span>, ylab <span class="op">=</span> <span class="st">"Polynomial prediction"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Polynomial for nn_con"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="includes/nn2poly-02-reg-polynomial-prediction-2.png"></p>
 <p>We can clearly see how the constrained NN allows to obtain a close
 approximation with <code>nn2poly</code> while the polynomial obtained
@@ -524,10 +529,10 @@ interactions of order 2 or higher would usually need a higher absolute
 value than the lower order coefficients to be more relevant</p>
 </blockquote>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_n_important_coeffs.html">plot_n_important_coeffs</a></span><span class="op">(</span><span class="va">final_poly_uncon</span>, n_important_coeffs <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">final_poly_uncon</span>, n <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
 <p><img src="includes/nn2poly-02-reg-n-important-1.png"></p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_n_important_coeffs.html">plot_n_important_coeffs</a></span><span class="op">(</span><span class="va">final_poly_con</span>, n_important_coeffs <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">final_poly_con</span>, n <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
 <p><img src="includes/nn2poly-02-reg-n-important-2.png"></p>
 </div>
 </div>

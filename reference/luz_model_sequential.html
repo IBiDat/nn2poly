@@ -12,7 +12,7 @@ it a stack of luz layers."><!-- mathjax --><script src="https://cdnjs.cloudflare
     
     <a class="navbar-brand me-2" href="../index.html">nn2poly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -30,6 +30,9 @@ it a stack of luz layers."><!-- mathjax --><script src="https://cdnjs.cloudflare
     <a class="dropdown-item" href="../articles/nn2poly-02-supported-DL-frameworks.html">Supported DL frameworks</a>
     <a class="dropdown-item" href="../articles/nn2poly-03-classification-example.html">Classification example using tensorflow</a>
   </div>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="../news/index.html">Changelog</a>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
@@ -82,7 +85,8 @@ constraints when using the <code>luz/torch</code> framework.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"luz"</span>, quietly<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"luz"</span>, quietly<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="co"># Create a NN using luz/torch as a sequential model</span></span></span>
 <span class="r-in"><span><span class="co"># with 3 fully connected linear layers,</span></span></span>
 <span class="r-in"><span><span class="co"># the first one with input = 5 variables,</span></span></span>
@@ -102,8 +106,7 @@ constraints when using the <code>luz/torch</code> framework.</p>
 <span class="r-in"><span><span class="co"># Check that the nn is of class nn_squential</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">nn</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in (function (size, options, memory_format) {    .Call(`_torch_cpp_torch_namespace_empty_size_IntArrayRef`,         size, options, memory_format)})(size = list(100, 5), options = list(dtype = NULL, layout = NULL,     device = NULL, requires_grad = FALSE), memory_format = NULL):</span> Lantern is not loaded. Please use `install_torch()` to install additional dependencies.</span>
-<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

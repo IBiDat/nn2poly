@@ -28,6 +28,9 @@
     <loc>https://ibidat.github.io/nn2poly/index.html</loc>
   </url>
   <url>
+    <loc>https://ibidat.github.io/nn2poly/news/index.html</loc>
+  </url>
+  <url>
     <loc>https://ibidat.github.io/nn2poly/reference/add_constraints.html</loc>
   </url>
   <url>
@@ -43,10 +46,10 @@
     <loc>https://ibidat.github.io/nn2poly/reference/nn2poly.html</loc>
   </url>
   <url>
-    <loc>https://ibidat.github.io/nn2poly/reference/plot_diagonal.html</loc>
+    <loc>https://ibidat.github.io/nn2poly/reference/plot.nn2poly.html</loc>
   </url>
   <url>
-    <loc>https://ibidat.github.io/nn2poly/reference/plot_n_important_coeffs.html</loc>
+    <loc>https://ibidat.github.io/nn2poly/reference/plot_diagonal.html</loc>
   </url>
   <url>
     <loc>https://ibidat.github.io/nn2poly/reference/plot_taylor_and_activation_potentials.html</loc>
