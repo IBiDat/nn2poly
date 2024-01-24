@@ -51,7 +51,7 @@ value is used, that value is set for each non linear layer and 1 for linear
 at each layer activation function. Default set to \code{8}.}
 
 \item{constraints}{Boolean parameter determining if the NN is constrained
-(TRUE) or not (FALSE). This only modifies de plots title to show
+(TRUE) or not (FALSE). This only modifies the plots title to show
 "constrained" or "unconstrained" respectively.}
 
 \item{taylor_interval}{optional parameter determining the interval in which
