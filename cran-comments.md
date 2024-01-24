@@ -1,7 +1,7 @@
-## Initial release
+## Resubmission
 
-This package implements a method that builds the coefficients of a polynomial
-model that performs almost equivalently as a given MLP neural network.
+1. Examples with unexported functions have been removed.
+2. Examples using `\dontrun` are required as they use `keras` and `torch`, which require an interactive setup.
 
 ## Test environments
 

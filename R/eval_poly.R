@@ -33,28 +33,6 @@
 #'
 #' @seealso \code{eval_poly()} is also used in [predict.nn2poly()].
 #'
-#' @examples
-#' # Single polynomial evaluation
-#' # Create the polynomial 1 + (-1)·x_1 + 1·x_2 + 0.5·(x_1)^2 as a list
-#' poly <- list()
-#' poly$values <- c(1,-1,1,0.5)
-#' poly$labels <- list(c(0),c(1),c(2),c(1,1))
-#' # Create two observations, (x_1,x_2) = (1,2) and (x_1,x_2) = (3,1)
-#' newdata <- rbind(c(1,2), c(3,1))
-#' # Evaluate the polynomial on both observations
-#' nn2poly:::eval_poly(poly = poly,newdata = newdata)
-#'
-#' # Multiple polynomial evaluation, with same terms but different coefficients
-#' # Create the polynomial 1 + (-1)·x_1 + 1·x_2 + 0.5·(x_1)^2 as a list
-#' poly <- list()
-#' coeff_matrix <- cbind(c(1,-1,1,0.5),
-#'                       c(2,-3,0,1.3))
-#' poly$values <- coeff_matrix
-#' poly$labels <- list(c(0),c(1),c(2),c(1,1))
-#' # Create two observations, (x_1,x_2) = (1,2) and (x_1,x_2) = (3,1)
-#' new_data <- rbind(c(1,2), c(3,1))
-#' # Evaluate the polynomial on both observations
-#' nn2poly:::eval_poly(poly = poly, newdata = newdata)
 eval_poly <- function(poly, newdata) {
 
   # Remove names and transform into matrix (variables as columns)
