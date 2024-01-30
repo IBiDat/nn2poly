@@ -1,7 +1,6 @@
-## Resubmission
+## Patch release
 
-1. Examples with unexported functions have been removed.
-2. Examples using `\dontrun` are required as they use `keras` and `torch`, which require an interactive setup.
+- Solve test rounding precision problem due to new architechture of mac OS.
 
 ## Test environments
 
