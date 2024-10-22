@@ -327,7 +327,7 @@ obtain_taylor_vector <- function(taylor_orders, af_string_list){
   if(!(is.numeric(taylor_orders) & all((taylor_orders %% 1)==0))){
     stop("Argument `taylor_orders` is non numeric", call. = FALSE)
   } else if(length(taylor_orders)==1) {
-    # Single value case, set 1 in linear, 8 in other AF
+    # Single value case, set 1 in linear, taylor_orders in other AF
     taylor_orders <- ifelse(af_string_list=="linear", 1, taylor_orders)
   } else {
     # Vector provided by user, check if dimensions match
