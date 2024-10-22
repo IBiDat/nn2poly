@@ -63,7 +63,7 @@ NULL
 #' represents each time one of the original variables appears in that term.
 #' As an example, vector c(1,1,2) represents the term \eqn{x_1^2x_2}. Note that
 #' the variables are numbered from 1 to p, with the intercept is represented by
-#' 0.
+#' zero.
 #' - An item named `values` which contains a matrix in which each column contains
 #' the coefficients of the polynomial associated with an output neuron. That is,
 #' if the neural network has a single output unit, the matrix `values` will have

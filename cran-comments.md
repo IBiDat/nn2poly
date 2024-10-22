@@ -1,6 +1,6 @@
 ## Patch release
 
-- Solve test rounding precision problem due to new architechture of mac OS.
+- Solve documentation problem with empty list item.
 
 ## Test environments
 
