@@ -52,11 +52,11 @@ eval_poly <- function(poly, newdata) {
     # Select the desired polynomial values (column of poly$values)
     values_j <- poly$values[,j]
 
-    # Intercept (label = 0) should always be the first element of labels at this
-    # point of the function (labels reordered previously in preprocess_poly).
-    # Poly had no intercept if intercept_position is NULL
+    # If poly has no intercept if intercept_position is NULL
     if (is.null(intercept_position)){
-      # initialize hte vector with 0s repeated as needed.
+      # Intercept (label = 0) should always be the first element of labels at this
+      # point of the function (labels reordered previously in preprocess_poly).
+      # initialize the vector with 0s repeated as needed.
       response_j <- rep(0, nrow(newdata))
       start_loop <- 1
     } else {
@@ -103,3 +103,112 @@ eval_poly <- function(poly, newdata) {
 
   return(response)
 }
+
+
+
+
+# Aux functions to help with internal eval_poly and eval_monomials ------
+
+
+#' Preprocesses different newdata inputs to match eval_poly needs
+#'
+#' @param newdata matrix, dataframe, vector, or any other possible input, where
+#' rows represent observations and columns the variables.
+#'
+#' @return An unnamed matrix, even if its single vector.
+#'
+#' @noRd
+preprocess_newdata <- function(newdata){
+
+  # Remove names and transform into matrix (variables as columns)
+  newdata <- unname(as.matrix(newdata))
+
+  # If newdata is a single vector, transpose to have it as row vector:
+  if(ncol(newdata)==1){
+    newdata = t(newdata)
+  }
+
+  return(newdata)
+}
+
+
+#' Preprocesses poly input to match eval_poly needs
+#'
+#' This should not be needed if the input polynomial to eval_poly is always
+#' built using nn2poly(), but this preprocessing steps allow us to use it with
+#' manually built polynomials under different conditions.
+#'
+#' @param poly A polynomial as given by eval_poly, with $labels and $values.
+#'
+#' @return An element containing:
+#' - A new polynomial in the same form, but with values as a matrix
+#' and labels with the intercept ordered to be the first element.
+#' - The original intercept position, which will a positive integer if it has
+#' been moved, and NULL if not.
+#'
+#' @noRd
+preprocess_poly <- function(poly){
+
+  # If values is a single vector, transform into matrix
+  if (!is.matrix(poly$values)){
+    poly$values <- as.matrix(poly$values)
+  }
+
+  # In case there is no intercept, set a NULL value
+  intercept_position <- NULL
+
+  # If there is intercept and it is not the first element, reorder the
+  # polynomial labels and values
+  if (c(0) %in% poly$labels){
+
+    intercept_position <- which(sapply(poly$labels, function(x) c(0) %in% x))
+
+    if (intercept_position != 1){
+
+      # Store the value
+      intercept_value <- poly$values[intercept_position,]
+
+      # Remove label and value
+      poly$labels <- poly$labels[-intercept_position]
+      poly$values <- poly$values[-intercept_position, , drop = FALSE]
+
+      # Add label and value back at start of list
+      poly$labels <- append(poly$labels, c(0), after=0)
+      poly$values <- unname(rbind(intercept_value, poly$values))
+
+    }
+  }
+
+  output <- list()
+  output$intercept_position <- intercept_position
+  output$poly <- poly
+  return(output)
+}
+
+#' Reorder intercept in monomials matrix
+#'
+#' Returns the matrix with the monomials evaluation to comply with the original
+#' order in poly$labels when the intercept has been moved to the first element.
+#'
+#' @param poly A polynomial as given by eval_poly, with $labels and $values.
+#' @param intercept_position The original position of the intercept. Set to NULL
+#' if not present.
+#'
+#' @return The same monomials matrix but with he intercept values at the
+#' original position in poly$labels instead of the first one (if it was changed)
+reorder_intercept_in_monomials <- function(monomials_matrix, intercept_position){
+
+  # Intercept has only been moved if its position is not NULL
+  # Also, reordering only needed if it is different from 1.
+  if(!is.null(intercept_position) && !(intercept_position==1)){
+
+    output <- cbind(
+      monomials_matrix[,2:(intercept_position)],
+      monomials_matrix[,1],
+      monomials_matrix[,(intercept_position+1):ncol(monomials_matrix)]
+    )
+  }
+
+  return(output)
+}
+
