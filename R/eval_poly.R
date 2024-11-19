@@ -35,43 +35,11 @@
 #'
 eval_poly <- function(poly, newdata) {
 
-  # Remove names and transform into matrix (variables as columns)
-  newdata <- unname(as.matrix(newdata))
+  newdata <- preprocess_newdata(newdata)
 
-  # If newdata is a single vector, transpose to have it as row vector:
-  if(ncol(newdata)==1){
-    newdata = t(newdata)
-  }
-
-  # If values is a single vector, transform into matrix
-  if (!is.matrix(poly$values)){
-    poly$values <- as.matrix(poly$values)
-  }
-
-  # Detect if the polynomial has intercept or not, needed in later steps
-  bool_intercept <- FALSE
-  if (c(0) %in% poly$labels) bool_intercept <- TRUE
-
-
-  # If there is intercept and it is not the first element, reorder the
-  # polynomial labels and values
-  if (bool_intercept){
-    intercept_position <- which(sapply(poly$labels, function(x) c(0) %in% x))
-    if (intercept_position != 1){
-
-      # Store the value
-      intercept_value <- poly$values[intercept_position,]
-
-      # Remove label and value
-      poly$labels <- poly$labels[-intercept_position]
-      poly$values <- poly$values[-intercept_position,, drop = FALSE]
-
-      # Add label and value back at start of list
-      poly$labels <- append(poly$labels, c(0), after=0)
-      poly$values <- unname(rbind(intercept_value, poly$values))
-    }
-  }
-
+  aux <- preprocess_poly(poly)
+  poly <- aux$poly
+  intercept_position <- aux$intercept_position
 
 
   # Initialize matrix which will contain results for each desired polynomial,
@@ -81,17 +49,20 @@ eval_poly <- function(poly, newdata) {
   response <- matrix(0, nrow = nrow(newdata), ncol = n_polynomials)
   for (j in 1:n_polynomials){
 
-    # Select the desired polynomial values (row of poly$values)
+    # Select the desired polynomial values (column of poly$values)
     values_j <- poly$values[,j]
 
     # Intercept (label = 0) should always be the first element of labels at this
-    # point of the function (labels reordered previously)
-    if (bool_intercept){
-      response_j <- rep(values_j[1], nrow(newdata))
-      start_loop <- 2
-    } else {
+    # point of the function (labels reordered previously in preprocess_poly).
+    # Poly had no intercept if intercept_position is NULL
+    if (is.null(intercept_position)){
+      # initialize hte vector with 0s repeated as needed.
       response_j <- rep(0, nrow(newdata))
       start_loop <- 1
+    } else {
+      # Initialize the vector with the intercept value repeated as needed.
+      response_j <- rep(values_j[1], nrow(newdata))
+      start_loop <- 2
     }
 
     # Loop over all terms (labels) except the intercept
@@ -99,7 +70,7 @@ eval_poly <- function(poly, newdata) {
 
       label_i <- poly$labels[[i]]
 
-      # Need to differentiate between 1 single label or more to use rowProds
+      # Need to differentiate between 1 single label or more to use colProds
       if(length(label_i) == 1){
         # When single variable, it is included in 1:p, that are also the
         # number of columns in newdata
@@ -119,6 +90,7 @@ eval_poly <- function(poly, newdata) {
 
       # We add to the response the product of those variables
       # with their associated coefficient value
+
       response_j <- response_j + values_j[i] * var_prod
     }
     response[,j] <- response_j
