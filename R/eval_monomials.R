@@ -10,11 +10,8 @@
 #'
 #' @seealso \code{eval_local_poly()} is also used in [predict.nn2poly()].
 #'
-eval_poly_local <- function(poly, newdata) {
+eval_monomials <- function(poly, newdata) {
 
-  # MODIFICATION THAT SHOULD BE FIXED IN THE PACKAGE:
-  # We need to transpose the poly values to match previous behavior
-  poly$values <- t(poly$values)
 
   # Remove names and transform into matrix (variables as columns)
   newdata <- unname(as.matrix(newdata))
@@ -114,6 +111,6 @@ eval_poly_local <- function(poly, newdata) {
 
 
 
-if (bool_intercept == TRUE && k == intercept_position){
-
-}
+# if (bool_intercept == TRUE && k == intercept_position){
+#
+# }
