@@ -122,7 +122,7 @@ preprocess_poly <- function(poly){
 
   # If values is a single vector, transform into matrix
   if (!is.matrix(poly$values)){
-    poly$values <- t(as.matrix(poly$values))
+    poly$values <- as.matrix(poly$values)
   }
 
   # In case there is no intercept, set a NULL value
@@ -137,15 +137,15 @@ preprocess_poly <- function(poly){
     if (intercept_position != 1){
 
       # Store the value
-      intercept_value <- poly$values[,intercept_position]
+      intercept_value <- poly$values[intercept_position,]
 
       # Remove label and value
       poly$labels <- poly$labels[-intercept_position]
-      poly$values <- poly$values[,-intercept_position, drop = FALSE]
+      poly$values <- poly$values[-intercept_position, , drop = FALSE]
 
       # Add label and value back at start of list
       poly$labels <- append(poly$labels, c(0), after=0)
-      poly$values <- unname(cbind(intercept_value, poly$values))
+      poly$values <- unname(rbind(intercept_value, poly$values))
 
     }
   }
@@ -170,7 +170,8 @@ preprocess_poly <- function(poly){
 reorder_intercept_in_monomials <- function(monomials_matrix, intercept_position){
 
   # Intercept has only been moved if its position is not NULL
-  if(!is.null(intercept_position)){
+  # Also, reordering only needed if it is different from 1.
+  if(!is.null(intercept_position) && !(intercept_position==1)){
 
     output <- cbind(
       monomials_matrix[,2:(intercept_position)],
