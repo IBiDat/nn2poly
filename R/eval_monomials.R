@@ -94,7 +94,7 @@ preprocess_newdata <- function(newdata){
   # Remove names and transform into matrix (variables as columns)
   newdata <- unname(as.matrix(newdata))
 
-  # If x is a single vector, transpose to have it as row vector:
+  # If newdata is a single vector, transpose to have it as row vector:
   if(ncol(newdata)==1){
     newdata = t(newdata)
   }
