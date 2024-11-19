@@ -67,31 +67,14 @@ eval_poly <- function(poly, newdata) {
 
     # Loop over all terms (labels) except the intercept
     for (i in start_loop:length(values_j)) {
-
       label_i <- poly$labels[[i]]
 
-      # Need to differentiate between 1 single label or more to use colProds
-      if(length(label_i) == 1){
-        # When single variable, it is included in 1:p, that are also the
-        # number of columns in newdata
-        var_prod <- newdata[,label_i]
-      } else {
-        # Special case if newdata is a single observation.
-        # Selecting the vars in newdata returns a column instead of row in this case
-        if(nrow(newdata)==1){
-          var_prod <- matrixStats::colProds(as.matrix(newdata[,label_i]))
-        } else {
-          # Obtain the product of each variable as many times as label_i indicates
-          var_prod <- matrixStats::rowProds(newdata[,label_i])
-        }
-
-      }
-
+      var_prod <- multiply_variables(label_i, newdata)
 
       # We add to the response the product of those variables
       # with their associated coefficient value
-
       response_j <- response_j + values_j[i] * var_prod
+
     }
     response[,j] <- response_j
   }
@@ -104,11 +87,7 @@ eval_poly <- function(poly, newdata) {
   return(response)
 }
 
-
-
-
-# Aux functions to help with internal eval_poly and eval_monomials ------
-
+# Aux functions to help with internal eval_poly and eval_monomials -----
 
 #' Preprocesses different newdata inputs to match eval_poly needs
 #'
@@ -212,3 +191,21 @@ reorder_intercept_in_monomials <- function(monomials_matrix, intercept_position)
   return(output)
 }
 
+
+multiply_variables <- function(label, newdata){
+  # Get the needed values with repetition determined by the label
+  values_rep <- newdata[,label]
+
+  # Transform into matrix form to be able to use rowProds.
+  # This is needed for the case of single labels or single variables,
+  # that sadly return a vector instead of the desired matrix when selecting
+  # the needed variables in the previous step.
+  # The matrix needs to keep the rows as the observations.
+  M <- matrix(values_rep, nrow = nrow(newdata))
+
+  # Perform the product of al values involved in the monomial determined by the
+  # label
+  var_prod <- matrixStats::rowProds(M)
+
+  return(var_prod)
+}
