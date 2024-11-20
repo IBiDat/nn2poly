@@ -2,9 +2,9 @@
 #'
 #' Evaluates one or several polynomials on the given data.
 #'
-#' Note that this function is unstable and subject to change. Therefore it is
+#' @details Note that this function is unstable and subject to change. Therefore it is
 #' not exported but this documentations is left available so users can use it if
-#' needed to simulate data by using \code{nn2poly:::eval_poly()}
+#' needed to simulate data by using \code{nn2poly:::eval_poly()}.
 #'
 #' @param poly List containing 2 items: \code{labels} and \code{values}.
 #' - \code{labels}: List of integer vectors with same length (or number of cols)
@@ -17,19 +17,34 @@
 #' of \code{labels}, containing at each row the value of the coefficient
 #' of the monomial given by the equivalent label in that same position.
 #'
-#' Example: If \code{labels} contains the integer vector c(1,1,3) at position
+#' Example: If \code{labels} contains the integer vector \code{c(1,1,3)} at position
 #' 5, then the value stored in \code{values} at row 5 is the coefficient
-#' associated with the term x_1^2*x_3.
+#' associated with the term \eqn{x_1^2*x_3}.
 #'
 #' @param newdata Input data as matrix, vector or dataframe.
 #' Number of columns (or elements in vector) should be the number of variables
 #' in the polynomial (dimension p). Response variable to be predicted should
 #' not be included.
 #'
-#' @return Returns a matrix containing the evaluation of the polynomials.
-#' Each column corresponds to each polynomial used and each row to each
-#' observation, meaning that each column vector corresponds to the results of
-#' evaluating all the given data for each polynomial.
+#' @param monomials Boolean determining if the returned item should contain the
+#' evaluations of all the monomials of the provided polynomials
+#' (\code{monomials==TRUE}), or if the final polynomial evaluation should be
+#' computed, i.e., adding up all the monomials (\code{monomials==FALSE}).
+#' Defaults to \code{FALSE}.
+#'
+#' @return If \code{monomials==FALSE}, returns a matrix containing the
+#' evaluation of the polynomials on the given data. The matrix has dimensions
+#' \code{(n_sample, n_polynomials)}, meaning that each column corresponds to the
+#' result of evaluating all the data for a polynomial. If a single polynomial is
+#' provided, the output is a vector instead of a row matrix.
+#'
+#' If \code{monomials==TRUE}, returns a 3D array containing the monomials of
+#' each polynomial evaluated on the given data. The array has dimensions
+#' \code{(n_sample, n_monomial_terms, n_polynomials)}, where element
+#' \code{[i,j,k]} contains the evaluation on observation \code{i} on
+#' monomial \code{j} of polynomial \code{k}, where monomial \code{j} corresponds
+#' to the one on \code{poly$labels[[j]]}. If a single polynomial is provided,
+#' a single matrix is returned with elements \code{[i,j]}.
 #'
 #' @seealso \code{eval_poly()} is also used in [predict.nn2poly()].
 #'
@@ -203,12 +218,16 @@ preprocess_poly <- function(poly){
 #' Returns the matrix with the monomials evaluation to comply with the original
 #' order in poly$labels when the intercept has been moved to the first element.
 #'
-#' @param poly A polynomial as given by eval_poly, with $labels and $values.
+#' @param monomials_matrix The monomials matrix computed for a single polynomial
+#' on all the given data.
 #' @param intercept_position The original position of the intercept. Set to NULL
 #' if not present.
+#' @param n_sample number of samples or observations in newdata.
 #'
 #' @return The same monomials matrix but with he intercept values at the
 #' original position in poly$labels instead of the first one (if it was changed)
+#'
+#' @noRd
 reorder_intercept_in_monomials <- function(monomials_matrix,
                                            intercept_position,
                                            n_sample){
@@ -235,6 +254,19 @@ reorder_intercept_in_monomials <- function(monomials_matrix,
   return(monomials_matrix)
 }
 
+
+#' Multiply variables given by label (a monomial representation)
+#'
+#' Multiplies the needed variables with their newdata values, but does not
+#' include the monomial coefficient.
+#'
+#'
+#' @param label label representing the variables interacting in the monomial
+#' @param newdata data on which the monomial will be evaluated.
+#'
+#' @return A number with the products of the variables.
+#'
+#' @noRd
 
 multiply_variables <- function(label, newdata){
   # Get the needed values with repetition determined by the label

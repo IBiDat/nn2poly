@@ -73,6 +73,9 @@
 #' # Predict using the obtained polynomial
 #' predict(object = final_poly, newdata = newdata)
 #'
+#' # Predict the values of each monomial of the obtained polynomial
+#' predict(object = final_poly, newdata = newdata, monomials = TRUE)
+#'
 #' # Change the last layer to have 3 outputs (as in a multiclass classification)
 #' # problem
 #' weights_layer_4 <- matrix(rnorm(20), nrow = 5, ncol = 4)

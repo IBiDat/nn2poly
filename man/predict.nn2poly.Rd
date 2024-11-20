@@ -4,7 +4,7 @@
 \alias{predict.nn2poly}
 \title{Predict method for \code{nn2poly} objects.}
 \usage{
-\method{predict}{nn2poly}(object, newdata, layers = NULL, ...)
+\method{predict}{nn2poly}(object, newdata, monomials = FALSE, layers = NULL, ...)
 }
 \arguments{
 \item{object}{Object of class inheriting from 'nn2poly'.}
@@ -13,6 +13,12 @@
 Number of columns (or elements in vector) should be the number of variables
 in the polynomial (dimension p). Response variable to be predicted should
 not be included.}
+
+\item{monomials}{Boolean determining if the returned item should contain the
+evaluations of all the monomials of the provided polynomials
+(\code{monomials==TRUE}), or if the final polynomial evaluation should be
+computed, i.e., adding up all the monomials (\code{monomials==FALSE}).
+Defaults to \code{FALSE}.}
 
 \item{layers}{Vector containing the chosen layers from \code{object} to be
 evaluated. If set to \code{NULL}, all layers are computed. Default is set
@@ -82,6 +88,9 @@ newdata <- matrix(rnorm(10), ncol = 2, nrow = 5)
 
 # Predict using the obtained polynomial
 predict(object = final_poly, newdata = newdata)
+
+# Predict the values of each monomial of the obtained polynomial
+predict(object = final_poly, newdata = newdata, monomials = TRUE)
 
 # Change the last layer to have 3 outputs (as in a multiclass classification)
 # problem
