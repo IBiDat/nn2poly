@@ -47,8 +47,7 @@ each polynomial evaluated on the given data. The array has dimensions
 \code{(n_sample, n_monomial_terms, n_polynomials)}, where element
 \code{[i,j,k]} contains the evaluation on observation \code{i} on
 monomial \code{j} of polynomial \code{k}, where monomial \code{j} corresponds
-to the one on \code{poly$labels[[j]]}. If a single polynomial is provided,
-a single matrix is returned with elements \code{[i,j]}.
+to the one on \code{poly$labels[[j]]}.
 }
 \description{
 Evaluates one or several polynomials on the given data.
