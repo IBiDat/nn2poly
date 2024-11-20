@@ -92,7 +92,7 @@ test_that("eval_poly: Observation as dataframe works", {
 })
 
 
-test_that("Multiple layers: eval_poly works on each layer(input/output)", {
+test_that("Multiple layers (and Monomials): eval_poly works on each layer(input/output)", {
   # Define a poly object with 2 polynomials
   poly <- list()
   poly$values <- matrix(c(1,-1,1,
@@ -117,7 +117,21 @@ test_that("Multiple layers: eval_poly works on each layer(input/output)", {
       expect_equal(pred_layer_i, t(as.matrix(c(0,6))))
   }
 
+  # Monomials:
+  prediction_monomials <- predict(object, newdata, monomials = TRUE)
+
+  # Build expected
+  A <- array(0, dim=c(1,3,2))
+  A[,,1] <- c(1,-2,1)
+  A[,,2] <- c(2,6,-2)
+  # All monomials are the same so we loop over them
+  for (pred_layer in prediction_monomials){
+    for (pred_layer_i in pred_layer)
+      expect_equal(pred_layer_i, A)
+  }
 })
+
+
 
 
 test_that("Multiple layers: choosing last layer returns the same as evaluation
