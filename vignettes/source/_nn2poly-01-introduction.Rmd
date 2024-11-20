@@ -243,7 +243,7 @@ final_poly
 
 ## Predictions using the obtained polynomial
 
-With the obtained polynomial coefficients, we can use them to predict the response variable $Y$ using the polynomial. This can be done using `predcit` on the output of `nn2poly` (object with class `"nn2poly"`) together with the desired values for the predictor variables.
+With the obtained polynomial coefficients, we can use them to predict the response variable $Y$ using the polynomial. This can be done using `predcit()` on the output of `nn2poly` (object with class `"nn2poly"`) together with the desired values for the predictor variables.
 
 
 ```{r reg-polynomial-prediction}
@@ -252,8 +252,29 @@ With the obtained polynomial coefficients, we can use them to predict the respon
 prediction_poly <- predict(object = final_poly,
                            newdata = test_x)
 
+# In this case the output is a vector of length equal to the rows of test_x,
+# as we are predicting the output of out final polynomial for each observation.
+length(prediction_poly)==nrow(test_x)
+
 ```
 
+Another option available is to evaluate the monomials of the obtained polynomial separately, which may be useful when trying to analyze the contribution of each term to the final output of the model, specially when comparing interactions of variables. This can be done by passing the option `monomials=TRUE` to the `predict()` function.
+
+
+```{r reg-monomial-prediction}
+
+# Obtain the predicted values for the test data with our polynomial
+prediction_monomials <- predict(object = final_poly,
+                                newdata = test_x,
+                                monomials = TRUE)
+
+# In this case, the output is a 3D array, where the last dimension corresponds 
+# to the number of output polynomials (in this example 1), and each matrix
+# represented by the first two dimensions has rows equal to the rows in
+# test_x, and columns equal to the rows in poly$values, corresponding to a 
+# column for each monomial (or term) in the polynomial.
+dim(prediction_monomials)
+```
 
 ## Visualizing the results
 
