@@ -19,6 +19,26 @@ test_that("eval_poly: Single polynomial evaluation and single observation works"
   expect_equal(predict(poly, newdata), as.vector(4.5))
 })
 
+test_that("(Monomials) Check that adding the monomials gives the final poly prediction", {
+
+  # With intercept and unnordered labels
+  poly <- list()
+  poly$values <- matrix(c(1,-1,1,
+                          2,3,-2), ncol = 2, byrow = FALSE)
+  poly$labels <- list(c(2),c(0),c(2,1))
+  class(poly) <- "nn2poly"
+
+  newdata <- rbind(c(5,2), c(-1,5.4))
+
+  A <- predict(poly, newdata)
+  B <- predict(poly, newdata, monomials = TRUE)
+
+  C <- cbind(rowSums(B[,,1]), rowSums(B[,,2]))
+
+  expect_equal(A, C)
+
+})
+
 
 test_that("eval_poly: Multiple polynomial evaluation and single observation works", {
 
@@ -209,5 +229,8 @@ test_that("Multiple layers: output from nn2poly also works", {
   expect_null(prediction1$layer_1)
 
 })
+
+
+
 
 
