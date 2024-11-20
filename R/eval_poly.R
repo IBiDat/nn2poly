@@ -33,7 +33,7 @@
 #'
 #' @seealso \code{eval_poly()} is also used in [predict.nn2poly()].
 #'
-eval_poly <- function(poly, newdata) {
+eval_poly <- function(poly, newdata, monomials = FALSE) {
 
   newdata <- preprocess_newdata(newdata)
 
@@ -41,47 +41,81 @@ eval_poly <- function(poly, newdata) {
   poly <- aux$poly
   intercept_position <- aux$intercept_position
 
-
-  # Initialize matrix which will contain results for each desired polynomial,
-  # with columns equal to the columns of `poly$values`, that is, the number of
-  # polynomials and rows equal to the number of observations evaluated.
+  n_sample <- nrow(newdata)
   n_polynomials <- ncol(poly$values)
-  response <- matrix(0, nrow = nrow(newdata), ncol = n_polynomials)
-  for (j in 1:n_polynomials){
+  n_monomial_terms <- length(poly$labels)
+
+  # We will first compute all the needed 3D monomial arrays
+  # At the end, they will be summed to form the final polynomial prediction if
+  # needed.
+
+  response <- array(0,c(n_sample, n_monomial_terms, n_polynomials))
+
+  for (k in 1:n_polynomials){
 
     # Select the desired polynomial values (column of poly$values)
-    values_j <- poly$values[,j]
+    values_k <- poly$values[,k]
 
     # If poly has no intercept if intercept_position is NULL
     if (is.null(intercept_position)){
       # Intercept (label = 0) should always be the first element of labels at this
       # point of the function (labels reordered previously in preprocess_poly).
       # initialize the vector with 0s repeated as needed.
-      response_j <- rep(0, nrow(newdata))
       start_loop <- 1
     } else {
       # Initialize the vector with the intercept value repeated as needed.
-      response_j <- rep(values_j[1], nrow(newdata))
+      response[,1,k] <- rep(values_k[1], nrow(newdata))
       start_loop <- 2
     }
 
     # Loop over all terms (labels) except the intercept
-    for (i in start_loop:length(values_j)) {
-      label_i <- poly$labels[[i]]
+    for (j in start_loop:length(values_k)) {
 
-      var_prod <- multiply_variables(label_i, newdata)
+      label_j <- poly$labels[[j]]
 
-      # We add to the response the product of those variables
-      # with their associated coefficient value
-      response_j <- response_j + values_j[i] * var_prod
+      var_prod <- multiply_variables(label_j, newdata)
+
+
+      # Here instead of adding response over the loop as in the normal
+      # eval_poly, store it in the appropriate position.
+      response[,j,k] = values_k[j] * var_prod
+
 
     }
-    response[,j] <- response_j
+
+    # In case the intercept has been moved, we reorder it to its original
+    # position so it preserves the original notation of the user.
+    response[,,k] <- reorder_intercept_in_monomials(response[,,k],
+                                                    intercept_position,
+                                                    n_sample)
   }
 
-  # Check if it is a single polynomial and transform to vector:
-  if (dim(response)[2]==1){
-    response <- as.vector(response)
+  # With all monomials computed, we can now add them to obtain the final
+  # polynomial prediction if needed, and simplify the output format when
+  # having a single polynomial.
+
+  if (monomials == FALSE){
+    # The full polynomial prediction is needed.
+    # It can be computed by adding the monomials for each polynomial, which is
+    # adding by rows on each matrix response[,,k]
+    aux_response <- NULL
+    for (k in 1:n_polynomials){
+      aux_response <- cbind(aux_response,
+                            rowSums(matrix(
+                              response[,,k],
+                              nrow = n_sample,
+                              ncol = n_monomial_terms))
+                            )
+    }
+
+    # Set the final response to be the obtained matrix
+    response <- aux_response
+
+    # If there is a single polynomial, turn matrix into vector
+    if (n_polynomials==1){
+      response <- as.vector(response)
+    }
+
   }
 
   return(response)

@@ -96,7 +96,11 @@
 #' predict(object = final_poly, newdata = newdata, layers = c(2,3))
 #'
 #' @export
-predict.nn2poly <- function(object, newdata, layers = NULL, ...) {
+predict.nn2poly <- function(object,
+                            newdata,
+                            monomials = FALSE,
+                            layers = NULL,
+                            ...) {
   if (length(class(object)) > 1)
     return(NextMethod())
 
@@ -105,7 +109,7 @@ predict.nn2poly <- function(object, newdata, layers = NULL, ...) {
   # values and labels. We check one of them:
   if (!is.null(object$labels)){
     # If we have a final polynomial, directly evaluate the results:
-    result <- eval_poly(poly = object, newdata = newdata)
+    result <- eval_poly(poly = object, newdata = newdata, monomials = monomials)
   } else {
     # Multiple layer case:
 
@@ -135,14 +139,19 @@ predict.nn2poly <- function(object, newdata, layers = NULL, ...) {
     # Compute results for the given layers.
     result <- list()
     for (i in layers){
+
       layer_name <- paste0("layer_", i)
       result[[layer_name]] <- list()
-      result[[layer_name]][["input"]] <- eval_poly(
-        poly = object[[layer_name]][["input"]],
-        newdata = newdata)
-      result[[layer_name]][["output"]] <- eval_poly(
-        poly = object[[layer_name]][["output"]],
-        newdata = newdata)
+
+      result[[layer_name]][["input"]] <-
+        eval_poly(poly = object[[layer_name]][["input"]],
+                  newdata = newdata,
+                  monomials = monomials)
+
+      result[[layer_name]][["output"]] <-
+        eval_poly(poly = object[[layer_name]][["output"]],
+                  newdata = newdata,
+                  monomials = monomials)
     }
   }
 
