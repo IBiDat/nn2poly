@@ -116,3 +116,23 @@ test_that("(Monomials) Multiple polynomial evaluation and multiple observations 
 
   expect_equal(eval_monomials(poly, newdata), aux_expected)
 })
+
+
+test_that("(Monomials) Check that adding the monomials gives the final poly prediction", {
+
+  # With intercept and unnordered labels
+  poly <- list()
+  poly$values <- matrix(c(1,-1,1,
+                          2,3,-2), ncol = 2, byrow = FALSE)
+  poly$labels <- list(c(2),c(0),c(2,1))
+
+  newdata <- rbind(c(5,2), c(-1,5.4))
+
+  A <- eval_poly(poly, newdata)
+  B <- eval_monomials(poly, newdata)
+
+  C <- cbind(rowSums(B[,,1]), rowSums(B[,,2]))
+
+  expect_equal(A, C)
+
+})
