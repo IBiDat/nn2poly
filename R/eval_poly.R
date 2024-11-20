@@ -175,20 +175,30 @@ preprocess_poly <- function(poly){
 #'
 #' @return The same monomials matrix but with he intercept values at the
 #' original position in poly$labels instead of the first one (if it was changed)
-reorder_intercept_in_monomials <- function(monomials_matrix, intercept_position){
+reorder_intercept_in_monomials <- function(monomials_matrix,
+                                           intercept_position,
+                                           n_sample){
+
 
   # Intercept has only been moved if its position is not NULL
   # Also, reordering only needed if it is different from 1.
   if(!is.null(intercept_position) && !(intercept_position==1)){
 
-    output <- cbind(
-      monomials_matrix[,2:(intercept_position)],
-      monomials_matrix[,1],
-      monomials_matrix[,(intercept_position+1):ncol(monomials_matrix)]
-    )
+    # Force monomials_matrix to be a matrix, which will be not if
+    # we have a single observation.
+    M<- matrix(monomials_matrix, nrow = n_sample)
+
+    M_prev <- matrix(M[,2:(intercept_position)], nrow = n_sample)
+    M_intercept <- matrix(M[,1], nrow = n_sample)
+    M_post <- matrix(M[,(intercept_position+1):ncol(M)], nrow = n_sample)
+
+
+    monomials_matrix <- cbind(M_prev,
+                              M_intercept,
+                              M_post)
   }
 
-  return(output)
+  return(monomials_matrix)
 }
 
 
