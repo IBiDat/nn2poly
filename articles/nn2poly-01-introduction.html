@@ -271,18 +271,18 @@ to <code><a href="../articles/nn2poly-02-supported-DL-frameworks.html">vignette(
 <span>                  activation <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">nn</span></span>
-<span><span class="co">#&gt; Model: "sequential"</span></span>
-<span><span class="co">#&gt; ____________________________________________________________________________________________________________________</span></span>
-<span><span class="co">#&gt;  Layer (type)                                       Output Shape                                  Param #           </span></span>
-<span><span class="co">#&gt; ====================================================================================================================</span></span>
-<span><span class="co">#&gt;  dense (Dense)                                      (None, 10)                                    40                </span></span>
-<span><span class="co">#&gt;  dense_1 (Dense)                                    (None, 10)                                    110               </span></span>
-<span><span class="co">#&gt;  dense_2 (Dense)                                    (None, 1)                                     11                </span></span>
-<span><span class="co">#&gt; ====================================================================================================================</span></span>
-<span><span class="co">#&gt; Total params: 161 (644.00 Byte)</span></span>
-<span><span class="co">#&gt; Trainable params: 161 (644.00 Byte)</span></span>
-<span><span class="co">#&gt; Non-trainable params: 0 (0.00 Byte)</span></span>
-<span><span class="co">#&gt; ____________________________________________________________________________________________________________________</span></span></code></pre></div>
+<span><span class="co">#&gt; Model: "sequential_9"</span></span>
+<span><span class="co">#&gt; ________________________________________________________________________________________________________________________________________________________</span></span>
+<span><span class="co">#&gt;  Layer (type)                                                       Output Shape                                                 Param #                </span></span>
+<span><span class="co">#&gt; ========================================================================================================================================================</span></span>
+<span><span class="co">#&gt;  dense_27 (Dense)                                                   (None, 10)                                                   40                     </span></span>
+<span><span class="co">#&gt;  dense_28 (Dense)                                                   (None, 10)                                                   110                    </span></span>
+<span><span class="co">#&gt;  dense_29 (Dense)                                                   (None, 1)                                                    11                     </span></span>
+<span><span class="co">#&gt; ========================================================================================================================================================</span></span>
+<span><span class="co">#&gt; Total params: 161</span></span>
+<span><span class="co">#&gt; Trainable params: 161</span></span>
+<span><span class="co">#&gt; Non-trainable params: 0</span></span>
+<span><span class="co">#&gt; ________________________________________________________________________________________________________________________________________________________</span></span></code></pre></div>
 <p>Compile the model:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://generics.r-lib.org/reference/compile.html" class="external-link">compile</a></span><span class="op">(</span><span class="va">nn</span>,</span>
@@ -307,7 +307,7 @@ values.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Obtain the predicted values with the NN to compare them</span></span>
 <span><span class="va">prediction_NN</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">nn</span>, <span class="va">test_x</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 4/4 - 0s - 64ms/epoch - 16ms/step</span></span>
+<span><span class="co">#&gt; 4/4 - 0s - 71ms/epoch - 18ms/step</span></span>
 <span></span>
 <span><span class="co"># Diagonal plot implemented in the package to quickly visualize and compare predictions</span></span>
 <span><span class="fu">nn2poly</span><span class="fu">:::</span><span class="fu"><a href="../reference/plot_diagonal.html">plot_diagonal</a></span><span class="op">(</span>x_axis <span class="op">=</span>  <span class="va">prediction_NN</span>, y_axis <span class="op">=</span>  <span class="va">test_y</span>, xlab <span class="op">=</span> <span class="st">"NN prediction"</span>, ylab <span class="op">=</span> <span class="st">"Original Y"</span><span class="op">)</span></span></code></pre></div>
@@ -372,42 +372,25 @@ on the supported frameworks refer to
 <span></span>
 <span><span class="va">weights_object</span></span>
 <span><span class="co">#&gt; $tanh</span></span>
-<span><span class="co">#&gt;            [,1]       [,2]      [,3]       [,4]        [,5]       [,6]       [,7]        [,8]        [,9]</span></span>
-<span><span class="co">#&gt; [1,]  0.2468006 -0.1615576 0.4128721 -0.2022066  0.04867206 -0.3397017 -0.1973533 -0.08864177 -0.06979843</span></span>
-<span><span class="co">#&gt; [2,]  0.2653632  0.1291278 0.1464561  0.5171605 -0.47153816  0.1952459  0.6991890 -0.34414759 -0.01077842</span></span>
-<span><span class="co">#&gt; [3,] -0.7783106 -0.1182964 0.8215331  0.0756740  0.06914742  0.7492308 -0.8363205 -0.46379340  0.04437404</span></span>
-<span><span class="co">#&gt; [4,] -0.7159964  0.5072741 0.6033612 -0.4585148  0.49232438 -0.7474106  0.1091831  0.34101799  0.04305385</span></span>
-<span><span class="co">#&gt;             [,10]</span></span>
-<span><span class="co">#&gt; [1,] -0.359030366</span></span>
-<span><span class="co">#&gt; [2,]  0.006373413</span></span>
-<span><span class="co">#&gt; [3,] -0.698476076</span></span>
-<span><span class="co">#&gt; [4,] -0.571668506</span></span>
+<span><span class="co">#&gt;            [,1]       [,2]      [,3]       [,4]        [,5]       [,6]       [,7]        [,8]        [,9]        [,10]</span></span>
+<span><span class="co">#&gt; [1,]  0.2468006 -0.1615576 0.4128721 -0.2022066  0.04867206 -0.3397017 -0.1973533 -0.08864177 -0.06979843 -0.359030366</span></span>
+<span><span class="co">#&gt; [2,]  0.2653632  0.1291278 0.1464561  0.5171605 -0.47153816  0.1952459  0.6991890 -0.34414759 -0.01077842  0.006373413</span></span>
+<span><span class="co">#&gt; [3,] -0.7783106 -0.1182964 0.8215331  0.0756740  0.06914742  0.7492308 -0.8363205 -0.46379340  0.04437404 -0.698476076</span></span>
+<span><span class="co">#&gt; [4,] -0.7159964  0.5072741 0.6033612 -0.4585148  0.49232438 -0.7474106  0.1091831  0.34101799  0.04305385 -0.571668506</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $tanh</span></span>
-<span><span class="co">#&gt;              [,1]          [,2]        [,3]        [,4]        [,5]       [,6]        [,7]        [,8]</span></span>
-<span><span class="co">#&gt;  [1,] -0.06682093  1.354177e-02  0.41062176  0.06204464  0.08612972  0.2199472  0.07406761  0.16231309</span></span>
-<span><span class="co">#&gt;  [2,]  0.61209673 -1.587261e-01  0.33286688  0.16685191  0.25638032 -0.2960541  0.06451954 -0.04405669</span></span>
-<span><span class="co">#&gt;  [3,] -0.24969149 -5.748887e-02 -0.46696794  0.12622431 -0.03608320 -0.3931088  0.28291187  0.24243380</span></span>
-<span><span class="co">#&gt;  [4,]  0.38323382  4.771161e-01  0.11585876  0.44199020  0.16203447  0.6357560  0.01491554 -0.29491946</span></span>
-<span><span class="co">#&gt;  [5,] -0.24755152  6.043483e-06  0.41534948  0.27495798 -0.46539015 -0.3829005 -0.53592098 -0.42729110</span></span>
-<span><span class="co">#&gt;  [6,] -0.26591998  5.250556e-01 -0.10562975  0.37414369  0.26212201  0.4499114 -0.41681677 -0.25272584</span></span>
-<span><span class="co">#&gt;  [7,]  0.49481559  1.359816e-01  0.67004895 -0.15929574  0.16280667  0.4475754 -0.20691858  0.40582910</span></span>
-<span><span class="co">#&gt;  [8,]  0.40330765 -4.343324e-01 -0.92225003 -0.15942611  0.01812540  0.2977643 -0.04585903 -0.37514219</span></span>
-<span><span class="co">#&gt;  [9,]  0.51166564  1.184353e-01 -0.82071930 -0.02945352  0.31787610  0.2762571  0.48814669 -0.39470875</span></span>
-<span><span class="co">#&gt; [10,]  0.27744713 -1.118216e-01  0.02931483  0.35466376  0.24984393 -0.1250943 -0.32097501  0.09834206</span></span>
-<span><span class="co">#&gt; [11,] -0.50523925  4.479433e-01 -0.55034703  0.48515356 -0.03854835 -0.8001245  0.15069254 -0.20994137</span></span>
-<span><span class="co">#&gt;              [,9]        [,10]</span></span>
-<span><span class="co">#&gt;  [1,]  0.08528626  0.074458212</span></span>
-<span><span class="co">#&gt;  [2,] -0.57139808 -0.314788640</span></span>
-<span><span class="co">#&gt;  [3,] -0.47687724 -0.002060457</span></span>
-<span><span class="co">#&gt;  [4,]  0.09033196 -0.017912282</span></span>
-<span><span class="co">#&gt;  [5,] -0.48928314 -0.197884247</span></span>
-<span><span class="co">#&gt;  [6,] -0.28060704 -0.249755934</span></span>
-<span><span class="co">#&gt;  [7,] -0.11089712 -0.387193263</span></span>
-<span><span class="co">#&gt;  [8,]  0.24891976 -0.395170867</span></span>
-<span><span class="co">#&gt;  [9,]  0.01584071 -0.538033605</span></span>
-<span><span class="co">#&gt; [10,] -0.06148605 -0.403377086</span></span>
-<span><span class="co">#&gt; [11,]  0.23820342  0.375222772</span></span>
+<span><span class="co">#&gt;              [,1]          [,2]        [,3]        [,4]        [,5]       [,6]        [,7]        [,8]        [,9]        [,10]</span></span>
+<span><span class="co">#&gt;  [1,] -0.06682093  1.354177e-02  0.41062176  0.06204464  0.08612972  0.2199472  0.07406761  0.16231309  0.08528626  0.074458212</span></span>
+<span><span class="co">#&gt;  [2,]  0.61209673 -1.587261e-01  0.33286688  0.16685191  0.25638032 -0.2960541  0.06451954 -0.04405669 -0.57139808 -0.314788640</span></span>
+<span><span class="co">#&gt;  [3,] -0.24969149 -5.748887e-02 -0.46696794  0.12622431 -0.03608320 -0.3931088  0.28291187  0.24243380 -0.47687724 -0.002060457</span></span>
+<span><span class="co">#&gt;  [4,]  0.38323382  4.771161e-01  0.11585876  0.44199020  0.16203447  0.6357560  0.01491554 -0.29491946  0.09033196 -0.017912282</span></span>
+<span><span class="co">#&gt;  [5,] -0.24755152  6.043483e-06  0.41534948  0.27495798 -0.46539015 -0.3829005 -0.53592098 -0.42729110 -0.48928314 -0.197884247</span></span>
+<span><span class="co">#&gt;  [6,] -0.26591998  5.250556e-01 -0.10562975  0.37414369  0.26212201  0.4499114 -0.41681677 -0.25272584 -0.28060704 -0.249755934</span></span>
+<span><span class="co">#&gt;  [7,]  0.49481559  1.359816e-01  0.67004895 -0.15929574  0.16280667  0.4475754 -0.20691858  0.40582910 -0.11089712 -0.387193263</span></span>
+<span><span class="co">#&gt;  [8,]  0.40330765 -4.343324e-01 -0.92225003 -0.15942611  0.01812540  0.2977643 -0.04585903 -0.37514219  0.24891976 -0.395170867</span></span>
+<span><span class="co">#&gt;  [9,]  0.51166564  1.184353e-01 -0.82071930 -0.02945352  0.31787610  0.2762571  0.48814669 -0.39470875  0.01584071 -0.538033605</span></span>
+<span><span class="co">#&gt; [10,]  0.27744713 -1.118216e-01  0.02931483  0.35466376  0.24984393 -0.1250943 -0.32097501  0.09834206 -0.06148605 -0.403377086</span></span>
+<span><span class="co">#&gt; [11,] -0.50523925  4.479433e-01 -0.55034703  0.48515356 -0.03854835 -0.8001245  0.15069254 -0.20994137  0.23820342  0.375222772</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $linear</span></span>
 <span><span class="co">#&gt;              [,1]</span></span>
@@ -542,15 +525,40 @@ this case, the obtained polynomial is up to order 3.</p>
 <p>With the obtained polynomial coefficients, we can use them to predict
 the response variable
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Y</mi><annotation encoding="application/x-tex">Y</annotation></semantics></math>
-using the polynomial. This can be done using <code>predcit</code> on the
-output of <code>nn2poly</code> (object with class
+using the polynomial. This can be done using <code>predcit()</code> on
+the output of <code>nn2poly</code> (object with class
 <code>"nn2poly"</code>) together with the desired values for the
 predictor variables.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># Obtain the predicted values for the test data with our polynomial</span></span>
 <span><span class="va">prediction_poly</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">final_poly</span>,</span>
-<span>                           newdata <span class="op">=</span> <span class="va">test_x</span><span class="op">)</span></span></code></pre></div>
+<span>                           newdata <span class="op">=</span> <span class="va">test_x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># In this case the output is a vector of length equal to the rows of test_x,</span></span>
+<span><span class="co"># as we are predicting the output of out final polynomial for each observation.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">prediction_poly</span><span class="op">)</span><span class="op">==</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">test_x</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<p>Another option available is to evaluate the monomials of the obtained
+polynomial separately, which may be useful when trying to analyze the
+contribution of each term to the final output of the model, specially
+when comparing interactions of variables. This can be done by passing
+the option <code>monomials=TRUE</code> to the <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>
+function.</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="co"># Obtain the predicted values for the test data with our polynomial</span></span>
+<span><span class="va">prediction_monomials</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">final_poly</span>,</span>
+<span>                                newdata <span class="op">=</span> <span class="va">test_x</span>,</span>
+<span>                                monomials <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># In this case, the output is a 3D array, where the last dimension corresponds </span></span>
+<span><span class="co"># to the number of output polynomials (in this example 1), and each matrix</span></span>
+<span><span class="co"># represented by the first two dimensions has rows equal to the rows in</span></span>
+<span><span class="co"># test_x, and columns equal to the rows in poly$values, corresponding to a </span></span>
+<span><span class="co"># column for each monomial (or term) in the polynomial.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">prediction_monomials</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 125  20   1</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="visualizing-the-results">Visualizing the results<a class="anchor" aria-label="anchor" href="#visualizing-the-results"></a>
@@ -574,7 +582,7 @@ diagonal line represents where a perfect relationship between the NN and
 the polynomial predictions would be obtained. In this example, as the
 theoretical weight constraints have not been imposed, we can observe how
 the approximation is not perfect.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu">nn2poly</span><span class="fu">:::</span><span class="fu"><a href="../reference/plot_diagonal.html">plot_diagonal</a></span><span class="op">(</span>x_axis <span class="op">=</span>  <span class="va">prediction_NN</span>, y_axis <span class="op">=</span>  <span class="va">prediction_poly</span>, xlab <span class="op">=</span> <span class="st">"NN prediction"</span>, ylab <span class="op">=</span> <span class="st">"Polynomial prediction"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="includes%2Fnn2poly-01-reg-comparison-polynomial-nn-1.png"></p>
@@ -594,7 +602,7 @@ terms appearing in the original polynomial
 However, other interactions of order 3 appear to be also relevant, which
 is caused by the Taylor expansions not being controlled as we have not
 imposed constraints on the neural network weights training.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">final_poly</span>, n<span class="op">=</span><span class="fl">8</span><span class="op">)</span></span></code></pre></div>
 <p><img src="includes%2Fnn2poly-01-reg-n-important-1.png"></p>
 <p>Another convenient plot to show how the algorithm is affected by each
@@ -605,7 +613,7 @@ the Taylor expansion approximation of the activation function at each
 layer.</p>
 <p>In this case, as we have not used constraints in the NN training, the
 activation potentials are not strictly centered around zero.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">nn2poly</span><span class="fu">:::</span><span class="fu"><a href="../reference/plot_taylor_and_activation_potentials.html">plot_taylor_and_activation_potentials</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">nn</span>,</span>
 <span>                                                data <span class="op">=</span> <span class="va">train</span>,</span>
 <span>                                                max_order <span class="op">=</span> <span class="fl">3</span>,</span>

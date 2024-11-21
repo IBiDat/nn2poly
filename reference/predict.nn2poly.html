@@ -45,7 +45,7 @@
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'nn2poly'</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">newdata</span>, layers <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">newdata</span>, monomials <span class="op">=</span> <span class="cn">FALSE</span>, layers <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -63,6 +63,14 @@ in the polynomial (dimension p). Response variable to be predicted should
 not be included.</p></dd>
 
 
+<dt id="arg-monomials">monomials<a class="anchor" aria-label="anchor" href="#arg-monomials"></a></dt>
+<dd><p>Boolean determining if the returned item should contain the
+evaluations of all the monomials of the provided polynomials
+(<code>monomials==TRUE</code>), or if the final polynomial evaluation should be
+computed, i.e., adding up all the monomials (<code>monomials==FALSE</code>).
+Defaults to <code>FALSE</code>.</p></dd>
+
+
 <dt id="arg-layers">layers<a class="anchor" aria-label="anchor" href="#arg-layers"></a></dt>
 <dd><p>Vector containing the chosen layers from <code>object</code> to be
 evaluated. If set to <code>NULL</code>, all layers are computed. Default is set
@@ -77,19 +85,28 @@ to <code>NULL</code>.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>Returns a matrix or list of matrices with the evaluation of each
 polynomial at each layer as given by the provided <code>object</code> of class
-<code>nn2poly</code>.</p>
-<p>If <code>object</code> contains the polynomials of the last layer, as given by
-<code>nn2poly(object, keep_layers = FALSE)</code>, then the output is a matrix with
-the evaluation of each data point on each polynomial. In this matrix, each
-column represents the evaluation of a polynomial and each column corresponds
-to each point in the new data to be evaluated.</p>
-<p>If <code>object</code> contains all the internal polynomials also, as given by
+<code>nn2poly</code>. The format can be as follows, depending on the layers
+contained in <code>object</code> and the parameters <code>layers</code> and <code>monomials</code> values:</p><ul><li><p>If <code>object</code> contains the polynomials of the last layer, as given by
+<code>nn2poly(object, keep_layers = FALSE)</code>, then the output is:</p><ul><li><p>A matrix: if <code>monomials==FALSE</code>, returns a matrix containing the
+evaluation of the polynomials on the given data. The matrix has dimensions
+<code>(n_sample, n_polynomials)</code>, meaning that each column corresponds to the
+result of evaluating all the data for a polynomial. If a single polynomial is
+provided, the output is a vector instead of a row matrix.</p></li>
+<li><p>A 3D array: If <code>monomials==TRUE</code>, returns a 3D array containing the monomials of
+each polynomial evaluated on the given data. The array has dimensions
+<code>(n_sample, n_monomial_terms, n_polynomials)</code>, where element
+<code>[i,j,k]</code> contains the evaluation on observation <code>i</code> on
+monomial <code>j</code> of polynomial <code>k</code>, where monomial <code>j</code> corresponds
+to the one on <code>poly$labels[[j]]</code>.</p></li>
+</ul></li>
+<li><p>If <code>object</code> contains all the internal polynomials, as given by
 <code>nn2poly(object, keep_layers = TRUE)</code>, then the output is a list of
-layers (represented by <code>layer_i</code>), where each one is another list with
-<code>input</code> and <code>output</code> elements, where each one contains a matrix
-with the evaluation of the "input" or "output" polynomial at the given layer,
-as explained in the case without internal polynomials.</p>
-    </div>
+layers (represented by <code>layer_i</code>), where each of them is another list with
+<code>input</code> and <code>output</code> elements. Each of those elements contains the
+corresponding evaluation of the "input" or "output" polynomial at the given layer,
+as explained in the last layer case, which will be a matrix if <code>monomials==FALSE</code>
+and a 3D array if <code>monomials==TRUE</code>.</p></li>
+</ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Internally uses <code><a href="eval_poly.html">eval_poly()</a></code> to obtain the predictions. However, this only
@@ -139,6 +156,24 @@ object, <code><a href="eval_poly.html">eval_poly()</a></code>: function that can
 <span class="r-in"><span><span class="co"># Predict using the obtained polynomial</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">final_poly</span>, newdata <span class="op">=</span> <span class="va">newdata</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1]   -187.8372 -39928.6031    484.2835   5728.3026  33157.9147</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Predict the values of each monomial of the obtained polynomial</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">final_poly</span>, newdata <span class="op">=</span> <span class="va">newdata</span>, monomials <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> , , 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          [,1]      [,2]       [,3]       [,4]       [,5]       [,6]       [,7]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 3.513261  2.085832 -0.9767128 -106.05289   78.26172  -14.28478  -883.2954</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 3.513261  1.668730  7.0684472  -67.87907 -453.11999 -748.14865  -452.2994</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,] 3.513261  2.248785 -3.3289988 -123.27058  287.58393 -165.94613 -1106.9075</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,] 3.513261 -1.028708 -3.6640994  -25.79572 -144.79793 -201.03624   105.9604</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5,] 3.513261 -2.768480 -5.3540672 -186.82993 -569.41422 -429.24723  2065.3414</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            [,8]        [,9]        [,10]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]  1040.3706   -356.2025     48.74379</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] -4819.0179 -14925.1243 -18475.26426</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]  4121.6558  -4461.2748   1930.00981</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,]   949.3221   2472.3521   2573.47736</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5,] 10046.8266  14206.6881   8029.15924</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Change the last layer to have 3 outputs (as in a multiclass classification)</span></span></span>
 <span class="r-in"><span><span class="co"># problem</span></span></span>
