@@ -33,21 +33,29 @@
 #'
 #' @return Returns a matrix or list of matrices with the evaluation of each
 #' polynomial at each layer as given by the provided \code{object} of class
-#' \code{nn2poly}.
+#' \code{nn2poly}. The format can be as follows, depending on the layers
+#' contained in \code{object} and the parameters \code{layers} and \code{monomials} values:
 #'
-#' If \code{object} contains the polynomials of the last layer, as given by
-#' \code{nn2poly(object, keep_layers = FALSE)}, then the output is a matrix with
-#' the evaluation of each data point on each polynomial. In this matrix, each
-#' column represents the evaluation of a polynomial and each column corresponds
-#' to each point in the new data to be evaluated.
-#'
-#' If \code{object} contains all the internal polynomials also, as given by
+#' - If \code{object} contains the polynomials of the last layer, as given by
+#'   \code{nn2poly(object, keep_layers = FALSE)}, then the output is:
+#'    - A matrix: if \code{monomials==FALSE}, returns a matrix containing the
+#'      evaluation of the polynomials on the given data. The matrix has dimensions
+#'      \code{(n_sample, n_polynomials)}, meaning that each column corresponds to the
+#'      result of evaluating all the data for a polynomial. If a single polynomial is
+#'      provided, the output is a vector instead of a row matrix.
+#'    - A 3D array: If \code{monomials==TRUE}, returns a 3D array containing the monomials of
+#'      each polynomial evaluated on the given data. The array has dimensions
+#'      \code{(n_sample, n_monomial_terms, n_polynomials)}, where element
+#'      \code{[i,j,k]} contains the evaluation on observation \code{i} on
+#'      monomial \code{j} of polynomial \code{k}, where monomial \code{j} corresponds
+#'      to the one on \code{poly$labels[[j]]}.
+#'- If \code{object} contains all the internal polynomials, as given by
 #' \code{nn2poly(object, keep_layers = TRUE)}, then the output is a list of
-#' layers (represented by \code{layer_i}), where each one is another list with
-#' \code{input} and \code{output} elements, where each one contains a matrix
-#' with the evaluation of the "input" or "output" polynomial at the given layer,
-#' as explained in the case without internal polynomials.
-#'
+#' layers (represented by \code{layer_i}), where each of them is another list with
+#' \code{input} and \code{output} elements. Each of those elements contains the
+#' corresponding evaluation of the "input" or "output" polynomial at the given layer,
+#' as explained in the last layer case, which will be a matrix if \code{monomials==FALSE}
+#' and a 3D array if \code{monomials==TRUE}.
 #'
 #' @examples
 #' # Build a NN structure with random weights, with 2 (+ bias) inputs,
@@ -73,6 +81,9 @@
 #' # Predict using the obtained polynomial
 #' predict(object = final_poly, newdata = newdata)
 #'
+#' # Predict the values of each monomial of the obtained polynomial
+#' predict(object = final_poly, newdata = newdata, monomials = TRUE)
+#'
 #' # Change the last layer to have 3 outputs (as in a multiclass classification)
 #' # problem
 #' weights_layer_4 <- matrix(rnorm(20), nrow = 5, ncol = 4)
@@ -96,7 +107,11 @@
 #' predict(object = final_poly, newdata = newdata, layers = c(2,3))
 #'
 #' @export
-predict.nn2poly <- function(object, newdata, layers = NULL, ...) {
+predict.nn2poly <- function(object,
+                            newdata,
+                            monomials = FALSE,
+                            layers = NULL,
+                            ...) {
   if (length(class(object)) > 1)
     return(NextMethod())
 
@@ -105,7 +120,7 @@ predict.nn2poly <- function(object, newdata, layers = NULL, ...) {
   # values and labels. We check one of them:
   if (!is.null(object$labels)){
     # If we have a final polynomial, directly evaluate the results:
-    result <- eval_poly(poly = object, newdata = newdata)
+    result <- eval_poly(poly = object, newdata = newdata, monomials = monomials)
   } else {
     # Multiple layer case:
 
@@ -135,14 +150,19 @@ predict.nn2poly <- function(object, newdata, layers = NULL, ...) {
     # Compute results for the given layers.
     result <- list()
     for (i in layers){
+
       layer_name <- paste0("layer_", i)
       result[[layer_name]] <- list()
-      result[[layer_name]][["input"]] <- eval_poly(
-        poly = object[[layer_name]][["input"]],
-        newdata = newdata)
-      result[[layer_name]][["output"]] <- eval_poly(
-        poly = object[[layer_name]][["output"]],
-        newdata = newdata)
+
+      result[[layer_name]][["input"]] <-
+        eval_poly(poly = object[[layer_name]][["input"]],
+                  newdata = newdata,
+                  monomials = monomials)
+
+      result[[layer_name]][["output"]] <-
+        eval_poly(poly = object[[layer_name]][["output"]],
+                  newdata = newdata,
+                  monomials = monomials)
     }
   }
 

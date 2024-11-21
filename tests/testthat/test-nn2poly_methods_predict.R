@@ -19,6 +19,26 @@ test_that("eval_poly: Single polynomial evaluation and single observation works"
   expect_equal(predict(poly, newdata), as.vector(4.5))
 })
 
+test_that("(Monomials) Check that adding the monomials gives the final poly prediction", {
+
+  # With intercept and unnordered labels
+  poly <- list()
+  poly$values <- matrix(c(1,-1,1,
+                          2,3,-2), ncol = 2, byrow = FALSE)
+  poly$labels <- list(c(2),c(0),c(2,1))
+  class(poly) <- "nn2poly"
+
+  newdata <- rbind(c(5,2), c(-1,5.4))
+
+  A <- predict(poly, newdata)
+  B <- predict(poly, newdata, monomials = TRUE)
+
+  C <- cbind(rowSums(B[,,1]), rowSums(B[,,2]))
+
+  expect_equal(A, C)
+
+})
+
 
 test_that("eval_poly: Multiple polynomial evaluation and single observation works", {
 
@@ -72,7 +92,7 @@ test_that("eval_poly: Observation as dataframe works", {
 })
 
 
-test_that("Multiple layers: eval_poly works on each layer(input/output)", {
+test_that("Multiple layers (and Monomials): eval_poly works on each layer(input/output)", {
   # Define a poly object with 2 polynomials
   poly <- list()
   poly$values <- matrix(c(1,-1,1,
@@ -97,7 +117,21 @@ test_that("Multiple layers: eval_poly works on each layer(input/output)", {
       expect_equal(pred_layer_i, t(as.matrix(c(0,6))))
   }
 
+  # Monomials:
+  prediction_monomials <- predict(object, newdata, monomials = TRUE)
+
+  # Build expected
+  A <- array(0, dim=c(1,3,2))
+  A[,,1] <- c(1,-2,1)
+  A[,,2] <- c(2,6,-2)
+  # All monomials are the same so we loop over them
+  for (pred_layer in prediction_monomials){
+    for (pred_layer_i in pred_layer)
+      expect_equal(pred_layer_i, A)
+  }
 })
+
+
 
 
 test_that("Multiple layers: choosing last layer returns the same as evaluation
@@ -209,5 +243,8 @@ test_that("Multiple layers: output from nn2poly also works", {
   expect_null(prediction1$layer_1)
 
 })
+
+
+
 
 

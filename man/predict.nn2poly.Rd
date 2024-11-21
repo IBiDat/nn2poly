@@ -4,7 +4,7 @@
 \alias{predict.nn2poly}
 \title{Predict method for \code{nn2poly} objects.}
 \usage{
-\method{predict}{nn2poly}(object, newdata, layers = NULL, ...)
+\method{predict}{nn2poly}(object, newdata, monomials = FALSE, layers = NULL, ...)
 }
 \arguments{
 \item{object}{Object of class inheriting from 'nn2poly'.}
@@ -13,6 +13,12 @@
 Number of columns (or elements in vector) should be the number of variables
 in the polynomial (dimension p). Response variable to be predicted should
 not be included.}
+
+\item{monomials}{Boolean determining if the returned item should contain the
+evaluations of all the monomials of the provided polynomials
+(\code{monomials==TRUE}), or if the final polynomial evaluation should be
+computed, i.e., adding up all the monomials (\code{monomials==FALSE}).
+Defaults to \code{FALSE}.}
 
 \item{layers}{Vector containing the chosen layers from \code{object} to be
 evaluated. If set to \code{NULL}, all layers are computed. Default is set
@@ -23,20 +29,32 @@ to \code{NULL}.}
 \value{
 Returns a matrix or list of matrices with the evaluation of each
 polynomial at each layer as given by the provided \code{object} of class
-\code{nn2poly}.
-
-If \code{object} contains the polynomials of the last layer, as given by
-\code{nn2poly(object, keep_layers = FALSE)}, then the output is a matrix with
-the evaluation of each data point on each polynomial. In this matrix, each
-column represents the evaluation of a polynomial and each column corresponds
-to each point in the new data to be evaluated.
-
-If \code{object} contains all the internal polynomials also, as given by
+\code{nn2poly}. The format can be as follows, depending on the layers
+contained in \code{object} and the parameters \code{layers} and \code{monomials} values:
+\itemize{
+\item If \code{object} contains the polynomials of the last layer, as given by
+\code{nn2poly(object, keep_layers = FALSE)}, then the output is:
+\itemize{
+\item A matrix: if \code{monomials==FALSE}, returns a matrix containing the
+evaluation of the polynomials on the given data. The matrix has dimensions
+\code{(n_sample, n_polynomials)}, meaning that each column corresponds to the
+result of evaluating all the data for a polynomial. If a single polynomial is
+provided, the output is a vector instead of a row matrix.
+\item A 3D array: If \code{monomials==TRUE}, returns a 3D array containing the monomials of
+each polynomial evaluated on the given data. The array has dimensions
+\code{(n_sample, n_monomial_terms, n_polynomials)}, where element
+\code{[i,j,k]} contains the evaluation on observation \code{i} on
+monomial \code{j} of polynomial \code{k}, where monomial \code{j} corresponds
+to the one on \code{poly$labels[[j]]}.
+}
+\item If \code{object} contains all the internal polynomials, as given by
 \code{nn2poly(object, keep_layers = TRUE)}, then the output is a list of
-layers (represented by \code{layer_i}), where each one is another list with
-\code{input} and \code{output} elements, where each one contains a matrix
-with the evaluation of the "input" or "output" polynomial at the given layer,
-as explained in the case without internal polynomials.
+layers (represented by \code{layer_i}), where each of them is another list with
+\code{input} and \code{output} elements. Each of those elements contains the
+corresponding evaluation of the "input" or "output" polynomial at the given layer,
+as explained in the last layer case, which will be a matrix if \code{monomials==FALSE}
+and a 3D array if \code{monomials==TRUE}.
+}
 }
 \description{
 Predicted values obtained with a \code{nn2poly} object on given data.
@@ -82,6 +100,9 @@ newdata <- matrix(rnorm(10), ncol = 2, nrow = 5)
 
 # Predict using the obtained polynomial
 predict(object = final_poly, newdata = newdata)
+
+# Predict the values of each monomial of the obtained polynomial
+predict(object = final_poly, newdata = newdata, monomials = TRUE)
 
 # Change the last layer to have 3 outputs (as in a multiclass classification)
 # problem
