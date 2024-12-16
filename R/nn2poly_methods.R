@@ -353,3 +353,102 @@ plot.nn2poly <- function(x, ..., n=NULL) {
 
   return(plot_all)
 }
+
+#' Heatmap for Second-Order Polynomial Terms
+#'
+#' This function generates a heatmap to visualize second-order terms in the polynomial representation of a neural network.
+#' It displays squared terms along the diagonal and pairwise interactions off-diagonal, with colors indicating the magnitude and sign of the coefficients.
+#'
+#' @param x A `nn2poly` object, as returned by the `nn2poly` algorithm.
+#' @param ... Additional arguments (unused).
+#' @param max_order Integer, defaults to 2. This function currently supports only second-order terms.
+#'
+#' @return A ggplot object showing the heatmap of second-order terms.
+#'
+#' @details
+#' Coefficients are displayed as a gradient from red (negative) to green (positive), with white indicating zero.
+#' The diagonal contains squared terms (e.g., \eqn{x_1^2}), while off-diagonal entries represent pairwise interactions (e.g., \eqn{x_1x_2}).
+#'
+#' @examples
+#' # Example: Single output polynomial with 20 variables
+#' set.seed(42)
+#' weights_layer_1 <- matrix(rnorm(21 * 10), nrow = 21, ncol = 10)
+#' weights_layer_2 <- matrix(rnorm(11 * 1), nrow = 11, ncol = 1)
+#'
+#' nn_object <- list("softplus" = weights_layer_1, "linear" = weights_layer_2)
+#'
+#' # Generate the polynomial representation
+#' final_poly <- nn2poly(nn_object, max_order = 2)
+#'
+#' # Plot the heatmap for second-order terms
+#' heatmap.nn2poly(final_poly)
+#'
+#'
+heatmap.nn2poly <- function(x, ..., max_order = 2) {
+  if (!requireNamespace("ggplot2", quietly = TRUE)) {
+    stop("package 'ggplot2' is required for this functionality", call. = FALSE)
+  }
+
+  if (max_order != 2) {
+    stop("This function currently supports only second-order terms (max_order = 2).", call. = FALSE)
+  }
+
+  # Ensure the object is an nn2poly object
+  if (length(class(x)) > 1) {
+    return(NextMethod())
+  }
+
+  # Extract polynomial coefficients and labels
+  coefficients <- x$values
+  labels <- x$labels
+
+  if (is.null(coefficients) || is.null(labels)) {
+    stop("Invalid nn2poly object: missing coefficients or labels.", call. = FALSE)
+  }
+
+  if (is.vector(coefficients)) {
+    coefficients <- matrix(coefficients, ncol = 1)
+  }
+
+  # Prepare data for second-order terms
+  second_order_indices <- which(sapply(labels, function(label) length(label) <= max_order))
+  second_order_labels <- labels[second_order_indices]
+  second_order_values <- coefficients[second_order_indices, , drop = FALSE]
+
+  # Create a matrix for the heatmap
+  max_vars <- max(unlist(second_order_labels))
+  heatmap_matrix <- matrix(0, nrow = max_vars, ncol = max_vars, dimnames = list(paste0("x", 1:max_vars), paste0("x", 1:max_vars)))
+
+  for (i in seq_along(second_order_labels)) {
+    label <- second_order_labels[[i]]
+    value <- second_order_values[i, 1]
+
+    if (length(label) == 1) {
+      # Single variable squared
+      heatmap_matrix[label, label] <- value
+    } else if (length(label) == 2) {
+      # Interaction terms
+      heatmap_matrix[label[1], label[2]] <- value
+      heatmap_matrix[label[2], label[1]] <- value
+    }
+  }
+
+  # Convert matrix to long format for ggplot2
+  heatmap_df <- as.data.frame(as.table(heatmap_matrix))
+  colnames(heatmap_df) <- c("Var1", "Var2", "Value")
+
+  # Generate the heatmap plot
+  heatmap_plot <- ggplot2::ggplot(heatmap_df, ggplot2::aes(x = Var1, y = Var2, fill = Value)) +
+    ggplot2::geom_tile(color = "white") +
+    ggplot2::scale_fill_gradient2(low = "#F8766D", mid = "white", high = "#00BA38", midpoint = 0,
+                                  name = "Coefficient") +
+    ggplot2::theme_minimal() +
+    ggplot2::labs(x = "Variables", y = "Variables", title = "Second-Order Terms Heatmap") +
+    ggplot2::theme(
+      axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
+      axis.text.y = ggplot2::element_text(size = 10)
+    )
+
+  return(heatmap_plot)
+}
+
