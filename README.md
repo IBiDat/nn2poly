@@ -4,6 +4,7 @@
 [![Build\_Status](https://github.com/IBiDat/nn2poly/actions/workflows/build.yml/badge.svg)](https://github.com/IBiDat/nn2poly/actions/workflows/build.yml)
 [![Coverage\_Status](https://img.shields.io/codecov/c/github/IBiDat/nn2poly/master.svg)](https://app.codecov.io/github/IBiDat/nn2poly?branch=master)
 [![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/nn2poly)](https://cran.r-project.org/package=nn2poly)
+[![CRAN Downloads](https://cranlogs.r-pkg.org/badges/grand-total/nn2poly)](https://cran.r-project.org/package=nn2poly)
 [![DOI](https://img.shields.io/badge/doi-10.1016/j.neunet.2021.04.036-informational.svg)](https://doi.org/10.1016/j.neunet.2021.04.036)
 [![DOI](https://img.shields.io/badge/doi-10.1109/TNNLS.2023.3330328-informational.svg)](https://doi.org/10.1109/TNNLS.2023.3330328)
 <!-- badges: end -->
