@@ -29,7 +29,7 @@ Imports:
 Suggests:
     keras, tensorflow, reticulate,
     luz, torch,
-    cowplot, ggplot2, patchwork,
+    cowplot, ggplot2, patchwork, ggbeesawarm
     testthat (>= 3.0.0), vdiffr,
     knitr, rmarkdown
 LinkingTo:
@@ -37,6 +37,6 @@ LinkingTo:
     RcppArmadillo
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 Config/testthat/edition: 3
 URL: https://ibidat.github.io/nn2poly/

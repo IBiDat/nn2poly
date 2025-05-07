@@ -295,11 +295,130 @@ We can also plot the $n$ most important coefficients in absolute value to compar
 In this case we can see how the two most important obtained coefficients are `2,3` and `1`, precisely the two terms appearing in the original polynomial $4x_1 - 3 x_2x_3$. However, other interactions of order 3 appear to be also relevant, which is caused by the Taylor expansions not being controlled as we have not imposed constraints on the neural network weights training.
 
 ```{r reg-n-important}
-plot(final_poly, n=8)
+plot(final_poly, n=8, type = "bar")
+```
+
+```{r}
+plot(final_poly,type = "heatmap")
 ```
 
 
+```{r}
+# Assuming 'final_poly' and 'test_x' are from your vignette
+# library(nn2poly) # and other necessary libraries like ggplot2
+
+# 1. Get monomial predictions for all test data
+prediction_monomials <- predict(object = final_poly,
+                                newdata = test_x,
+                                monomials = TRUE)
+dim(prediction_monomials) # Should be [125, 20, 1] in the vignette example
+
+# 2. Generate the local contributions plot for the first observation
+plot(final_poly,
+     type = "local_contributions",
+     newdata_monomials = prediction_monomials,
+     observation_index = 1,
+     poly_output_index = 1, # Only one output in this example
+     max_order_to_display = 3) # Show up to 3rd order contributions
+
+```
+
+
+```{r}
+# Assuming 'final_poly', 'test_x' are from your vignette
+prediction_monomials <- predict(object = final_poly,
+                                newdata = test_x,
+                                monomials = TRUE)
+dim(prediction_monomials) # Should be [125, 20, 1] in the vignette example
+
+# --- Beeswarm Plot ---
+
+# Color by the second original feature
+plot(final_poly,
+     type = "beeswarm",
+     newdata_monomials = prediction_monomials,
+     original_feature_data = test_x,
+     color_by_feature = 3, # Color by the second column of test_x
+     poly_output_index = 1,
+     top_n_terms = 10)
+
+```
+
+
+
+```{r}
+
+# Assuming 'final_poly' and 'test_x' are available from your vignette
+# And the plot_interaction_surface_internal function is defined and accessible.
+
+# Example 1.1: Plotting the interaction surface for features 2 and 3 using numeric indices
+plot(final_poly,
+     type = "interaction_surface",
+     feature_pair = c(2, 3),         # Specify the pair of features by their indices
+     original_feature_data = test_x, # Provide the original data for ranges and means
+     grid_resolution = 30,           # Increase resolution for a smoother surface (optional)
+     variable_names = c("X1", "X2", "X3")) # Provide variable names for axis labels (optional)
+
+# Example 1.2: Plotting the interaction surface for features 1 and 2 using feature names (if test_x had column names or variable_names are provided and match)
+# Let's assume variable_names were used to define the column names conceptually
+# If test_x has columns named "X1", "X2", "X3"
+plot(final_poly,
+     type = "interaction_surface",
+     feature_pair = c("X1", "X2"),   # Specify the pair of features by their names
+     original_feature_data = test_x,
+     grid_resolution = 30)
+
+# If test_x does NOT have column names, you need to provide variable_names
+plot(final_poly,
+     type = "interaction_surface",
+     feature_pair = c("X1", "X2"),   # Specify the pair of features by their names
+     original_feature_data = test_x,
+     grid_resolution = 30,
+     variable_names = c("X1", "X2", "X3")) # These names are used for matching feature_pair
+
+```
+
+
+```{r}
+# Assuming 'final_poly', 'test_x', and 'prediction_monomials' are available
+# And the plot_interaction_network_internal function is defined and accessible.
+
+# Example 2.1: Plotting the 2nd-order interaction network using coefficient magnitudes
+plot(final_poly,
+     type = "interaction_network",
+     interaction_order_network = 2,       # Focus on 2nd-order interactions (pairwise projections)
+     metric_network = "coefficient_abs",  # Use the absolute value of coefficients for strength
+     variable_names = c("X1", "X2", "X3")) # Provide variable names for nodes
+
+# Example 2.2: Plotting the 2nd-order interaction network using mean absolute monomial values
+plot(final_poly,
+     type = "interaction_network",
+     interaction_order_network = 2,
+     metric_network = "mean_monomial_abs", # Use average monomial value across data for strength
+     newdata_monomials = prediction_monomials, # Required for mean_monomial_abs metric
+     variable_names = c("X1", "X2", "X3"))
+
+# Example 2.3: Plotting the 3rd-order interaction network (if max_order >= 3 was used in nn2poly)
+# This will project 3rd order terms like x1*x2*x3 onto pairs (x1,x2), (x1,x3), (x2,x3)
+plot(final_poly,
+     type = "interaction_network",
+     interaction_order_network = 3,       # Look for 3rd-order terms
+     metric_network = "coefficient_abs",
+     variable_names = c("X1", "X2", "X3"))
+
+# Example 2.4: Plotting the top N 2nd-order interactions
+plot(final_poly,
+     type = "interaction_network",
+     interaction_order_network = 2,
+     metric_network = "coefficient_abs",
+     top_n_interactions = 5,             # Display only the 5 strongest projected pairwise interactions
+     variable_names = c("X1", "X2", "X3"))
+```
+
+
+
 Another convenient plot to show how the algorithm is affected by each layer can be obtained with `nn2poly:::plot_taylor_and_activation_potentials()`, where the activation potentials at each neuron are computed and presented over the Taylor expansion approximation of the activation function at each layer.
+
 
 In this case, as we have not used constraints in the NN training, the activation potentials are not strictly centered around zero.
 

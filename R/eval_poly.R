@@ -53,7 +53,13 @@ eval_poly <- function(poly, newdata, monomials = FALSE) {
 
   aux <- preprocess_poly(poly)
   poly <- aux$poly
-  intercept_position <- aux$intercept_position
+  original_intercept_pos_for_reordering <- aux$intercept_position
+
+  # Check if the *current first term* (after potential reordering by preprocess_poly) is the intercept
+  first_term_is_intercept <- FALSE
+  if (length(poly$labels) > 0 && length(poly$labels[[1]]) == 1 && poly$labels[[1]][1] == 0) {
+    first_term_is_intercept <- TRUE
+  }
 
   n_sample <- nrow(newdata)
   n_polynomials <- ncol(poly$values)
@@ -70,16 +76,15 @@ eval_poly <- function(poly, newdata, monomials = FALSE) {
     # Select the desired polynomial values (column of poly$values)
     values_k <- poly$values[,k]
 
-    # If poly has no intercept if intercept_position is NULL
-    if (is.null(intercept_position)){
+    if (first_term_is_intercept){
+      # Initialize the vector with the intercept value repeated as needed.
+      response[,1,k] <- rep(values_k[1], nrow(newdata))
+      start_loop <- 2
+    } else {
       # Intercept (label = 0) should always be the first element of labels at this
       # point of the function (labels reordered previously in preprocess_poly).
       # initialize the vector with 0s repeated as needed.
       start_loop <- 1
-    } else {
-      # Initialize the vector with the intercept value repeated as needed.
-      response[,1,k] <- rep(values_k[1], nrow(newdata))
-      start_loop <- 2
     }
 
     # Loop over all terms (labels) except the intercept
@@ -100,7 +105,7 @@ eval_poly <- function(poly, newdata, monomials = FALSE) {
     # In case the intercept has been moved, we reorder it to its original
     # position so it preserves the original notation of the user.
     response[,,k] <- reorder_intercept_in_monomials(response[,,k],
-                                                    intercept_position,
+                                                    original_intercept_pos_for_reordering,
                                                     n_sample)
   }
 
@@ -175,39 +180,45 @@ preprocess_newdata <- function(newdata){
 #'
 #' @noRd
 preprocess_poly <- function(poly){
-
-  # If values is a single vector, transform into matrix
   if (!is.matrix(poly$values)){
     poly$values <- as.matrix(poly$values)
   }
+  intercept_position_original <- NULL # To return the original position
 
-  # In case there is no intercept, set a NULL value
-  intercept_position <- NULL
+  # Find if intercept c(0) exists
+  idx_intercept_in_list <- which(sapply(poly$labels, function(x) length(x)==1 && x[1]==0))
 
-  # If there is intercept and it is not the first element, reorder the
-  # polynomial labels and values
-  if (c(0) %in% poly$labels){
+  if (length(idx_intercept_in_list) > 0) { # Intercept c(0) exists
+    intercept_position_original <- idx_intercept_in_list[1] # Take the first one if multiple
 
-    intercept_position <- which(sapply(poly$labels, function(x) c(0) %in% x))
+    if (intercept_position_original != 1) { # If it's not already first
+      # Store the intercept label and value
+      intercept_label_vec <- poly$labels[[intercept_position_original]] # Should be c(0)
+      intercept_value_row <- poly$values[intercept_position_original, , drop = FALSE]
 
-    if (intercept_position != 1){
+      # Remove it from original position
+      poly$labels <- poly$labels[-intercept_position_original]
+      poly$values <- poly$values[-intercept_position_original, , drop = FALSE]
 
-      # Store the value
-      intercept_value <- poly$values[intercept_position,]
-
-      # Remove label and value
-      poly$labels <- poly$labels[-intercept_position]
-      poly$values <- poly$values[-intercept_position, , drop = FALSE]
-
-      # Add label and value back at start of list
-      poly$labels <- append(poly$labels, c(0), after=0)
-      poly$values <- unname(rbind(intercept_value, poly$values))
-
+      # Prepend it
+      poly$labels <- c(list(intercept_label_vec), poly$labels) # Correctly prepend list element
+      poly$values <- rbind(intercept_value_row, poly$values)
     }
   }
+  # At this point, if intercept c(0) existed, it's now the first element.
+  # If it didn't exist, poly is unchanged.
+  # The variable to return indicating original pos (for reorder_intercept_in_monomials)
+  # should reflect the original position, not just if it was moved.
 
   output <- list()
-  output$intercept_position <- intercept_position
+  # For reorder_intercept_in_monomials, we need to know if an intercept *was* present and its *original* slot
+  # The current `intercept_position` in `eval_poly` seems to be used to determine if an intercept *is now first*.
+  # Let's stick to your variable names. `intercept_position` will be used by `eval_poly` to check if the first term is an intercept.
+  # And by `reorder_intercept_in_monomials` to know where it *originally* was.
+
+  current_first_is_intercept <- length(poly$labels) > 0 && length(poly$labels[[1]]) == 1 && poly$labels[[1]][1] == 0
+
+  output$intercept_position <- if(length(idx_intercept_in_list) > 0) idx_intercept_in_list[1] else NULL
   output$poly <- poly
   return(output)
 }

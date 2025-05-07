@@ -4,27 +4,38 @@
 \alias{plot.nn2poly}
 \title{Plot method for \code{nn2poly} objects.}
 \usage{
-\method{plot}{nn2poly}(x, ..., n = NULL)
+\method{plot}{nn2poly}(x, type = "bar", ..., n = NULL)
 }
 \arguments{
 \item{x}{A \code{nn2poly} object, as returned by the \pkg{nn2poly} algorithm.}
 
+\item{type}{A string containing the type of plot chosen. Currently available
+plots are "bar" (default)  for coefficient bar plots and "heatmap" for a
+heatmap of second-order terms.}
+
 \item{...}{Ignored.}
 
-\item{n}{An integer denoting the number of coefficients to be plotted,
-after ordering them by absolute magnitude.}
+\item{n}{An integer denoting the number of coefficients to be plotted in the
+"bar" case, after ordering them by absolute magnitude.}
 }
 \value{
-A plot showing the \code{n} most important coefficients.
+A ggplot object, depending on the \code{type} chosen.
 }
 \description{
 A function that takes a polynomial (or several ones) as given by the
-\pkg{nn2poly} algorithm, and then plots their absolute magnitude as barplots
-to be able to compare the most important coefficients.
+\pkg{nn2poly} algorithm, and then provides a plot depending on the chosen
+type to be able to compare the most important coefficients.
 }
 \details{
 The plot method represents only the polynomials at the final layer, even if
-\code{x} is generated using \code{nn2poly()} with \code{keep_layers=TRUE}.
+\code{x} is generated using \code{nn2poly()} with \code{keep_layers=TRUE}. The plot types
+are as follows:
+\itemize{
+\item The bar plot represents coefficients ordered by absolute value.
+\item The heatmap displays squared terms on the diagonal and pairwise
+interactions off-diagonal, with colors indicating the magnitude and sign
+of coefficients.
+}
 }
 \examples{
 # --- Single polynomial output ---
@@ -52,6 +63,12 @@ plot(final_poly)
 # one plot per output unit
 plot(final_poly, n = 5)
 
+# Plot a heatmap for second order terms.
+plot(final_poly, type = "heatmap")
+
+
+
+
 # --- Multiple output polynomials ---
 # Build a NN structure with random weights, with 2 (+ bias) inputs,
 # 4 (+bias) neurons in the first hidden layer with "tanh" activation
@@ -73,7 +90,7 @@ final_poly <- nn2poly(nn_object, max_order = 3)
 # Plot all the coefficients, one plot per output unit
 plot(final_poly)
 
-# Plot only the 5 most important coeffcients (by absolute magnitude)
+# Plot only the 5 most important coefficients (by absolute magnitude)
 # one plot per output unit
 plot(final_poly, n = 5)
 
