@@ -51,6 +51,23 @@ eval_poly <- function(poly, newdata, monomials = FALSE) {
 
   newdata <- preprocess_newdata(newdata)
 
+  # Check if there are labels with bigger numbers than the number of columns
+  if (length(poly$labels) > 0) { # Only check if there are labels
+    # Find the maximum variable index referenced in the polynomial labels
+    # Exclude 0 (intercept) from consideration as a variable index
+    all_vars_in_labels <- unlist(lapply(poly$labels, function(lab) lab[lab > 0]))
+    if (length(all_vars_in_labels) > 0) {
+      max_var_index_poly <- max(all_vars_in_labels, na.rm = TRUE)
+
+      # Check against number of columns in newdata
+      if (max_var_index_poly > 0 && ncol(newdata) < max_var_index_poly) {
+        stop(paste0("Polynomial requires at least ", max_var_index_poly,
+                    " variable(s), but newdata only has ", ncol(newdata), " column(s)."),
+             call. = FALSE)
+      }
+    }
+  }
+
   aux <- preprocess_poly(poly)
   poly <- aux$poly
   original_intercept_pos_for_reordering <- aux$intercept_position
@@ -88,18 +105,18 @@ eval_poly <- function(poly, newdata, monomials = FALSE) {
     }
 
     # Loop over all terms (labels) except the intercept
-    for (j in start_loop:length(values_k)) {
+    if (start_loop <= length(poly$labels)) {
+      for (j in start_loop:length(poly$labels)) {
 
-      label_j <- poly$labels[[j]]
+        label_j <- poly$labels[[j]]
+        coefficient_val <- values_k[j]
 
-      var_prod <- multiply_variables(label_j, newdata)
+        var_prod <- multiply_variables(label_j, newdata)
 
-
-      # Here instead of adding response over the loop as in the normal
-      # eval_poly, store it in the appropriate position.
-      response[,j,k] = values_k[j] * var_prod
-
-
+        # Here instead of adding response over the loop as in the normal
+        # eval_poly, store it in the appropriate position.
+        response[,j,k] = coefficient_val * var_prod
+      }
     }
 
     # In case the intercept has been moved, we reorder it to its original
