@@ -361,10 +361,10 @@ plot(final_poly,
 
 # Example 1.2: Plotting the interaction surface for features 1 and 2 using feature names (if test_x had column names or variable_names are provided and match)
 # Let's assume variable_names were used to define the column names conceptually
-# If test_x has columns named "X1", "X2", "X3"
+# If test_x has columns named "V1", "V2", "V3"
 plot(final_poly,
      type = "interaction_surface",
-     feature_pair = c("X1", "X2"),   # Specify the pair of features by their names
+     feature_pair = c("V1", "V2"),   # Specify the pair of features by their names
      original_feature_data = test_x,
      grid_resolution = 30)
 
@@ -391,12 +391,12 @@ plot(final_poly,
      variable_names = c("X1", "X2", "X3")) # Provide variable names for nodes
 
 # Example 2.2: Plotting the 2nd-order interaction network using mean absolute monomial values
-plot(final_poly,
-     type = "interaction_network",
-     interaction_order_network = 2,
-     metric_network = "mean_monomial_abs", # Use average monomial value across data for strength
-     newdata_monomials = prediction_monomials, # Required for mean_monomial_abs metric
-     variable_names = c("X1", "X2", "X3"))
+# plot(final_poly,
+#      type = "interaction_network",
+#      interaction_order_network = 2,
+#      metric_network = "mean_monomial_abs", # Use average monomial value across data for strength
+#      newdata_monomials = prediction_monomials, # Required for mean_monomial_abs metric
+#      variable_names = c("X1", "X2", "X3"))
 
 # Example 2.3: Plotting the 3rd-order interaction network (if max_order >= 3 was used in nn2poly)
 # This will project 3rd order terms like x1*x2*x3 onto pairs (x1,x2), (x1,x3), (x2,x3)

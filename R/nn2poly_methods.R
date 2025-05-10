@@ -272,7 +272,6 @@ plot.nn2poly <- function(x, type = "bar", ...,
     }
 
     if (type == "bar") {
-      if (!is.null(list(...)$n) && is.null(n)) n <- list(...)$n
       plot_object <- plot_bar(poly_for_plot, n = n, variable_names = variable_names, min_order = min_order)
     } else if (type == "heatmap") {
       plot_object <- plot_heatmap(poly_for_plot, variable_names = variable_names)
@@ -472,7 +471,7 @@ plot_bar <- function(poly_obj, n = NULL, variable_names = NULL, min_order = 0) {
   if (length(labels_to_keep) == 0) {
     return(ggplot2::ggplot() +
              ggplot2::annotate("text", x = 0.5, y = 0.5, label = paste0("No terms found with order >= ", min_order, ".")) +
-             ggplot2::theme_minimal() +
+             ggplot2::theme_minimal(base_size = 10) +
              ggplot2::ggtitle(paste0("Coefficients (Order >= ", min_order, ")")))
   }
 
@@ -493,7 +492,7 @@ plot_bar <- function(poly_obj, n = NULL, variable_names = NULL, min_order = 0) {
   if (n == 0) { # Case where n becomes 0 after filtering if nrow(poly_obj_filtered$values) was 0
     return(ggplot2::ggplot() +
              ggplot2::annotate("text", x = 0.5, y = 0.5, label = paste0("No terms to plot after filtering (n=0).")) +
-             ggplot2::theme_minimal() +
+             ggplot2::theme_minimal(base_size = 10) +
              ggplot2::ggtitle(paste0("Coefficients (Order >= ", min_order, ")")))
   }
 
@@ -550,7 +549,7 @@ plot_bar <- function(poly_obj, n = NULL, variable_names = NULL, min_order = 0) {
   if (nrow(all_plot_df) == 0) {
     return(ggplot2::ggplot() +
              ggplot2::annotate("text", x = 0.5, y = 0.5, label = "No coefficients to plot after processing.") +
-             ggplot2::theme_minimal() +
+             ggplot2::theme_minimal(base_size = 10) +
              ggplot2::ggtitle(paste0("Coefficients (Order >= ", min_order, ")")))
   }
 
@@ -579,15 +578,13 @@ plot_bar <- function(poly_obj, n = NULL, variable_names = NULL, min_order = 0) {
                   y = "Polynomial Term")
 
 
-    p <- p + ggplot2::theme_minimal() +
+    p <- p + ggplot2::theme_minimal(base_size = 10) +
       ggplot2::theme(
         axis.text.x = ggplot2::element_text(size=10),
         axis.text.y = ggplot2::element_text(size=10),
         legend.position = "top",
         legend.direction = "horizontal",
-        plot.title = ggplot2::element_text(hjust = 0.5, face="bold"),
-        panel.grid.major.y = ggplot2::element_blank(),
-        panel.grid.minor.y = ggplot2::element_blank(),
+        plot.title = ggplot2::element_text(hjust = 0.5, size = 14),
         strip.background = ggplot2::element_rect(fill="grey90", linetype="blank"),
         strip.text = ggplot2::element_text(face="bold")
       )
@@ -622,7 +619,7 @@ plot_heatmap <- function(poly_obj, variable_names = NULL) { # Changed x to poly_
   if (!any(is_second_order)) {
     return(ggplot2::ggplot() +
              ggplot2::annotate("text", x = 0.5, y = 0.5, label = "No second-order terms with positive variable indices found.") +
-             ggplot2::theme_minimal() +
+             ggplot2::theme_minimal(base_size = 10) +
              ggplot2::ggtitle("Second-Order Coefficients Heatmap"))
   }
 
@@ -634,7 +631,7 @@ plot_heatmap <- function(poly_obj, variable_names = NULL) { # Changed x to poly_
   if (length(present_vars) == 0) {
     return(ggplot2::ggplot() +
              ggplot2::annotate("text", x=0.5, y=0.5, label="No variables found in second-order terms.") +
-             ggplot2::theme_minimal() +
+             ggplot2::theme_minimal(base_size = 10) +
              ggplot2::ggtitle("Second-Order Coefficients Heatmap"))
   }
   max_var_idx <- max(present_vars)
@@ -642,7 +639,7 @@ plot_heatmap <- function(poly_obj, variable_names = NULL) { # Changed x to poly_
   if(max_var_idx == 0){ # Should not happen if all(lab > 0) filter is effective
     return(ggplot2::ggplot() +
              ggplot2::annotate("text", x=0.5, y=0.5, label="Max variable index is 0.") +
-             ggplot2::theme_minimal() +
+             ggplot2::theme_minimal(base_size = 10) +
              ggplot2::ggtitle("Second-Order Coefficients Heatmap"))
   }
 
@@ -705,10 +702,9 @@ plot_heatmap <- function(poly_obj, variable_names = NULL) { # Changed x to poly_
     ggplot2::theme_minimal(base_size = 10) +
     ggplot2::labs(x = "Variable", y = "Variable") +
     ggplot2::theme(
-      axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, vjust = 1),
-      axis.text.y = ggplot2::element_text(), # Default angle
-      panel.grid = ggplot2::element_blank(),
-      legend.position = "bottom",
+      axis.text.x = ggplot2::element_text(),
+      axis.text.y = ggplot2::element_text(),
+      legend.position = "top", legend.direction = "horizontal",
       plot.title = ggplot2::element_text(hjust = 0.5, size = 14),
       strip.background = ggplot2::element_rect(fill="grey90", linetype="blank"),
       strip.text = ggplot2::element_text(face="bold")
@@ -810,7 +806,7 @@ plot_local_contributions_internal <- function(poly_obj,
   if (length(contributions_list) == 0) {
     return(ggplot2::ggplot() +
              ggplot2::annotate("text", x = 0.5, y = 0.5, label = "No feature contributions to display for this observation (or selected orders).") +
-             ggplot2::theme_minimal() + ggplot2::ggtitle("Local Feature Contributions"))
+             ggplot2::theme_minimal(base_size = 10) + ggplot2::ggtitle("Local Feature Contributions"))
   }
 
   plot_df <- do.call(rbind, contributions_list)
@@ -825,7 +821,7 @@ plot_local_contributions_internal <- function(poly_obj,
   if (nrow(plot_df_agg) == 0) {
     return(ggplot2::ggplot() +
              ggplot2::annotate("text", x = 0.5, y = 0.5, label = "All aggregated feature contributions are negligible.") +
-             ggplot2::theme_minimal() + ggplot2::ggtitle("Local Feature Contributions"))
+             ggplot2::theme_minimal(base_size = 10) + ggplot2::ggtitle("Local Feature Contributions"))
   }
 
   # --- Prepare for Plotting ---
@@ -834,7 +830,7 @@ plot_local_contributions_internal <- function(poly_obj,
   if(is.infinite(max_present_order) || max_present_order < 1) {
     return(ggplot2::ggplot() +
              ggplot2::annotate("text", x = 0.5, y = 0.5, label = "No contributions to display for the selected orders after aggregation.") +
-             ggplot2::theme_minimal() + ggplot2::ggtitle("Local Feature Contributions"))
+             ggplot2::theme_minimal(base_size = 10) + ggplot2::ggtitle("Local Feature Contributions"))
   }
 
   order_suffix <- function(k) {
@@ -858,7 +854,7 @@ plot_local_contributions_internal <- function(poly_obj,
   if (p == 0 && nrow(plot_df_agg) > 0) { p <- max(plot_df_agg$variable_idx, na.rm = TRUE) }
   if (p == 0) {
     return(ggplot2::ggplot() + ggplot2::annotate("text", x=0.5, y=0.5, label="No variables found in contributions.") +
-             ggplot2::theme_minimal() + ggplot2::ggtitle("Local Feature Contributions"))
+             ggplot2::theme_minimal(base_size = 10) + ggplot2::ggtitle("Local Feature Contributions"))
   }
 
   current_axis_var_labels <- character(p) # Full list of potential labels
@@ -886,14 +882,13 @@ plot_local_contributions_internal <- function(poly_obj,
                                              fill = .data$term_order_str)) +
     ggplot2::geom_col(position = "stack", width = 0.7, na.rm = TRUE) + # na.rm for safety
     ggplot2::geom_hline(yintercept = 0, linetype = "solid", color = "black") +
-    # ggplot2::scale_fill_manual(values = active_colors, name = "Term Order", drop = FALSE) + # drop=FALSE ensures legend consistency
+    ggplot2::scale_fill_brewer(palette = "Set1", name = "Term Order", drop = FALSE) +
     ggplot2::labs(title = "Local Feature Contributions",
                   x = "Feature",
                   y = "Contribution to Prediction") +
-    ggplot2::theme_minimal(base_size = 11) +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, vjust = 1),
-                   legend.position = "top",
-                   plot.title = ggplot2::element_text(hjust = 0.5))
+    ggplot2::theme_minimal(base_size = 10) +
+    ggplot2::theme(legend.position = "top", legend.direction = "horizontal",
+                   plot.title = ggplot2::element_text(hjust = 0.5, size = 14))
 
   return(final_plot)
 }
@@ -945,7 +940,7 @@ plot_beeswarm_internal <- function(poly_obj,
     if (length(term_indices_to_plot) == 0) {
       return(ggplot2::ggplot() +
                ggplot2::annotate("text", x = 0.5, y = 0.5, label = "Only an intercept term found. No beeswarm plot to generate.") +
-               ggplot2::theme_minimal() + ggplot2::ggtitle("Term Contribution Beeswarm Plot"))
+               ggplot2::theme_minimal(base_size = 10) + ggplot2::ggtitle("Term Contribution Beeswarm Plot"))
     }
   }
   current_labels_raw_no_intercept <- term_labels_raw[term_indices_to_plot]
@@ -953,7 +948,7 @@ plot_beeswarm_internal <- function(poly_obj,
 
   if (ncol(current_monomial_values_no_intercept) == 0) {
     return(ggplot2::ggplot() + ggplot2::annotate("text",x=0.5,y=0.5,label="No non-intercept terms to plot.") +
-             ggplot2::theme_minimal() + ggplot2::ggtitle("Term Contribution Beeswarm Plot"))
+             ggplot2::theme_minimal(base_size = 10) + ggplot2::ggtitle("Term Contribution Beeswarm Plot"))
   }
 
   # --- Term Importance and Selection ---
@@ -1025,7 +1020,7 @@ plot_beeswarm_internal <- function(poly_obj,
   if (nrow(plot_df_long) == 0) {
     return(ggplot2::ggplot() +
              ggplot2::annotate("text", x = 0.5, y = 0.5, label = "No data to plot after filtering terms.") +
-             ggplot2::theme_minimal() + ggplot2::ggtitle("Term Contribution Beeswarm Plot"))
+             ggplot2::theme_minimal(base_size = 10) + ggplot2::ggtitle("Term Contribution Beeswarm Plot"))
   }
 
   plot_df_long$term_label_str <- factor(plot_df_long$term_label_str,
@@ -1039,16 +1034,16 @@ plot_beeswarm_internal <- function(poly_obj,
   beeswarm_plot <- ggplot2::ggplot(plot_df_long,
                                    ggplot2::aes(x = .data$monomial_value,
                                                 y = .data$term_label_str,
-                                                color = .data$coloring_value)) + # Changed to coloring_value
+                                                colour = .data$coloring_value)) +
     ggplot2::geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
-    ggbeeswarm::geom_quasirandom(alpha = 0.7, size = 1.5, shape = 16, groupOnX = FALSE, na.rm = TRUE) +
-    ggplot2::scale_color_gradient(low = "blue", high = "red", name = color_legend_title, na.value = "grey70") +
+    ggbeeswarm::geom_quasirandom(alpha = 1, size = 1.5, shape = 16, groupOnX = FALSE, na.rm = TRUE) +
+    ggplot2::scale_colour_gradient2(low = "#F8766D", mid = "gray80", high = "#00BA38", midpoint = 0, name = color_legend_title, na.value = "grey70") +
     ggplot2::labs(title = "Term Contribution Beeswarm Plot",
                   x = "Monomial Term Value (Contribution)",
                   y = "Polynomial Term") +
-    ggplot2::theme_minimal(base_size = 11) +
+    ggplot2::theme_minimal(base_size = 10) +
     ggplot2::theme(legend.position = "right",
-                   plot.title = ggplot2::element_text(hjust = 0.5))
+                   plot.title = ggplot2::element_text(hjust = 0.5, size = 14))
 
   return(beeswarm_plot)
 }
@@ -1056,37 +1051,6 @@ plot_beeswarm_internal <- function(poly_obj,
 
 
 # Helper to identify and sum relevant terms for the surface plot
-# eval_selected_terms_on_surface <- function(poly_obj, # Should be single output (values is a vector or 1-col matrix)
-#                                            newdata_row, # Single row of data for all p features
-#                                            feature_pair_indices) { # Numeric indices of the two features
-#   value_sum <- 0
-#
-#   for (k_term in seq_along(poly_obj$labels)) {
-#     term_label <- poly_obj$labels[[k_term]]
-#     term_coeff <- poly_obj$values[k_term] # Already single output
-#
-#     # Identify variables in the current term label (excluding 0 for intercept)
-#     vars_in_current_label <- term_label[term_label > 0]
-#
-#     is_relevant <- FALSE
-#     if (length(term_label) == 1 && term_label[1] == 0) { # Intercept term
-#       is_relevant <- TRUE
-#     } else if (length(vars_in_current_label) > 0 && # Has some variables
-#                all(vars_in_current_label %in% feature_pair_indices)) { # All variables in term are from the chosen pair
-#       is_relevant <- TRUE
-#     }
-#
-#     if (is_relevant) {
-#       # Evaluate this single term
-#       # Create a temporary mini-polynomial for this one term
-#       mini_poly <- list(labels = list(term_label), values = matrix(term_coeff, ncol = 1))
-#       value_sum <- value_sum + eval_poly(poly = mini_poly, newdata = newdata_row)
-#     }
-#   }
-#   return(value_sum)
-# }
-
-
 eval_selected_terms_on_surface <- function(poly_obj,
                                            newdata_row,
                                            feature_pair_indices) {
@@ -1220,7 +1184,10 @@ plot_interaction_surface_internal <- function(poly_obj,
     ggplot2::scale_fill_viridis_c(name = "Summed Effect") +
     ggplot2::labs(title = paste("Interaction Surface:", feat_name1, "&", feat_name2),
                   x = feat_name1, y = feat_name2) +
-    ggplot2::theme_minimal() +
+    ggplot2::theme_minimal(base_size = 10) +
+    ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5, size = 14),
+                   legend.position = "top",
+                   legend.direction = "horizontal" ) +
     ggplot2::coord_equal() # Often good for surfaces
 
   return(p)
@@ -1401,12 +1368,13 @@ plot_interaction_network_internal <- function(poly_obj,
     ggraph::geom_edge_fan(ggplot2::aes(edge_width = .data$weight, edge_color = .data$sign),
                           alpha = 0.6, arrow = NULL, end_cap = ggraph::circle(3, 'mm')) +
     ggraph::scale_edge_width_continuous(range = c(0.5, 4), name = "Strength") +
-    ggraph::scale_edge_color_manual(values = c("-1" = "firebrick", "1" = "steelblue", "0" = "grey50"),
+    ggraph::scale_edge_color_manual(values = c("-1" = "#F8766D", "1" = "#00BA38", "0" = "grey70"),
                                     name = "Sign of Coeff.", drop = FALSE) +
     ggraph::geom_node_point(size = 7, color = "skyblue", alpha = 0.8) +
     # Explicitly tell ggraph to use 'name_attr' for the label aesthetic
     ggraph::geom_node_text(ggplot2::aes(label = .data$name_attr), repel = TRUE, size = 3.5) +
     ggraph::theme_graph(base_family = 'sans', plot_margin = ggplot2::margin(1,1,1,1)) +
+    ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5, size = 14)) +
     ggplot2::labs(title = paste(interaction_order, "-Order Interaction Network", sep=""))
 
   return(gg_plot)
