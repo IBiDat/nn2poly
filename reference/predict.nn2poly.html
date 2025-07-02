@@ -155,24 +155,24 @@ object, <code><a href="eval_poly.html">eval_poly()</a></code>: function that can
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Predict using the obtained polynomial</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">final_poly</span>, newdata <span class="op">=</span> <span class="va">newdata</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1]   -187.8372 -39928.6031    484.2835   5728.3026  33157.9147</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1]   9.351224 -25.505057  34.719666   6.247844  91.053817</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Predict the values of each monomial of the obtained polynomial</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">final_poly</span>, newdata <span class="op">=</span> <span class="va">newdata</span>, monomials <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> , , 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          [,1]      [,2]       [,3]       [,4]       [,5]       [,6]       [,7]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 3.513261  2.085832 -0.9767128 -106.05289   78.26172  -14.28478  -883.2954</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 3.513261  1.668730  7.0684472  -67.87907 -453.11999 -748.14865  -452.2994</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3,] 3.513261  2.248785 -3.3289988 -123.27058  287.58393 -165.94613 -1106.9075</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [4,] 3.513261 -1.028708 -3.6640994  -25.79572 -144.79793 -201.03624   105.9604</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [5,] 3.513261 -2.768480 -5.3540672 -186.82993 -569.41422 -429.24723  2065.3414</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            [,8]        [,9]        [,10]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]  1040.3706   -356.2025     48.74379</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] -4819.0179 -14925.1243 -18475.26426</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]  4121.6558  -4461.2748   1930.00981</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [4,]   949.3221   2472.3521   2573.47736</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [5,] 10046.8266  14206.6881   8029.15924</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           [,1]       [,2]       [,3]       [,4]        [,5]        [,6]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 0.5998362  0.1956268  3.6839954 0.05099631  -1.3684534 -0.97273007</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 0.5998362 -1.4157464  1.3379416 2.67087139   3.5967084 -0.12830055</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,] 0.5998362  0.6667685  4.8118638 0.59242342  -6.0921559 -1.65951371</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,] 0.5998362  0.7338862 -0.3720858 0.71769420   0.5185067 -0.00992294</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5,] 0.5998362  1.0723715  6.1911194 1.53240156 -12.6065731 -2.74721440</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              [,7]        [,8]       [,9]        [,10]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]   0.07381407  0.01091141  4.7237937  2.353433367</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] -27.97760627  0.20754546 -4.5090416  0.112734331</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]   2.92266751  0.16556503 27.4679454  5.244265374</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,]   3.89708831 -0.01550978  0.1807754 -0.002424789</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5,]  12.15877904  0.55101681 73.1321043 11.169975574</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Change the last layer to have 3 outputs (as in a multiclass classification)</span></span></span>
@@ -195,56 +195,56 @@ object, <code><a href="eval_poly.html">eval_poly()</a></code>: function that can
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">final_poly</span>, newdata <span class="op">=</span> <span class="va">newdata</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $layer_1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $layer_1$input</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             [,1]       [,2]       [,3]      [,4]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] -2.62401445  1.8188597 -0.3543759 0.5645582</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]  2.21743082 -1.7261670  2.5971104 5.4244951</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3,] -1.90623760  1.0108695  0.7964167 0.6549163</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [4,] -0.84490338  0.5278190  0.7007539 2.3765011</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [5,]  0.03021762 -0.4802582  2.1618137 2.4354195</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            [,1]        [,2]       [,3]        [,4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] -5.6735417 -0.32513524  1.6814923  1.62302779</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]  4.5589447  3.87422294 -2.6519402  0.13562721</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,] -2.9341045 -0.62868026  2.3703111  0.20284204</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,] -1.0384512 -0.09566662  1.8847146 -0.24804201</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5,]  0.9666878  1.55422076 -0.0353892  0.05242729</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $layer_1$output</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             [,1]        [,2]       [,3]         [,4]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]  2.55979238 -0.05156903  126.17275   13.5694684</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]  0.96627363  1.46296363 -183.38882 -126.5851436</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3,] -0.20150872  0.66431045   12.06814    0.1345584</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [4,] -0.64226760  0.49067820   13.89172   -6.2204705</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [5,]  0.03186566 -0.40981375  -10.28230   -4.6008917</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              [,1]        [,2]        [,3]        [,4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]  48.20486265 -27.7250526  8.59200940  0.39427109</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] -31.65159736 -17.0734437 -4.00627030  0.19575252</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]   3.36625783   1.5250084 -0.07809946  0.19920248</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,]  -0.60308233  -0.3957372  0.79671108 -0.27897526</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5,]  -0.07149144   1.6906254 -0.36895992  0.06026532</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $layer_2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $layer_2$input</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             [,1]        [,2]        [,3]       [,4]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]   2.3561693  2.12300785  116.816764 -142.30171</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 122.2628369 39.50262885 -133.710641  159.13016</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]  -0.2124414  0.09674539   10.610109  -13.52429</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [4,]   6.4922421  1.85018160   14.255976  -16.97538</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [5,]   2.3442393  0.44160798   -6.612954   10.50599</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             [,1]        [,2]        [,3]         [,4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]  31.5809235 100.1570991 -73.7892050  19.65320413</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] -45.6669367   3.9530106  75.0068291 -10.76281414</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]   3.9445754   0.4584441  -6.8056997   1.62897865</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,]  -1.3308726   1.8814099   0.6507434  -1.68789840</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5,]   0.4767643  -2.8508475  -0.5016165  -0.06090673</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $layer_2$output</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             [,1]       [,2]        [,3]       [,4]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]   32.014312  0.7261721 -38.9407722 15206.8488</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] -230.619175 10.9465024 -27.4589902 -5836.6763</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]    2.435578  0.4999311  -2.3683187  1656.7308</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [4,]   11.450233  0.9040130   5.2396058  2480.8518</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [5,]   -1.761550  0.6042637  -0.6636513  -148.4675</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            [,1]       [,2]        [,3]      [,4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]  2.4586391 27.6727464 -62.9655489 7.9150715</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] -2.6859591 -5.2350994  60.5183983 7.4428759</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]  1.6125714  2.4137782  -3.6892159 0.3460346</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,]  0.2265399  1.9037634   0.8811226 0.1730364</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5,]  1.2921931 -0.1571784   1.4721249 0.6753352</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $layer_3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $layer_3$input</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             [,1]        [,2]       [,3]         [,4]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]  39023.2866 -12465.2876 17357.4781 -1109.970518</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] -15067.8516   4565.8468 -7062.4930   231.596136</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]   4252.7714  -1358.5749  1889.4238  -118.096296</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [4,]   6370.7828  -2029.3069  2846.6748  -160.796821</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [5,]   -378.8749    122.2192  -172.9164     9.520727</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            [,1]       [,2]       [,3]        [,4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]  53.452427 -7.2556396 -95.358988  59.6811039</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] -38.043966 25.2478182  83.650617 -65.2359662</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]   6.797121  1.5914101  -3.851680  -0.2259946</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,]   2.968127  0.6026495   1.748960  -1.7792371</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5,]   1.221525  3.0026318   4.054609  -5.4887796</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $layer_3$output</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             [,1]        [,2]       [,3]         [,4]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]  39023.2866 -12465.2876 17357.4781 -1109.970518</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] -15067.8516   4565.8468 -7062.4930   231.596136</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]   4252.7714  -1358.5749  1889.4238  -118.096296</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [4,]   6370.7828  -2029.3069  2846.6748  -160.796821</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [5,]   -378.8749    122.2192  -172.9164     9.520727</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            [,1]       [,2]       [,3]        [,4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]  53.452427 -7.2556396 -95.358988  59.6811039</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] -38.043966 25.2478182  83.650617 -65.2359662</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]   6.797121  1.5914101  -3.851680  -0.2259946</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,]   2.968127  0.6026495   1.748960  -1.7792371</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5,]   1.221525  3.0026318   4.054609  -5.4887796</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
@@ -252,38 +252,38 @@ object, <code><a href="eval_poly.html">eval_poly()</a></code>: function that can
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">final_poly</span>, newdata <span class="op">=</span> <span class="va">newdata</span>, layers <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $layer_2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $layer_2$input</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             [,1]        [,2]        [,3]       [,4]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]   2.3561693  2.12300785  116.816764 -142.30171</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 122.2628369 39.50262885 -133.710641  159.13016</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]  -0.2124414  0.09674539   10.610109  -13.52429</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [4,]   6.4922421  1.85018160   14.255976  -16.97538</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [5,]   2.3442393  0.44160798   -6.612954   10.50599</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             [,1]        [,2]        [,3]         [,4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]  31.5809235 100.1570991 -73.7892050  19.65320413</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] -45.6669367   3.9530106  75.0068291 -10.76281414</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]   3.9445754   0.4584441  -6.8056997   1.62897865</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,]  -1.3308726   1.8814099   0.6507434  -1.68789840</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5,]   0.4767643  -2.8508475  -0.5016165  -0.06090673</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $layer_2$output</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             [,1]       [,2]        [,3]       [,4]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]   32.014312  0.7261721 -38.9407722 15206.8488</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] -230.619175 10.9465024 -27.4589902 -5836.6763</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]    2.435578  0.4999311  -2.3683187  1656.7308</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [4,]   11.450233  0.9040130   5.2396058  2480.8518</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [5,]   -1.761550  0.6042637  -0.6636513  -148.4675</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            [,1]       [,2]        [,3]      [,4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]  2.4586391 27.6727464 -62.9655489 7.9150715</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] -2.6859591 -5.2350994  60.5183983 7.4428759</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]  1.6125714  2.4137782  -3.6892159 0.3460346</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,]  0.2265399  1.9037634   0.8811226 0.1730364</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5,]  1.2921931 -0.1571784   1.4721249 0.6753352</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $layer_3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $layer_3$input</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             [,1]        [,2]       [,3]         [,4]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]  39023.2866 -12465.2876 17357.4781 -1109.970518</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] -15067.8516   4565.8468 -7062.4930   231.596136</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]   4252.7714  -1358.5749  1889.4238  -118.096296</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [4,]   6370.7828  -2029.3069  2846.6748  -160.796821</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [5,]   -378.8749    122.2192  -172.9164     9.520727</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            [,1]       [,2]       [,3]        [,4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]  53.452427 -7.2556396 -95.358988  59.6811039</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] -38.043966 25.2478182  83.650617 -65.2359662</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]   6.797121  1.5914101  -3.851680  -0.2259946</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,]   2.968127  0.6026495   1.748960  -1.7792371</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5,]   1.221525  3.0026318   4.054609  -5.4887796</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $layer_3$output</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             [,1]        [,2]       [,3]         [,4]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]  39023.2866 -12465.2876 17357.4781 -1109.970518</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] -15067.8516   4565.8468 -7062.4930   231.596136</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]   4252.7714  -1358.5749  1889.4238  -118.096296</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [4,]   6370.7828  -2029.3069  2846.6748  -160.796821</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [5,]   -378.8749    122.2192  -172.9164     9.520727</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            [,1]       [,2]       [,3]        [,4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]  53.452427 -7.2556396 -95.358988  59.6811039</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] -38.043966 25.2478182  83.650617 -65.2359662</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]   6.797121  1.5914101  -3.851680  -0.2259946</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,]   2.968127  0.6026495   1.748960  -1.7792371</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5,]   1.221525  3.0026318   4.054609  -5.4887796</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
@@ -298,7 +298,7 @@ object, <code><a href="eval_poly.html">eval_poly()</a></code>: function that can
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer></div>
