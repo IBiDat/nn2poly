@@ -1,6 +1,6 @@
 ## Patch release
 
-- Solve documentation problem with empty list item.
+- Drop C++14 specification, as requested by CRAN.
 
 ## Test environments
 
@@ -9,9 +9,4 @@
 
 ## R CMD check results
 
-There is one NOTE:
-
-> checking C++ specification ... NOTE
-    Specified C++14: please drop specification unless essential
-
-which is essential.
+There were no ERRORs, WARNINGs or NOTEs.

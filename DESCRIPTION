@@ -1,6 +1,6 @@
 Package: nn2poly
 Title: Neural Network Weights Transformation into Polynomial Coefficients
-Version: 0.1.2.9000
+Version: 0.1.3
 Authors@R: c(
     person(given = "Pablo", family = "Morala", role = c("aut", "cre"),
            email = "moralapablo@gmail.com",
