@@ -1,0 +1,94 @@
+# nn2poly: Transforming Neural Networks into Polynomials
+
+The **nn2poly** package implements the NN2Poly method that allows to
+transform an already trained deep feed-forward fully connected neural
+network into a polynomial representation that predicts as similar as
+possible to the original neural network. The obtained polynomial
+coefficients can be used to explain features (and their interactions)
+importance in the neural network, therefore working as a tool for
+interpretability or eXplainable Artificial Intelligence (XAI).
+
+## Related Papers:
+
+- Pablo Morala, J. Alexandra Cifuentes, Rosa E. Lillo, Iñaki Ucar
+  (2021). “Towards a mathematical framework to inform neural network
+  modelling via polynomial regression.” *Neural Networks*, *142*, 57-72.
+  doi:
+  [10.1016/j.neunet.2021.04.036](https://doi.org/10.1016/j.neunet.2021.04.036)
+
+- Pablo Morala, J. Alexandra Cifuentes, Rosa E. Lillo, Iñaki Ucar
+  (2023). “NN2Poly: A Polynomial Representation for Deep Feed-Forward
+  Artificial Neural Networks.” *IEEE Transactions on Neural Networks and
+  Learning Systems*, (Early Access). doi:
+  [10.1109/TNNLS.2023.3330328](https://doi.org/10.1109/TNNLS.2023.3330328)
+
+## Installation
+
+The latest release version available in CRAN can be installed as:
+
+``` r
+install.packages("nn2poly")
+```
+
+The installation from GitHub requires the
+[remotes](https://cran.r-project.org/package=remotes) package.
+
+``` r
+# install.packages("remotes")
+remotes::install_github("IBiDat/nn2poly")
+```
+
+## Funding
+
+This package is part of the project/grant PDC2022-133359-I00 funded by
+MCIN/AEI/10.13039/501100011033 and by the European Union
+“NextGenerationEU/PRTR”.
+
+![Funding](reference/figures/Logo-Funding.png)
+
+Funding
+
+# Package index
+
+## All functions
+
+- [`add_constraints()`](https://ibidat.github.io/nn2poly/reference/add_constraints.md)
+  : Add constraints to a neural network
+
+- [`eval_poly()`](https://ibidat.github.io/nn2poly/reference/eval_poly.md)
+  : Polynomial evaluation
+
+- [`luz_model_sequential()`](https://ibidat.github.io/nn2poly/reference/luz_model_sequential.md)
+  :
+
+  Build a `luz` model composed of a linear stack of layers
+
+- [`nn2poly()`](https://ibidat.github.io/nn2poly/reference/nn2poly.md) :
+  Obtain polynomial representation
+
+- [`plot(`*`<nn2poly>`*`)`](https://ibidat.github.io/nn2poly/reference/plot.nn2poly.md)
+  :
+
+  Plot method for `nn2poly` objects.
+
+- [`plot_diagonal()`](https://ibidat.github.io/nn2poly/reference/plot_diagonal.md)
+  : Plots a comparison between two sets of points.
+
+- [`plot_taylor_and_activation_potentials()`](https://ibidat.github.io/nn2poly/reference/plot_taylor_and_activation_potentials.md)
+  : Plots activation potentials and Taylor expansion.
+
+- [`predict(`*`<nn2poly>`*`)`](https://ibidat.github.io/nn2poly/reference/predict.nn2poly.md)
+  :
+
+  Predict method for `nn2poly` objects.
+
+# Articles
+
+### All vignettes
+
+- [Introduction to
+  nn2poly](https://ibidat.github.io/nn2poly/articles/nn2poly-01-introduction.md):
+- [Supported DL
+  frameworks](https://ibidat.github.io/nn2poly/articles/nn2poly-02-supported-DL-frameworks.md):
+- [Classification example using
+  tensorflow](https://ibidat.github.io/nn2poly/articles/nn2poly-03-classification-example.md):

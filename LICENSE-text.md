@@ -1,0 +1,4 @@
+# License
+
+    YEAR: 2021-2023
+    COPYRIGHT HOLDER: Pablo Morala, Iñaki Úcar
