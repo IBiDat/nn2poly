@@ -25,11 +25,11 @@
   </clipPath>
 </defs>
 <g clip-path='url(#cpNDYuMTZ8NjM3Ljc3fDI4LjI4fDUyOS44NA==)'>
-<rect x='63.23' y='51.08' width='102.39' height='455.96' style='stroke-width: 1.07; stroke-linecap: butt; stroke-linejoin: miter; fill: #F8766D;' />
-<rect x='177.00' y='300.42' width='102.39' height='206.63' style='stroke-width: 1.07; stroke-linecap: butt; stroke-linejoin: miter; fill: #F8766D;' />
-<rect x='290.77' y='300.42' width='102.39' height='206.63' style='stroke-width: 1.07; stroke-linecap: butt; stroke-linejoin: miter; fill: #F8766D;' />
-<rect x='404.54' y='383.18' width='102.39' height='123.87' style='stroke-width: 1.07; stroke-linecap: butt; stroke-linejoin: miter; fill: #F8766D;' />
-<rect x='518.31' y='445.11' width='102.39' height='61.93' style='stroke-width: 1.07; stroke-linecap: butt; stroke-linejoin: miter; fill: #F8766D;' />
+<rect x='63.23' y='51.08' width='102.39' height='455.96' style='stroke-width: 1.36; stroke-linecap: butt; stroke-linejoin: miter; fill: #F8766D;' />
+<rect x='177.00' y='300.42' width='102.39' height='206.63' style='stroke-width: 1.36; stroke-linecap: butt; stroke-linejoin: miter; fill: #F8766D;' />
+<rect x='290.77' y='300.42' width='102.39' height='206.63' style='stroke-width: 1.36; stroke-linecap: butt; stroke-linejoin: miter; fill: #F8766D;' />
+<rect x='404.54' y='383.18' width='102.39' height='123.87' style='stroke-width: 1.36; stroke-linecap: butt; stroke-linejoin: miter; fill: #F8766D;' />
+<rect x='518.31' y='445.11' width='102.39' height='61.93' style='stroke-width: 1.36; stroke-linecap: butt; stroke-linejoin: miter; fill: #F8766D;' />
 </g>
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
 <polyline points='46.16,529.84 46.16,28.28 ' style='stroke-width: 1.07; stroke-linecap: square;' />
@@ -55,7 +55,7 @@
 <text x='341.96' y='566.12' text-anchor='middle' style='font-size: 14.00px; font-family: sans;' textLength='150.20px' lengthAdjust='spacingAndGlyphs'>Variables or interactions</text>
 <text transform='translate(16.61,279.06) rotate(-90)' text-anchor='middle' style='font-size: 14.00px; font-family: sans;' textLength='176.67px' lengthAdjust='spacingAndGlyphs'>Coefficient (absolute) values</text>
 <text x='651.72' y='283.88' style='font-size: 14.00px; font-family: sans;' textLength='28.02px' lengthAdjust='spacingAndGlyphs'>Sign</text>
-<rect x='687.42' y='272.10' width='13.93' height='13.93' style='stroke-width: 1.07; stroke-linecap: butt; stroke-linejoin: miter; fill: #F8766D;' />
+<rect x='687.62' y='272.29' width='13.54' height='13.54' style='stroke-width: 1.36; stroke-linecap: butt; stroke-linejoin: miter; fill: #F8766D;' />
 <text x='709.03' y='283.19' style='font-size: 12.00px; font-family: sans;' textLength='4.00px' lengthAdjust='spacingAndGlyphs'>-</text>
 <text x='46.16' y='17.99' style='font-size: 16.00px; font-weight: bold; font-family: sans;' textLength='66.73px' lengthAdjust='spacingAndGlyphs'>top 5 neg</text>
 </g>
