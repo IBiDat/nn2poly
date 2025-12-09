@@ -16,7 +16,7 @@ test_that("Test the plot for a polynomial generated with `keep_layers = FALSE`",
   p <- plot(result, n = 5)
 
   # testing the plot
-  vdiffr::expect_doppelganger("top 5", p)
+  vdiffr::expect_doppelganger("top 5 FALSE", p)
 })
 
 
@@ -38,7 +38,7 @@ test_that("Test the plot for a polynomial generated with n = NULL", {
   p <- plot(result)
 
   # testing the plot
-  vdiffr::expect_doppelganger("top NULL", p)
+  vdiffr::expect_doppelganger("top NULL FALSE", p)
 })
 
 
@@ -60,7 +60,7 @@ test_that("Test the plot for a polynomial generated with  `keep_layers = TRUE`",
   p <- plot(result, n = 5)
 
   # testing the plot
-  vdiffr::expect_doppelganger("top 5", p)
+  vdiffr::expect_doppelganger("top 5 TRUE", p)
 })
 
 test_that("Test the plot for a polynomial generated with  `keep_layers = TRUE`
@@ -82,7 +82,7 @@ test_that("Test the plot for a polynomial generated with  `keep_layers = TRUE`
   p <- plot(result, n = NULL)
 
   # testing the plot
-  vdiffr::expect_doppelganger("top NULL", p)
+  vdiffr::expect_doppelganger("top NULL TRUE", p)
 })
 
 
