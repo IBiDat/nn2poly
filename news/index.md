@@ -2,6 +2,8 @@
 
 ## nn2poly 0.1.3
 
+CRAN release: 2025-12-12
+
 - Add URLs for source repo and BugReports in DESCRIPTION file.
 - Drop C++14 specification, as requested by CRAN.
 
