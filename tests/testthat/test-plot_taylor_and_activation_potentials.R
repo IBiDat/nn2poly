@@ -1,6 +1,5 @@
 test_that("The function works as expected", {
-  skip_if_not_installed("keras")
-  skip_if_not_installed("tensorflow")
+  skip_if_keras_unavailable()
   skip()
   skip_on_cran()
   skip_on_covr()

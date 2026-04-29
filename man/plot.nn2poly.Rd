@@ -4,94 +4,107 @@
 \alias{plot.nn2poly}
 \title{Plot method for \code{nn2poly} objects.}
 \usage{
-\method{plot}{nn2poly}(x, type = "bar", ..., n = NULL)
+\method{plot}{nn2poly}(
+  x,
+  type = "bar",
+  ...,
+  n = NULL,
+  min_order = 0,
+  newdata_monomials = NULL,
+  poly_output_index = 1,
+  variable_names = NULL,
+  observation_index = 1,
+  max_order_to_display = 3,
+  waterfall_n = 15,
+  original_feature_data = NULL,
+  color_by_feature = 1,
+  top_n_terms = NULL,
+  feature_pair = NULL,
+  grid_resolution = 20,
+  interaction_order_network = 2,
+  metric_network = "coefficient_abs",
+  top_n_interactions = NULL,
+  layout_network = "nicely"
+)
 }
 \arguments{
-\item{x}{A \code{nn2poly} object, as returned by the \pkg{nn2poly} algorithm.}
+\item{x}{A \code{nn2poly} object.}
 
-\item{type}{A string containing the type of plot chosen. Currently available
-plots are "bar" (default)  for coefficient bar plots and "heatmap" for a
-heatmap of second-order terms.}
+\item{type}{A string selecting the plot type. Main supported types are:
+\itemize{
+\item \code{"bar"}: coefficient magnitude bar plot.
+\item \code{"heatmap"}: second-order coefficient heatmap (diagonal = squared terms).
+\item \code{"local_contributions"}: per-feature local attributions for one observation
+by redistributing each term contribution across its variables (by multiplicity).
+\item \code{"waterfall"}: SHAP-like waterfall using per-term contributions for one observation.
+\item \code{"beeswarm"}: SHAP-like summary (beeswarm) of per-term contributions across observations.
+}
 
-\item{...}{Ignored.}
+Additional types (\code{"interaction_surface"}, \code{"interaction_network"}) are experimental.}
 
-\item{n}{An integer denoting the number of coefficients to be plotted in the
-"bar" case, after ordering them by absolute magnitude.}
+\item{...}{Additional arguments passed to specific plot types.}
+
+\item{n}{For \code{type = "bar"}, the number of top coefficients to plot.}
+
+\item{min_order}{For \code{type = "bar"}, the minimum order of terms to include.
+0 (default) includes intercept (order 0 for this purpose) and all terms.
+1 excludes intercept, showing terms of polynomial degree 1+.
+2 excludes intercept and linear terms, showing terms of polynomial degree 2+.}
+
+\item{newdata_monomials}{For \code{type = "local_contributions"}, \code{"waterfall"} or \code{"beeswarm"},
+the output of \code{predict(x, newdata, monomials = TRUE)}. This should be
+for a single observation for "local_contributions" (or specify \code{observation_index})
+and for multiple observations for "beeswarm".}
+
+\item{poly_output_index}{For \code{type = "local_contributions"} or \code{"beeswarm"},
+if \code{x} produces multiple polynomial outputs, which one to plot (default: 1).}
+
+\item{variable_names}{For \code{type = "local_contributions"} or \code{"beeswarm"},
+an optional character vector of original feature names to make term labels
+more readable (e.g., "x1" instead of "1").}
+
+\item{observation_index}{For \code{type = "local_contributions"}, the row index
+from \code{newdata_monomials} to plot (default: 1).}
+
+\item{max_order_to_display}{For \code{type = "local_contributions"}, the maximum
+term order to show in the stacked bars (default: 3).}
+
+\item{waterfall_n}{For \code{type = "waterfall"}, the number of top non-intercept
+terms (by absolute contribution) to show. Remaining terms are aggregated
+into an \code{(Other)} bucket.}
+
+\item{original_feature_data}{For \code{type = "beeswarm"}, a matrix or data frame
+of the original predictor values for all observations in \code{newdata_monomials}.
+Required for coloring points.}
+
+\item{color_by_feature}{For \code{type = "beeswarm"}, which feature to use for
+coloring the points. Can be a numeric column index or a character name
+matching \code{colnames(original_feature_data)} or \code{variable_names}.}
+
+\item{top_n_terms}{For \code{type = "beeswarm"}, an optional integer to display only
+the top N most important terms (based on mean absolute monomial value).}
+
+\item{feature_pair}{For \code{type = "interaction_surface"}, a numeric or character
+vector of length 2 specifying the pair of features to plot.}
+
+\item{grid_resolution}{For \code{type = "interaction_surface"}, the number of points
+per dimension for the grid.}
+
+\item{interaction_order_network}{For \code{type = "interaction_network"}, the effective
+order of interactions to visualize (e.g., 2 for pairwise feature interactions).}
+
+\item{metric_network}{For \code{type = "interaction_network"}, the metric for edge
+weights ("coefficient_abs" or "mean_monomial_abs").}
+
+\item{top_n_interactions}{For \code{type = "interaction_network"}, number of top
+(projected) pairwise interactions to display by weight.}
+
+\item{layout_network}{For \code{type = "interaction_network"}, the layout algorithm
+for ggraph (e.g., "nicely", "fr").}
 }
 \value{
-A ggplot object, depending on the \code{type} chosen.
+A ggplot object.
 }
 \description{
-A function that takes a polynomial (or several ones) as given by the
-\pkg{nn2poly} algorithm, and then provides a plot depending on the chosen
-type to be able to compare the most important coefficients.
-}
-\details{
-The plot method represents only the polynomials at the final layer, even if
-\code{x} is generated using \code{nn2poly()} with \code{keep_layers=TRUE}. The plot types
-are as follows:
-\itemize{
-\item The bar plot represents coefficients ordered by absolute value.
-\item The heatmap displays squared terms on the diagonal and pairwise
-interactions off-diagonal, with colors indicating the magnitude and sign
-of coefficients.
-}
-}
-\examples{
-# --- Single polynomial output ---
-# Build a NN structure with random weights, with 2 (+ bias) inputs,
-# 4 (+bias) neurons in the first hidden layer with "tanh" activation
-# function, 4 (+bias) neurons in the second hidden layer with "softplus",
-# and 2 "linear" output units
-
-weights_layer_1 <- matrix(rnorm(12), nrow = 3, ncol = 4)
-weights_layer_2 <- matrix(rnorm(20), nrow = 5, ncol = 4)
-weights_layer_3 <- matrix(rnorm(5), nrow = 5, ncol = 1)
-
-# Set it as a list with activation functions as names
-nn_object = list("tanh" = weights_layer_1,
-                 "softplus" = weights_layer_2,
-                 "linear" = weights_layer_3)
-
-# Obtain the polynomial representation (order = 3) of that neural network
-final_poly <- nn2poly(nn_object, max_order = 3)
-
-# Plot all the coefficients, one plot per output unit
-plot(final_poly)
-
-# Plot only the 5 most important coeffcients (by absolute magnitude)
-# one plot per output unit
-plot(final_poly, n = 5)
-
-# Plot a heatmap for second order terms.
-plot(final_poly, type = "heatmap")
-
-
-
-
-# --- Multiple output polynomials ---
-# Build a NN structure with random weights, with 2 (+ bias) inputs,
-# 4 (+bias) neurons in the first hidden layer with "tanh" activation
-# function, 4 (+bias) neurons in the second hidden layer with "softplus",
-# and 2 "linear" output units
-
-weights_layer_1 <- matrix(rnorm(12), nrow = 3, ncol = 4)
-weights_layer_2 <- matrix(rnorm(20), nrow = 5, ncol = 4)
-weights_layer_3 <- matrix(rnorm(10), nrow = 5, ncol = 2)
-
-# Set it as a list with activation functions as names
-nn_object = list("tanh" = weights_layer_1,
-                 "softplus" = weights_layer_2,
-                 "linear" = weights_layer_3)
-
-# Obtain the polynomial representation (order = 3) of that neural network
-final_poly <- nn2poly(nn_object, max_order = 3)
-
-# Plot all the coefficients, one plot per output unit
-plot(final_poly)
-
-# Plot only the 5 most important coefficients (by absolute magnitude)
-# one plot per output unit
-plot(final_poly, n = 5)
-
+Provides various plots for \code{nn2poly} objects.
 }

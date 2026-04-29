@@ -321,6 +321,23 @@ plot(final_poly,
      poly_output_index = 1, # Only one output in this example
      max_order_to_display = 3) # Show up to 3rd order contributions
 
+plot(final_poly,
+     type = "local_contributions",
+     newdata_monomials = prediction_monomials,
+     observation_index = 42,
+     poly_output_index = 1, # Only one output in this example
+     max_order_to_display = 3) # Show up to 3rd order contributions
+
+```
+
+```{r}
+# --- Waterfall Plot ---
+plot(final_poly,
+     type = "waterfall",
+     newdata_monomials = prediction_monomials,
+     observation_index = 1,
+     poly_output_index = 1,
+     waterfall_n = 12)
 ```
 
 
@@ -338,7 +355,7 @@ plot(final_poly,
      type = "beeswarm",
      newdata_monomials = prediction_monomials,
      original_feature_data = test_x,
-     color_by_feature = 3, # Color by the second column of test_x
+     color_by_feature = 2, # Color by the second column of test_x
      poly_output_index = 1,
      top_n_terms = 10)
 
@@ -362,11 +379,11 @@ plot(final_poly,
 # Example 1.2: Plotting the interaction surface for features 1 and 2 using feature names (if test_x had column names or variable_names are provided and match)
 # Let's assume variable_names were used to define the column names conceptually
 # If test_x has columns named "V1", "V2", "V3"
-plot(final_poly,
-     type = "interaction_surface",
-     feature_pair = c("V1", "V2"),   # Specify the pair of features by their names
-     original_feature_data = test_x,
-     grid_resolution = 30)
+# plot(final_poly,
+#      type = "interaction_surface",
+#      feature_pair = c("V1", "V2"),   # Specify the pair of features by their names
+#      original_feature_data = test_x,
+#      grid_resolution = 30)
 
 # If test_x does NOT have column names, you need to provide variable_names
 plot(final_poly,
@@ -429,7 +446,6 @@ nn2poly:::plot_taylor_and_activation_potentials(object = nn,
                                                 max_order = 3,
                                                 constraints = FALSE)
 ```
-
 
 
 

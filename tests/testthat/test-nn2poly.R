@@ -55,8 +55,7 @@ test_that("nn2poly with list input against precomputed example with
 
 
 test_that("nn2poly for a keras.engine.training.Model object", {
-  skip_if_not_installed("keras")
-  skip_if_not_installed("tensorflow")
+  skip_if_keras_unavailable()
   skip_on_cran()
 
   nn <- keras_test_model()
@@ -71,8 +70,7 @@ test_that("nn2poly for a keras.engine.training.Model object", {
 })
 
 test_that("nn2poly for a nn_module object", {
-  skip_if_not_installed("luz")
-  skip_if_not_installed("torch")
+  skip_if_luz_unavailable()
   skip_on_os("mac") # Runner out of memory
   skip_on_cran()
 

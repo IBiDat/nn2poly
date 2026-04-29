@@ -1,3 +1,28 @@
+test_that("Intercept-only polynomial evaluation works", {
+  poly <- list(
+    values = 2,
+    labels = list(c(0))
+  )
+
+  newdata <- c(10, 20, 30)
+  expect_equal(eval_poly(poly, newdata), 2)
+
+  newdata2 <- rbind(c(1, 2, 3), c(4, 5, 6))
+  expect_equal(eval_poly(poly, newdata2), c(2, 2))
+
+  expect_equal(eval_poly(poly, newdata, monomials = TRUE), array(2, dim = c(1, 1, 1)))
+})
+
+test_that("Errors when newdata has fewer columns than the polynomial needs", {
+  poly <- list(
+    values = c(1, 1),
+    labels = list(c(0), c(3))
+  )
+
+  newdata <- c(1, 2) # only 2 columns, but polynomial uses x3
+  expect_error(eval_poly(poly, newdata), "Polynomial requires at least 3")
+})
+
 test_that("Single polynomial evaluation and single observation works", {
 
   # With intercept and ordered labels
@@ -251,4 +276,3 @@ test_that("(Monomials) Check that adding the monomials gives the final poly pred
   expect_equal(A, C)
 
 })
-

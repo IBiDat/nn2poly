@@ -1,6 +1,5 @@
 test_that("The constranied training works using the l1 and l2 constraints", {
-  skip_if_not_installed("luz")
-  skip_if_not_installed("torch")
+  skip_if_luz_unavailable()
   skip_on_os("mac") # Runner out of memory
   skip_on_cran()
 

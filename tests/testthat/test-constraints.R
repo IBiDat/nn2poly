@@ -1,7 +1,6 @@
 test_that("The function works over an already trained network and the connstraints
           are fulfiled after training for the constrained network", {
-  skip_if_not_installed("keras")
-  skip_if_not_installed("tensorflow")
+  skip_if_keras_unavailable()
   skip_on_cran()
 
   testing_data <- testing_helper_2()

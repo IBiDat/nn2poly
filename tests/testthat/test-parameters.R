@@ -1,6 +1,5 @@
 test_that("The function works well over a regular Neural Network.", {
-  skip_if_not_installed("keras")
-  skip_if_not_installed("tensorflow")
+  skip_if_keras_unavailable()
   skip_on_cran()
 
   nn <- keras_test_model()
@@ -24,8 +23,7 @@ test_that("The function works well over a regular Neural Network.", {
 
 test_that("The get_parameters functions returns the right list of activation
           functions for a neural network with custom constraints.", {
-  skip_if_not_installed("keras")
-  skip_if_not_installed("tensorflow")
+  skip_if_keras_unavailable()
   skip_on_cran()
 
   testing_data <- testing_helper_2()
@@ -53,8 +51,7 @@ test_that("The get_parameters functions returns the right list of activation
 
 test_that("The get_parameters function works for a torch model (nn_module)
           and the list of activation functions is the expected one.", {
-  skip_if_not_installed("luz")
-  skip_if_not_installed("torch")
+  skip_if_luz_unavailable()
   skip_on_cran()
 
   nn <- luz_test_model()

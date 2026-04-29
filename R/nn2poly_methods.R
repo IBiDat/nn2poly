@@ -170,20 +170,143 @@ predict.nn2poly <- function(object,
 
 }
 
+.nn2poly_extract_final_layer_index <- function(x) {
+  if (!is.list(x) || is.null(names(x)))
+    return(NULL)
+
+  layer_names <- names(x)
+  layer_hits <- grep("^layer_[0-9]+$", layer_names)
+  if (length(layer_hits) == 0)
+    return(NULL)
+
+  layer_ids <- suppressWarnings(as.integer(sub("^layer_", "", layer_names[layer_hits])))
+  layer_ids <- layer_ids[!is.na(layer_ids)]
+  if (length(layer_ids) == 0)
+    return(NULL)
+
+  max(layer_ids)
+}
+
+.nn2poly_extract_final_poly <- function(x) {
+  if (is.list(x) && !is.null(x$labels) && !is.null(x$values))
+    return(x)
+
+  last_layer_index <- .nn2poly_extract_final_layer_index(x)
+  if (!is.null(last_layer_index)) {
+    last_layer_name <- paste0("layer_", last_layer_index)
+    last_layer <- x[[last_layer_name]]
+    if (is.list(last_layer) && !is.null(last_layer$output) &&
+        !is.null(last_layer$output$labels) && !is.null(last_layer$output$values)) {
+      return(last_layer$output)
+    }
+  }
+
+  stop("Input 'x' is not a recognized nn2poly polynomial object.", call. = FALSE)
+}
+
+.nn2poly_normalize_poly <- function(poly_obj) {
+  if (!is.list(poly_obj) || is.null(poly_obj$labels) || is.null(poly_obj$values))
+    stop("Internal error: invalid polynomial object.", call. = FALSE)
+
+  if (is.vector(poly_obj$values))
+    poly_obj$values <- matrix(poly_obj$values, ncol = 1)
+
+  if (!is.matrix(poly_obj$values))
+    stop("Internal error: polynomial values must be a matrix.", call. = FALSE)
+
+  if (nrow(poly_obj$values) != length(poly_obj$labels))
+    stop("Polynomial is inconsistent: number of labels does not match number of coefficient rows.", call. = FALSE)
+
+  poly_obj
+}
+
+.nn2poly_extract_final_monomials <- function(newdata_monomials) {
+  if (is.array(newdata_monomials))
+    return(newdata_monomials)
+
+  if (is.list(newdata_monomials)) {
+    last_layer_index <- .nn2poly_extract_final_layer_index(newdata_monomials)
+    if (!is.null(last_layer_index)) {
+      last_layer_name <- paste0("layer_", last_layer_index)
+      last_layer <- newdata_monomials[[last_layer_name]]
+      if (is.list(last_layer) && !is.null(last_layer$output))
+        return(last_layer$output)
+    }
+  }
+
+  stop("'newdata_monomials' must be an array, or the output of predict(..., monomials=TRUE) for keep_layers=TRUE objects.", call. = FALSE)
+}
+
+.nn2poly_slice_monomials_for_obs <- function(newdata_monomials,
+                                            observation_index,
+                                            poly_output_index) {
+  pred_dims <- dim(newdata_monomials)
+  if (is.null(pred_dims) || length(pred_dims) < 2 || length(pred_dims) > 3)
+    stop("'newdata_monomials' must be a 2D or 3D array.", call. = FALSE)
+
+  num_obs_pred <- pred_dims[1]
+  num_poly_outputs_pred <- if (length(pred_dims) == 3) pred_dims[3] else 1
+
+  if (observation_index < 1 || observation_index > num_obs_pred)
+    stop("'observation_index' out of bounds.", call. = FALSE)
+  if (poly_output_index < 1 || poly_output_index > num_poly_outputs_pred)
+    stop("'poly_output_index' out of bounds.", call. = FALSE)
+
+  if (num_poly_outputs_pred == 1 && length(pred_dims) == 2) {
+    return(newdata_monomials[observation_index, ])
+  }
+  newdata_monomials[observation_index, , poly_output_index]
+}
+
+.nn2poly_resolve_feature_index <- function(color_by_feature,
+                                           original_feature_data,
+                                           variable_names = NULL) {
+  if (is.null(color_by_feature))
+    return(NULL)
+
+  if (is.numeric(color_by_feature) && length(color_by_feature) == 1) {
+    idx <- as.integer(color_by_feature)
+    if (idx < 1 || idx > ncol(original_feature_data))
+      stop("'color_by_feature' is out of bounds for 'original_feature_data'.", call. = FALSE)
+    return(idx)
+  }
+
+  if (is.character(color_by_feature) && length(color_by_feature) == 1) {
+    if (!is.null(colnames(original_feature_data))) {
+      hit <- match(color_by_feature, colnames(original_feature_data))
+      if (!is.na(hit))
+        return(hit)
+    }
+    if (!is.null(variable_names)) {
+      hit <- match(color_by_feature, variable_names)
+      if (!is.na(hit))
+        return(hit)
+    }
+    stop("'color_by_feature' did not match any column name in 'original_feature_data' or entry in 'variable_names'.", call. = FALSE)
+  }
+
+  stop("'color_by_feature' must be a single numeric index or a single character name.", call. = FALSE)
+}
+
 #' Plot method for \code{nn2poly} objects.
 #'
 #' Provides various plots for \code{nn2poly} objects.
 #'
 #' @param x A \code{nn2poly} object.
-#' @param type A string for plot type: "bar" (coefficient magnitudes),
-#'   "heatmap" (second-order terms), "local_contributions" (feature
-#'   contributions for a single observation), or "beeswarm" (summary of
-#'   term contributions across observations).
+#' @param type A string selecting the plot type. Main supported types are:
+#' - `"bar"`: coefficient magnitude bar plot.
+#' - `"heatmap"`: second-order coefficient heatmap (diagonal = squared terms).
+#' - `"local_contributions"`: per-feature local attributions for one observation
+#'   by redistributing each term contribution across its variables (by multiplicity).
+#' - `"waterfall"`: SHAP-like waterfall using per-term contributions for one observation.
+#' - `"beeswarm"`: SHAP-like summary (beeswarm) of per-term contributions across observations.
+#'
+#' Additional types (`"interaction_surface"`, `"interaction_network"`) are experimental.
 #' @param ... Additional arguments passed to specific plot types.
 #'
 #' @param n For `type = "bar"`, the number of top coefficients to plot.
 #'
-#' @param newdata_monomials For `type = "local_contributions"` or `"beeswarm"`,
+#' @param newdata_monomials For `type = "local_contributions"`, `"waterfall"` or `"beeswarm"`,
 #'   the output of `predict(x, newdata, monomials = TRUE)`. This should be
 #'   for a single observation for "local_contributions" (or specify `observation_index`)
 #'   and for multiple observations for "beeswarm".
@@ -196,10 +319,16 @@ predict.nn2poly <- function(object,
 #'   more readable (e.g., "x1" instead of "1").
 #' @param max_order_to_display For `type = "local_contributions"`, the maximum
 #'   term order to show in the stacked bars (default: 3).
+#' @param waterfall_n For `type = "waterfall"`, the number of top non-intercept
+#'   terms (by absolute contribution) to show. Remaining terms are aggregated
+#'   into an `(Other)` bucket.
 #'
 #' @param original_feature_data For `type = "beeswarm"`, a matrix or data frame
 #'   of the original predictor values for all observations in `newdata_monomials`.
 #'   Required for coloring points.
+#' @param color_by_feature For `type = "beeswarm"`, which feature to use for
+#'   coloring the points. Can be a numeric column index or a character name
+#'   matching `colnames(original_feature_data)` or `variable_names`.
 #' @param top_n_terms For `type = "beeswarm"`, an optional integer to display only
 #'   the top N most important terms (based on mean absolute monomial value).
 #' @param min_order For `type = "bar"`, the minimum order of terms to include.
@@ -232,8 +361,11 @@ plot.nn2poly <- function(x, type = "bar", ...,
                          # Args for local_contributions plot
                          observation_index = 1,
                          max_order_to_display = 3,
+                         # Args for waterfall plot
+                         waterfall_n = 15,
                          # Args for beeswarm plot
                          original_feature_data = NULL, # Still needed for beeswarm
+                         color_by_feature = 1,
                          top_n_terms = NULL, # For beeswarm y-axis
                          # Args for interaction_surface plot
                          feature_pair = NULL,
@@ -253,59 +385,65 @@ plot.nn2poly <- function(x, type = "bar", ...,
   }
 
   plot_object <- NULL
+  poly_obj <- NULL
+
+  if (type %in% c("bar", "heatmap", "local_contributions", "waterfall", "beeswarm",
+                  "interaction_surface", "interaction_network")) {
+    poly_obj <- .nn2poly_normalize_poly(.nn2poly_extract_final_poly(x))
+  }
 
   # --- Common pre-processing for coefficient-based plots ("bar", "heatmap") ---
   if (type %in% c("bar", "heatmap")) {
-    poly_for_plot <- NULL
-    if (is.null(x$values) && !is.null(x[[length(x)]]) && !is.null(x[[length(x)]][["output"]])) {
-      poly_for_plot <- x[[length(x)]][["output"]]
-    } else if (!is.null(x$values)) {
-      poly_for_plot <- x
-    } else {
-      stop("Input 'x' is not a recognized nn2poly object for plot type '", type, "'.", call. = FALSE)
-    }
-    if (is.vector(poly_for_plot$values)) {
-      poly_for_plot$values <- matrix(poly_for_plot$values, ncol = 1)
-    }
-    if (is.null(poly_for_plot$labels)) {
-      stop("Input 'x' is missing polynomial labels for plot type '", type, "'.", call. = FALSE)
-    }
-
     if (type == "bar") {
-      plot_object <- plot_bar(poly_for_plot, n = n, variable_names = variable_names, min_order = min_order)
+      plot_object <- plot_bar(poly_obj, n = n, variable_names = variable_names, min_order = min_order)
     } else if (type == "heatmap") {
-      plot_object <- plot_heatmap(poly_for_plot, variable_names = variable_names)
+      plot_object <- plot_heatmap(poly_obj, variable_names = variable_names)
     }
   }
   # --- Local Contributions Plot ---
   else if (type == "local_contributions") {
     if (is.null(newdata_monomials)) stop("For 'local_contributions', 'newdata_monomials' must be provided.", call. = FALSE)
-    if (is.null(x$labels)) stop("Input 'x' (nn2poly object) is missing labels for 'local_contributions'.", call. = FALSE)
+    newdata_monomials_arr <- .nn2poly_extract_final_monomials(newdata_monomials)
+    if (dim(newdata_monomials_arr)[2] != length(poly_obj$labels))
+      stop("Term count mismatch between 'newdata_monomials' and the nn2poly object labels.", call. = FALSE)
 
-    pred_dims <- dim(newdata_monomials)
-    if (is.null(pred_dims) || length(pred_dims) < 2 || length(pred_dims) > 3) stop("'newdata_monomials' must be a 2D or 3D array.", call. = FALSE)
-    num_obs_pred <- pred_dims[1]; num_terms_pred <- pred_dims[2]; num_poly_outputs_pred <- if (length(pred_dims) == 3) pred_dims[3] else 1
-    if (observation_index < 1 || observation_index > num_obs_pred) stop(paste0("'observation_index' out of bounds."), call. = FALSE)
-    if (poly_output_index < 1 || poly_output_index > num_poly_outputs_pred) stop(paste0("'poly_output_index' out of bounds."), call. = FALSE)
-    if (num_terms_pred != length(x$labels)) stop("Term count mismatch between 'newdata_monomials' and 'x$labels'.", call. = FALSE)
-
-    monomial_values_slice <- if (num_poly_outputs_pred == 1 && length(pred_dims) == 2) {
-      newdata_monomials[observation_index, ]
-    } else {
-      newdata_monomials[observation_index, , poly_output_index]
-    }
+    monomial_values_slice <- .nn2poly_slice_monomials_for_obs(
+      newdata_monomials_arr,
+      observation_index = observation_index,
+      poly_output_index = poly_output_index
+    )
     plot_object <- plot_local_contributions_internal(
-      poly_obj = x, monomial_values_for_obs = monomial_values_slice,
+      poly_obj = poly_obj, monomial_values_for_obs = monomial_values_slice,
       variable_names = variable_names, max_order_to_display = max_order_to_display
+    )
+  }
+  # --- Waterfall Plot ---
+  else if (type == "waterfall") {
+    if (is.null(newdata_monomials)) stop("For 'waterfall', 'newdata_monomials' must be provided.", call. = FALSE)
+
+    newdata_monomials_arr <- .nn2poly_extract_final_monomials(newdata_monomials)
+    if (dim(newdata_monomials_arr)[2] != length(poly_obj$labels))
+      stop("Term count mismatch between 'newdata_monomials' and the nn2poly object labels.", call. = FALSE)
+
+    monomial_values_slice <- .nn2poly_slice_monomials_for_obs(
+      newdata_monomials_arr,
+      observation_index = observation_index,
+      poly_output_index = poly_output_index
+    )
+
+    plot_object <- plot_waterfall_internal(
+      poly_obj = poly_obj,
+      monomial_values_for_obs = monomial_values_slice,
+      variable_names = variable_names,
+      waterfall_n = waterfall_n
     )
   }
   # --- Beeswarm Plot ---
   else if (type == "beeswarm") {
     if (is.null(newdata_monomials)) stop("For 'beeswarm', 'newdata_monomials' must be provided.", call. = FALSE)
     if (is.null(original_feature_data)) stop("For 'beeswarm', 'original_feature_data' must be provided for coloring.", call. = FALSE)
-    if (is.null(x$labels)) stop("Input 'x' (nn2poly object) is missing labels for 'beeswarm'.", call. = FALSE)
-
-    pred_dims <- dim(newdata_monomials)
+    newdata_monomials_arr <- .nn2poly_extract_final_monomials(newdata_monomials)
+    pred_dims <- dim(newdata_monomials_arr)
     if (length(pred_dims) < 2 || length(pred_dims) > 3) stop("'newdata_monomials' must be a 2D or 3D array.", call. = FALSE)
     num_obs_pred <- pred_dims[1]; num_terms_pred <- pred_dims[2]; num_poly_outputs_pred <- if (length(pred_dims) == 3) pred_dims[3] else 1
 
@@ -320,19 +458,27 @@ plot.nn2poly <- function(x, type = "bar", ...,
     }
 
     if (nrow(original_feature_data_mat) != num_obs_pred) stop("Row count mismatch: 'original_feature_data' and 'newdata_monomials'.", call. = FALSE)
-    if (poly_output_index < 1 || poly_output_index > num_poly_outputs_pred) stop(paste0("'poly_output_index' out of bounds."), call. = FALSE)
-    if (num_terms_pred != length(x$labels)) stop("Term count mismatch: 'newdata_monomials' and 'x$labels'.", call. = FALSE)
+    if (poly_output_index < 1 || poly_output_index > num_poly_outputs_pred) stop("'poly_output_index' out of bounds.", call. = FALSE)
+    if (num_terms_pred != length(poly_obj$labels)) stop("Term count mismatch between 'newdata_monomials' and the nn2poly object labels.", call. = FALSE)
+
+    color_by_feature_idx <- .nn2poly_resolve_feature_index(
+      color_by_feature = color_by_feature,
+      original_feature_data = original_feature_data_mat,
+      variable_names = variable_names
+    )
+    if (is.null(color_by_feature_idx))
+      color_by_feature_idx <- 1L
 
     monomial_values_for_plot <- if (num_poly_outputs_pred == 1 && length(pred_dims) == 2) {
-      newdata_monomials
+      newdata_monomials_arr
     } else {
-      newdata_monomials[, , poly_output_index]
+      newdata_monomials_arr[, , poly_output_index]
     }
 
     plot_object <- plot_beeswarm_internal(
-      poly_obj = x, all_monomial_values_for_output = monomial_values_for_plot,
+      poly_obj = poly_obj, all_monomial_values_for_output = monomial_values_for_plot,
       original_feature_data = original_feature_data_mat, # ensure matrix form is passed
-      variable_names = variable_names, top_n_terms = top_n_terms
+      variable_names = variable_names, color_by_feature = color_by_feature_idx, top_n_terms = top_n_terms
     )
   }
 
@@ -340,11 +486,11 @@ plot.nn2poly <- function(x, type = "bar", ...,
   else if (type == "interaction_surface") {
     if (is.null(feature_pair)) stop("For 'interaction_surface', 'feature_pair' must be provided.", call. = FALSE)
     if (is.null(original_feature_data)) stop("For 'interaction_surface', 'original_feature_data' must be provided.", call. = FALSE) # original_feature_data for surface
-    if (is.null(x$labels) || is.null(x$values)) stop("Input 'x' is not a valid nn2poly object for 'interaction_surface'.", call. = FALSE)
+    if (is.null(poly_obj$labels) || is.null(poly_obj$values)) stop("Input 'x' is not a valid nn2poly object for 'interaction_surface'.", call. = FALSE)
 
     current_original_feature_data <- original_feature_data # Use the one passed for this plot type
     plot_object <- plot_interaction_surface_internal(
-      poly_obj = x, feature_pair = feature_pair,
+      poly_obj = poly_obj, feature_pair = feature_pair,
       original_feature_data = current_original_feature_data,
       grid_resolution = grid_resolution, variable_names = variable_names,
       poly_output_index = poly_output_index
@@ -352,21 +498,24 @@ plot.nn2poly <- function(x, type = "bar", ...,
   }
   # --- Interaction Network Plot ---
   else if (type == "interaction_network") {
-    if (is.null(x$labels) || is.null(x$values)) stop("Input 'x' is not a valid nn2poly object for 'interaction_network'.", call. = FALSE)
+    if (is.null(poly_obj$labels) || is.null(poly_obj$values)) stop("Input 'x' is not a valid nn2poly object for 'interaction_network'.", call. = FALSE)
 
     current_newdata_monomials <- newdata_monomials
     if (metric_network == "mean_monomial_abs" && is.null(current_newdata_monomials)) {
       stop("If metric_network is 'mean_monomial_abs', 'newdata_monomials' must be provided for 'interaction_network'.", call. = FALSE)
     }
 
+    if (!is.null(current_newdata_monomials))
+      current_newdata_monomials <- .nn2poly_extract_final_monomials(current_newdata_monomials)
+
     plot_object <- plot_interaction_network_internal(
-      poly_obj = x, interaction_order = interaction_order_network,
+      poly_obj = poly_obj, interaction_order = interaction_order_network,
       metric = metric_network, newdata_monomials = current_newdata_monomials,
       top_n_interactions = top_n_interactions, variable_names = variable_names,
       poly_output_index = poly_output_index, layout = layout_network
     )
   } else {
-    stop(paste0("Unknown plot type: '", type, "'. Available types are 'bar', 'heatmap', 'local_contributions', 'beeswarm', 'interaction_surface', 'interaction_network'."), call. = FALSE)
+    stop(paste0("Unknown plot type: '", type, "'. Available types are 'bar', 'heatmap', 'local_contributions', 'waterfall', 'beeswarm', 'interaction_surface', 'interaction_network'."), call. = FALSE)
   }
   return(plot_object)
 }
@@ -604,7 +753,7 @@ plot_bar <- function(poly_obj, n = NULL, variable_names = NULL, min_order = 0) {
 #'
 #' @inheritParams plot.nn2poly
 #'
-#' @return
+#' @return A ggplot object.
 #' @noRd
 plot_heatmap <- function(poly_obj, variable_names = NULL) { # Changed x to poly_obj
 
@@ -893,12 +1042,159 @@ plot_local_contributions_internal <- function(poly_obj,
   return(final_plot)
 }
 
+plot_waterfall_internal <- function(poly_obj,
+                                   monomial_values_for_obs,
+                                   variable_names = NULL,
+                                   waterfall_n = 15) {
+  if (!is.list(poly_obj) || is.null(poly_obj$labels))
+    stop("'poly_obj' must be a valid nn2poly object with labels.", call. = FALSE)
+
+  if (!is.numeric(monomial_values_for_obs) || !is.vector(monomial_values_for_obs))
+    stop("'monomial_values_for_obs' must be a numeric vector.", call. = FALSE)
+
+  if (length(poly_obj$labels) != length(monomial_values_for_obs))
+    stop("Length of 'poly_obj$labels' and 'monomial_values_for_obs' must match.", call. = FALSE)
+
+  intercept_idx <- which(sapply(poly_obj$labels, function(lab) length(lab) == 1 && lab[1] == 0))
+  intercept_value <- 0
+  if (length(intercept_idx) > 0)
+    intercept_value <- monomial_values_for_obs[intercept_idx[1]]
+
+  # Build a per-term table
+  term_df <- data.frame(
+    term_index = seq_along(poly_obj$labels),
+    contribution = as.numeric(monomial_values_for_obs),
+    stringsAsFactors = FALSE
+  )
+
+  term_df$is_intercept <- FALSE
+  if (length(intercept_idx) > 0)
+    term_df$is_intercept[intercept_idx[1]] <- TRUE
+
+  term_labels <- lapply(poly_obj$labels, function(lab) lab)
+  term_df$term_label_str <- vapply(
+    term_labels,
+    function(lab) {
+      if (length(lab) == 1 && lab[1] == 0)
+        return("(Intercept)")
+      format_term_label_display(
+        lab,
+        variable_names = variable_names,
+        use_product_format_for_named = TRUE,
+        use_product_format_for_numeric = TRUE
+      )
+    },
+    character(1)
+  )
+
+  # Order terms (excluding intercept) by absolute contribution
+  other_terms <- term_df[!term_df$is_intercept, , drop = FALSE]
+  other_terms <- other_terms[order(abs(other_terms$contribution), decreasing = TRUE), , drop = FALSE]
+
+  if (!is.null(waterfall_n) && is.finite(waterfall_n)) {
+    waterfall_n <- as.integer(waterfall_n)
+    if (waterfall_n < 0)
+      stop("'waterfall_n' must be >= 0.", call. = FALSE)
+  } else {
+    waterfall_n <- nrow(other_terms)
+  }
+
+  kept_terms <- utils::head(other_terms, waterfall_n)
+  dropped_terms <- if (nrow(other_terms) > nrow(kept_terms)) other_terms[(nrow(kept_terms) + 1):nrow(other_terms), , drop = FALSE] else NULL
+
+  steps <- list(
+    data.frame(term_label_str = "(Intercept)", contribution = intercept_value, stringsAsFactors = FALSE)
+  )
+
+  if (nrow(kept_terms) > 0)
+    steps[[length(steps) + 1]] <- kept_terms[, c("term_label_str", "contribution"), drop = FALSE]
+
+  if (!is.null(dropped_terms) && nrow(dropped_terms) > 0) {
+    steps[[length(steps) + 1]] <- data.frame(
+      term_label_str = "(Other)",
+      contribution = sum(dropped_terms$contribution),
+      stringsAsFactors = FALSE
+    )
+  }
+
+  plot_df <- do.call(rbind, steps)
+
+  plot_df$step_id <- seq_len(nrow(plot_df))
+  plot_df$start <- c(0, head(cumsum(plot_df$contribution), -1))
+  plot_df$end <- cumsum(plot_df$contribution)
+  plot_df$ymin <- pmin(plot_df$start, plot_df$end)
+  plot_df$ymax <- pmax(plot_df$start, plot_df$end)
+  plot_df$sign <- factor(sign(plot_df$contribution), levels = c(-1, 0, 1))
+
+  plot_df$prev_end <- c(NA_real_, head(plot_df$end, -1))
+
+  pred_value <- tail(plot_df$end, 1)
+  pred_row <- data.frame(step_id = max(plot_df$step_id) + 1L, y = pred_value)
+
+  p <- ggplot2::ggplot(plot_df) +
+    ggplot2::geom_hline(yintercept = 0, color = "grey60") +
+    ggplot2::geom_rect(
+      ggplot2::aes(
+        xmin = .data$step_id - 0.4,
+        xmax = .data$step_id + 0.4,
+        ymin = .data$ymin,
+        ymax = .data$ymax,
+        fill = .data$sign
+      ),
+      color = "black"
+    ) +
+    ggplot2::geom_segment(
+      data = plot_df[!is.na(plot_df$prev_end), , drop = FALSE],
+      ggplot2::aes(
+        x = .data$step_id - 1 + 0.4,
+        xend = .data$step_id - 0.4,
+        y = .data$prev_end,
+        yend = .data$prev_end
+      ),
+      inherit.aes = FALSE,
+      color = "grey50"
+    ) +
+    ggplot2::geom_point(
+      data = pred_row,
+      ggplot2::aes(x = .data$step_id, y = .data$y),
+      inherit.aes = FALSE,
+      size = 2.2,
+      color = "black"
+    ) +
+    ggplot2::scale_fill_manual(
+      values = c("-1" = "#F8766D", "0" = "grey80", "1" = "#00BA38"),
+      breaks = c("-1", "1", "0"),
+      labels = c("-" , "+", "0"),
+      name = "Sign"
+    ) +
+    ggplot2::scale_x_continuous(
+      breaks = c(plot_df$step_id, pred_row$step_id),
+      labels = c(plot_df$term_label_str, "Prediction"),
+      expand = ggplot2::expansion(add = c(0.2, 0.6))
+    ) +
+    ggplot2::labs(
+      title = "Waterfall: term contributions",
+      x = NULL,
+      y = "Model output"
+    ) +
+    ggplot2::coord_flip() +
+    ggplot2::theme_minimal(base_size = 10) +
+    ggplot2::theme(
+      legend.position = "top",
+      legend.direction = "horizontal",
+      plot.title = ggplot2::element_text(hjust = 0.5, size = 14)
+    )
+
+  p
+}
+
 #' Internal function for plot.nn2poly beeswarm type.
 #' @noRd
 plot_beeswarm_internal <- function(poly_obj,
                                    all_monomial_values_for_output, # 2D matrix: observations x terms
                                    original_feature_data,        # Full matrix/data frame of original predictors
                                    variable_names = NULL,
+                                   color_by_feature = 1,
                                    top_n_terms = NULL) {
 
   if (!requireNamespace("ggbeeswarm", quietly = TRUE)) {
@@ -972,45 +1268,26 @@ plot_beeswarm_internal <- function(poly_obj,
   # --- Prepare Data for Plotting (Long Format) ---
   plot_df_list <- list()
   term_strings_for_plot <- character(length(final_labels_to_plot))
+  if (color_by_feature < 1 || color_by_feature > num_features_orig)
+    stop("'color_by_feature' is out of bounds for 'original_feature_data'.", call. = FALSE)
+
+  coloring_vector <- as.numeric(original_feature_data[, color_by_feature])
 
   for (j_idx in seq_along(final_labels_to_plot)) {
     term_lab_vector <- final_labels_to_plot[[j_idx]] # e.g. c(1), c(1,2)
 
-    term_str <- format_term_label_display(term_lab_vector, variable_names, use_product_format_for_named = TRUE)
+    term_str <- format_term_label_display(
+      term_lab_vector,
+      variable_names = variable_names,
+      use_product_format_for_named = TRUE,
+      use_product_format_for_numeric = TRUE
+    )
     term_strings_for_plot[j_idx] <- term_str
-
-    # Calculate the product of feature values for coloring
-    # P(X) part of M = c * P(X)
-    feature_product_for_coloring <- rep(1, num_obs_mono) # Start with 1 for product
-    valid_term <- TRUE
-    if (length(term_lab_vector) > 0) { # Should always be true if not intercept
-      for (var_idx_in_term in term_lab_vector) {
-        if (var_idx_in_term > 0 && var_idx_in_term <= num_features_orig) {
-          feature_product_for_coloring <- feature_product_for_coloring * original_feature_data[, var_idx_in_term]
-        } else if (var_idx_in_term == 0) { # Should not happen, intercept excluded
-          # This term involves intercept for coloring?
-          # For simplicity, if a 0 is in term_lab_vector (should not be), product is 0 or 1 depending on interpretation.
-          # Here, we are assuming term_lab_vector only contains positive variable indices.
-        } else {
-          # Variable index in term is out of bounds for original_feature_data
-          warning(paste0("Variable index ", var_idx_in_term, " in term '", term_str,
-                         "' is out of bounds for 'original_feature_data' (max col: ", num_features_orig,
-                         "). Coloring for this term might be inaccurate."), call. = FALSE)
-          feature_product_for_coloring <- rep(NA, num_obs_mono) # Make coloring NA
-          valid_term <- FALSE
-          break
-        }
-      }
-    } else { # Empty term label (should not happen)
-      feature_product_for_coloring <- rep(NA, num_obs_mono)
-      valid_term <- FALSE
-    }
-
 
     plot_df_list[[j_idx]] <- data.frame(
       term_label_str = term_str,
       monomial_value = final_monomial_values_to_plot[, j_idx],
-      coloring_value = if(valid_term) feature_product_for_coloring else NA_real_, # Use the calculated product
+      coloring_value = coloring_vector,
       stringsAsFactors = FALSE
     )
   }
@@ -1027,7 +1304,13 @@ plot_beeswarm_internal <- function(poly_obj,
                                         levels = term_strings_for_plot[y_axis_order_indices])
 
   # Legend title for coloring
-  color_legend_title <- "Feature Product Value"
+  color_legend_title <- if (!is.null(variable_names) && color_by_feature <= length(variable_names)) {
+    variable_names[color_by_feature]
+  } else if (!is.null(colnames(original_feature_data)) && color_by_feature <= length(colnames(original_feature_data))) {
+    colnames(original_feature_data)[color_by_feature]
+  } else {
+    paste0("Feature ", color_by_feature)
+  }
 
 
   # --- Generate Plot ---
@@ -1379,8 +1662,3 @@ plot_interaction_network_internal <- function(poly_obj,
 
   return(gg_plot)
 }
-
-
-
-
-
