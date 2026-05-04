@@ -13,6 +13,23 @@ test_that("Intercept-only polynomial evaluation works", {
   expect_equal(eval_poly(poly, newdata, monomials = TRUE), array(2, dim = c(1, 1, 1)))
 })
 
+test_that("Intercept can be reordered from the last polynomial term", {
+  poly <- list(
+    values = c(10, 2),
+    labels = list(c(2), c(0))
+  )
+
+  newdata <- rbind(c(1, 3), c(1, 4))
+
+  expect_equal(eval_poly(poly, newdata), c(32, 42))
+
+  expected_monomials <- array(
+    c(30, 40, 2, 2),
+    dim = c(2, 2, 1)
+  )
+  expect_equal(eval_poly(poly, newdata, monomials = TRUE), expected_monomials)
+})
+
 test_that("Errors when newdata has fewer columns than the polynomial needs", {
   poly <- list(
     values = c(1, 1),

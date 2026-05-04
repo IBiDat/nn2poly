@@ -1,6 +1,7 @@
 # cleanup python files after each test (based on vetiver's setup.R)
 teardown({
-  if (requireNamespace("reticulate", quietly = TRUE)) {
+  if (requireNamespace("reticulate", quietly = TRUE) &&
+      reticulate::py_available(initialize = FALSE)) {
     python_temp_dir <- dirname(reticulate::py_run_string(
       "import tempfile; x=tempfile.NamedTemporaryFile().name",
       local = TRUE

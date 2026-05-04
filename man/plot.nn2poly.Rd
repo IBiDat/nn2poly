@@ -37,7 +37,8 @@
 \item \code{"local_contributions"}: per-feature local attributions for one observation
 by redistributing each term contribution across its variables (by multiplicity).
 \item \code{"waterfall"}: SHAP-like waterfall using per-term contributions for one observation.
-\item \code{"beeswarm"}: SHAP-like summary (beeswarm) of per-term contributions across observations.
+\item \code{"beeswarm"}: SHAP-like summary (beeswarm) of per-term contributions
+across observations, colored by one selected original feature.
 }
 
 Additional types (\code{"interaction_surface"}, \code{"interaction_network"}) are experimental.}
@@ -52,7 +53,8 @@ Additional types (\code{"interaction_surface"}, \code{"interaction_network"}) ar
 2 excludes intercept and linear terms, showing terms of polynomial degree 2+.}
 
 \item{newdata_monomials}{For \code{type = "local_contributions"}, \code{"waterfall"} or \code{"beeswarm"},
-the output of \code{predict(x, newdata, monomials = TRUE)}. This should be
+the output of \code{predict(x, newdata, monomials = TRUE)}. These values are
+per-term contributions (coefficient multiplied by variable product). This should be
 for a single observation for "local_contributions" (or specify \code{observation_index})
 and for multiple observations for "beeswarm".}
 
@@ -77,12 +79,12 @@ into an \code{(Other)} bucket.}
 of the original predictor values for all observations in \code{newdata_monomials}.
 Required for coloring points.}
 
-\item{color_by_feature}{For \code{type = "beeswarm"}, which feature to use for
-coloring the points. Can be a numeric column index or a character name
+\item{color_by_feature}{For \code{type = "beeswarm"}, which original feature to
+use for selected-feature coloring. Can be a numeric column index or a character name
 matching \code{colnames(original_feature_data)} or \code{variable_names}.}
 
 \item{top_n_terms}{For \code{type = "beeswarm"}, an optional integer to display only
-the top N most important terms (based on mean absolute monomial value).}
+the top N most important terms (based on mean absolute term contribution).}
 
 \item{feature_pair}{For \code{type = "interaction_surface"}, a numeric or character
 vector of length 2 specifying the pair of features to plot.}

@@ -220,6 +220,50 @@ predict.nn2poly <- function(object,
   poly_obj
 }
 
+.nn2poly_validate_whole_number <- function(x,
+                                           arg,
+                                           allow_null = FALSE,
+                                           min = NULL,
+                                           max = NULL) {
+  if (is.null(x)) {
+    if (allow_null)
+      return(NULL)
+    stop("'", arg, "' must not be NULL.", call. = FALSE)
+  }
+
+  if (!is.numeric(x) || length(x) != 1L || is.na(x) || !is.finite(x) ||
+      abs(x - round(x)) > sqrt(.Machine$double.eps)) {
+    stop("'", arg, "' must be a single whole number.", call. = FALSE)
+  }
+
+  x <- as.integer(round(x))
+  if (!is.null(min) && x < min)
+    stop("'", arg, "' must be >= ", min, ".", call. = FALSE)
+  if (!is.null(max) && x > max)
+    stop("'", arg, "' must be <= ", max, ".", call. = FALSE)
+
+  x
+}
+
+.nn2poly_validate_optional_whole_number <- function(x,
+                                                    arg,
+                                                    min = NULL,
+                                                    max = NULL) {
+  .nn2poly_validate_whole_number(
+    x = x,
+    arg = arg,
+    allow_null = TRUE,
+    min = min,
+    max = max
+  )
+}
+
+.nn2poly_validate_character_scalar <- function(x, arg) {
+  if (!is.character(x) || length(x) != 1L || is.na(x) || !nzchar(x))
+    stop("'", arg, "' must be a single non-empty string.", call. = FALSE)
+  x
+}
+
 .nn2poly_extract_final_monomials <- function(newdata_monomials) {
   if (is.array(newdata_monomials))
     return(newdata_monomials)
@@ -247,15 +291,48 @@ predict.nn2poly <- function(object,
   num_obs_pred <- pred_dims[1]
   num_poly_outputs_pred <- if (length(pred_dims) == 3) pred_dims[3] else 1
 
-  if (observation_index < 1 || observation_index > num_obs_pred)
-    stop("'observation_index' out of bounds.", call. = FALSE)
-  if (poly_output_index < 1 || poly_output_index > num_poly_outputs_pred)
-    stop("'poly_output_index' out of bounds.", call. = FALSE)
+  observation_index <- .nn2poly_validate_whole_number(
+    observation_index,
+    "observation_index",
+    min = 1,
+    max = num_obs_pred
+  )
+  poly_output_index <- .nn2poly_validate_whole_number(
+    poly_output_index,
+    "poly_output_index",
+    min = 1,
+    max = num_poly_outputs_pred
+  )
 
   if (num_poly_outputs_pred == 1 && length(pred_dims) == 2) {
     return(newdata_monomials[observation_index, ])
   }
   newdata_monomials[observation_index, , poly_output_index]
+}
+
+.nn2poly_slice_monomials_for_output <- function(newdata_monomials,
+                                                poly_output_index) {
+  pred_dims <- dim(newdata_monomials)
+  if (is.null(pred_dims) || length(pred_dims) < 2 || length(pred_dims) > 3)
+    stop("'newdata_monomials' must be a 2D or 3D array.", call. = FALSE)
+
+  if (length(pred_dims) == 2) {
+    .nn2poly_validate_whole_number(poly_output_index, "poly_output_index", min = 1, max = 1)
+    return(as.matrix(newdata_monomials))
+  }
+
+  poly_output_index <- .nn2poly_validate_whole_number(
+    poly_output_index,
+    "poly_output_index",
+    min = 1,
+    max = pred_dims[3]
+  )
+
+  matrix(
+    newdata_monomials[, , poly_output_index],
+    nrow = pred_dims[1],
+    ncol = pred_dims[2]
+  )
 }
 
 .nn2poly_resolve_feature_index <- function(color_by_feature,
@@ -265,13 +342,16 @@ predict.nn2poly <- function(object,
     return(NULL)
 
   if (is.numeric(color_by_feature) && length(color_by_feature) == 1) {
-    idx <- as.integer(color_by_feature)
-    if (idx < 1 || idx > ncol(original_feature_data))
-      stop("'color_by_feature' is out of bounds for 'original_feature_data'.", call. = FALSE)
-    return(idx)
+    return(.nn2poly_validate_whole_number(
+      color_by_feature,
+      "color_by_feature",
+      min = 1,
+      max = ncol(original_feature_data)
+    ))
   }
 
   if (is.character(color_by_feature) && length(color_by_feature) == 1) {
+    color_by_feature <- .nn2poly_validate_character_scalar(color_by_feature, "color_by_feature")
     if (!is.null(colnames(original_feature_data))) {
       hit <- match(color_by_feature, colnames(original_feature_data))
       if (!is.na(hit))
@@ -299,7 +379,8 @@ predict.nn2poly <- function(object,
 #' - `"local_contributions"`: per-feature local attributions for one observation
 #'   by redistributing each term contribution across its variables (by multiplicity).
 #' - `"waterfall"`: SHAP-like waterfall using per-term contributions for one observation.
-#' - `"beeswarm"`: SHAP-like summary (beeswarm) of per-term contributions across observations.
+#' - `"beeswarm"`: SHAP-like summary (beeswarm) of per-term contributions
+#'   across observations, colored by one selected original feature.
 #'
 #' Additional types (`"interaction_surface"`, `"interaction_network"`) are experimental.
 #' @param ... Additional arguments passed to specific plot types.
@@ -307,7 +388,8 @@ predict.nn2poly <- function(object,
 #' @param n For `type = "bar"`, the number of top coefficients to plot.
 #'
 #' @param newdata_monomials For `type = "local_contributions"`, `"waterfall"` or `"beeswarm"`,
-#'   the output of `predict(x, newdata, monomials = TRUE)`. This should be
+#'   the output of `predict(x, newdata, monomials = TRUE)`. These values are
+#'   per-term contributions (coefficient multiplied by variable product). This should be
 #'   for a single observation for "local_contributions" (or specify `observation_index`)
 #'   and for multiple observations for "beeswarm".
 #' @param observation_index For `type = "local_contributions"`, the row index
@@ -326,11 +408,11 @@ predict.nn2poly <- function(object,
 #' @param original_feature_data For `type = "beeswarm"`, a matrix or data frame
 #'   of the original predictor values for all observations in `newdata_monomials`.
 #'   Required for coloring points.
-#' @param color_by_feature For `type = "beeswarm"`, which feature to use for
-#'   coloring the points. Can be a numeric column index or a character name
+#' @param color_by_feature For `type = "beeswarm"`, which original feature to
+#'   use for selected-feature coloring. Can be a numeric column index or a character name
 #'   matching `colnames(original_feature_data)` or `variable_names`.
 #' @param top_n_terms For `type = "beeswarm"`, an optional integer to display only
-#'   the top N most important terms (based on mean absolute monomial value).
+#'   the top N most important terms (based on mean absolute term contribution).
 #' @param min_order For `type = "bar"`, the minimum order of terms to include.
 #'   0 (default) includes intercept (order 0 for this purpose) and all terms.
 #'   1 excludes intercept, showing terms of polynomial degree 1+.
@@ -380,15 +462,17 @@ plot.nn2poly <- function(x, type = "bar", ...,
   if (length(class(x)) > 1) {
     return(NextMethod())
   }
+  type <- .nn2poly_validate_character_scalar(type, "type")
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("Package 'ggplot2' is required for this functionality.", call. = FALSE)
   }
 
   plot_object <- NULL
   poly_obj <- NULL
+  available_types <- c("bar", "heatmap", "local_contributions", "waterfall",
+                       "beeswarm", "interaction_surface", "interaction_network")
 
-  if (type %in% c("bar", "heatmap", "local_contributions", "waterfall", "beeswarm",
-                  "interaction_surface", "interaction_network")) {
+  if (type %in% available_types) {
     poly_obj <- .nn2poly_normalize_poly(.nn2poly_extract_final_poly(x))
   }
 
@@ -442,6 +526,7 @@ plot.nn2poly <- function(x, type = "bar", ...,
   else if (type == "beeswarm") {
     if (is.null(newdata_monomials)) stop("For 'beeswarm', 'newdata_monomials' must be provided.", call. = FALSE)
     if (is.null(original_feature_data)) stop("For 'beeswarm', 'original_feature_data' must be provided for coloring.", call. = FALSE)
+    top_n_terms <- .nn2poly_validate_optional_whole_number(top_n_terms, "top_n_terms", min = 1)
     newdata_monomials_arr <- .nn2poly_extract_final_monomials(newdata_monomials)
     pred_dims <- dim(newdata_monomials_arr)
     if (length(pred_dims) < 2 || length(pred_dims) > 3) stop("'newdata_monomials' must be a 2D or 3D array.", call. = FALSE)
@@ -458,7 +543,12 @@ plot.nn2poly <- function(x, type = "bar", ...,
     }
 
     if (nrow(original_feature_data_mat) != num_obs_pred) stop("Row count mismatch: 'original_feature_data' and 'newdata_monomials'.", call. = FALSE)
-    if (poly_output_index < 1 || poly_output_index > num_poly_outputs_pred) stop("'poly_output_index' out of bounds.", call. = FALSE)
+    poly_output_index <- .nn2poly_validate_whole_number(
+      poly_output_index,
+      "poly_output_index",
+      min = 1,
+      max = num_poly_outputs_pred
+    )
     if (num_terms_pred != length(poly_obj$labels)) stop("Term count mismatch between 'newdata_monomials' and the nn2poly object labels.", call. = FALSE)
 
     color_by_feature_idx <- .nn2poly_resolve_feature_index(
@@ -469,11 +559,10 @@ plot.nn2poly <- function(x, type = "bar", ...,
     if (is.null(color_by_feature_idx))
       color_by_feature_idx <- 1L
 
-    monomial_values_for_plot <- if (num_poly_outputs_pred == 1 && length(pred_dims) == 2) {
-      newdata_monomials_arr
-    } else {
-      newdata_monomials_arr[, , poly_output_index]
-    }
+    monomial_values_for_plot <- .nn2poly_slice_monomials_for_output(
+      newdata_monomials_arr,
+      poly_output_index = poly_output_index
+    )
 
     plot_object <- plot_beeswarm_internal(
       poly_obj = poly_obj, all_monomial_values_for_output = monomial_values_for_plot,
@@ -501,6 +590,8 @@ plot.nn2poly <- function(x, type = "bar", ...,
     if (is.null(poly_obj$labels) || is.null(poly_obj$values)) stop("Input 'x' is not a valid nn2poly object for 'interaction_network'.", call. = FALSE)
 
     current_newdata_monomials <- newdata_monomials
+    metric_network <- .nn2poly_validate_character_scalar(metric_network, "metric_network")
+    metric_network <- match.arg(metric_network, c("coefficient_abs", "mean_monomial_abs"))
     if (metric_network == "mean_monomial_abs" && is.null(current_newdata_monomials)) {
       stop("If metric_network is 'mean_monomial_abs', 'newdata_monomials' must be provided for 'interaction_network'.", call. = FALSE)
     }
@@ -585,6 +676,8 @@ format_term_label_display <- function(term_label_vec,
 #' @return A ggplot object.
 #' @noRd
 plot_bar <- function(poly_obj, n = NULL, variable_names = NULL, min_order = 0) {
+  n <- .nn2poly_validate_optional_whole_number(n, "n", min = 0)
+  min_order <- .nn2poly_validate_whole_number(min_order, "min_order", min = 0)
 
   # --- 1. Filter terms based on min_order ---
   labels_to_keep <- list()
@@ -723,8 +816,8 @@ plot_bar <- function(poly_obj, n = NULL, variable_names = NULL, min_order = 0) {
       drop = FALSE # Show all legend items even if one sign not present
     ) +
     ggplot2::labs(title = plot_title_text,
-                  x = "Coefficient (absolute value)",
-                  y = "Polynomial Term")
+                  x = "Polynomial Term",
+                  y = "Coefficient (absolute value)")
 
 
     p <- p + ggplot2::theme_minimal(base_size = 10) +
@@ -884,6 +977,12 @@ plot_local_contributions_internal <- function(poly_obj,
                                               variable_names = NULL,
                                               max_order_to_display = 3) {
 
+  max_order_to_display <- .nn2poly_validate_whole_number(
+    max_order_to_display,
+    "max_order_to_display",
+    min = 1
+  )
+
   # --- Input Validation ---
   if (!is.list(poly_obj) || is.null(poly_obj$labels)) {
     stop("'poly_obj' must be a valid nn2poly object with labels.")
@@ -901,7 +1000,7 @@ plot_local_contributions_internal <- function(poly_obj,
     term_label <- poly_obj$labels[[i]]       # e.g., c(1), c(1,2), c(1,1,2)
     term_value_for_obs <- monomial_values_for_obs[i]
 
-    # Skip if monomial value is effectively zero
+    # Skip if this term contribution is effectively zero
     if (abs(term_value_for_obs) < .Machine$double.eps^0.75) { # More robust check for zero
       next
     }
@@ -962,7 +1061,7 @@ plot_local_contributions_internal <- function(poly_obj,
 
   # Aggregate contributions: sum up all contributions for each variable_idx and term_order_num
   # E.g., if var 1 gets contribution from term c(1) [1st order] and from term c(1,1,2) [3rd order]
-  plot_df_agg <- aggregate(contribution ~ variable_idx + term_order_num, data = plot_df, FUN = sum)
+  plot_df_agg <- stats::aggregate(contribution ~ variable_idx + term_order_num, data = plot_df, FUN = sum)
 
   # Filter out effectively zero aggregated contributions
   plot_df_agg <- plot_df_agg[abs(plot_df_agg$contribution) > .Machine$double.eps^0.75, ]
@@ -1046,6 +1145,12 @@ plot_waterfall_internal <- function(poly_obj,
                                    monomial_values_for_obs,
                                    variable_names = NULL,
                                    waterfall_n = 15) {
+  waterfall_n <- .nn2poly_validate_optional_whole_number(
+    waterfall_n,
+    "waterfall_n",
+    min = 0
+  )
+
   if (!is.list(poly_obj) || is.null(poly_obj$labels))
     stop("'poly_obj' must be a valid nn2poly object with labels.", call. = FALSE)
 
@@ -1091,11 +1196,7 @@ plot_waterfall_internal <- function(poly_obj,
   other_terms <- term_df[!term_df$is_intercept, , drop = FALSE]
   other_terms <- other_terms[order(abs(other_terms$contribution), decreasing = TRUE), , drop = FALSE]
 
-  if (!is.null(waterfall_n) && is.finite(waterfall_n)) {
-    waterfall_n <- as.integer(waterfall_n)
-    if (waterfall_n < 0)
-      stop("'waterfall_n' must be >= 0.", call. = FALSE)
-  } else {
+  if (is.null(waterfall_n)) {
     waterfall_n <- nrow(other_terms)
   }
 
@@ -1120,15 +1221,15 @@ plot_waterfall_internal <- function(poly_obj,
   plot_df <- do.call(rbind, steps)
 
   plot_df$step_id <- seq_len(nrow(plot_df))
-  plot_df$start <- c(0, head(cumsum(plot_df$contribution), -1))
+  plot_df$start <- c(0, utils::head(cumsum(plot_df$contribution), -1))
   plot_df$end <- cumsum(plot_df$contribution)
   plot_df$ymin <- pmin(plot_df$start, plot_df$end)
   plot_df$ymax <- pmax(plot_df$start, plot_df$end)
   plot_df$sign <- factor(sign(plot_df$contribution), levels = c(-1, 0, 1))
 
-  plot_df$prev_end <- c(NA_real_, head(plot_df$end, -1))
+  plot_df$prev_end <- c(NA_real_, utils::head(plot_df$end, -1))
 
-  pred_value <- tail(plot_df$end, 1)
+  pred_value <- utils::tail(plot_df$end, 1)
   pred_row <- data.frame(step_id = max(plot_df$step_id) + 1L, y = pred_value)
 
   p <- ggplot2::ggplot(plot_df) +
@@ -1196,6 +1297,11 @@ plot_beeswarm_internal <- function(poly_obj,
                                    variable_names = NULL,
                                    color_by_feature = 1,
                                    top_n_terms = NULL) {
+  top_n_terms <- .nn2poly_validate_optional_whole_number(
+    top_n_terms,
+    "top_n_terms",
+    min = 1
+  )
 
   if (!requireNamespace("ggbeeswarm", quietly = TRUE)) {
     stop("Package 'ggbeeswarm' is required for the 'beeswarm' plot type.\n",
@@ -1214,8 +1320,8 @@ plot_beeswarm_internal <- function(poly_obj,
   # Ensure original_feature_data is a matrix
   if (!is.matrix(original_feature_data)) {
     original_feature_data <- as.matrix(original_feature_data)
-    if (!is.numeric(original_feature_data)) {
-      stop("'original_feature_data' could not be coerced to a numeric matrix.")
+    if (!is.numeric(original_feature_data) && !is.logical(original_feature_data)) {
+      stop("'original_feature_data' could not be coerced to a numeric/logical matrix.")
     }
   }
   num_obs_orig <- nrow(original_feature_data)
@@ -1248,19 +1354,19 @@ plot_beeswarm_internal <- function(poly_obj,
   }
 
   # --- Term Importance and Selection ---
-  mean_abs_monomial_vals_all <- colMeans(abs(current_monomial_values_no_intercept), na.rm = TRUE)
+  mean_abs_term_contribution_vals_all <- colMeans(abs(current_monomial_values_no_intercept), na.rm = TRUE)
 
   if (!is.null(top_n_terms) && top_n_terms > 0 && top_n_terms < ncol(current_monomial_values_no_intercept)) {
-    term_order_indices <- order(mean_abs_monomial_vals_all, decreasing = TRUE)
+    term_order_indices <- order(mean_abs_term_contribution_vals_all, decreasing = TRUE)
     selected_indices_in_no_intercept <- term_order_indices[1:top_n_terms]
 
     final_labels_to_plot <- current_labels_raw_no_intercept[selected_indices_in_no_intercept]
     final_monomial_values_to_plot <- current_monomial_values_no_intercept[, selected_indices_in_no_intercept, drop = FALSE]
-    mean_abs_for_selected_terms <- mean_abs_monomial_vals_all[selected_indices_in_no_intercept]
+    mean_abs_for_selected_terms <- mean_abs_term_contribution_vals_all[selected_indices_in_no_intercept]
   } else {
     final_labels_to_plot <- current_labels_raw_no_intercept
     final_monomial_values_to_plot <- current_monomial_values_no_intercept
-    mean_abs_for_selected_terms <- mean_abs_monomial_vals_all
+    mean_abs_for_selected_terms <- mean_abs_term_contribution_vals_all
   }
 
   y_axis_order_indices <- order(mean_abs_for_selected_terms, decreasing = FALSE)
@@ -1268,8 +1374,12 @@ plot_beeswarm_internal <- function(poly_obj,
   # --- Prepare Data for Plotting (Long Format) ---
   plot_df_list <- list()
   term_strings_for_plot <- character(length(final_labels_to_plot))
-  if (color_by_feature < 1 || color_by_feature > num_features_orig)
-    stop("'color_by_feature' is out of bounds for 'original_feature_data'.", call. = FALSE)
+  color_by_feature <- .nn2poly_validate_whole_number(
+    color_by_feature,
+    "color_by_feature",
+    min = 1,
+    max = num_features_orig
+  )
 
   coloring_vector <- as.numeric(original_feature_data[, color_by_feature])
 
@@ -1286,7 +1396,7 @@ plot_beeswarm_internal <- function(poly_obj,
 
     plot_df_list[[j_idx]] <- data.frame(
       term_label_str = term_str,
-      monomial_value = final_monomial_values_to_plot[, j_idx],
+      term_contribution = final_monomial_values_to_plot[, j_idx],
       coloring_value = coloring_vector,
       stringsAsFactors = FALSE
     )
@@ -1315,14 +1425,14 @@ plot_beeswarm_internal <- function(poly_obj,
 
   # --- Generate Plot ---
   beeswarm_plot <- ggplot2::ggplot(plot_df_long,
-                                   ggplot2::aes(x = .data$monomial_value,
+                                   ggplot2::aes(x = .data$term_contribution,
                                                 y = .data$term_label_str,
                                                 colour = .data$coloring_value)) +
     ggplot2::geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
     ggbeeswarm::geom_quasirandom(alpha = 1, size = 1.5, shape = 16, groupOnX = FALSE, na.rm = TRUE) +
     ggplot2::scale_colour_gradient2(low = "#F8766D", mid = "gray80", high = "#00BA38", midpoint = 0, name = color_legend_title, na.value = "grey70") +
     ggplot2::labs(title = "Term Contribution Beeswarm Plot",
-                  x = "Monomial Term Value (Contribution)",
+                  x = "Term Contribution",
                   y = "Polynomial Term") +
     ggplot2::theme_minimal(base_size = 10) +
     ggplot2::theme(legend.position = "right",
@@ -1384,6 +1494,17 @@ plot_interaction_surface_internal <- function(poly_obj,
                                               grid_resolution = 20,
                                               variable_names = NULL,
                                               poly_output_index = 1) {
+  grid_resolution <- .nn2poly_validate_whole_number(
+    grid_resolution,
+    "grid_resolution",
+    min = 2
+  )
+  poly_output_index <- .nn2poly_validate_whole_number(
+    poly_output_index,
+    "poly_output_index",
+    min = 1,
+    max = ncol(poly_obj$values)
+  )
 
   if (!is.matrix(original_feature_data)) original_feature_data <- as.matrix(original_feature_data)
   num_total_features <- ncol(original_feature_data)
@@ -1487,6 +1608,25 @@ plot_interaction_network_internal <- function(poly_obj,
                                               variable_names = NULL,
                                               poly_output_index = 1,
                                               layout = "nicely") {
+  interaction_order <- .nn2poly_validate_whole_number(
+    interaction_order,
+    "interaction_order_network",
+    min = 2
+  )
+  poly_output_index <- .nn2poly_validate_whole_number(
+    poly_output_index,
+    "poly_output_index",
+    min = 1,
+    max = ncol(poly_obj$values)
+  )
+  top_n_interactions <- .nn2poly_validate_optional_whole_number(
+    top_n_interactions,
+    "top_n_interactions",
+    min = 1
+  )
+  metric <- .nn2poly_validate_character_scalar(metric, "metric_network")
+  metric <- match.arg(metric, c("coefficient_abs", "mean_monomial_abs"))
+  layout <- .nn2poly_validate_character_scalar(layout, "layout_network")
 
   if (!requireNamespace("igraph", quietly = TRUE) || !requireNamespace("ggraph", quietly = TRUE)) {
     stop("Packages 'igraph' and 'ggraph' are required for 'interaction_network' plot type.", call. = FALSE)
@@ -1504,11 +1644,12 @@ plot_interaction_network_internal <- function(poly_obj,
   # Prepare monomial slice if needed
   monomial_slice_for_metric <- NULL
   if (metric == "mean_monomial_abs") {
-    monomial_slice_for_metric <- if (length(dim(newdata_monomials)) == 3) {
-      newdata_monomials[,,poly_output_index, drop = FALSE]
-    } else {
-      newdata_monomials
-    }
+    monomial_slice_for_metric <- .nn2poly_slice_monomials_for_output(
+      newdata_monomials,
+      poly_output_index = poly_output_index
+    )
+    if (ncol(monomial_slice_for_metric) != length(poly_obj$labels))
+      stop("Term count mismatch between 'newdata_monomials' and the nn2poly object labels.", call. = FALSE)
   }
 
 

@@ -407,11 +407,11 @@ plot(final_poly,
      metric_network = "coefficient_abs",  # Use the absolute value of coefficients for strength
      variable_names = c("X1", "X2", "X3")) # Provide variable names for nodes
 
-# Example 2.2: Plotting the 2nd-order interaction network using mean absolute monomial values
+# Example 2.2: Plotting the 2nd-order interaction network using mean absolute term contributions
 # plot(final_poly,
 #      type = "interaction_network",
 #      interaction_order_network = 2,
-#      metric_network = "mean_monomial_abs", # Use average monomial value across data for strength
+#      metric_network = "mean_monomial_abs", # Use average term contribution across data for strength
 #      newdata_monomials = prediction_monomials, # Required for mean_monomial_abs metric
 #      variable_names = c("X1", "X2", "X3"))
 
@@ -446,7 +446,6 @@ nn2poly:::plot_taylor_and_activation_potentials(object = nn,
                                                 max_order = 3,
                                                 constraints = FALSE)
 ```
-
 
 
 

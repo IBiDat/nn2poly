@@ -57,8 +57,8 @@
 <text x='429.77' y='557.49' text-anchor='middle' style='font-size: 10.00px; fill: #4D4D4D; font-family: sans;' textLength='13.90px' lengthAdjust='spacingAndGlyphs'>1,2</text>
 <text x='539.48' y='557.49' text-anchor='middle' style='font-size: 10.00px; fill: #4D4D4D; font-family: sans;' textLength='13.90px' lengthAdjust='spacingAndGlyphs'>2,2</text>
 <text x='649.19' y='557.49' text-anchor='middle' style='font-size: 10.00px; fill: #4D4D4D; font-family: sans;' textLength='13.90px' lengthAdjust='spacingAndGlyphs'>1,1</text>
-<text x='374.92' y='568.94' text-anchor='middle' style='font-size: 10.00px; font-family: sans;' textLength='121.19px' lengthAdjust='spacingAndGlyphs'>Coefficient (absolute value)</text>
-<text transform='translate(11.86,302.92) rotate(-90)' text-anchor='middle' style='font-size: 10.00px; font-family: sans;' textLength='75.03px' lengthAdjust='spacingAndGlyphs'>Polynomial Term</text>
+<text x='374.92' y='568.94' text-anchor='middle' style='font-size: 10.00px; font-family: sans;' textLength='75.03px' lengthAdjust='spacingAndGlyphs'>Polynomial Term</text>
+<text transform='translate(11.86,302.92) rotate(-90)' text-anchor='middle' style='font-size: 10.00px; font-family: sans;' textLength='121.19px' lengthAdjust='spacingAndGlyphs'>Coefficient (absolute value)</text>
 <text x='348.95' y='39.57' style='font-size: 10.00px; font-family: sans;' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>Sign</text>
 <rect x='374.66' y='28.19' width='15.86' height='15.86' style='stroke-width: 1.07; stroke-linecap: butt; stroke-linejoin: miter; fill: #00BA38;' />
 <text x='396.21' y='38.88' style='font-size: 8.00px; font-family: sans;' textLength='4.68px' lengthAdjust='spacingAndGlyphs'>+</text>
