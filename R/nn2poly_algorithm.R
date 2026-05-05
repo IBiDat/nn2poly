@@ -390,25 +390,6 @@ obtain_activation_coefficients_list <- function(af_string_list,
   return(af_coefficients_list)
 }
 
-#' Obtain needed derivatives up to the chosen order (q Taylor)
-#'
-#' This compatibility wrapper preserves the original internal helper name for
-#' Taylor coefficients.
-#'
-#' @inheritParams nn2poly
-#' @inheritParams nn2poly_algorithm
-#'
-#' @return list of vectors with the Taylor coefficients
-#'
-#' @noRd
-obtain_derivatives_list <- function(af_string_list, taylor_orders) {
-  obtain_activation_coefficients_list(
-    af_string_list = af_string_list,
-    taylor_orders = taylor_orders,
-    approximation = "taylor"
-  )
-}
-
 #' Obtain Taylor coefficients in ascending power-basis order
 #'
 #' @noRd

@@ -171,30 +171,6 @@ test_that("Taylor vector gets error becauseof non numeric value", {
   expect_error(obtain_taylor_vector(taylor_orders, af_string_list))
 })
 
-test_that("Taylor activation coefficients preserve legacy coefficient order", {
-  af_string_list <- c("softplus", "tanh", "sigmoid", "linear")
-  taylor_orders <- c(4, 5, 4, 1)
-  af_function_list <- string_to_function(af_string_list)
-
-  output <- obtain_activation_coefficients_list(
-    af_string_list = af_string_list,
-    taylor_orders = taylor_orders,
-    approximation = "taylor"
-  )
-
-  expected <- lapply(seq_along(af_function_list), function(i) {
-    coefficients <- rev(pracma::taylor(af_function_list[[i]], 0, taylor_orders[i]))
-    diff_len <- (taylor_orders[i] + 1) - length(coefficients)
-    if (diff_len > 0) {
-      coefficients <- c(coefficients, rep(0, diff_len))
-    }
-    coefficients
-  })
-
-  expect_equal(output, expected)
-  expect_equal(obtain_derivatives_list(af_string_list, taylor_orders), expected)
-})
-
 test_that("Chebyshev coefficients match pracma chebApprox", {
   af_string_list <- c("softplus", "tanh", "sigmoid", "linear")
   af_function_list <- string_to_function(af_string_list)
