@@ -7,8 +7,8 @@ NULL
 #' Obtain polynomial representation
 #'
 #' Implements the main NN2Poly algorithm to obtain a polynomial representation
-#' of a trained neural network using its weights and Taylor expansion of its
-#' activation functions.
+#' of a trained neural network using its weights and a polynomial approximation
+#' of its activation functions.
 #'
 #' @param object An object for which the computation of the NN2Poly algorithm is
 #' desired. Currently supports models from the following deep learning frameworks:
@@ -31,8 +31,8 @@ NULL
 #'
 #' @param max_order \code{integer} that determines the maximum order
 #' that will be forced in the final polynomial, discarding terms of higher order
-#' that would naturally arise when considering all Taylor expansions allowed by
-#' \code{taylor_orders}.
+#' that would naturally arise when considering all activation-function
+#' polynomial approximations allowed by \code{taylor_orders}.
 #'
 #' @param keep_layers Boolean that determines if all polynomials computed in
 #' the internal layers have to be stored and given in the output (\code{TRUE}),
@@ -40,10 +40,21 @@ NULL
 #' Default set to \code{FALSE}.
 #'
 #' @param taylor_orders \code{integer} or \code{vector} of length L that sets the
-#' degree at which Taylor expansion is truncated at each layer. If a single
-#' value is used, that value is set for each non linear layer and 1 for linear
-#  layers. If a vector is used, each value corresponds to the Taylor order used
-#' at each layer activation function. Default set to \code{8}.
+#' degree at which activation-function approximations are truncated at each
+#' layer. If \code{approximation = "taylor"}, this is the Taylor expansion
+#' degree. If \code{approximation = "chebyshev"}, this is the Chebyshev
+#' approximation degree. If a single value is used, that value is set for each
+#' non linear layer and 1 for linear layers. If a vector is used, each value
+#' corresponds to the approximation degree used at each layer activation
+#' function. Default set to \code{8}.
+#'
+#' @param approximation Character string selecting the activation-function
+#' approximation to use. Currently supports \code{"taylor"} and
+#' \code{"chebyshev"}. Default set to \code{"taylor"}.
+#'
+#' @param chebyshev_interval Numeric vector of length 2 defining the interval
+#' over which Chebyshev approximations are computed when
+#' \code{approximation = "chebyshev"}. Default set to \code{c(-1, 1)}.
 #'
 #' @param ... Ignored.
 #'
@@ -121,6 +132,8 @@ nn2poly <- function(object,
                     max_order = 2,
                     keep_layers = FALSE,
                     taylor_orders = 8,
+                    approximation = c("taylor", "chebyshev"),
+                    chebyshev_interval = c(-1, 1),
                     ...,
                     all_partitions = NULL
                     ) {

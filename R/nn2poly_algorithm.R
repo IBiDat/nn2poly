@@ -23,9 +23,13 @@ nn2poly_algorithm <- function(weights_list,
                               max_order = 2,
                               keep_layers = FALSE,
                               taylor_orders = 8,
+                              approximation = c("taylor", "chebyshev"),
+                              chebyshev_interval = c(-1, 1),
                               ...,
                               all_partitions = NULL
                               ) {
+
+  approximation <- match.arg(approximation)
 
   if (!check_weights_dimensions(weights_list)) {
     stop("The list of weights has incorrect dimensions.
@@ -60,10 +64,12 @@ nn2poly_algorithm <- function(weights_list,
     af_string_list = af_string_list
     )
 
-  # Obtain all the derivatives up to the desired Taylor degree at each layer
-  af_derivatives_list <- obtain_derivatives_list(
+  # Obtain the activation-function polynomial coefficients used at each layer.
+  af_coefficients_list <- obtain_activation_coefficients_list(
     af_string_list = af_string_list,
-    taylor_orders = taylor_orders
+    taylor_orders = taylor_orders,
+    approximation = approximation,
+    chebyshev_interval = chebyshev_interval
     )
 
   # Obtain the maximum degree of the final polynomial:
@@ -211,7 +217,7 @@ nn2poly_algorithm <- function(weights_list,
       labels_output = coeffs_list_output$labels,
       taylor_orders = taylor_orders,
       current_layer = current_layer,
-      g = af_derivatives_list[[current_layer]],
+      g = af_coefficients_list[[current_layer]],
       partitions_labels = all_partitions$labels,
       partitions = all_partitions$partitions
     )
@@ -339,40 +345,158 @@ obtain_taylor_vector <- function(taylor_orders, af_string_list){
   return(taylor_orders)
 }
 
-#' Obtain needed derivatives up to the chosen order (q Taylor)
+#' Obtain activation-function polynomial coefficients up to the chosen order
 #'
 #' This function is internally used in nn2poly_algorithm to obtain the
-#' derivatives of the given activation function at 0 up to the desired order $q$
-#' for each layer.
+#' ordinary power-basis coefficients of the given activation function up to the
+#' desired order q for each layer. Coefficients are returned in ascending order,
+#' i.e., constant, x, x^2, ...
 #'
 #' @inheritParams nn2poly
 #' @inheritParams nn2poly_algorithm
 #'
-#' @return list of vectors with the derivatives
+#' @return list of coefficient vectors
 #'
 #' @noRd
-obtain_derivatives_list <- function(af_string_list, taylor_orders) {
+obtain_activation_coefficients_list <- function(af_string_list,
+                                                taylor_orders,
+                                                approximation = c("taylor", "chebyshev"),
+                                                chebyshev_interval = c(-1, 1)) {
 
+  approximation <- match.arg(approximation)
   n <- length(af_string_list)
   af_function_list <- string_to_function(af_string_list)
-  af_derivatives_list <- vector(mode = "list", length = n)
+  af_coefficients_list <- vector(mode = "list", length = n)
+
+  if (approximation == "chebyshev") {
+    chebyshev_interval <- validate_chebyshev_interval(chebyshev_interval)
+  }
 
   for (i in 1:n) {
-    # Obtain the vector with the derivatives of the activation function up to the given degree:
-    # centered at 0
-    # and use rev to reverse and match our notation.
-    af_derivatives_list[[i]] <- rev(pracma::taylor(af_function_list[[i]], 0, taylor_orders[i]))
-
-    # here we have a problem: if the last term of the taylor expansion is 0,
-    # the previous method deletes that entry and then the dimensions willm not macth later
-    # therefore, we add 0's if needed:
-    diff_len <- (taylor_orders[i] + 1) - length(af_derivatives_list[[i]])
-    if (diff_len > 0) {
-      af_derivatives_list[[i]] <- c(af_derivatives_list[[i]], rep(0, diff_len))
+    if (approximation == "taylor") {
+      af_coefficients_list[[i]] <- obtain_taylor_coefficients(
+        fun = af_function_list[[i]],
+        order = taylor_orders[i]
+      )
+    } else {
+      af_coefficients_list[[i]] <- obtain_chebyshev_coefficients(
+        fun = af_function_list[[i]],
+        order = taylor_orders[i],
+        chebyshev_interval = chebyshev_interval
+      )
     }
   }
 
-  return(af_derivatives_list)
+  return(af_coefficients_list)
+}
+
+#' Obtain needed derivatives up to the chosen order (q Taylor)
+#'
+#' This compatibility wrapper preserves the original internal helper name for
+#' Taylor coefficients.
+#'
+#' @inheritParams nn2poly
+#' @inheritParams nn2poly_algorithm
+#'
+#' @return list of vectors with the Taylor coefficients
+#'
+#' @noRd
+obtain_derivatives_list <- function(af_string_list, taylor_orders) {
+  obtain_activation_coefficients_list(
+    af_string_list = af_string_list,
+    taylor_orders = taylor_orders,
+    approximation = "taylor"
+  )
+}
+
+#' Obtain Taylor coefficients in ascending power-basis order
+#'
+#' @noRd
+obtain_taylor_coefficients <- function(fun, order) {
+  coefficients <- rev(pracma::taylor(fun, 0, order))
+  pad_activation_coefficients(coefficients, order)
+}
+
+#' Obtain Chebyshev approximation coefficients in ascending power-basis order
+#'
+#' @noRd
+obtain_chebyshev_coefficients <- function(fun,
+                                          order,
+                                          chebyshev_interval = c(-1, 1)) {
+  chebyshev_interval <- validate_chebyshev_interval(chebyshev_interval)
+
+  if (order == 0) {
+    return(fun(mean(chebyshev_interval)))
+  }
+
+  a <- chebyshev_interval[1]
+  b <- chebyshev_interval[2]
+
+  chebyshev_coefficients <- pracma::chebCoeff(fun, a, b, order)
+  power_coefficients_z <- drop(chebyshev_coefficients %*% pracma::chebPoly(order))
+
+  # pracma::chebApprox() subtracts c0 / 2 after converting from the Chebyshev
+  # basis. Do the same here before converting from z back to x.
+  power_coefficients_z[length(power_coefficients_z)] <-
+    power_coefficients_z[length(power_coefficients_z)] -
+    chebyshev_coefficients[1] / 2
+
+  alpha <- 2 / (b - a)
+  beta <- -(b + a) / (b - a)
+
+  coefficients <- compose_linear_power_polynomial(
+    power_coefficients = power_coefficients_z,
+    alpha = alpha,
+    beta = beta
+  )
+
+  pad_activation_coefficients(coefficients, order)
+}
+
+#' Compose a descending power-basis polynomial with alpha * x + beta
+#'
+#' @noRd
+compose_linear_power_polynomial <- function(power_coefficients, alpha, beta) {
+  output <- power_coefficients[1]
+
+  for (coefficient in power_coefficients[-1]) {
+    output <- c(beta * output, 0) + c(0, alpha * output)
+    output[1] <- output[1] + coefficient
+  }
+
+  output
+}
+
+#' Pad activation coefficients to the expected approximation degree
+#'
+#' @noRd
+pad_activation_coefficients <- function(coefficients, order) {
+  expected_length <- order + 1
+  diff_len <- expected_length - length(coefficients)
+
+  if (diff_len > 0) {
+    coefficients <- c(coefficients, rep(0, diff_len))
+  } else if (diff_len < 0) {
+    coefficients <- coefficients[seq_len(expected_length)]
+  }
+
+  coefficients
+}
+
+#' Validate Chebyshev approximation interval
+#'
+#' @noRd
+validate_chebyshev_interval <- function(chebyshev_interval) {
+  if (!is.numeric(chebyshev_interval) ||
+      length(chebyshev_interval) != 2 ||
+      any(is.na(chebyshev_interval)) ||
+      any(!is.finite(chebyshev_interval)) ||
+      chebyshev_interval[1] >= chebyshev_interval[2]) {
+    stop("Argument `chebyshev_interval` must be a finite numeric vector of length 2 with increasing values.",
+         call. = FALSE)
+  }
+
+  as.numeric(chebyshev_interval)
 }
 
 #' Checks that the weights dimensions are correct.

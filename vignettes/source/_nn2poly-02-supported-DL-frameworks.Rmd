@@ -33,7 +33,8 @@ If you are interested in having support for another deep learning framework, ple
 As our goal here is to show how to impose the needed constraints for each framework, we will replicate the polynomial data generation from `vignette("nn2poly-01-introduction")` and solve later the same regression problem with the different deep learning frameworks. Refer to that vignette for more details.
 
 ```{r}
-library(nn2poly)
+#library(nn2poly)
+reticulate::use_condaenv("py310-tf211", required = TRUE)
 set.seed(42)
 ```
 
@@ -243,6 +244,55 @@ We can also represent the obtained polynomial coefficients and observe how the c
 ```{r keras-n-important}
 plot(final_poly_uncon, n = 8)
 plot(final_poly_con, n = 8)
+```
+
+### Trying a Chebyshev approximation
+
+The default call to `nn2poly()` uses Taylor expansions for the activation
+functions. To test the Chebyshev alternative on the same constrained `keras`
+model, only the approximation arguments need to be changed. The interval
+`c(-1, 1)` matches the data scaling and the weight-constraint setup used in
+this vignette.
+
+```{r keras-chebyshev-test, eval=FALSE}
+# Chebyshev polynomial for the constrained NN
+final_poly_con_cheb <- nn2poly(
+  object = nn_con,
+  max_order = 3,
+  approximation = "chebyshev",
+  chebyshev_interval = c(-2, 2)
+)
+
+# Same monomial structure as the default Taylor polynomial
+identical(final_poly_con$labels, final_poly_con_cheb$labels)
+
+# Compare approximation error against the constrained NN predictions
+prediction_poly_con_cheb <- predict(
+  object = final_poly_con_cheb,
+  newdata = test_x
+)
+
+c(
+  taylor_rmse = sqrt(mean((as.vector(prediction_nn_con) -
+                             as.vector(prediction_poly_con))^2)),
+  chebyshev_rmse = sqrt(mean((as.vector(prediction_nn_con) -
+                                as.vector(prediction_poly_con_cheb))^2))
+)
+
+nn2poly:::plot_diagonal(
+  x_axis = prediction_nn_con,
+  y_axis = prediction_poly_con_cheb,
+  xlab = "NN prediction",
+  ylab = "Chebyshev polynomial prediction"
+) + ggplot2::ggtitle("Chebyshev polynomial for nn_con")
+
+plot(final_poly_con_cheb, n = 8)
+```
+
+
+```{r}
+final_poly_con_cheb$values
+final_poly_con$values
 ```
 
 

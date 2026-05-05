@@ -53,6 +53,52 @@ test_that("nn2poly with list input against precomputed example with
   expect_equal(round(coeff,3),-4.429)
 })
 
+test_that("nn2poly supports Chebyshev activation approximations", {
+  testing_data <- testing_helper_1()
+
+  object <- testing_data$weights_list
+  names(object) <- testing_data$af_string_list
+
+  taylor_result <- nn2poly(
+    object = object,
+    max_order = 3,
+    taylor_orders = testing_data$taylor_orders
+  )
+
+  chebyshev_result <- nn2poly(
+    object = object,
+    max_order = 3,
+    taylor_orders = testing_data$taylor_orders,
+    approximation = "chebyshev"
+  )
+
+  expect_equal(class(chebyshev_result), "nn2poly")
+  expect_equal(chebyshev_result$labels, taylor_result$labels)
+  expect_equal(dim(chebyshev_result$values), dim(taylor_result$values))
+  expect_false(isTRUE(all.equal(chebyshev_result$values, taylor_result$values)))
+})
+
+test_that("nn2poly validates approximation arguments", {
+  testing_data <- testing_helper_1()
+
+  object <- testing_data$weights_list
+  names(object) <- testing_data$af_string_list
+
+  expect_error(
+    nn2poly(object = object, approximation = "unknown"),
+    "should be one of"
+  )
+
+  expect_error(
+    nn2poly(
+      object = object,
+      approximation = "chebyshev",
+      chebyshev_interval = c(1, -1)
+    ),
+    "chebyshev_interval"
+  )
+})
+
 
 test_that("nn2poly for a keras.engine.training.Model object", {
   skip_if_not_installed("keras")

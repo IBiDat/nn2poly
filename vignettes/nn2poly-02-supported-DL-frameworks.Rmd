@@ -277,6 +277,50 @@ plot(final_poly_con, n = 8)
 
 ![](includes/nn2poly-02-keras-n-important-2.png)
 
+### Trying a Chebyshev approximation
+
+The default call to `nn2poly()` uses Taylor expansions for the activation
+functions. To test the Chebyshev alternative on the same constrained `keras`
+model, only the approximation arguments need to be changed. The interval
+`c(-1, 1)` matches the data scaling and the weight-constraint setup used in
+this vignette.
+
+
+```r
+# Chebyshev polynomial for the constrained NN
+final_poly_con_cheb <- nn2poly(
+  object = nn_con,
+  max_order = 3,
+  approximation = "chebyshev",
+  chebyshev_interval = c(-1, 1)
+)
+
+# Same monomial structure as the default Taylor polynomial
+identical(final_poly_con$labels, final_poly_con_cheb$labels)
+
+# Compare approximation error against the constrained NN predictions
+prediction_poly_con_cheb <- predict(
+  object = final_poly_con_cheb,
+  newdata = test_x
+)
+
+c(
+  taylor_rmse = sqrt(mean((as.vector(prediction_nn_con) -
+                             as.vector(prediction_poly_con))^2)),
+  chebyshev_rmse = sqrt(mean((as.vector(prediction_nn_con) -
+                                as.vector(prediction_poly_con_cheb))^2))
+)
+
+nn2poly:::plot_diagonal(
+  x_axis = prediction_nn_con,
+  y_axis = prediction_poly_con_cheb,
+  xlab = "NN prediction",
+  ylab = "Chebyshev polynomial prediction"
+) + ggplot2::ggtitle("Chebyshev polynomial for nn_con")
+
+plot(final_poly_con_cheb, n = 8)
+```
+
 
 ## `luz`/`torch`
 

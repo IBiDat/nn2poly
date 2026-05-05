@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_taylor_and_activation_potentials.R
 \name{plot_taylor_and_activation_potentials}
 \alias{plot_taylor_and_activation_potentials}
-\title{Plots activation potentials and Taylor expansion.}
+\title{Plots activation potentials and activation-function approximation.}
 \usage{
 plot_taylor_and_activation_potentials(
   object,
@@ -11,6 +11,8 @@ plot_taylor_and_activation_potentials(
   taylor_orders = 8,
   constraints,
   taylor_interval = 1.5,
+  approximation = c("taylor", "chebyshev"),
+  chebyshev_interval = c(-1, 1),
   ...
 )
 }
@@ -42,20 +44,32 @@ variable column should not be included.}
 
 \item{max_order}{\code{integer} that determines the maximum order
 that will be forced in the final polynomial, discarding terms of higher order
-that would naturally arise when considering all Taylor expansions allowed by
-\code{taylor_orders}.}
+that would naturally arise when considering all activation-function
+polynomial approximations allowed by \code{taylor_orders}.}
 
 \item{taylor_orders}{\code{integer} or \code{vector} of length L that sets the
-degree at which Taylor expansion is truncated at each layer. If a single
-value is used, that value is set for each non linear layer and 1 for linear
-at each layer activation function. Default set to \code{8}.}
+degree at which activation-function approximations are truncated at each
+layer. If \code{approximation = "taylor"}, this is the Taylor expansion
+degree. If \code{approximation = "chebyshev"}, this is the Chebyshev
+approximation degree. If a single value is used, that value is set for each
+non linear layer and 1 for linear layers. If a vector is used, each value
+corresponds to the approximation degree used at each layer activation
+function. Default set to \code{8}.}
 
 \item{constraints}{Boolean parameter determining if the NN is constrained
 (TRUE) or not (FALSE). This only modifies the plots title to show
 "constrained" or "unconstrained" respectively.}
 
 \item{taylor_interval}{optional parameter determining the interval in which
-the Taylor expansion is represented. Default is 1.5.}
+the activation-function approximation is represented. Default is 1.5.}
+
+\item{approximation}{Character string selecting the activation-function
+approximation to use. Currently supports \code{"taylor"} and
+\code{"chebyshev"}. Default set to \code{"taylor"}.}
+
+\item{chebyshev_interval}{Numeric vector of length 2 defining the interval
+over which Chebyshev approximations are computed when
+\code{approximation = "chebyshev"}. Default set to \code{c(-1, 1)}.}
 
 \item{...}{Additional parameters.}
 }
@@ -66,7 +80,7 @@ A list of plots.
 Function that allows to take a NN and the data input values
 and plot the distribution of data activation potentials
 (sum of input values * weights) at all neurons together at each layer
-with the Taylor expansion used in the activation functions. If any layer
+with the polynomial approximation used in the activation functions. If any layer
 is \code{'linear'} (usually will be the output), then that layer will not
-be an approximation as Taylor expansion is not needed.
+be an approximation as activation approximation is not needed.
 }

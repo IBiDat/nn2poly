@@ -170,3 +170,76 @@ test_that("Taylor vector gets error becauseof non numeric value", {
   taylor_orders <- c(5.4, 2.3, 1)
   expect_error(obtain_taylor_vector(taylor_orders, af_string_list))
 })
+
+test_that("Taylor activation coefficients preserve legacy coefficient order", {
+  af_string_list <- c("softplus", "tanh", "sigmoid", "linear")
+  taylor_orders <- c(4, 5, 4, 1)
+  af_function_list <- string_to_function(af_string_list)
+
+  output <- obtain_activation_coefficients_list(
+    af_string_list = af_string_list,
+    taylor_orders = taylor_orders,
+    approximation = "taylor"
+  )
+
+  expected <- lapply(seq_along(af_function_list), function(i) {
+    coefficients <- rev(pracma::taylor(af_function_list[[i]], 0, taylor_orders[i]))
+    diff_len <- (taylor_orders[i] + 1) - length(coefficients)
+    if (diff_len > 0) {
+      coefficients <- c(coefficients, rep(0, diff_len))
+    }
+    coefficients
+  })
+
+  expect_equal(output, expected)
+  expect_equal(obtain_derivatives_list(af_string_list, taylor_orders), expected)
+})
+
+test_that("Chebyshev coefficients match pracma chebApprox", {
+  af_string_list <- c("softplus", "tanh", "sigmoid", "linear")
+  af_function_list <- string_to_function(af_string_list)
+  interval <- c(-1, 1)
+  order <- 5
+  x <- seq(interval[1], interval[2], length.out = 101)
+
+  for (fun in af_function_list) {
+    coefficients <- obtain_chebyshev_coefficients(
+      fun = fun,
+      order = order,
+      chebyshev_interval = interval
+    )
+
+    expect_equal(
+      pracma::polyval(rev(coefficients), x),
+      pracma::chebApprox(x, fun, interval[1], interval[2], order),
+      tolerance = 1e-10
+    )
+  }
+})
+
+test_that("Chebyshev coefficients match pracma chebApprox on shifted interval", {
+  fun <- string_to_function(list("sigmoid"))[[1]]
+  interval <- c(-0.5, 1.5)
+  order <- 5
+  x <- seq(interval[1], interval[2], length.out = 101)
+
+  coefficients <- obtain_chebyshev_coefficients(
+    fun = fun,
+    order = order,
+    chebyshev_interval = interval
+  )
+
+  expect_equal(
+    pracma::polyval(rev(coefficients), x),
+    pracma::chebApprox(x, fun, interval[1], interval[2], order),
+    tolerance = 1e-10
+  )
+})
+
+test_that("Chebyshev interval validation rejects malformed intervals", {
+  expect_error(validate_chebyshev_interval(c(1, -1)), "chebyshev_interval")
+  expect_error(validate_chebyshev_interval(1), "chebyshev_interval")
+  expect_error(validate_chebyshev_interval(c(-1, NA)), "chebyshev_interval")
+  expect_error(validate_chebyshev_interval(c(-1, Inf)), "chebyshev_interval")
+  expect_error(validate_chebyshev_interval(c("a", "b")), "chebyshev_interval")
+})

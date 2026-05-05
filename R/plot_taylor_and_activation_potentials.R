@@ -1,11 +1,11 @@
-#' Plots activation potentials and Taylor expansion.
+#' Plots activation potentials and activation-function approximation.
 #'
 #' Function that allows to take a NN and the data input values
 #' and plot the distribution of data activation potentials
 #' (sum of input values * weights) at all neurons together at each layer
-#' with the Taylor expansion used in the activation functions. If any layer
+#' with the polynomial approximation used in the activation functions. If any layer
 #' is \code{'linear'} (usually will be the output), then that layer will not
-#' be an approximation as Taylor expansion is not needed.
+#' be an approximation as activation approximation is not needed.
 #'
 #' @inheritParams nn2poly
 #'
@@ -16,7 +16,7 @@
 #' (TRUE) or not (FALSE). This only modifies the plots title to show
 #' "constrained" or "unconstrained" respectively.
 #' @param taylor_interval optional parameter determining the interval in which
-#' the Taylor expansion is represented. Default is 1.5.
+#' the activation-function approximation is represented. Default is 1.5.
 #' @param ... Additional parameters.
 #'
 #' @return A list of plots.
@@ -27,13 +27,16 @@ plot_taylor_and_activation_potentials <- function(object,
                                                   taylor_orders = 8,
                                                   constraints,
                                                   taylor_interval = 1.5,
+                                                  approximation = c("taylor", "chebyshev"),
+                                                  chebyshev_interval = c(-1, 1),
                                                   ...) {
   params <- get_parameters(object)
   object <- params$weights_list
   names(object) <- params$af_string_list
 
   plot_taylor_and_activation_potentials.list(
-    object, data, max_order, taylor_orders, constraints, taylor_interval, ...)
+    object, data, max_order, taylor_orders, constraints, taylor_interval,
+    approximation, chebyshev_interval, ...)
 }
 
 plot_taylor_and_activation_potentials.list <- function(object,
@@ -42,9 +45,16 @@ plot_taylor_and_activation_potentials.list <- function(object,
                                                        taylor_orders = 8,
                                                        constraints,
                                                        taylor_interval = 1.5,
+                                                       approximation = c("taylor", "chebyshev"),
+                                                       chebyshev_interval = c(-1, 1),
                                                        ...) {
   weights_list   <- object
   af_string_list <- names(object)
+  approximation <- match.arg(approximation)
+
+  if (approximation == "chebyshev") {
+    chebyshev_interval <- validate_chebyshev_interval(chebyshev_interval)
+  }
 
   if (!requireNamespace("ggplot2", quietly = TRUE))
     stop("package 'ggplot2' is required for this functionality", call.=FALSE)
@@ -126,22 +136,33 @@ plot_taylor_and_activation_potentials.list <- function(object,
 
     ################## Plot creation ########################
 
-    # Create the x values for the Taylor plot
+    # Create the x values for the approximation plot
     x <- seq(-taylor_interval, taylor_interval, length.out = 1000)
 
     # create data frame and create an empty plot with only the density of those values
     df.density <- as.data.frame(activation_potentials_vectorized)
 
-    #### Taylor graph ######
     # compute the true function
     yf <- fun(x)
-    # compute the Taylor approximation
-    pol <- pracma::taylor(fun, 0, min(taylor_orders[k],max_order))
-    yp <- pracma::polyval(pol, x)
+    # compute the activation-function approximation
+    approximation_degree <- min(taylor_orders[k], max_order)
+    if (approximation == "taylor") {
+      pol <- pracma::taylor(fun, 0, approximation_degree)
+      yp <- pracma::polyval(pol, x)
+      approximation_label <- "Taylor approximation"
+    } else {
+      pol <- obtain_chebyshev_coefficients(
+        fun = fun,
+        order = approximation_degree,
+        chebyshev_interval = chebyshev_interval
+      )
+      yp <- pracma::polyval(rev(pol), x)
+      approximation_label <- "Chebyshev approximation"
+    }
     # compute the error as the absolute value of the difference
     error <- abs(yf - yp)
 
-    # Now we create the Taylor plot and add the density behind it.
+    # Now we create the approximation plot and add the density behind it.
     df.plot <- data.frame(x, yf, yp, error)
 
     name_plot <- paste0("Layer ",k, ",")
@@ -165,7 +186,7 @@ plot_taylor_and_activation_potentials.list <- function(object,
       ggplot2::theme(axis.text = ggplot2::element_text(size = 10), axis.title = ggplot2::element_text(size = 10)) +
       ggplot2::scale_color_identity(name = "Legend",
                            breaks = c("black", "red", "blue", "darkgreen"),
-                           labels = c("True function","Taylor approximation", "Error", "Activation potentials density (log(x+1) scaled)"),
+                           labels = c("True function", approximation_label, "Error", "Activation potentials density (log(x+1) scaled)"),
                            guide = "legend") +
       ggplot2::theme_minimal() +
       ggplot2::labs(x=NULL, y=NULL)
