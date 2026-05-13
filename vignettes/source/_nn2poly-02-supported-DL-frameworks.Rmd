@@ -213,11 +213,11 @@ After the NNs have been trained, we can directly call `nn2poly` on the `keras` m
 ```{r keras-apply-nn2poly}
 # Polynomial for nn_uncon
 final_poly_uncon <- nn2poly(object = nn_uncon,
-                      max_order = 3)
+                      max_order = 5)
 
 # Polynomial for nn_con
 final_poly_con <- nn2poly(object = nn_con,
-                      max_order = 3)
+                      max_order = 5)
 
 ```
 
@@ -258,9 +258,9 @@ this vignette.
 # Chebyshev polynomial for the constrained NN
 final_poly_con_cheb <- nn2poly(
   object = nn_con,
-  max_order = 3,
+  max_order = 5,
   approximation = "chebyshev",
-  chebyshev_interval = c(-2, 2)
+  chebyshev_interval = c(-1,1)
 )
 
 # Same monomial structure as the default Taylor polynomial
@@ -294,6 +294,47 @@ plot(final_poly_con_cheb, n = 8)
 final_poly_con_cheb$values
 final_poly_con$values
 ```
+
+```{r keras-chebyshev-unconstrained-test, eval=FALSE}
+# Chebyshev polynomial for the constrained NN
+final_poly_uncon_cheb <- nn2poly(
+  object = nn_uncon,
+  max_order = 3,
+  approximation = "chebyshev",
+  chebyshev_interval = c(-2,2)
+)
+
+# Same monomial structure as the default Taylor polynomial
+identical(final_poly_con$labels, final_poly_uncon_cheb$labels)
+
+# Compare approximation error against the constrained NN predictions
+prediction_poly_uncon_cheb <- predict(
+  object = final_poly_uncon_cheb,
+  newdata = test_x
+)
+
+c(
+  taylor_rmse = sqrt(mean((as.vector(prediction_nn_uncon) -
+                             as.vector(prediction_poly_uncon))^2)),
+  chebyshev_rmse = sqrt(mean((as.vector(prediction_nn_uncon) -
+                                as.vector(prediction_poly_uncon_cheb))^2))
+)
+
+nn2poly:::plot_diagonal(
+  x_axis = prediction_nn_uncon,
+  y_axis = prediction_poly_uncon_cheb,
+  xlab = "NN prediction",
+  ylab = "Chebyshev polynomial prediction"
+) + ggplot2::ggtitle("Chebyshev polynomial for nn_uncon")
+
+plot(final_poly_uncon_cheb, n = 8)
+```
+
+```{r}
+nn2poly:::plot_taylor_and_activation_potentials(final_poly_uncon_cheb,)
+```
+
+
 
 
 ## `luz`/`torch`
