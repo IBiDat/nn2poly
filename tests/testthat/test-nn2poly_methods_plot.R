@@ -174,6 +174,19 @@ test_that("Bar plot exposes correct axis labels and validates count arguments", 
   expect_equal(p$labels$x, "Polynomial Term")
   expect_equal(p$labels$y, "Coefficient (absolute value)")
 
+  multi_output_poly <- structure(
+    list(
+      labels = list(c(1), c(2)),
+      values = matrix(c(10, 1, 1, 10), nrow = 2, ncol = 2)
+    ),
+    class = "nn2poly"
+  )
+  p_multi <- plot(multi_output_poly, n = 2)
+  expect_equal(
+    levels(p_multi$data$term_display_order),
+    c("1___1", "2___1", "2___2", "1___2")
+  )
+
   expect_error(plot(poly, n = -1), "'n' must be >= 0")
   expect_error(plot(poly, n = 1.5), "'n' must be a single whole number")
   expect_error(plot(poly, min_order = NA_real_), "'min_order' must be a single whole number")
@@ -361,8 +374,15 @@ test_that("Interaction plots validate scalar arguments and accept 3D monomial in
     "'interaction_order_network' must be >= 2"
   )
 
-  skip_if_not_installed("igraph")
-  skip_if_not_installed("ggraph")
+  p_surface <- plot(
+    poly,
+    type = "interaction_surface",
+    feature_pair = c(1, 2),
+    original_feature_data = newdata,
+    grid_resolution = 3
+  )
+  expect_s3_class(p_surface, "ggplot")
+  expect_true(all(is.finite(p_surface$data$Prediction)))
 
   p <- plot(
     poly,

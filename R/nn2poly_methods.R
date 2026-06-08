@@ -381,33 +381,33 @@ predict.nn2poly <- function(object,
 #' - `"waterfall"`: SHAP-like waterfall using per-term contributions for one observation.
 #' - `"beeswarm"`: SHAP-like summary (beeswarm) of per-term contributions
 #'   across observations, colored by one selected original feature.
-#'
-#' Additional types (`"interaction_surface"`, `"interaction_network"`) are experimental.
+#' - `"interaction_surface"`: two-feature response surface for one output polynomial.
+#' - `"interaction_network"`: network view of pairwise or higher-order interactions.
 #' @param ... Additional arguments passed to specific plot types.
 #'
 #' @param n For `type = "bar"`, the number of top coefficients to plot.
 #'
-#' @param newdata_monomials For `type = "local_contributions"`, `"waterfall"` or `"beeswarm"`,
+#' @param newdata_monomials For `type = "local_contributions"`, `"waterfall"`,
+#'   `"beeswarm"` or `metric_network = "mean_monomial_abs"`,
 #'   the output of `predict(x, newdata, monomials = TRUE)`. These values are
 #'   per-term contributions (coefficient multiplied by variable product). This should be
 #'   for a single observation for "local_contributions" (or specify `observation_index`)
 #'   and for multiple observations for "beeswarm".
 #' @param observation_index For `type = "local_contributions"`, the row index
 #'   from `newdata_monomials` to plot (default: 1).
-#' @param poly_output_index For `type = "local_contributions"` or `"beeswarm"`,
+#' @param poly_output_index For local plots and multi-output polynomials,
 #'   if `x` produces multiple polynomial outputs, which one to plot (default: 1).
-#' @param variable_names For `type = "local_contributions"` or `"beeswarm"`,
-#'   an optional character vector of original feature names to make term labels
-#'   more readable (e.g., "x1" instead of "1").
+#' @param variable_names Optional character vector of original feature names
+#'   to make labels more readable in plots where variables are displayed.
 #' @param max_order_to_display For `type = "local_contributions"`, the maximum
 #'   term order to show in the stacked bars (default: 3).
 #' @param waterfall_n For `type = "waterfall"`, the number of top non-intercept
 #'   terms (by absolute contribution) to show. Remaining terms are aggregated
 #'   into an `(Other)` bucket.
 #'
-#' @param original_feature_data For `type = "beeswarm"`, a matrix or data frame
-#'   of the original predictor values for all observations in `newdata_monomials`.
-#'   Required for coloring points.
+#' @param original_feature_data For `type = "beeswarm"` or `"interaction_surface"`,
+#'   a matrix or data frame of original predictor values. It is used for beeswarm
+#'   coloring and to define the grid/ranges/reference values of response surfaces.
 #' @param color_by_feature For `type = "beeswarm"`, which original feature to
 #'   use for selected-feature coloring. Can be a numeric column index or a character name
 #'   matching `colnames(original_feature_data)` or `variable_names`.
@@ -417,18 +417,18 @@ predict.nn2poly <- function(object,
 #'   0 (default) includes intercept (order 0 for this purpose) and all terms.
 #'   1 excludes intercept, showing terms of polynomial degree 1+.
 #'   2 excludes intercept and linear terms, showing terms of polynomial degree 2+.
-#' @param feature_pair For `type = "interaction_surface"`, a numeric or character
-#'   vector of length 2 specifying the pair of features to plot.
+#' @param feature_pair For `type = "interaction_surface"`, a numeric index vector
+#'   or character vector of length 2 specifying the two features to vary.
 #' @param grid_resolution For `type = "interaction_surface"`, the number of points
 #'   per dimension for the grid.
-#' @param interaction_order_network For `type = "interaction_network"`, the effective
-#'   order of interactions to visualize (e.g., 2 for pairwise feature interactions).
+#' @param interaction_order_network For `type = "interaction_network"`, the number
+#'   of unique variables that must appear in a term for it to be included.
 #' @param metric_network For `type = "interaction_network"`, the metric for edge
 #'   weights ("coefficient_abs" or "mean_monomial_abs").
 #' @param top_n_interactions For `type = "interaction_network"`, number of top
 #'   (projected) pairwise interactions to display by weight.
-#' @param layout_network For `type = "interaction_network"`, the layout algorithm
-#'  for ggraph (e.g., "nicely", "fr").
+#' @param layout_network For `type = "interaction_network"`, either `"circle"`
+#'   or `"line"`.
 #'
 #' @return A ggplot object.
 #' @export
@@ -456,7 +456,7 @@ plot.nn2poly <- function(x, type = "bar", ...,
                          interaction_order_network = 2,
                          metric_network = "coefficient_abs", # Defaulted to coefficient_abs
                          top_n_interactions = NULL,
-                         layout_network = "nicely"
+                         layout_network = "circle"
 ) {
 
   if (length(class(x)) > 1) {
@@ -749,10 +749,9 @@ plot_bar <- function(poly_obj, n = NULL, variable_names = NULL, min_order = 0) {
   for (r in 1:n_polys) {
     poly_coeffs_for_output_r <- coefficients_matrix[, r]
 
-    # Sort by absolute magnitude to get top n coefficients for this polynomial output
-    # Handle cases where n is larger than available coefficients (already done by n re-assignment above for nrow)
-    # Ensure consistent tie-breaking by original index if abs values are same
-    order_indices <- order(abs(poly_coeffs_for_output_r), seq_along(poly_coeffs_for_output_r), decreasing = TRUE)
+    # Sort by absolute magnitude to get top n coefficients for this polynomial output.
+    # Ties are resolved by the original term order for reproducibility.
+    order_indices <- order(-abs(poly_coeffs_for_output_r), seq_along(poly_coeffs_for_output_r))
 
     top_n_actual_indices <- order_indices[1:n] # Indices within poly_coeffs_for_output_r
 
@@ -778,10 +777,15 @@ plot_bar <- function(poly_obj, n = NULL, variable_names = NULL, min_order = 0) {
       stringsAsFactors = FALSE
     )
 
-    # For reordering bars within facets (important if coord_flip is used)
-    # Order by value descending, so when flipped, largest is at top.
-    df_poly_r$term_display_order <- factor(df_poly_r$term_name,
-                                           levels = df_poly_r$term_name[order(df_poly_r$value, decreasing = TRUE)])
+    order_for_axis <- order(-df_poly_r$value, seq_len(nrow(df_poly_r)))
+    df_poly_r$term_display_order <- factor(
+      paste(df_poly_r$term_name, df_poly_r$poly_output_id, sep = "___"),
+      levels = paste(
+        df_poly_r$term_name[order_for_axis],
+        df_poly_r$poly_output_id[order_for_axis],
+        sep = "___"
+      )
+    )
 
     all_df_list[[r]] <- df_poly_r
   }
@@ -805,9 +809,10 @@ plot_bar <- function(poly_obj, n = NULL, variable_names = NULL, min_order = 0) {
 
   p <- ggplot2::ggplot(all_plot_df,
                        ggplot2::aes(x = .data$term_display_order, # Use the reordered factor
-                                    y = .data$value,
-                                    fill = .data$sign)) +
+                                     y = .data$value,
+                                     fill = .data$sign)) +
     ggplot2::geom_bar(stat = "identity", colour = "black", alpha = 1, width=0.7) +
+    ggplot2::scale_x_discrete(labels = function(x) sub("___[^_]+$", "", x)) +
 
     ggplot2::scale_fill_manual(
       name = "Sign",
@@ -1443,49 +1448,6 @@ plot_beeswarm_internal <- function(poly_obj,
 
 
 
-# Helper to identify and sum relevant terms for the surface plot
-eval_selected_terms_on_surface <- function(poly_obj,
-                                           newdata_row,
-                                           feature_pair_indices) {
-  value_sum <- 0
-
-  # Crucial: What is the structure of poly_obj here?
-  # poly_obj is poly_obj_single_output
-  # poly_obj$labels is a list of all original labels
-  # poly_obj$values is a matrix with N_terms rows and 1 column.
-
-  for (k_term in seq_along(poly_obj$labels)) {
-    term_label <- poly_obj$labels[[k_term]]
-    term_coeff <- poly_obj$values[k_term, 1] # Ensure it's a scalar from the single column
-
-    vars_in_current_label <- term_label[term_label > 0]
-    is_relevant <- FALSE
-    if (length(term_label) == 1 && term_label[1] == 0) {
-      is_relevant <- TRUE
-    } else if (length(vars_in_current_label) > 0 &&
-               all(vars_in_current_label %in% feature_pair_indices)) {
-      is_relevant <- TRUE
-    }
-
-    if (is_relevant) {
-      mini_poly <- list(labels = list(term_label), values = matrix(term_coeff, ncol = 1))
-
-      # This parts gets errors many times, should review it.
-      current_term_value <- tryCatch({
-        eval_poly(poly = mini_poly, newdata = newdata_row)
-      }, error = function(e) {
-        return(NA_real_) # Allow loop to continue
-      })
-
-      if (!is.na(current_term_value)) {
-        value_sum <- value_sum + current_term_value
-      }
-    }
-  }
-  return(value_sum)
-}
-
-
 #' Internal function for plot.nn2poly interaction_surface type
 #' @noRd
 plot_interaction_surface_internal <- function(poly_obj,
@@ -1506,20 +1468,29 @@ plot_interaction_surface_internal <- function(poly_obj,
     max = ncol(poly_obj$values)
   )
 
-  if (!is.matrix(original_feature_data)) original_feature_data <- as.matrix(original_feature_data)
+  if (!is.matrix(original_feature_data))
+    original_feature_data <- as.matrix(original_feature_data)
+
+  if (!is.numeric(original_feature_data) && !is.logical(original_feature_data))
+    stop("'original_feature_data' must be numeric or logical.", call. = FALSE)
+
+  storage.mode(original_feature_data) <- "double"
   num_total_features <- ncol(original_feature_data)
+  if (is.null(num_total_features) || num_total_features < 2)
+    stop("'original_feature_data' must have at least two columns.", call. = FALSE)
 
   feat_idx1 <- NULL; feat_idx2 <- NULL
   feat_name1 <- ""; feat_name2 <- ""
 
   if (is.character(feature_pair) && length(feature_pair) == 2) {
-    default_names_for_lookup <- paste0("x", 1:num_total_features) # if variable_names is NULL
-    current_var_names <- if (!is.null(variable_names)) variable_names else default_names_for_lookup
-    if (length(current_var_names) < num_total_features && is.null(variable_names)) {
-      # This case should not happen if default_names_for_lookup is used correctly.
-      # It might happen if user provides partial variable_names.
-      # We should ensure current_var_names has length num_total_features for matching.
-      # For simplicity, assume variable_names, if provided, is complete.
+    if (!is.null(variable_names)) {
+      if (length(variable_names) < num_total_features)
+        stop("'variable_names' must contain at least one name per feature.", call. = FALSE)
+      current_var_names <- variable_names[seq_len(num_total_features)]
+    } else if (!is.null(colnames(original_feature_data))) {
+      current_var_names <- colnames(original_feature_data)
+    } else {
+      current_var_names <- paste0("x", seq_len(num_total_features))
     }
 
     feat_idx1 <- match(feature_pair[1], current_var_names)
@@ -1528,11 +1499,8 @@ plot_interaction_surface_internal <- function(poly_obj,
     feat_name1 <- feature_pair[1]
     feat_name2 <- feature_pair[2]
   } else if (is.numeric(feature_pair) && length(feature_pair) == 2) {
-    feat_idx1 <- as.integer(feature_pair[1])
-    feat_idx2 <- as.integer(feature_pair[2])
-    if (feat_idx1 < 1 || feat_idx1 > num_total_features || feat_idx2 < 1 || feat_idx2 > num_total_features) {
-      stop("Numeric 'feature_pair' indices are out of bounds.", call. = FALSE)
-    }
+    feat_idx1 <- .nn2poly_validate_whole_number(feature_pair[1], "feature_pair[1]", min = 1, max = num_total_features)
+    feat_idx2 <- .nn2poly_validate_whole_number(feature_pair[2], "feature_pair[2]", min = 1, max = num_total_features)
     feat_name1 <- if (!is.null(variable_names) && feat_idx1 <= length(variable_names)) variable_names[feat_idx1] else as.character(feat_idx1)
     feat_name2 <- if (!is.null(variable_names) && feat_idx2 <= length(variable_names)) variable_names[feat_idx2] else as.character(feat_idx2)
   } else {
@@ -1540,59 +1508,50 @@ plot_interaction_surface_internal <- function(poly_obj,
   }
 
   if (feat_idx1 == feat_idx2) stop("Features in 'feature_pair' must be different.", call. = FALSE)
-  feature_pair_indices <- c(feat_idx1, feat_idx2)
 
   range1 <- range(original_feature_data[, feat_idx1], na.rm = TRUE)
   range2 <- range(original_feature_data[, feat_idx2], na.rm = TRUE)
+  if (!all(is.finite(range1)) || !all(is.finite(range2)))
+    stop("Selected features must contain finite values to define the surface grid.", call. = FALSE)
+
   grid1 <- seq(range1[1], range1[2], length.out = grid_resolution)
   grid2 <- seq(range2[1], range2[2], length.out = grid_resolution)
 
   surface_data_df <- expand.grid(Feat1_Val_Plot = grid1, Feat2_Val_Plot = grid2)
-  surface_data_df$CombinedEffect <- NA_real_
-
-  base_newdata_row <- matrix(NA, nrow = 1, ncol = num_total_features)
-  other_indices <- setdiff(1:num_total_features, feature_pair_indices)
-  if (length(other_indices) > 0) {
-    for (k_idx in other_indices) {
-      base_newdata_row[1, k_idx] <- mean(original_feature_data[, k_idx], na.rm = TRUE)
-    }
-  }
+  reference_values <- colMeans(original_feature_data, na.rm = TRUE)
+  if (any(!is.finite(reference_values)))
+    stop("'original_feature_data' must contain at least one finite value in every column.", call. = FALSE)
 
   # Prepare a version of poly_obj with only the selected output's coefficients
   poly_obj_single_output <- poly_obj
   poly_obj_single_output$values <- matrix(poly_obj$values[, poly_output_index], ncol = 1)
 
+  grid_newdata <- matrix(
+    rep(reference_values, each = nrow(surface_data_df)),
+    nrow = nrow(surface_data_df),
+    ncol = num_total_features
+  )
+  grid_newdata[, feat_idx1] <- surface_data_df$Feat1_Val_Plot
+  grid_newdata[, feat_idx2] <- surface_data_df$Feat2_Val_Plot
 
-  for (k_row in 1:nrow(surface_data_df)) {
-    current_eval_row <- base_newdata_row
-    current_eval_row[1, feat_idx1] <- surface_data_df$Feat1_Val_Plot[k_row]
-    current_eval_row[1, feat_idx2] <- surface_data_df$Feat2_Val_Plot[k_row]
-
-    # Add colnames if original data had them, for eval_poly robustness
-    if(!is.null(colnames(original_feature_data))) {
-      colnames(current_eval_row) <- colnames(original_feature_data)
-    } else if (!is.null(variable_names) && length(variable_names) == num_total_features) {
-      colnames(current_eval_row) <- variable_names # Use provided names if no colnames on data
-    }
-
-
-    surface_data_df$CombinedEffect[k_row] <- eval_selected_terms_on_surface(
-      poly_obj = poly_obj_single_output,
-      newdata_row = current_eval_row,
-      feature_pair_indices = feature_pair_indices
-    )
+  if(!is.null(colnames(original_feature_data))) {
+    colnames(grid_newdata) <- colnames(original_feature_data)
+  } else if (!is.null(variable_names) && length(variable_names) >= num_total_features) {
+    colnames(grid_newdata) <- variable_names[seq_len(num_total_features)]
   }
 
-  p <- ggplot2::ggplot(surface_data_df, ggplot2::aes(x = .data$Feat1_Val_Plot, y = .data$Feat2_Val_Plot, fill = .data$CombinedEffect)) +
+  surface_data_df$Prediction <- as.numeric(eval_poly(poly_obj_single_output, grid_newdata))
+
+  p <- ggplot2::ggplot(surface_data_df, ggplot2::aes(x = .data$Feat1_Val_Plot, y = .data$Feat2_Val_Plot, fill = .data$Prediction)) +
     ggplot2::geom_tile() +
-    ggplot2::scale_fill_viridis_c(name = "Summed Effect") +
-    ggplot2::labs(title = paste("Interaction Surface:", feat_name1, "&", feat_name2),
+    ggplot2::scale_fill_viridis_c(name = "Prediction") +
+    ggplot2::labs(title = paste("Two-feature response surface:", feat_name1, "&", feat_name2),
                   x = feat_name1, y = feat_name2) +
     ggplot2::theme_minimal(base_size = 10) +
     ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5, size = 14),
                    legend.position = "top",
                    legend.direction = "horizontal" ) +
-    ggplot2::coord_equal() # Often good for surfaces
+    ggplot2::coord_equal()
 
   return(p)
 }
@@ -1607,7 +1566,7 @@ plot_interaction_network_internal <- function(poly_obj,
                                               top_n_interactions = NULL,
                                               variable_names = NULL,
                                               poly_output_index = 1,
-                                              layout = "nicely") {
+                                              layout = "circle") {
   interaction_order <- .nn2poly_validate_whole_number(
     interaction_order,
     "interaction_order_network",
@@ -1627,16 +1586,13 @@ plot_interaction_network_internal <- function(poly_obj,
   metric <- .nn2poly_validate_character_scalar(metric, "metric_network")
   metric <- match.arg(metric, c("coefficient_abs", "mean_monomial_abs"))
   layout <- .nn2poly_validate_character_scalar(layout, "layout_network")
+  layout <- match.arg(layout, c("circle", "line"))
 
-  if (!requireNamespace("igraph", quietly = TRUE) || !requireNamespace("ggraph", quietly = TRUE)) {
-    stop("Packages 'igraph' and 'ggraph' are required for 'interaction_network' plot type.", call. = FALSE)
-  }
   if (metric == "mean_monomial_abs" && is.null(newdata_monomials)) {
     stop("If metric is 'mean_monomial_abs', 'newdata_monomials' must be provided.", call. = FALSE)
   }
 
   edges_collector <- list()
-  all_nodes_involved <- integer(0)
 
   # Use coefficients from the selected output polynomial
   current_poly_coeffs <- poly_obj$values[, poly_output_index, drop = TRUE]
@@ -1657,8 +1613,8 @@ plot_interaction_network_internal <- function(poly_obj,
     term_label <- poly_obj$labels[[i_term]]
     vars_in_label <- unique(term_label[term_label > 0]) # Unique positive variables in this term
 
-    # Effective order of the interaction (count of unique variables)
-    # This is different from length(term_label) if there are squared terms like c(1,1)
+    # Effective order is the count of unique variables. This treats x1^2*x2
+    # as a pairwise interaction between x1 and x2.
     effective_interaction_order <- length(vars_in_label)
 
     if (effective_interaction_order == interaction_order && interaction_order >= 2) {
@@ -1671,25 +1627,20 @@ plot_interaction_network_internal <- function(poly_obj,
         term_metric_val <- mean(abs(monomial_slice_for_metric[, i_term]), na.rm = TRUE)
       }
 
-      if (!is.na(term_metric_val) && term_metric_val > 1e-9) { # If metric is non-zero
-        # For any N-th order interaction, create pairwise edges between all involved unique vars
+      if (!is.na(term_metric_val) && term_metric_val > 1e-9) {
         if (length(vars_in_label) >= 2) {
           pairs <- utils::combn(vars_in_label, 2, simplify = FALSE)
-          # Weight attribution: for an N-way interaction, attribute its strength to all constituent pairs.
-          # Simple approach: each pair gets a portion of the strength.
-          # More direct: each pair simply *is* part of this N-way interaction.
-          # Let's use the term_metric_val for each projected edge for now.
-          # The `sign` will be the sign of the original N-way term's coefficient.
+          pair_weight <- term_metric_val / length(pairs)
+          pair_signed_weight <- sign(term_coeff_val) * pair_weight
 
           for (p in pairs) {
             edges_collector[[length(edges_collector) + 1]] <- data.frame(
-              from = min(p), # Ensure canonical order
+              from = min(p),
               to = max(p),
-              weight = term_metric_val, # Could divide by choose(length(vars_in_label), 2)
-              sign = sign(term_coeff_val),
-              original_term_label_str = format_term_label_display(term_label, variable_names, use_product_format_for_named = TRUE) # For tooltip/info
+              strength = pair_weight,
+              signed_strength = pair_signed_weight,
+              stringsAsFactors = FALSE
             )
-            all_nodes_involved <- c(all_nodes_involved, p)
           }
         }
       }
@@ -1702,27 +1653,16 @@ plot_interaction_network_internal <- function(poly_obj,
 
   edges_df <- do.call(rbind, edges_collector)
 
-  # Aggregate edges: if the same pair (from, to) results from multiple N-way terms, sum their weights.
-  # This means a pair frequently involved in strong N-way interactions gets a higher cumulative weight.
-  # Keep the sign of the component with the largest absolute weight for that pair.
-
-  # To correctly get sign after aggregation:
-  edges_df_agg <- do.call(rbind, by(edges_df, list(edges_df$from, edges_df$to), function(sub_df) {
-    max_abs_weight_idx <- which.max(abs(sub_df$weight * sub_df$sign)) # Use signed weight to find max impact
-    data.frame(
-      from = sub_df$from[1],
-      to = sub_df$to[1],
-      weight = sum(sub_df$weight, na.rm = TRUE), # Sum of absolute contributions (strength)
-      sign = sub_df$sign[max_abs_weight_idx[1]], # Sign of the strongest contributor
-      # Could also list original_term_label_str contributing
-      stringsAsFactors = FALSE
-    )
-  }))
+  edges_df_agg <- stats::aggregate(
+    cbind(strength, signed_strength) ~ from + to,
+    data = edges_df,
+    FUN = sum
+  )
   rownames(edges_df_agg) <- NULL
-
+  edges_df_agg$sign <- sign(edges_df_agg$signed_strength)
 
   if (!is.null(top_n_interactions) && top_n_interactions > 0 && nrow(edges_df_agg) > top_n_interactions) {
-    edges_df_agg <- edges_df_agg[order(edges_df_agg$weight, decreasing = TRUE), ][1:top_n_interactions, ]
+    edges_df_agg <- edges_df_agg[order(edges_df_agg$strength, decreasing = TRUE), ][1:top_n_interactions, ]
   }
 
   if (nrow(edges_df_agg) == 0) {
@@ -1735,7 +1675,7 @@ plot_interaction_network_internal <- function(poly_obj,
   }
 
   node_df <- data.frame(id = sort(all_nodes_involved_final))
-  node_df$name <- sapply(node_df$id, function(id_val) {
+  node_df$label <- sapply(node_df$id, function(id_val) {
     if (!is.null(variable_names) && id_val > 0 && id_val <= length(variable_names)) {
       variable_names[id_val]
     } else {
@@ -1743,63 +1683,110 @@ plot_interaction_network_internal <- function(poly_obj,
     }
   })
 
-  # igraph requires vertex IDs to be 1..N if supplying a vertex data frame.
-  # Map our potentially sparse numeric IDs (node_df$id) to a dense 1..N range.
-  id_to_igraph_map <- stats::setNames(seq_along(node_df$id), node_df$id)
-  edges_df_agg$from_igraph <- id_to_igraph_map[as.character(edges_df_agg$from)]
-  edges_df_agg$to_igraph <- id_to_igraph_map[as.character(edges_df_agg$to)]
-
-  # Create a clean vertex data frame for igraph, ensuring no 'name' column if
-  # from/to are numeric indices, or ensure from/to match the 'name' column if they are characters.
-  # Since from_igraph/to_igraph are 1..N dense indices, vertex_df should just have attributes.
-  # igraph will map row 1 of vertex_df to id 1, row 2 to id 2, etc.
-
-  vertex_df_for_igraph <- data.frame(name = node_df$name, stringsAsFactors = FALSE)
-  # Any other node attributes can be added here.
-
-  # Create the graph
-  # Start with an empty graph
-  graph <- igraph::make_empty_graph(n = nrow(node_df), directed = FALSE)
-
-  # Add vertex attributes
-  # igraph::V(graph) gives vertex sequence; names are 1, 2, ..., nrow(node_df) by default
-  igraph::V(graph)$name_attr <- node_df$name # Use a different name for the attribute internally
-  # Add original sparse IDs if needed for other purposes, though not directly for plotting name
-  igraph::V(graph)$original_id <- node_df$id
-
-  # Add edges
-  # Convert from/to_igraph to matrix for add_edges
-  edge_list_matrix <- as.matrix(edges_df_agg[, c("from_igraph", "to_igraph")])
-
-  if (nrow(edge_list_matrix) > 0) {
-    graph <- igraph::add_edges(graph, t(edge_list_matrix)) # add_edges expects 2-row matrix
-
-    # Add edge attributes
-    igraph::E(graph)$weight <- edges_df_agg$weight
-    igraph::E(graph)$sign <- as.factor(edges_df_agg$sign) # Ensure it's a factor
-    # igraph::E(graph)$original_term_label_str <- edges_df_agg$original_term_label_str # If needed
+  if (layout == "circle") {
+    angles <- seq(pi / 2, pi / 2 - 2 * pi, length.out = nrow(node_df) + 1)
+    angles <- angles[-length(angles)]
+    node_df$x <- cos(angles)
+    node_df$y <- sin(angles)
+  } else {
+    node_df$x <- seq_len(nrow(node_df))
+    node_df$y <- 0
   }
 
+  node_df$node_strength <- vapply(
+    node_df$id,
+    function(id_val) {
+      sum(edges_df_agg$strength[edges_df_agg$from == id_val | edges_df_agg$to == id_val])
+    },
+    numeric(1)
+  )
 
-  # Check for isolated nodes (nodes in node_df but not in any edge after filtering)
-  # They are already in the graph due to make_empty_graph(n = nrow(node_df))
+  edges_plot <- merge(
+    edges_df_agg,
+    node_df[, c("id", "x", "y")],
+    by.x = "from",
+    by.y = "id",
+    all.x = TRUE
+  )
+  names(edges_plot)[names(edges_plot) == "x"] <- "x_from"
+  names(edges_plot)[names(edges_plot) == "y"] <- "y_from"
+  edges_plot <- merge(
+    edges_plot,
+    node_df[, c("id", "x", "y")],
+    by.x = "to",
+    by.y = "id",
+    all.x = TRUE
+  )
+  names(edges_plot)[names(edges_plot) == "x"] <- "x_to"
+  names(edges_plot)[names(edges_plot) == "y"] <- "y_to"
+  edges_plot$sign_factor <- factor(edges_plot$sign, levels = c(-1, 0, 1))
 
-  # ggraph plotting
-  # geom_node_text will use V(graph)$name_attr IF we map it to 'name' in aes or if it's the default ggraph looks for.
-  # To be safe, explicitly map it in ggraph's aes.
+  edge_geom <- if (layout == "circle") {
+    ggplot2::geom_curve(
+      data = edges_plot,
+      ggplot2::aes(
+        x = .data$x_from,
+        y = .data$y_from,
+        xend = .data$x_to,
+        yend = .data$y_to,
+        linewidth = .data$strength,
+        colour = .data$sign_factor
+      ),
+      curvature = 0.18,
+      alpha = 0.75,
+      lineend = "round",
+      inherit.aes = FALSE
+    )
+  } else {
+    ggplot2::geom_segment(
+      data = edges_plot,
+      ggplot2::aes(
+        x = .data$x_from,
+        y = .data$y_from,
+        xend = .data$x_to,
+        yend = .data$y_to,
+        linewidth = .data$strength,
+        colour = .data$sign_factor
+      ),
+      alpha = 0.75,
+      lineend = "round",
+      inherit.aes = FALSE
+    )
+  }
 
-  gg_plot <- ggraph::ggraph(graph, layout = layout) +
-    ggraph::geom_edge_fan(ggplot2::aes(edge_width = .data$weight, edge_color = .data$sign),
-                          alpha = 0.6, arrow = NULL, end_cap = ggraph::circle(3, 'mm')) +
-    ggraph::scale_edge_width_continuous(range = c(0.5, 4), name = "Strength") +
-    ggraph::scale_edge_color_manual(values = c("-1" = "#F8766D", "1" = "#00BA38", "0" = "grey70"),
-                                    name = "Sign of Coeff.", drop = FALSE) +
-    ggraph::geom_node_point(size = 7, color = "skyblue", alpha = 0.8) +
-    # Explicitly tell ggraph to use 'name_attr' for the label aesthetic
-    ggraph::geom_node_text(ggplot2::aes(label = .data$name_attr), repel = TRUE, size = 3.5) +
-    ggraph::theme_graph(base_family = 'sans', plot_margin = ggplot2::margin(1,1,1,1)) +
-    ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5, size = 14)) +
-    ggplot2::labs(title = paste(interaction_order, "-Order Interaction Network", sep=""))
+  gg_plot <- ggplot2::ggplot() +
+    edge_geom +
+    ggplot2::geom_point(
+      data = node_df,
+      ggplot2::aes(x = .data$x, y = .data$y, size = .data$node_strength),
+      shape = 21,
+      fill = "#4C78A8",
+      colour = "white",
+      stroke = 0.8
+    ) +
+    ggplot2::geom_text(
+      data = node_df,
+      ggplot2::aes(x = .data$x, y = .data$y, label = .data$label),
+      colour = "black",
+      size = 3.5,
+      vjust = -1.1
+    ) +
+    ggplot2::scale_linewidth_continuous(range = c(0.3, 2.5), name = "Strength") +
+    ggplot2::scale_size_continuous(range = c(4, 8), name = "Node strength") +
+    ggplot2::scale_colour_manual(
+      values = c("-1" = "#F8766D", "0" = "grey70", "1" = "#00BA38"),
+      labels = c("-1" = "-", "0" = "mixed", "1" = "+"),
+      name = "Sign",
+      drop = FALSE
+    ) +
+    ggplot2::coord_equal(clip = "off") +
+    ggplot2::theme_void(base_size = 10) +
+    ggplot2::theme(
+      legend.position = "right",
+      plot.title = ggplot2::element_text(hjust = 0.5, size = 14),
+      plot.margin = ggplot2::margin(12, 24, 12, 24)
+    ) +
+    ggplot2::labs(title = paste(interaction_order, "-Feature Interaction Network", sep=""))
 
   return(gg_plot)
 }

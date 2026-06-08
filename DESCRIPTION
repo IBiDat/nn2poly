@@ -31,7 +31,6 @@ Suggests:
     luz, torch,
     cowplot, ggplot2, patchwork,
     ggbeeswarm,
-    igraph, ggraph,
     testthat (>= 3.0.0), vdiffr,
     knitr, rmarkdown
 LinkingTo:
