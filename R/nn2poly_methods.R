@@ -435,7 +435,7 @@ predict.nn2poly <- function(object,
 plot.nn2poly <- function(x, type = "bar", ...,
                          # Args for bar plot
                          n = NULL,
-                         min_order = 0, # New arg for bar plot
+                         min_order = 0,
                          # Args for local_contributions & beeswarm plots
                          newdata_monomials = NULL,
                          poly_output_index = 1,
@@ -446,7 +446,7 @@ plot.nn2poly <- function(x, type = "bar", ...,
                          # Args for waterfall plot
                          waterfall_n = 15,
                          # Args for beeswarm plot
-                         original_feature_data = NULL, # Still needed for beeswarm
+                         original_feature_data = NULL,
                          color_by_feature = 1,
                          top_n_terms = NULL, # For beeswarm y-axis
                          # Args for interaction_surface plot
@@ -454,7 +454,7 @@ plot.nn2poly <- function(x, type = "bar", ...,
                          grid_resolution = 20,
                          # Args for interaction_network plot
                          interaction_order_network = 2,
-                         metric_network = "coefficient_abs", # Defaulted to coefficient_abs
+                         metric_network = "coefficient_abs",
                          top_n_interactions = NULL,
                          layout_network = "circle"
 ) {
@@ -816,7 +816,7 @@ plot_bar <- function(poly_obj, n = NULL, variable_names = NULL, min_order = 0) {
 
     ggplot2::scale_fill_manual(
       name = "Sign",
-      values = c("1" = "#00BA38", "-1" = "#F8766D"), # Your green/red colors
+      values = c("1" = "#00BA38", "-1" = "#F8766D"),
       labels = c("1" = "+", "-1" = "-"),
       drop = FALSE # Show all legend items even if one sign not present
     ) +
@@ -853,7 +853,7 @@ plot_bar <- function(poly_obj, n = NULL, variable_names = NULL, min_order = 0) {
 #'
 #' @return A ggplot object.
 #' @noRd
-plot_heatmap <- function(poly_obj, variable_names = NULL) { # Changed x to poly_obj
+plot_heatmap <- function(poly_obj, variable_names = NULL) {
 
   coefficients_matrix <- poly_obj$values # Matrix: terms x n_polynomial_outputs
   all_labels_list <- poly_obj$labels   # List of label vectors for each term
@@ -883,7 +883,7 @@ plot_heatmap <- function(poly_obj, variable_names = NULL) { # Changed x to poly_
   }
   max_var_idx <- max(present_vars)
 
-  if(max_var_idx == 0){ # Should not happen if all(lab > 0) filter is effective
+  if(max_var_idx == 0){
     return(ggplot2::ggplot() +
              ggplot2::annotate("text", x=0.5, y=0.5, label="Max variable index is 0.") +
              ggplot2::theme_minimal(base_size = 10) +
