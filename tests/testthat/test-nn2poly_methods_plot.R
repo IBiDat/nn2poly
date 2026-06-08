@@ -1,4 +1,6 @@
 test_that("Test the plot for a polynomial generated with `keep_layers = FALSE`", {
+  skip_if_not_installed("vdiffr")
+
   # loading the example
   testing_data <- testing_helper_1()
   object <- testing_data$weights_list
@@ -21,6 +23,8 @@ test_that("Test the plot for a polynomial generated with `keep_layers = FALSE`",
 
 
 test_that("Test the plot for a polynomial generated with n = NULL", {
+  skip_if_not_installed("vdiffr")
+
   # loading the example
   testing_data <- testing_helper_1()
   object <- testing_data$weights_list
@@ -43,6 +47,8 @@ test_that("Test the plot for a polynomial generated with n = NULL", {
 
 
 test_that("Test the plot for a polynomial generated with  `keep_layers = TRUE`", {
+  skip_if_not_installed("vdiffr")
+
   # loading the example
   testing_data <- testing_helper_1()
   object <- testing_data$weights_list
@@ -65,6 +71,8 @@ test_that("Test the plot for a polynomial generated with  `keep_layers = TRUE`",
 
 test_that("Test the plot for a polynomial generated with  `keep_layers = TRUE`
           and n=NULL", {
+  skip_if_not_installed("vdiffr")
+
   # loading the example
   testing_data <- testing_helper_1()
   object <- testing_data$weights_list
@@ -88,6 +96,8 @@ test_that("Test the plot for a polynomial generated with  `keep_layers = TRUE`
 
 
 test_that("Test the plot for a polynomial generated with  vector values input, all positive coeficients", {
+  skip_if_not_installed("vdiffr")
+
   # loading the example
   testing_data <- testing_helper_1()
   object <- testing_data$weights_list
@@ -112,6 +122,8 @@ test_that("Test the plot for a polynomial generated with  vector values input, a
 
 
 test_that("Test the plot for a polynomial generated with  0 valued coeff and positive and negative coefficients", {
+  skip_if_not_installed("vdiffr")
+
   # loading the example
   testing_data <- testing_helper_1()
   object <- testing_data$weights_list
@@ -137,6 +149,8 @@ test_that("Test the plot for a polynomial generated with  0 valued coeff and pos
 
 
 test_that("Test the plot for a polynomial generated with  all negative coefficients", {
+  skip_if_not_installed("vdiffr")
+
   # loading the example
   testing_data <- testing_helper_1()
   object <- testing_data$weights_list
