@@ -1,4 +1,6 @@
 test_that("plot_diagonal for two arbitraty sequence of numbers", {
+  skip_if_not_installed("vdiffr")
+
   # generating two sequences of numbers
   a <- 1:20
   b <- seq(from = 1, to = 39, by = 2)
@@ -12,6 +14,8 @@ test_that("plot_diagonal for two arbitraty sequence of numbers", {
 
 test_that("plot_diagonal for two arbitraty sequence of numbers
           but without line", {
+  skip_if_not_installed("vdiffr")
+
   # generating two sequences of numbers
   a <- 1:20
   b <- seq(from = 1, to = 39, by = 2)
