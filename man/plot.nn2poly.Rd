@@ -36,8 +36,8 @@
 \item \code{"heatmap"}: second-order coefficient heatmap (diagonal = squared terms).
 \item \code{"local_contributions"}: per-feature local attributions for one observation
 by redistributing each term contribution across its variables (by multiplicity).
-\item \code{"waterfall"}: SHAP-like waterfall using per-term contributions for one observation.
-\item \code{"beeswarm"}: SHAP-like summary (beeswarm) of per-term contributions
+\item \code{"waterfall"}: waterfall of per-term contributions for one observation.
+\item \code{"beeswarm"}: summary of per-term contributions
 across observations, colored by one selected original feature.
 \item \code{"interaction_surface"}: two-feature response surface for one output polynomial.
 \item \code{"interaction_network"}: network view of pairwise or higher-order interactions.

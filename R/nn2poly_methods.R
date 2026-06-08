@@ -378,8 +378,8 @@ predict.nn2poly <- function(object,
 #' - `"heatmap"`: second-order coefficient heatmap (diagonal = squared terms).
 #' - `"local_contributions"`: per-feature local attributions for one observation
 #'   by redistributing each term contribution across its variables (by multiplicity).
-#' - `"waterfall"`: SHAP-like waterfall using per-term contributions for one observation.
-#' - `"beeswarm"`: SHAP-like summary (beeswarm) of per-term contributions
+#' - `"waterfall"`: waterfall of per-term contributions for one observation.
+#' - `"beeswarm"`: summary of per-term contributions
 #'   across observations, colored by one selected original feature.
 #' - `"interaction_surface"`: two-feature response surface for one output polynomial.
 #' - `"interaction_network"`: network view of pairwise or higher-order interactions.
