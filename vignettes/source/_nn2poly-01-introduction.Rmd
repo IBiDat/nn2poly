@@ -243,7 +243,7 @@ final_poly
 
 ## Predictions using the obtained polynomial
 
-With the obtained polynomial coefficients, we can use them to predict the response variable $Y$ using the polynomial. This can be done using `predcit()` on the output of `nn2poly` (object with class `"nn2poly"`) together with the desired values for the predictor variables.
+With the obtained polynomial coefficients, we can use them to predict the response variable $Y$ using the polynomial. This can be done using `predict()` on the output of `nn2poly` (object with class `"nn2poly"`) together with the desired values for the predictor variables.
 
 
 ```{r reg-polynomial-prediction}
@@ -253,7 +253,7 @@ prediction_poly <- predict(object = final_poly,
                            newdata = test_x)
 
 # In this case the output is a vector of length equal to the rows of test_x,
-# as we are predicting the output of out final polynomial for each observation.
+# as we are predicting the output of our final polynomial for each observation.
 length(prediction_poly)==nrow(test_x)
 
 ```
@@ -290,146 +290,78 @@ A simple plot comparing the polynomial and NN predictions can be obtained with `
 nn2poly:::plot_diagonal(x_axis =  prediction_NN, y_axis =  prediction_poly, xlab = "NN prediction", ylab = "Polynomial prediction")
 ```
 
-We can also plot the $n$ most important coefficients in absolute value to compare which variables or interactions are more relevant in the polynomial. Note that, as data should be scaled to the $[-1,1]$ interval, interactions of order 2 or higher would usually need a higher absolute value than the lower order coefficients to be more relevant.
+We can also plot the $n$ most important coefficients in absolute value to compare which variables or interactions are more relevant in the polynomial. Note that, as data should be scaled to the $[-1,1]$ interval, interactions of order 2 or higher would usually need a higher absolute value than lower order coefficients to have a comparable impact.
 
 In this case we can see how the two most important obtained coefficients are `2,3` and `1`, precisely the two terms appearing in the original polynomial $4x_1 - 3 x_2x_3$. However, other interactions of order 3 appear to be also relevant, which is caused by the Taylor expansions not being controlled as we have not imposed constraints on the neural network weights training.
 
+```{r reg-plot-setup}
+feature_names <- paste0("x", seq_len(p))
+```
+
 ```{r reg-n-important}
-plot(final_poly, n=8, type = "bar")
+plot(final_poly, n = 8, type = "bar", variable_names = feature_names)
 ```
 
-```{r}
-plot(final_poly,type = "heatmap")
+The heatmap focuses on second-order coefficients. Diagonal cells correspond to squared terms such as $x_1^2$, while off-diagonal cells correspond to pairwise interactions such as $x_2x_3$.
+
+```{r reg-coefficient-heatmap}
+plot(final_poly, type = "heatmap", variable_names = feature_names)
 ```
 
+The monomial predictions computed above give an exact decomposition of each polynomial prediction into its evaluated terms. The local contribution plot redistributes each evaluated term across the variables that appear in it, proportionally to their multiplicity in the term. This is useful as a feature-level summary for one observation, while keeping in mind that interaction terms are shared by construction.
 
-```{r}
-# Assuming 'final_poly' and 'test_x' are from your vignette
-# library(nn2poly) # and other necessary libraries like ggplot2
-
-# 1. Get monomial predictions for all test data
-prediction_monomials <- predict(object = final_poly,
-                                newdata = test_x,
-                                monomials = TRUE)
-dim(prediction_monomials) # Should be [125, 20, 1] in the vignette example
-
-# 2. Generate the local contributions plot for the first observation
+```{r reg-local-contributions}
 plot(final_poly,
      type = "local_contributions",
      newdata_monomials = prediction_monomials,
      observation_index = 1,
-     poly_output_index = 1, # Only one output in this example
-     max_order_to_display = 3) # Show up to 3rd order contributions
-
-plot(final_poly,
-     type = "local_contributions",
-     newdata_monomials = prediction_monomials,
-     observation_index = 42,
-     poly_output_index = 1, # Only one output in this example
-     max_order_to_display = 3) # Show up to 3rd order contributions
-
+     max_order_to_display = 3,
+     variable_names = feature_names)
 ```
 
-```{r}
-# --- Waterfall Plot ---
+The waterfall plot keeps the decomposition at the term level. The bars start at the intercept, add the largest term contributions for the selected observation, aggregate the remaining terms into `(Other)`, and end at the polynomial prediction.
+
+```{r reg-waterfall}
 plot(final_poly,
      type = "waterfall",
      newdata_monomials = prediction_monomials,
      observation_index = 1,
-     poly_output_index = 1,
-     waterfall_n = 12)
+     waterfall_n = 12,
+     variable_names = feature_names)
 ```
 
+Across a data set, a beeswarm plot shows how the contribution of the most relevant terms changes from observation to observation. The color can be tied to any original feature, which helps identify how the feature values relate to the evaluated term contributions.
 
-```{r}
-# Assuming 'final_poly', 'test_x' are from your vignette
-prediction_monomials <- predict(object = final_poly,
-                                newdata = test_x,
-                                monomials = TRUE)
-dim(prediction_monomials) # Should be [125, 20, 1] in the vignette example
-
-# --- Beeswarm Plot ---
-
-# Color by the second original feature
+```{r reg-beeswarm, eval=requireNamespace("ggbeeswarm", quietly = TRUE)}
 plot(final_poly,
      type = "beeswarm",
      newdata_monomials = prediction_monomials,
      original_feature_data = test_x,
-     color_by_feature = 2, # Color by the second column of test_x
-     poly_output_index = 1,
-     top_n_terms = 10)
-
+     color_by_feature = 2,
+     top_n_terms = 10,
+     variable_names = feature_names)
 ```
 
+The response surface varies two selected features over the range observed in `original_feature_data` and fixes the remaining features at their sample means. This gives a direct view of the fitted polynomial output over a two-dimensional slice of the predictor space.
 
-
-```{r}
-
-# Assuming 'final_poly' and 'test_x' are available from your vignette
-# And the plot_interaction_surface_internal function is defined and accessible.
-
-# Example 1.1: Plotting the interaction surface for features 2 and 3 using numeric indices
+```{r reg-response-surface}
 plot(final_poly,
      type = "interaction_surface",
-     feature_pair = c(2, 3),         # Specify the pair of features by their indices
-     original_feature_data = test_x, # Provide the original data for ranges and means
-     grid_resolution = 30,           # Increase resolution for a smoother surface (optional)
-     variable_names = c("X1", "X2", "X3")) # Provide variable names for axis labels (optional)
-
-# Example 1.2: Plotting the interaction surface for features 1 and 2 using feature names (if test_x had column names or variable_names are provided and match)
-# Let's assume variable_names were used to define the column names conceptually
-# If test_x has columns named "V1", "V2", "V3"
-# plot(final_poly,
-#      type = "interaction_surface",
-#      feature_pair = c("V1", "V2"),   # Specify the pair of features by their names
-#      original_feature_data = test_x,
-#      grid_resolution = 30)
-
-# If test_x does NOT have column names, you need to provide variable_names
-plot(final_poly,
-     type = "interaction_surface",
-     feature_pair = c("X1", "X2"),   # Specify the pair of features by their names
+     feature_pair = c("x2", "x3"),
      original_feature_data = test_x,
      grid_resolution = 30,
-     variable_names = c("X1", "X2", "X3")) # These names are used for matching feature_pair
-
+     variable_names = feature_names)
 ```
 
+Finally, the interaction network summarizes which variables appear together in interaction terms. With `metric_network = "coefficient_abs"`, edge strength is based on coefficient magnitude. With `metric_network = "mean_monomial_abs"`, edge strength is based on the average absolute evaluated contribution across the data.
 
-```{r}
-# Assuming 'final_poly', 'test_x', and 'prediction_monomials' are available
-# And the plot_interaction_network_internal function is defined and accessible.
-
-# Example 2.1: Plotting the 2nd-order interaction network using coefficient magnitudes
-plot(final_poly,
-     type = "interaction_network",
-     interaction_order_network = 2,       # Focus on 2nd-order interactions (pairwise projections)
-     metric_network = "coefficient_abs",  # Use the absolute value of coefficients for strength
-     variable_names = c("X1", "X2", "X3")) # Provide variable names for nodes
-
-# Example 2.2: Plotting the 2nd-order interaction network using mean absolute term contributions
-# plot(final_poly,
-#      type = "interaction_network",
-#      interaction_order_network = 2,
-#      metric_network = "mean_monomial_abs", # Use average term contribution across data for strength
-#      newdata_monomials = prediction_monomials, # Required for mean_monomial_abs metric
-#      variable_names = c("X1", "X2", "X3"))
-
-# Example 2.3: Plotting the 3rd-order interaction network (if max_order >= 3 was used in nn2poly)
-# This will project 3rd order terms like x1*x2*x3 onto pairs (x1,x2), (x1,x3), (x2,x3)
-plot(final_poly,
-     type = "interaction_network",
-     interaction_order_network = 3,       # Look for 3rd-order terms
-     metric_network = "coefficient_abs",
-     variable_names = c("X1", "X2", "X3"))
-
-# Example 2.4: Plotting the top N 2nd-order interactions
+```{r reg-interaction-network}
 plot(final_poly,
      type = "interaction_network",
      interaction_order_network = 2,
      metric_network = "coefficient_abs",
-     top_n_interactions = 5,             # Display only the 5 strongest projected pairwise interactions
-     variable_names = c("X1", "X2", "X3"))
+     top_n_interactions = 5,
+     variable_names = feature_names)
 ```
 
 

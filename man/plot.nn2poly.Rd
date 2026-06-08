@@ -24,7 +24,7 @@
   interaction_order_network = 2,
   metric_network = "coefficient_abs",
   top_n_interactions = NULL,
-  layout_network = "nicely"
+  layout_network = "circle"
 )
 }
 \arguments{
@@ -39,9 +39,10 @@ by redistributing each term contribution across its variables (by multiplicity).
 \item \code{"waterfall"}: SHAP-like waterfall using per-term contributions for one observation.
 \item \code{"beeswarm"}: SHAP-like summary (beeswarm) of per-term contributions
 across observations, colored by one selected original feature.
+\item \code{"interaction_surface"}: two-feature response surface for one output polynomial.
+\item \code{"interaction_network"}: network view of pairwise or higher-order interactions.
 }
-
-Additional types (\code{"interaction_surface"}, \code{"interaction_network"}) are experimental.}
+}
 
 \item{...}{Additional arguments passed to specific plot types.}
 
@@ -52,18 +53,18 @@ Additional types (\code{"interaction_surface"}, \code{"interaction_network"}) ar
 1 excludes intercept, showing terms of polynomial degree 1+.
 2 excludes intercept and linear terms, showing terms of polynomial degree 2+.}
 
-\item{newdata_monomials}{For \code{type = "local_contributions"}, \code{"waterfall"} or \code{"beeswarm"},
+\item{newdata_monomials}{For \code{type = "local_contributions"}, \code{"waterfall"},
+\code{"beeswarm"} or \code{metric_network = "mean_monomial_abs"},
 the output of \code{predict(x, newdata, monomials = TRUE)}. These values are
 per-term contributions (coefficient multiplied by variable product). This should be
 for a single observation for "local_contributions" (or specify \code{observation_index})
 and for multiple observations for "beeswarm".}
 
-\item{poly_output_index}{For \code{type = "local_contributions"} or \code{"beeswarm"},
+\item{poly_output_index}{For local plots and multi-output polynomials,
 if \code{x} produces multiple polynomial outputs, which one to plot (default: 1).}
 
-\item{variable_names}{For \code{type = "local_contributions"} or \code{"beeswarm"},
-an optional character vector of original feature names to make term labels
-more readable (e.g., "x1" instead of "1").}
+\item{variable_names}{Optional character vector of original feature names
+to make labels more readable in plots where variables are displayed.}
 
 \item{observation_index}{For \code{type = "local_contributions"}, the row index
 from \code{newdata_monomials} to plot (default: 1).}
@@ -75,9 +76,9 @@ term order to show in the stacked bars (default: 3).}
 terms (by absolute contribution) to show. Remaining terms are aggregated
 into an \code{(Other)} bucket.}
 
-\item{original_feature_data}{For \code{type = "beeswarm"}, a matrix or data frame
-of the original predictor values for all observations in \code{newdata_monomials}.
-Required for coloring points.}
+\item{original_feature_data}{For \code{type = "beeswarm"} or \code{"interaction_surface"},
+a matrix or data frame of original predictor values. It is used for beeswarm
+coloring and to define the grid/ranges/reference values of response surfaces.}
 
 \item{color_by_feature}{For \code{type = "beeswarm"}, which original feature to
 use for selected-feature coloring. Can be a numeric column index or a character name
@@ -86,14 +87,14 @@ matching \code{colnames(original_feature_data)} or \code{variable_names}.}
 \item{top_n_terms}{For \code{type = "beeswarm"}, an optional integer to display only
 the top N most important terms (based on mean absolute term contribution).}
 
-\item{feature_pair}{For \code{type = "interaction_surface"}, a numeric or character
-vector of length 2 specifying the pair of features to plot.}
+\item{feature_pair}{For \code{type = "interaction_surface"}, a numeric index vector
+or character vector of length 2 specifying the two features to vary.}
 
 \item{grid_resolution}{For \code{type = "interaction_surface"}, the number of points
 per dimension for the grid.}
 
-\item{interaction_order_network}{For \code{type = "interaction_network"}, the effective
-order of interactions to visualize (e.g., 2 for pairwise feature interactions).}
+\item{interaction_order_network}{For \code{type = "interaction_network"}, the number
+of unique variables that must appear in a term for it to be included.}
 
 \item{metric_network}{For \code{type = "interaction_network"}, the metric for edge
 weights ("coefficient_abs" or "mean_monomial_abs").}
@@ -101,8 +102,8 @@ weights ("coefficient_abs" or "mean_monomial_abs").}
 \item{top_n_interactions}{For \code{type = "interaction_network"}, number of top
 (projected) pairwise interactions to display by weight.}
 
-\item{layout_network}{For \code{type = "interaction_network"}, the layout algorithm
-for ggraph (e.g., "nicely", "fr").}
+\item{layout_network}{For \code{type = "interaction_network"}, either \code{"circle"}
+or \code{"line"}.}
 }
 \value{
 A ggplot object.
