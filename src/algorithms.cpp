@@ -145,15 +145,14 @@ arma::mat alg_non_linear(arma::mat coeffs_input,
         // do not appear dont need to be counted as they will be 0, their
         // factorial 1 and at the end will, not affect the total product.
 
-        // This can be done as follows. //REVISETHISLATER when this used
-        // string vectors, it was easier to count all with table().
-        // Now with vectors of different lengths in the vector this no
-        // longer works and a not so efficient workaround is used
-        ListOf<IntegerVector> unique_in_partition = Function("unique")(partition);
-        NumericVector m(unique_in_partition.size() + 1);
-        for (int i = 0; i < unique_in_partition.size(); i++)
-          m[i + 1] = sum(as<IntegerVector>(Function("%in%")(
-            partition, List::create(unique_in_partition[i]))));
+        PartitionSummary part_summary = summarize_partition(partition);
+        NumericVector m(part_summary.unique_terms.size() + 1);
+        for (size_t i = 0; i < part_summary.unique_terms.size(); i++) {
+          auto it = part_summary.counts.find(as_termkey(part_summary.unique_terms[i]));
+          if (it == part_summary.counts.end())
+            stop("Internal error while counting partition terms.");
+          m[i + 1] = it->second;
+        }
         m[0] = difference;
 
         // Compute the multinomial coefficient
@@ -162,7 +161,7 @@ arma::mat alg_non_linear(arma::mat coeffs_input,
 
 
         // Now we need to use the labels to get the needed coefficients:
-        LogicalVector needed = Function("%in%")(labels_input, partition);
+        LogicalVector needed = in_partition(labels_input, part_summary);
         arma::mat coeffs_input_needed = coeffs_input.cols(find(as<arma::vec>(needed) == 1));
         for (unsigned int i = 0; i < coeffs_input_needed.n_cols; i++)
           coeffs_input_needed.col(i) = arma::pow(coeffs_input_needed.col(i), m[i + 1]);
