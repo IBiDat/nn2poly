@@ -8,15 +8,12 @@
 #include <algorithm>
 
 template <typename T>
-using Partition = std::vector<std::vector<T>>;
-
-template <typename T>
 class MultisetPartitions {
   std::vector<T> comp;
   std::vector<int> mult;
 
 public:
-  using value_type = Partition<T>;
+  using value_type = std::vector<std::vector<T>>;
   using pointer = value_type*;
   using reference = value_type&;
 
