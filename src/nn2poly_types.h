@@ -49,17 +49,20 @@ struct TermQHash {
 struct PartitionCache {
   unordered_map<Term, Partition, TermHash> signature;
   unordered_map<TermQ, Partition, TermQHash> filtered;
+  unordered_map<TermQ, Partition, TermQHash> renamed;
 
 #ifdef NN2POLY_DEBUG
   void debug(int layer = -1) const {
     std::cerr << "[DEBUG][nn2poly][cache]";
     if (layer >= 0) {
       std::cerr << "[layer " << layer << "] "
-                << "filtered " << filtered.delta()
+                << "renamed " << renamed.delta()
+                << ", filtered " << filtered.delta()
                 << ", signature " << signature.delta();
     } else {
       std::cerr << "[total]   "
-                << "filtered " << filtered.total()
+                << "renamed " << renamed.total()
+                << ", filtered " << filtered.total()
                 << ", signature " << signature.total();
     }
     std::cerr << "\n";
