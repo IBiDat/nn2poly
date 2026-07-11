@@ -75,6 +75,7 @@ Partition build_allowed_terms(const Term& label,
 
     // Filtering
     Partition filtered_terms;
+    filtered_terms.reserve(sig_parts_ptr->size()); // Maximum possible size
     for (const Terms& partition : *sig_parts_ptr) {
       bool allowed = true;
       for (const Term& part : partition) {
@@ -92,6 +93,7 @@ Partition build_allowed_terms(const Term& label,
 
   // Renaming
   Partition renamed_terms;
+  renamed_terms.reserve(filtered_it->second.size()); // Exact size known
   for (const Terms& partition : filtered_it->second) {
     Terms renamed_partition;
     renamed_partition.reserve(partition.size());
