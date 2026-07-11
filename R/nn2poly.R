@@ -123,7 +123,7 @@ nn2poly.list <- function(object,
                          max_order = 2,
                          keep_layers = FALSE,
                          taylor_orders = 8,
-                         ....) {
+                         ...) {
   result <- nn2poly_algorithm(object, names(object),
                               max_order, keep_layers, taylor_orders)
   class(result) <- "nn2poly"

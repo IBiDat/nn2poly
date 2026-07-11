@@ -133,7 +133,7 @@ plot_taylor_and_activation_potentials.list <- function(object,
     yf <- fun(x)
     # compute the Taylor approximation
     q <- min(taylor_orders[k], max_order)
-    af_derivatives_list <- nn2poly:::obtain_derivatives_list(q, fun)
+    af_derivatives_list <- obtain_derivatives_list(q, fun)
     pol <- af_derivatives_list[[k]][1:(q + 1)]
     yp <- as.vector(outer(x, 0:(length(pol) - 1), "^") %*% pol)
     # compute the error as the absolute value of the difference

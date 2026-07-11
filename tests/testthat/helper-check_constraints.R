@@ -1,3 +1,13 @@
+Norm <- function (x, p = 2) {
+  stopifnot(is.numeric(x) || is.complex(x), is.numeric(p), length(p) == 1)
+  if (p > -Inf && p < Inf)
+    sum(abs(x)^p)^(1/p)
+  else if (p == Inf)
+    max(abs(x))
+  else if (p == -Inf)
+    min(abs(x))
+  else return(NULL)
+}
 
 check_weight_constraints <- function(weights, maxnorm) {
   #### Compute the norm for the full matrix ####
@@ -19,17 +29,17 @@ check_weight_constraints <- function(weights, maxnorm) {
     # Loop over each column
     for (j in 1:n_cols) {
       if (maxnorm[[1]] == "l1_norm") {
-        norm <- pracma::Norm(weights[[i]][, j], 1)
+        norm <- Norm(weights[[i]][, j], 1)
         weights_norms[[i]][j] <- norm
       } else if (maxnorm[[1]] == "l2_norm") {
-        norm <- pracma::Norm(weights[[i]][, j], 2)
+        norm <- Norm(weights[[i]][, j], 2)
         weights_norms[[i]][j] <- norm
       } else if (maxnorm[[1]] == "unit") {
-        norm <- pracma::Norm(weights[[i]][, j], 2)
+        norm <- Norm(weights[[i]][, j], 2)
         weights_norms[[i]][j] <- norm
       } else {
         print("Imprecise norm. Computing the l1 norm...")
-        norm <- pracma::Norm(weights[[i]][, j], 1)
+        norm <- Norm(weights[[i]][, j], 1)
         weights_norms[[i]][j] <- norm
       }
 
