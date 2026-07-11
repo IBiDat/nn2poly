@@ -39,78 +39,74 @@ Partition build_allowed_terms(const Term& label,
   // LEVEL 1: renamed cache, exact match
   // ---------------------------------------------------------
   TermQ renamed_key{label, q_previous_layer};
-  auto renamed_it = pcache.renamed.find(renamed_key);
+  auto ren_it = pcache.renamed.find(renamed_key);
 
-  if (renamed_it != pcache.renamed.end())
-    return renamed_it->second;
+  if (ren_it != pcache.renamed.end())
+    return ren_it->second;
 
   // Find the equivalence between label and the ones needed for the
   // reduced partitions list
-  const TermEquivalence equivalence = summarize_label_equivalence(label);
+  const TermEquivalence eq = summarize_label_equivalence(label);
 
   // ---------------------------------------------------------
   // LEVEL 2: filtered cache (filtered structural matches)
   // ---------------------------------------------------------
-  TermQ filter_key{equivalence.signature, q_previous_layer};
-  auto filtered_it = pcache.filtered.find(filter_key);
+  TermQ filter_key{eq.signature, q_previous_layer};
+  auto filt_it = pcache.filtered.find(filter_key);
 
-  if (filtered_it == pcache.filtered.end()) {
+  if (filt_it == pcache.filtered.end()) {
     // ---------------------------------------------------------
     // LEVEL 3: signature cache (structural matches only)
     // ---------------------------------------------------------
-    const Partition* sig_parts_ptr = nullptr;
-    auto sig_it = pcache.signature.find(equivalence.signature);
+    auto sig_it = pcache.signature.find(eq.signature);
 
-    if (sig_it != pcache.signature.end()) {
-      sig_parts_ptr = &(sig_it->second);
-    } else { // Generate base partitions
-      std::multiset<int> mset(equivalence.signature.begin(), equivalence.signature.end());
+    if (sig_it == pcache.signature.end()) {
+      std::multiset<int> mset(eq.signature.begin(), eq.signature.end());
       Partition sig_parts;
       auto partitions = multiset_partitions(mset);
       for (auto it = partitions.begin(); it != partitions.end(); ++it)
         sig_parts.push_back(*it);
-      auto inserted_sig = pcache.signature.emplace(equivalence.signature, std::move(sig_parts));
-      sig_parts_ptr = &(inserted_sig.first->second);
+
+      sig_it = pcache.signature.emplace(eq.signature, std::move(sig_parts)).first;
     }
 
     // Filtering
-    Partition filtered_terms;
-    filtered_terms.reserve(sig_parts_ptr->size()); // Maximum possible size
-    for (const Terms& partition : *sig_parts_ptr) {
+    Partition filt_parts;
+    filt_parts.reserve(sig_it->second.size()); // Maximum possible size
+    for (const Terms& terms : sig_it->second) {
       bool allowed = true;
-      for (const Term& part : partition) {
-        if (static_cast<int>(part.size()) > q_previous_layer) {
+      for (const Term& term : terms) {
+        if (static_cast<int>(term.size()) > q_previous_layer) {
           allowed = false;
           break;
         }
       }
-      if (allowed) filtered_terms.push_back(partition);
+      if (allowed) filt_parts.push_back(terms);
     }
 
-    // Save and grab the iterator
-    filtered_it = pcache.filtered.emplace(filter_key, std::move(filtered_terms)).first;
+    filt_it = pcache.filtered.emplace(filter_key, std::move(filt_parts)).first;
   }
 
   // Renaming
-  Partition renamed_terms;
-  renamed_terms.reserve(filtered_it->second.size()); // Exact size known
-  for (const Terms& partition : filtered_it->second) {
-    Terms renamed_partition;
-    renamed_partition.reserve(partition.size());
+  Partition ren_parts;
+  ren_parts.reserve(filt_it->second.size()); // Exact size known
+  for (const Terms& terms : filt_it->second) {
+    Terms ren_terms;
+    ren_terms.reserve(terms.size());
 
-    for (const Term& part : partition) {
-      Term renamed_part;
-      renamed_part.reserve(part.size());
-      for (int rank : part)
-        renamed_part.push_back(equivalence.canonical_order[rank - 1]);
-      std::sort(renamed_part.begin(), renamed_part.end());
-      renamed_partition.push_back(std::move(renamed_part));
+    for (const Term& term : terms) {
+      Term ren_term;
+      ren_terms.reserve(term.size());
+      for (int rank : term)
+        ren_term.push_back(eq.canonical_order[rank - 1]);
+      std::sort(ren_term.begin(), ren_term.end());
+      ren_terms.push_back(std::move(ren_term));
     }
 
-    std::sort(renamed_partition.begin(), renamed_partition.end());
-    renamed_terms.push_back(std::move(renamed_partition));
+    std::sort(ren_terms.begin(), ren_terms.end());
+    ren_parts.push_back(std::move(ren_terms));
   }
 
-  auto inserted_renamed = pcache.renamed.emplace(renamed_key, std::move(renamed_terms));
-  return inserted_renamed.first->second;
+  ren_it = pcache.renamed.emplace(renamed_key, std::move(ren_parts)).first;
+  return ren_it->second;
 }
