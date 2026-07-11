@@ -24,8 +24,7 @@ Depends: R (>= 3.5.0)
 Imports:
     Rcpp,
     generics,
-    matrixStats,
-    pracma
+    matrixStats
 Suggests:
     keras, tensorflow, reticulate,
     luz, torch,
