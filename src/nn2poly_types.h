@@ -27,9 +27,12 @@ struct TermHash {
   }
 };
 
+using PartitionCache = std::unordered_map<Term, Partition, TermHash>;
+using TermMap = std::unordered_map<Term, size_t, TermHash>;
+
 struct TermSummary {
   Terms unique_terms;
-  std::unordered_map<Term, int, TermHash> counts;
+  TermMap counts;
 };
 
 struct TermEquivalence {

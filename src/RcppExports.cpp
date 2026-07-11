@@ -12,18 +12,6 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// obtain_final_poly_order
-int obtain_final_poly_order(int max_order, const Term& taylor_orders);
-RcppExport SEXP _nn2poly_obtain_final_poly_order(SEXP max_orderSEXP, SEXP taylor_ordersSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type max_order(max_orderSEXP);
-    Rcpp::traits::input_parameter< const Term& >::type taylor_orders(taylor_ordersSEXP);
-    rcpp_result_gen = Rcpp::wrap(obtain_final_poly_order(max_order, taylor_orders));
-    return rcpp_result_gen;
-END_RCPP
-}
 // obtain_taylor_vector
 Term obtain_taylor_vector(const Term& taylor_orders, const Functions& af_string_list);
 RcppExport SEXP _nn2poly_obtain_taylor_vector(SEXP taylor_ordersSEXP, SEXP af_string_listSEXP) {
@@ -48,21 +36,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// obtain_partitions_with_labels
-PartitionsList obtain_partitions_with_labels(int p, int q_max);
-RcppExport SEXP _nn2poly_obtain_partitions_with_labels(SEXP pSEXP, SEXP q_maxSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type p(pSEXP);
-    Rcpp::traits::input_parameter< int >::type q_max(q_maxSEXP);
-    rcpp_result_gen = Rcpp::wrap(obtain_partitions_with_labels(p, q_max));
-    return rcpp_result_gen;
-END_RCPP
-}
 // alg_non_linear
-Weights alg_non_linear(const Weights& coeffs_input, const Terms& labels_input, const Terms& labels_output, const Term& taylor_orders, int current_layer, const Coeffs& g, const Terms& partitions_labels, const Partitions& partitions);
-RcppExport SEXP _nn2poly_alg_non_linear(SEXP coeffs_inputSEXP, SEXP labels_inputSEXP, SEXP labels_outputSEXP, SEXP taylor_ordersSEXP, SEXP current_layerSEXP, SEXP gSEXP, SEXP partitions_labelsSEXP, SEXP partitionsSEXP) {
+Weights alg_non_linear(const Weights& coeffs_input, const Terms& labels_input, const Terms& labels_output, const Term& taylor_orders, int current_layer, const Coeffs& g);
+RcppExport SEXP _nn2poly_alg_non_linear(SEXP coeffs_inputSEXP, SEXP labels_inputSEXP, SEXP labels_outputSEXP, SEXP taylor_ordersSEXP, SEXP current_layerSEXP, SEXP gSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -72,9 +48,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const Term& >::type taylor_orders(taylor_ordersSEXP);
     Rcpp::traits::input_parameter< int >::type current_layer(current_layerSEXP);
     Rcpp::traits::input_parameter< const Coeffs& >::type g(gSEXP);
-    Rcpp::traits::input_parameter< const Terms& >::type partitions_labels(partitions_labelsSEXP);
-    Rcpp::traits::input_parameter< const Partitions& >::type partitions(partitionsSEXP);
-    rcpp_result_gen = Rcpp::wrap(alg_non_linear(coeffs_input, labels_input, labels_output, taylor_orders, current_layer, g, partitions_labels, partitions));
+    rcpp_result_gen = Rcpp::wrap(alg_non_linear(coeffs_input, labels_input, labels_output, taylor_orders, current_layer, g));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -105,28 +79,13 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// generate_partitions
-Partitions generate_partitions(int p, int q_max);
-RcppExport SEXP _nn2poly_generate_partitions(SEXP pSEXP, SEXP q_maxSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type p(pSEXP);
-    Rcpp::traits::input_parameter< int >::type q_max(q_maxSEXP);
-    rcpp_result_gen = Rcpp::wrap(generate_partitions(p, q_max));
-    return rcpp_result_gen;
-END_RCPP
-}
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_nn2poly_obtain_final_poly_order", (DL_FUNC) &_nn2poly_obtain_final_poly_order, 2},
     {"_nn2poly_obtain_taylor_vector", (DL_FUNC) &_nn2poly_obtain_taylor_vector, 2},
     {"_nn2poly_obtain_derivatives_list", (DL_FUNC) &_nn2poly_obtain_derivatives_list, 2},
-    {"_nn2poly_obtain_partitions_with_labels", (DL_FUNC) &_nn2poly_obtain_partitions_with_labels, 2},
-    {"_nn2poly_alg_non_linear", (DL_FUNC) &_nn2poly_alg_non_linear, 8},
+    {"_nn2poly_alg_non_linear", (DL_FUNC) &_nn2poly_alg_non_linear, 6},
     {"_nn2poly_nn2poly_algorithm", (DL_FUNC) &_nn2poly_nn2poly_algorithm, 5},
     {"_nn2poly_combinations_with_repetition", (DL_FUNC) &_nn2poly_combinations_with_repetition, 2},
-    {"_nn2poly_generate_partitions", (DL_FUNC) &_nn2poly_generate_partitions, 2},
     {NULL, NULL, 0}
 };
 

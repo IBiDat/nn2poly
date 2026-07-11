@@ -3,6 +3,11 @@
 
 #include "nn2poly_types.h"
 
+Terms combinations_with_repetition(int n, int k);
+Partition build_allowed_terms(const Term& label,
+                              int q_previous_layer,
+                              PartitionCache& partition_cache);
+
 inline TermEquivalence summarize_label_equivalence(const Term& label) {
   std::unordered_map<int, int> counts;
   for (int value : label)
@@ -36,57 +41,6 @@ inline TermEquivalence summarize_label_equivalence(const Term& label) {
   return {signature, canonical_order};
 }
 
-inline Terms rename_terms(const Terms& terms, const Term& canonical_order) {
-  Terms renamed;
-  renamed.reserve(terms.size());
-
-  for (const Term& term : terms) {
-    Term mapped;
-    mapped.reserve(term.size());
-    for (int value : term) {
-      const int index = value - 1;
-      if (index < 0 || index >= static_cast<int>(canonical_order.size())) {
-        stop("Internal error while renaming partition terms.");
-      }
-      mapped.push_back(canonical_order[index]);
-    }
-    std::sort(mapped.begin(), mapped.end());
-    renamed.push_back(std::move(mapped));
-  }
-
-  return renamed;
-}
-
-inline Partition filter_allowed_terms(const Term& equivalent_label,
-                                      int q_previous_layer,
-                                      const Terms& labels,
-                                      const Partitions& partitions) {
-  //REVISETHISLATER This function could be omitted if we already include it when
-  // generating the partitions.
-
-  // Obtain chosen label position from the partitions labels list:
-  auto label_it = std::find(labels.begin(), labels.end(), equivalent_label);
-  if (label_it == labels.end())
-    stop("Internal error while locating the equivalent partition label.");
-  const size_t label_index = static_cast<size_t>(std::distance(labels.begin(), label_it));
-
-  Partition output;
-  for (const Terms& terms : partitions[label_index]) {
-    bool allowed = true;
-    // Check that the given partition has all elements allowed by q_previous_layer.
-    for (const Term& term : terms) {
-      if (static_cast<int>(term.size()) > q_previous_layer) {
-        allowed = false;
-        break;
-      }
-    }
-    if (allowed)
-      output.push_back(terms);
-  }
-
-  return output;
-}
-
 inline arma::uvec to_arma_indices(const std::vector<size_t>& positions) {
   arma::uvec indices(positions.size());
   for (size_t i = 0; i < positions.size(); i++)
@@ -112,13 +66,17 @@ inline TermSummary summarize_terms(const Terms& terms) {
   return out;
 }
 
-inline std::vector<size_t> in_terms_positions(const Terms& labels_input,
+inline std::vector<size_t> in_terms_positions(const TermMap& labels_map,
                                               const TermSummary& term_summary) {
   std::vector<size_t> needed;
-  needed.reserve(labels_input.size());
-  for (size_t i = 0; i < labels_input.size(); i++) {
-    if (term_summary.counts.find(labels_input[i]) != term_summary.counts.end())
-      needed.push_back(i);
+  needed.reserve(term_summary.unique_terms.size());
+  for (const auto& term : term_summary.unique_terms) {
+    auto it = labels_map.find(term);
+    if (it != labels_map.end()) {
+      needed.push_back(it->second);
+    } else {
+      stop("Internal error: term not found in labels_input.");
+    }
   }
   return needed;
 }

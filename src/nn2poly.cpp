@@ -1,23 +1,6 @@
 #include "partitions.h"
+#include "multiset.h"
 #include "taylor.h"
-
-// Forward declaration from partitions.cpp
-Partitions generate_partitions(int p, int q_max);
-Terms combinations_with_repetition(int n, int k);
-
-// [[Rcpp::export]]
-int obtain_final_poly_order(int max_order, const Term& taylor_orders) {
-  long long product = 1;
-  for (int order : taylor_orders)
-    product *= order;
-  int poly_order = std::min(static_cast<int>(product), static_cast<int>(max_order));
-
-  // Warning if max_order has not been reached. (Very rare situation)
-  if (poly_order < max_order)
-    warning("Argument `max_order` has not been reached due to chosen taylor_Worders");
-
-  return poly_order;
-}
 
 // [[Rcpp::export]]
 Term obtain_taylor_vector(const Term& taylor_orders,
@@ -55,37 +38,13 @@ CoeffsList obtain_derivatives_list(const Term& taylor_orders,
   return out;
 }
 
-// [[Rcpp::export]]
-PartitionsList obtain_partitions_with_labels(int p, int q_max) {
-  // This function will return a list with 2 elements:
-  // * The partitions obtained with Knuth's algorithm
-  // * The actual coefficient's "labels" for which the partitions are obtained
-
-  PartitionsList out;
-  out.partitions = generate_partitions(p, q_max);
-  out.labels.reserve(out.partitions.size());
-
-  for (size_t i = 0; i < out.partitions.size(); i++) {
-    if (out.partitions[i].empty() || out.partitions[i][0].empty())
-      stop("Internal error while extracting partition labels.");
-    // Here it is used that the first partition of the multiset is always
-    // the multiset itself. This could be generalized in case we change the
-    // generation order. #REVISETHISLATER
-    out.labels.push_back(out.partitions[i][0][0]);
-  }
-
-  return out;
-}
-
-// [[Rcpp::export]]
-Weights alg_non_linear(const Weights& coeffs_input,
-                       const Terms& labels_input,
-                       const Terms& labels_output,
-                       const Term& taylor_orders,
-                       int current_layer,
-                       const Coeffs& g,
-                       const Terms& partitions_labels,
-                       const Partitions& partitions) {
+Weights alg_non_linear_impl(const Weights& coeffs_input,
+                            const Terms& labels_input,
+                            const Terms& labels_output,
+                            const Term& taylor_orders,
+                            int current_layer,
+                            const Coeffs& g,
+                            PartitionCache& partition_cache) {
   // Extract the needed parameters and values:
   const int q_layer = taylor_orders[current_layer - 1];
   int q_previous_layer = 1;
@@ -111,26 +70,18 @@ Weights alg_non_linear(const Weights& coeffs_input,
 
   ////////// Rest of the coefficients //////////
 
+  // Build a hash map for labels_input to optimize term positions lookup
+  TermMap labels_input_map;
+  labels_input_map.reserve(labels_input.size());
+  for (size_t i = 0; i < labels_input.size(); i++) {
+    labels_input_map[labels_input[i]] = i;
+  }
+
   // As we already have all the coefficient labels, we can loop over them
   // Note that the intercept has to be skipped so start at 1
   for (int coeff_index = 1; coeff_index < n_poly_terms; coeff_index++) {
     const Term& label = labels_output[coeff_index];
-
-    // Find the equivalence between label and a the ones needed for the
-    // reduced partitions list
-    const TermEquivalence equivalence = summarize_label_equivalence(label);
-
-    // Obtain all allowed partitions of the equivalent term
-    Partition allowed_terms = filter_allowed_terms(
-      equivalence.signature,
-      q_previous_layer,
-      partitions_labels,
-      partitions
-    );
-
-    // Replace again all the partitions to match the original indexes
-    for (Terms& terms : allowed_terms)
-      terms = rename_terms(terms, equivalence.canonical_order);
+    Partition allowed_terms = build_allowed_terms(label, q_previous_layer, partition_cache);
 
     // Now, use the correctly renamed partitions
     for (int n = 1; n <= q_layer; n++) {
@@ -173,7 +124,7 @@ Weights alg_non_linear(const Weights& coeffs_input,
           multinomial_coef /= std::tgamma(static_cast<double>(m) + 1.0);
 
         // Now we need to use the labels to get the needed coefficients:
-        const std::vector<size_t> idx = in_terms_positions(labels_input, term_summary);
+        const std::vector<size_t> idx = in_terms_positions(labels_input_map, term_summary);
         Weights coeffs_input_needed(h_l, idx.size());
         if (!idx.empty()) {
           coeffs_input_needed = coeffs_input.cols(to_arma_indices(idx));
@@ -200,6 +151,25 @@ Weights alg_non_linear(const Weights& coeffs_input,
   }
 
   return coeffs_output;
+}
+
+// [[Rcpp::export]]
+Weights alg_non_linear(const Weights& coeffs_input,
+                       const Terms& labels_input,
+                       const Terms& labels_output,
+                       const Term& taylor_orders,
+                       int current_layer,
+                       const Coeffs& g) {
+  PartitionCache partition_cache;
+  return alg_non_linear_impl(
+    coeffs_input,
+    labels_input,
+    labels_output,
+    taylor_orders,
+    current_layer,
+    g,
+    partition_cache
+  );
 }
 
 inline void check_weights_dimensions(const Layers& layers) {
@@ -243,11 +213,8 @@ List nn2poly_algorithm(const Layers& layers,
   // Obtain all the derivatives up to the desired Taylor degree at each layer
   const CoeffsList af_derivatives_list = obtain_derivatives_list(taylor, af_list);
 
-  // Obtain the maximum degree of the final polynomial:
-  const int q_max = obtain_final_poly_order(max_order, taylor);
-
-  // Obtain the partitions and their labels for the given p and q_max
-  const PartitionsList partition_data = obtain_partitions_with_labels(p, q_max);
+  // Reuse signature partitions across non linear layers in the same run.
+  PartitionCache partition_cache;
 
   ////////////////// current_layer = 1, linear ///////////////////
 
@@ -355,15 +322,14 @@ List nn2poly_algorithm(const Layers& layers,
 
     // The output index is already computed in the linear case
     // but not for l=1 #REVISETHISLATER
-    coeffs_list_output = alg_non_linear(
+    coeffs_list_output = alg_non_linear_impl(
       coeffs_list_input,
       labels_input,
       labels_output,
       taylor,
       current_layer,
       af_derivatives_list[current_layer - 1],
-      partition_data.labels,
-      partition_data.partitions
+      partition_cache
     );
 
     // Save results from this layer:
