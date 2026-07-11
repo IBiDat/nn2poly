@@ -34,36 +34,49 @@ Terms combinations_with_repetition(int n, int k) {
 
 Partition build_allowed_terms(const Term& label,
                               int q_previous_layer,
-                              PartitionCache& partition_cache) {
+                              PartitionCache& pcache) {
   // Find the equivalence between label and the ones needed for the
   // reduced partitions list
   const TermEquivalence equivalence = summarize_label_equivalence(label);
 
-  const Partition* sig_parts_ptr = nullptr;
-  auto cache_it = partition_cache.find(equivalence.signature);
-  if (cache_it != partition_cache.end()) {
-    sig_parts_ptr = &(cache_it->second);
-  } else {
-    std::multiset<int> mset(equivalence.signature.begin(), equivalence.signature.end());
-    Partition sig_parts;
-    auto partitions = multiset_partitions(mset);
-    for (auto it = partitions.begin(); it != partitions.end(); ++it)
-      sig_parts.push_back(*it);
-    auto inserted = partition_cache.emplace(equivalence.signature, std::move(sig_parts));
-    sig_parts_ptr = &(inserted.first->second);
+  TermQ filter_key{equivalence.signature, q_previous_layer};
+  auto filtered_it = pcache.filtered.find(filter_key);
+  if (filtered_it == pcache.filtered.end()) {
+    const Partition* sig_parts_ptr = nullptr;
+    auto cache_it = pcache.signature.find(equivalence.signature);
+    if (cache_it != pcache.signature.end()) {
+      sig_parts_ptr = &(cache_it->second);
+    } else {
+      std::multiset<int> mset(equivalence.signature.begin(), equivalence.signature.end());
+      Partition sig_parts;
+      auto partitions = multiset_partitions(mset);
+      for (auto it = partitions.begin(); it != partitions.end(); ++it)
+        sig_parts.push_back(*it);
+      auto inserted = pcache.signature.emplace(equivalence.signature, std::move(sig_parts));
+      sig_parts_ptr = &(inserted.first->second);
+    }
+
+    Partition filtered_terms;
+    for (const Terms& partition : *sig_parts_ptr) {
+      bool allowed = true;
+      for (const Term& part : partition) {
+        if (static_cast<int>(part.size()) > q_previous_layer) {
+          allowed = false;
+          break;
+        }
+      }
+      if (allowed)
+        filtered_terms.push_back(partition);
+    }
+
+    filtered_it = pcache.filtered.emplace(filter_key, std::move(filtered_terms)).first;
   }
 
-  // Filter and rename cached partitions on the fly
-  Partition allowed_terms;
-  for (const Terms& partition : *sig_parts_ptr) {
-    bool allowed = true;
+  Partition renamed_terms;
+  for (const Terms& partition : filtered_it->second) {
     Terms renamed_partition;
     renamed_partition.reserve(partition.size());
     for (const Term& part : partition) {
-      if (static_cast<int>(part.size()) > q_previous_layer) {
-        allowed = false;
-        break;
-      }
       Term renamed_part;
       renamed_part.reserve(part.size());
       for (int rank : part)
@@ -71,11 +84,9 @@ Partition build_allowed_terms(const Term& label,
       std::sort(renamed_part.begin(), renamed_part.end());
       renamed_partition.push_back(std::move(renamed_part));
     }
-    if (allowed) {
-      std::sort(renamed_partition.begin(), renamed_partition.end());
-      allowed_terms.push_back(std::move(renamed_partition));
-    }
+    std::sort(renamed_partition.begin(), renamed_partition.end());
+    renamed_terms.push_back(std::move(renamed_partition));
   }
 
-  return allowed_terms;
+  return renamed_terms;
 }

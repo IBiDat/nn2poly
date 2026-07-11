@@ -44,7 +44,7 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
                             const Term& taylor_orders,
                             int current_layer,
                             const Coeffs& g,
-                            PartitionCache& partition_cache) {
+                            PartitionCache& pcache) {
   // Extract the needed parameters and values:
   const int q_layer = taylor_orders[current_layer - 1];
   int q_previous_layer = 1;
@@ -81,7 +81,7 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
   // Note that the intercept has to be skipped so start at 1
   for (int coeff_index = 1; coeff_index < n_poly_terms; coeff_index++) {
     const Term& label = labels_output[coeff_index];
-    Partition allowed_terms = build_allowed_terms(label, q_previous_layer, partition_cache);
+    Partition allowed_terms = build_allowed_terms(label, q_previous_layer, pcache);
 
     // Now, use the correctly renamed partitions
     for (int n = 1; n <= q_layer; n++) {
@@ -160,7 +160,7 @@ Weights alg_non_linear(const Weights& coeffs_input,
                        const Term& taylor_orders,
                        int current_layer,
                        const Coeffs& g) {
-  PartitionCache partition_cache;
+  PartitionCache pcache;
   return alg_non_linear_impl(
     coeffs_input,
     labels_input,
@@ -168,7 +168,7 @@ Weights alg_non_linear(const Weights& coeffs_input,
     taylor_orders,
     current_layer,
     g,
-    partition_cache
+    pcache
   );
 }
 
@@ -213,8 +213,8 @@ List nn2poly_algorithm(const Layers& layers,
   // Obtain all the derivatives up to the desired Taylor degree at each layer
   const CoeffsList af_derivatives_list = obtain_derivatives_list(taylor, af_list);
 
-  // Reuse signature partitions across non linear layers in the same run.
-  PartitionCache partition_cache;
+  // Reuse partitions across non linear layers.
+  PartitionCache pcache;
 
   ////////////////// current_layer = 1, linear ///////////////////
 
@@ -329,8 +329,11 @@ List nn2poly_algorithm(const Layers& layers,
       taylor,
       current_layer,
       af_derivatives_list[current_layer - 1],
-      partition_cache
+      pcache
     );
+#ifdef NN2POLY_DEBUG
+    pcache.debug(current_layer);
+#endif
 
     // Save results from this layer:
     results[2 * current_layer - 1] = WeightsList{labels_output, coeffs_list_output};
@@ -341,6 +344,9 @@ List nn2poly_algorithm(const Layers& layers,
   }
 
 out:
+#ifdef NN2POLY_DEBUG
+  pcache.debug();
+#endif
   if (keep_layers)
     return wrap(results);
   return wrap(results.back());

@@ -6,7 +6,7 @@
 Terms combinations_with_repetition(int n, int k);
 Partition build_allowed_terms(const Term& label,
                               int q_previous_layer,
-                              PartitionCache& partition_cache);
+                              PartitionCache& pcache);
 
 inline TermEquivalence summarize_label_equivalence(const Term& label) {
   std::unordered_map<int, int> counts;

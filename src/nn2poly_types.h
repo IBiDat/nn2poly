@@ -2,7 +2,7 @@
 #define nn2poly__types_h
 
 #include <vector>
-#include <unordered_map>
+#include "debug.h"
 
 using Term = std::vector<int>;
 using Terms = std::vector<Term>;
@@ -27,7 +27,46 @@ struct TermHash {
   }
 };
 
-using PartitionCache = std::unordered_map<Term, Partition, TermHash>;
+struct TermQ {
+  Term signature;
+  int q_previous_layer;
+
+  bool operator==(const TermQ& other) const {
+    return q_previous_layer == other.q_previous_layer && signature == other.signature;
+  }
+};
+
+struct TermQHash {
+  std::size_t operator()(const TermQ& key) const noexcept {
+    TermHash term_hash;
+    std::size_t seed = term_hash(key.signature);
+    std::size_t q_hash = std::hash<int>{}(key.q_previous_layer);
+    seed ^= q_hash + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+    return seed;
+  }
+};
+
+struct PartitionCache {
+  unordered_map<Term, Partition, TermHash> signature;
+  unordered_map<TermQ, Partition, TermQHash> filtered;
+
+#ifdef NN2POLY_DEBUG
+  void debug(int layer = -1) const {
+    std::cerr << "[DEBUG][nn2poly][cache]";
+    if (layer >= 0) {
+      std::cerr << "[layer " << layer << "] "
+                << "filtered " << filtered.delta()
+                << ", signature " << signature.delta();
+    } else {
+      std::cerr << "[total]   "
+                << "filtered " << filtered.total()
+                << ", signature " << signature.total();
+    }
+    std::cerr << "\n";
+  }
+#endif
+};
+
 using TermMap = std::unordered_map<Term, size_t, TermHash>;
 
 struct TermSummary {
