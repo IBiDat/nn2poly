@@ -2,7 +2,6 @@
 #define nn2poly__types_h
 
 #include <vector>
-#include "debug.h"
 
 using Term = std::vector<int>;
 using Terms = std::vector<Term>;
@@ -46,30 +45,9 @@ struct TermQHash {
   }
 };
 
-struct PartitionCache {
-  unordered_map<Term, Partition, TermHash> signature;
-  unordered_map<TermQ, Partition, TermQHash> filtered;
-  unordered_map<TermQ, Partition, TermQHash> renamed;
+#include "debug.h"
 
-#ifdef NN2POLY_DEBUG
-  void debug(int layer = -1) const {
-    std::cerr << "[DEBUG][nn2poly][cache]";
-    if (layer >= 0) {
-      std::cerr << "[layer " << layer << "] "
-                << "renamed " << renamed.delta()
-                << ", filtered " << filtered.delta()
-                << ", signature " << signature.delta();
-    } else {
-      std::cerr << "[total]   "
-                << "renamed " << renamed.total()
-                << ", filtered " << filtered.total()
-                << ", signature " << signature.total();
-    }
-    std::cerr << "\n";
-  }
-#endif
-};
-
+using PartitionCache = nn2poly::PartitionCache;
 using TermMap = std::unordered_map<Term, size_t, TermHash>;
 
 struct TermSummary {

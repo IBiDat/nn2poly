@@ -2,10 +2,56 @@
 #define nn2poly__debug_h
 
 #include <unordered_map>
+#include <vector>
 #include <iostream>
 #include <string>
 
-#ifdef NN2POLY_DEBUG
+#ifndef NN2POLY_DEBUG
+#define NN2POLY_DEBUG 0
+#endif
+
+namespace nn2poly {
+
+#if NN2POLY_DEBUG >= 1
+
+#define NN2POLY_DEBUG_LOG(level, ...) \
+  do { \
+    if constexpr ((level) <= NN2POLY_DEBUG) { \
+      ::nn2poly::detail::log_debug( \
+        "[nn2poly][DEBUG", (level), "][", __FILE__, ":", __LINE__, "]", \
+        __VA_ARGS__); \
+    } \
+  } while(0)
+
+namespace detail {
+
+// Helper
+template <typename T>
+struct Printable {
+  const T& val;
+};
+
+// Standard types
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const Printable<T>& p) {
+  return os << p.val;
+}
+
+// Vectors and nested vectors
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const Printable<std::vector<T>>& p) {
+  os << "[";
+  for (size_t i = 0; i < p.val.size(); ++i) {
+    os << Printable<T>{p.val[i]};
+    if (i != p.val.size() - 1) os << ", ";
+  }
+  return os << "]";
+}
+
+template <typename... Args>
+void log_debug(Args&&... args) {
+  (std::cerr << ... << Printable<std::decay_t<Args>>{args}) << '\n';
+}
 
 template <
   typename Key,
@@ -67,31 +113,27 @@ public:
   }
 #endif
 
-  struct DeltaProxy {
-    const debug_unordered_map* map;
+  struct DebugProxy {
+    size_t hits, misses;
 
-    friend std::ostream& operator<<(std::ostream& os, const DeltaProxy& proxy) {
-      os << "hit/miss=" << proxy.map->hits - proxy.map->last_hits
-         << "/"         << proxy.map->misses - proxy.map->last_misses;
-      proxy.map->last_hits = proxy.map->hits;
-      proxy.map->last_misses = proxy.map->misses;
-      return os;
+    friend std::ostream& operator<<(std::ostream& os, const DebugProxy& proxy) {
+      return os << "hit/miss=" << proxy.hits << "/" << proxy.misses;
     }
   };
 
-  struct TotalProxy {
-    const debug_unordered_map* map;
+  DebugProxy delta() const {
+    DebugProxy snap{hits - last_hits, misses - last_misses};
+    last_hits = hits;
+    last_misses = misses;
+    return snap;
+  }
 
-    friend std::ostream& operator<<(std::ostream& os, const TotalProxy& proxy) {
-      os << "hit/miss=" << proxy.map->hits
-         << "/"         << proxy.map->misses;
-      return os;
-    }
-  };
-
-  DeltaProxy delta() const { return {this}; }
-  TotalProxy total() const { return {this}; }
+  DebugProxy total() const {
+    return {hits, misses};
+  }
 };
+
+} // namespace detail
 
 template <
   typename Key, typename T,
@@ -99,9 +141,11 @@ template <
   typename KeyEqual = std::equal_to<Key>,
   typename Allocator = std::allocator<std::pair<const Key, T>>
 >
-using unordered_map = debug_unordered_map<Key, T, Hash, KeyEqual, Allocator>;
+using unordered_map = detail::debug_unordered_map<Key, T, Hash, KeyEqual, Allocator>;
 
 #else
+
+#define NN2POLY_DEBUG_LOG(level, ...) do {} while(0)
 
 template <
   typename Key, typename T,
@@ -112,5 +156,40 @@ template <
 using unordered_map = std::unordered_map<Key, T, Hash, KeyEqual, Allocator>;
 
 #endif
+
+struct PartitionCache {
+  unordered_map<Term, Partition, TermHash> signature;
+  unordered_map<TermQ, Partition, TermQHash> filtered;
+  unordered_map<TermQ, Partition, TermQHash> renamed;
+
+#if NN2POLY_DEBUG >= 1
+  struct DebugProxy {
+    const PartitionCache* pcache;
+    bool delta;
+
+    friend std::ostream& operator<<(std::ostream& os, const DebugProxy& proxy) {
+      os << "[cache]";
+      if (proxy.delta) {
+        os << "[delta] "
+          << "renamed " << proxy.pcache->renamed.delta()
+          << ", filtered " << proxy.pcache->filtered.delta()
+          << ", signature " << proxy.pcache->signature.delta();
+      } else {
+        os << "[total] "
+          << "renamed " << proxy.pcache->renamed.total()
+          << ", filtered " << proxy.pcache->filtered.total()
+          << ", signature " << proxy.pcache->signature.total();
+      }
+      return os;
+    }
+  };
+
+  DebugProxy debug(bool delta = false) const {
+    return {this, delta};
+  }
+#endif
+};
+
+} // namespace nn2poly
 
 #endif

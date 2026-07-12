@@ -331,9 +331,7 @@ List nn2poly_algorithm(const Layers& layers,
       af_derivatives_list[current_layer - 1],
       pcache
     );
-#ifdef NN2POLY_DEBUG
-    pcache.debug(current_layer);
-#endif
+    NN2POLY_DEBUG_LOG(1, "[layer", current_layer, "]", pcache.debug(true));
 
     // Save results from this layer:
     results[2 * current_layer - 1] = WeightsList{labels_output, coeffs_list_output};
@@ -344,9 +342,7 @@ List nn2poly_algorithm(const Layers& layers,
   }
 
 out:
-#ifdef NN2POLY_DEBUG
-  pcache.debug();
-#endif
+  NN2POLY_DEBUG_LOG(1, pcache.debug());
   if (keep_layers)
     return wrap(results);
   return wrap(results.back());
