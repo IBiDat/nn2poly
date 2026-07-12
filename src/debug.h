@@ -1,11 +1,6 @@
 #ifndef nn2poly__debug_h
 #define nn2poly__debug_h
 
-#include <unordered_map>
-#include <vector>
-#include <iostream>
-#include <string>
-
 #ifndef NN2POLY_DEBUG
 #define NN2POLY_DEBUG 0
 #endif
@@ -33,6 +28,11 @@ struct Printable {
   const T& val;
   size_t indent = 0;
 };
+
+template <typename... Args>
+void log_debug(Args&&... args) {
+  (std::cerr << ... << Printable<std::decay_t<Args>>{args}) << '\n';
+}
 
 template <typename, typename = void> struct is_mapping : std::false_type {};
 template <typename T> struct is_mapping<T,
@@ -92,10 +92,21 @@ std::ostream& operator<<(std::ostream& os, const Printable<std::vector<T>>& p) {
   return os;
 }
 
-template <typename... Args>
-void log_debug(Args&&... args) {
-  (std::cerr << ... << Printable<std::decay_t<Args>>{args}) << '\n';
-}
+} // namespace detail
+} // namespace nn2poly
+
+#define NN2POLY_DEFINE_PRINTABLE_STRUCT_2(StructName, Member1, Member2) \
+  inline std::ostream& operator<<(std::ostream& os, const StructName& s) { \
+    return os << "{" \
+      << #Member1 ": " << nn2poly::detail::Printable<decltype(s.Member1)>{s.Member1, 0} << ", " \
+      << #Member2 ": " << nn2poly::detail::Printable<decltype(s.Member2)>{s.Member2, 0} \
+      << "}"; \
+  }
+NN2POLY_DEFINE_PRINTABLE_STRUCT_2(TermSummary, unique_terms, counts)
+NN2POLY_DEFINE_PRINTABLE_STRUCT_2(TermEquivalence, signature, canonical_order)
+
+namespace nn2poly {
+namespace detail {
 
 template <
   typename Key,

@@ -2,6 +2,10 @@
 #define nn2poly__types_h
 
 #include <vector>
+#include <unordered_map>
+#include <vector>
+#include <iostream>
+#include <string>
 
 using Term = std::vector<int>;
 using Terms = std::vector<Term>;
@@ -45,9 +49,6 @@ struct TermQHash {
   }
 };
 
-#include "debug.h"
-
-using PartitionCache = nn2poly::PartitionCache;
 using TermMap = std::unordered_map<Term, size_t, TermHash>;
 
 struct TermSummary {
@@ -59,6 +60,9 @@ struct TermEquivalence {
   Term signature;
   Term canonical_order;
 };
+
+#include "debug.h"
+using PartitionCache = nn2poly::PartitionCache;
 
 using Coeffs = std::vector<double>;
 using CoeffsList = std::vector<Coeffs>;

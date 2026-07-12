@@ -50,6 +50,8 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
   int q_previous_layer = 1;
   if (current_layer != 1)
     q_previous_layer = taylor_orders[current_layer - 2];
+  NN2POLY_DEBUG_LOG(3, "[layer", current_layer, "]",
+    DTAG(q_layer), DTAG(q_previous_layer));
 
   // Obtain total number of terms in the polynomial from labels
   const int n_poly_terms = static_cast<int>(labels_output.size());
@@ -81,7 +83,7 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
   // Note that the intercept has to be skipped so start at 1
   for (int coeff_index = 1; coeff_index < n_poly_terms; coeff_index++) {
     const Term& label = labels_output[coeff_index];
-    NN2POLY_DEBUG_LOG(3, "[layer", current_layer, "]", DTAG(label), DTAG(q_previous_layer));
+    NN2POLY_DEBUG_LOG(3, "[layer", current_layer, "]", DTAG(label));
 
     Partition allowed_terms = build_allowed_terms(label, q_previous_layer, pcache);
     NN2POLY_DEBUG_LOG(3, "[layer", current_layer, "]", DTAG(allowed_terms));
@@ -112,8 +114,7 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
         // do not appear dont need to be counted as they will be 0, their
         // factorial 1 and at the end will, not affect the total product.
         TermSummary term_summary = summarize_terms(terms);
-        NN2POLY_DEBUG_LOG(4, "[layer", current_layer, "]", DTAG(term_summary.unique_terms));
-        NN2POLY_DEBUG_LOG(4, "[layer", current_layer, "]", DTAG(term_summary.counts));
+        NN2POLY_DEBUG_LOG(5, "[layer", current_layer, "]", DTAG(term_summary));
 
         Term mult(term_summary.unique_terms.size() + 1, 0);
         for (size_t i = 0; i < term_summary.unique_terms.size(); i++) {
@@ -123,7 +124,6 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
           mult[i + 1] = it->second;
         }
         mult[0] = difference;
-        NN2POLY_DEBUG_LOG(4, "[layer", current_layer, "]", DTAG(mult));
 
         // Compute the multinomial coefficient
         double multinomial_coef = std::tgamma(static_cast<double>(n) + 1.0);
@@ -132,7 +132,7 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
 
         // Now we need to use the labels to get the needed coefficients:
         const std::vector<size_t> idx = in_terms_positions(labels_input_map, term_summary);
-        NN2POLY_DEBUG_LOG(4, "[layer", current_layer, "]", DTAG(idx));
+        NN2POLY_DEBUG_LOG(5, "[layer", current_layer, "]", DTAG(mult), DTAG(idx));
 
         Weights coeffs_input_needed(h_l, idx.size());
         if (!idx.empty()) {

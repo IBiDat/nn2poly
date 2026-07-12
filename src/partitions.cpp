@@ -49,7 +49,7 @@ Partition build_allowed_terms(const Term& label,
   // Find the equivalence between label and the ones needed for the
   // reduced partitions list
   const TermEquivalence eq = summarize_label_equivalence(label);
-  NN2POLY_DEBUG_LOG(4, DTAG(eq.signature), DTAG(eq.canonical_order));
+  NN2POLY_DEBUG_LOG(4, DTAG(eq));
 
   // ---------------------------------------------------------
   // LEVEL 2: filtered cache (filtered structural matches)
