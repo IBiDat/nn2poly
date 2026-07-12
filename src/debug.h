@@ -10,6 +10,8 @@
 #define NN2POLY_DEBUG 0
 #endif
 
+#define DTAG(x) " " #x "=", x
+
 namespace nn2poly {
 
 #if NN2POLY_DEBUG >= 1
@@ -29,23 +31,65 @@ namespace detail {
 template <typename T>
 struct Printable {
   const T& val;
+  size_t indent = 0;
 };
+
+template <typename, typename = void> struct is_mapping : std::false_type {};
+template <typename T> struct is_mapping<T,
+  std::void_t<typename T::key_type, typename T::mapped_type>> : std::true_type {};
+template <typename T> inline constexpr bool is_mapping_v = is_mapping<T>::value;
 
 // Standard types
 template <typename T>
-std::ostream& operator<<(std::ostream& os, const Printable<T>& p) {
+std::enable_if_t<!is_mapping_v<T>, std::ostream&>
+operator<<(std::ostream& os, const Printable<T>& p) {
   return os << p.val;
 }
+
+// Maps
+template <typename T>
+std::enable_if_t<is_mapping_v<T>, std::ostream&>
+operator<<(std::ostream& os, const Printable<T>& p) {
+  os << "{";
+  size_t count = 0;
+  for (const auto& [key, value] : p.val) {
+    using KeyT = std::decay_t<decltype(key)>;
+    using ValT = std::decay_t<decltype(value)>;
+    os << Printable<KeyT>{key, 0} << ": " << Printable<ValT>{value, p.indent};
+    if (count != p.val.size() - 1) os << ", ";
+    count++;
+  }
+  os << "}";
+  return os;
+}
+
+template <typename T> struct vector_depth { static constexpr size_t value = 0; };
+template <typename T, typename A> struct vector_depth<std::vector<T, A>> {
+  static constexpr size_t value = 1 + vector_depth<T>::value; };
+template <typename T> inline constexpr bool vector_depth_v = vector_depth<T>::value;
 
 // Vectors and nested vectors
 template <typename T>
 std::ostream& operator<<(std::ostream& os, const Printable<std::vector<T>>& p) {
-  os << "[";
-  for (size_t i = 0; i < p.val.size(); ++i) {
-    os << Printable<T>{p.val[i]};
-    if (i != p.val.size() - 1) os << ", ";
+  if constexpr (vector_depth_v<T> > 1) {
+    std::string current_indent(p.indent, ' ');
+    std::string next_indent(p.indent + 2, ' ');
+    os << "[\n";
+    for (size_t i = 0; i < p.val.size(); ++i) {
+      os << next_indent << Printable<T>{p.val[i], p.indent + 2};
+      if (i != p.val.size() - 1) os << ",";
+      os << "\n";
+    }
+    os << current_indent << "]";
+  } else {
+    os << "[";
+    for (size_t i = 0; i < p.val.size(); ++i) {
+      os << Printable<T>{p.val[i], 0};
+      if (i != p.val.size() - 1) os << ", ";
+    }
+    os << "]";
   }
-  return os << "]";
+  return os;
 }
 
 template <typename... Args>
@@ -170,15 +214,15 @@ struct PartitionCache {
     friend std::ostream& operator<<(std::ostream& os, const DebugProxy& proxy) {
       os << "[cache]";
       if (proxy.delta) {
-        os << "[delta] "
-          << "renamed " << proxy.pcache->renamed.delta()
-          << ", filtered " << proxy.pcache->filtered.delta()
-          << ", signature " << proxy.pcache->signature.delta();
+        os << "[delta]"
+          << " renamed " << proxy.pcache->renamed.delta()
+          << " filtered " << proxy.pcache->filtered.delta()
+          << " signature " << proxy.pcache->signature.delta();
       } else {
-        os << "[total] "
-          << "renamed " << proxy.pcache->renamed.total()
-          << ", filtered " << proxy.pcache->filtered.total()
-          << ", signature " << proxy.pcache->signature.total();
+        os << "[total]"
+          << " renamed " << proxy.pcache->renamed.total()
+          << " filtered " << proxy.pcache->filtered.total()
+          << " signature " << proxy.pcache->signature.total();
       }
       return os;
     }

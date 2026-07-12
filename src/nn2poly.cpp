@@ -81,7 +81,10 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
   // Note that the intercept has to be skipped so start at 1
   for (int coeff_index = 1; coeff_index < n_poly_terms; coeff_index++) {
     const Term& label = labels_output[coeff_index];
+    NN2POLY_DEBUG_LOG(3, "[layer", current_layer, "]", DTAG(label), DTAG(q_previous_layer));
+
     Partition allowed_terms = build_allowed_terms(label, q_previous_layer, pcache);
+    NN2POLY_DEBUG_LOG(3, "[layer", current_layer, "]", DTAG(allowed_terms));
 
     // Now, use the correctly renamed partitions
     for (int n = 1; n <= q_layer; n++) {
@@ -109,6 +112,9 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
         // do not appear dont need to be counted as they will be 0, their
         // factorial 1 and at the end will, not affect the total product.
         TermSummary term_summary = summarize_terms(terms);
+        NN2POLY_DEBUG_LOG(4, "[layer", current_layer, "]", DTAG(term_summary.unique_terms));
+        NN2POLY_DEBUG_LOG(4, "[layer", current_layer, "]", DTAG(term_summary.counts));
+
         Term mult(term_summary.unique_terms.size() + 1, 0);
         for (size_t i = 0; i < term_summary.unique_terms.size(); i++) {
           auto it = term_summary.counts.find(term_summary.unique_terms[i]);
@@ -117,6 +123,7 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
           mult[i + 1] = it->second;
         }
         mult[0] = difference;
+        NN2POLY_DEBUG_LOG(4, "[layer", current_layer, "]", DTAG(mult));
 
         // Compute the multinomial coefficient
         double multinomial_coef = std::tgamma(static_cast<double>(n) + 1.0);
@@ -125,6 +132,8 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
 
         // Now we need to use the labels to get the needed coefficients:
         const std::vector<size_t> idx = in_terms_positions(labels_input_map, term_summary);
+        NN2POLY_DEBUG_LOG(4, "[layer", current_layer, "]", DTAG(idx));
+
         Weights coeffs_input_needed(h_l, idx.size());
         if (!idx.empty()) {
           coeffs_input_needed = coeffs_input.cols(to_arma_indices(idx));
@@ -320,6 +329,8 @@ List nn2poly_algorithm(const Layers& layers,
       }
     }
 
+    NN2POLY_DEBUG_LOG(2, "[layer", current_layer, "]", DTAG(labels_input));
+    NN2POLY_DEBUG_LOG(2, "[layer", current_layer, "]", DTAG(labels_output));
     // The output index is already computed in the linear case
     // but not for l=1 #REVISETHISLATER
     coeffs_list_output = alg_non_linear_impl(
@@ -331,7 +342,7 @@ List nn2poly_algorithm(const Layers& layers,
       af_derivatives_list[current_layer - 1],
       pcache
     );
-    NN2POLY_DEBUG_LOG(1, "[layer", current_layer, "]", pcache.debug(true));
+    NN2POLY_DEBUG_LOG(2, "[layer", current_layer, "]", pcache.debug(true));
 
     // Save results from this layer:
     results[2 * current_layer - 1] = WeightsList{labels_output, coeffs_list_output};
