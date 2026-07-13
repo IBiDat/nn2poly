@@ -191,7 +191,7 @@ inline void check_weights_dimensions(const Layers& layers) {
 // [[Rcpp::export]]
 List nn2poly_algorithm(const Layers& layers,
                        const Functions& af_list,
-                       double max_order,
+                       int max_order,
                        bool keep_layers,
                        const Term& taylor_orders) {
   if (layers.empty())
@@ -252,7 +252,7 @@ List nn2poly_algorithm(const Layers& layers,
   results[0] = WeightsList{labels_output, coeffs_list_output};
 
   // Stop if last layer and the last layer is linear
-  int new_total_order = 1;
+  int new_order = 1;
   if (L == 1 && last_linear)
     goto out;
 
@@ -307,20 +307,17 @@ List nn2poly_algorithm(const Layers& layers,
     // ones can be reused.
     // The new labels will be for monomials of orders between the total order
     // of the previous polynomial and the total order of the new polynomial:
-    int previous_total_order = 1;
-    if (current_layer != 1)
-      previous_total_order = new_total_order;
+    int previous_order = new_order;
 
     // Compute the new total order with the product of taylor_orders.
     // If a max_order value is used, its taken as the minimum between both.
-    new_total_order = std::min(previous_total_order * taylor[current_layer - 1],
-                               static_cast<int>(max_order));
+    new_order = std::min(previous_order * taylor[current_layer - 1], max_order);
 
     // If the order has increased, create new needed labels.
     // If not, max_order has been reached and no new labels are needed.
-    if (previous_total_order != new_total_order) {
+    if (previous_order != new_order) {
       // Loop over each of the new orders up to the maximum one
-      for (int order = previous_total_order + 1; order <= new_total_order; order++) {
+      for (int order = previous_order + 1; order <= new_order; order++) {
         Terms comb = combinations_with_repetition(p, order);
 
         // update labels with the new ones

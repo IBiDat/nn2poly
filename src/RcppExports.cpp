@@ -53,14 +53,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // nn2poly_algorithm
-List nn2poly_algorithm(const Layers& layers, const Functions& af_list, double max_order, bool keep_layers, const Term& taylor_orders);
+List nn2poly_algorithm(const Layers& layers, const Functions& af_list, int max_order, bool keep_layers, const Term& taylor_orders);
 RcppExport SEXP _nn2poly_nn2poly_algorithm(SEXP layersSEXP, SEXP af_listSEXP, SEXP max_orderSEXP, SEXP keep_layersSEXP, SEXP taylor_ordersSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Layers& >::type layers(layersSEXP);
     Rcpp::traits::input_parameter< const Functions& >::type af_list(af_listSEXP);
-    Rcpp::traits::input_parameter< double >::type max_order(max_orderSEXP);
+    Rcpp::traits::input_parameter< int >::type max_order(max_orderSEXP);
     Rcpp::traits::input_parameter< bool >::type keep_layers(keep_layersSEXP);
     Rcpp::traits::input_parameter< const Term& >::type taylor_orders(taylor_ordersSEXP);
     rcpp_result_gen = Rcpp::wrap(nn2poly_algorithm(layers, af_list, max_order, keep_layers, taylor_orders));
