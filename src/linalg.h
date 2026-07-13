@@ -55,9 +55,9 @@ inline void add_poly_eval(Weights& mat, int i,
   mat.col(i) += result;
 }
 
-inline auto accumulate_partition(const Weights& coeffs_input,
-                                 const std::vector<size_t>& idx,
-                                 const Term& mult, int n) {
+inline Vector accumulate_partition(const Weights& coeffs_input,
+                                   const std::vector<size_t>& idx,
+                                   const Term& mult, int n) {
   if (idx.empty()) stop("empty idx in accumulate_partition");
 
   Weights needed = coeffs_input.cols(arma::conv_to<arma::uvec>::from(idx));
