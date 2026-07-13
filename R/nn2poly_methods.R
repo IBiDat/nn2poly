@@ -188,9 +188,16 @@ print.nn2poly <- function(x, ...) {
     cbind(data.frame(labels, stringsAsFactors = FALSE), x$values)
   })
 
-  # remove all the labels column except for the first layer (all the same)
-  for (i in seq_along(layers)[-1])
+  # remove all the labels column except for the last layer and fill with zeroes
+  for (i in seq_along(layers)[-length(layers)]) {
     layers[[i]]$labels <- NULL
+    z <- matrix(0, nrow = n_coeff - nrow(layers[[i]]), ncol = ncol(layers[[i]]))
+    z <- setNames(as.data.frame(z), names(layers[[i]]))
+    layers[[i]] <- rbind(layers[[i]], z)
+  }
+  # move the labels to the first layer
+  layers[[1]] <- cbind(layers[[length(layers)]][1], layers[[1]])
+  layers[[length(layers)]]$labels <- NULL
 
   # combine all the layers, rename first and last columns
   df <- do.call(cbind, layers)
@@ -198,8 +205,8 @@ print.nn2poly <- function(x, ...) {
 
   # output and return the same object invisibly per generic contract
   cat("nn2poly p=", n_var, " max_order=", n_order,
-      " (", n_coeff, " coefficients)\n", sep="")
-  print(df)
+      " (", n_coeff, " coefficients)\n\n", sep="")
+  print(df, ...)
   invisible(x)
 }
 
