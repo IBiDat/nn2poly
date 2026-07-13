@@ -39,7 +39,7 @@ CoeffsList obtain_derivatives_list(const Term& taylor_orders,
 }
 
 Weights alg_non_linear_impl(const Weights& coeffs_input,
-                            const Terms& labels_input,
+                            const TermMap& labels_input_map,
                             const Terms& labels_output,
                             const Term& taylor_orders,
                             int current_layer,
@@ -71,13 +71,6 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
   }
 
   ////////// Rest of the coefficients //////////
-
-  // Build a hash map for labels_input to optimize term positions lookup
-  TermMap labels_input_map;
-  labels_input_map.reserve(labels_input.size());
-  for (size_t i = 0; i < labels_input.size(); i++) {
-    labels_input_map[labels_input[i]] = i;
-  }
 
   // As we already have all the coefficient labels, we can loop over them
   // Note that the intercept has to be skipped so start at 1
@@ -170,9 +163,12 @@ Weights alg_non_linear(const Weights& coeffs_input,
                        int current_layer,
                        const Coeffs& g) {
   PartitionCache pcache;
+  TermMap labels_map;
+  for (size_t i = 0; i < labels_input.size(); i++)
+    labels_map[labels_input[i]] = i;
   return alg_non_linear_impl(
     coeffs_input,
-    labels_input,
+    labels_map,
     labels_output,
     taylor_orders,
     current_layer,
@@ -232,24 +228,26 @@ List nn2poly_algorithm(const Layers& layers,
 
   // The labels for each coefficient vector at the same layer and linear or
   // same layer and non linear case will have be the same, so they can be
-  // stored only once as the element `labels` of the coeffs_list_output,
+  // stored only once as the element `labels` of the coeffs_list,
   // so we define length h+1
   // For each neuron in the first hidden layer, when computing the activation
   // potentials (u_j), each column of the weight matrix represents the
   // coefficients of an order 1 polynomial for that neuron potential.
   // The first element will be the bias, and the rest the coefficient
   // associated with each variable from x_1 to x_p.
-  Weights coeffs_list_output = arma::trans(layers[0]);
+  Weights coeffs_list = arma::trans(layers[0]);
 
   // generate and store the labels (as a list of integer vectors)
   // In this case the integer vectors are of length 1.
-  Terms labels_output;
-  labels_output.reserve(p + 1);
+  Terms labels_list;
+  labels_list.reserve(p + 1);
   for (int i = 0; i <= p; i++)
-    labels_output.push_back(Term{ i });
+    labels_list.push_back(Term{ i });
+  // Build a hash map for labels_input to optimize term positions lookup
+  TermMap labels_map;
 
   // Store the results
-  results[0] = WeightsList{labels_output, coeffs_list_output};
+  results[0] = WeightsList{labels_list, coeffs_list};
 
   // Stop if last layer and the last layer is linear
   int new_order = 1;
@@ -267,9 +265,6 @@ List nn2poly_algorithm(const Layers& layers,
     ///////////////// Linear case //////////////////
     if (current_layer != 1) {
 
-      // Treat the previous coefficients output as input
-      const Weights coeffs_list_input = coeffs_list_output;
-
       // Note that the polynomial in this case does not increase its order
       // from the one in the non linear previous layer, so the labels
       // will be the same and are already stored in $labels output.
@@ -277,17 +272,17 @@ List nn2poly_algorithm(const Layers& layers,
 
       /////// New  version alg linear START  ----------------------------------
       // apply the linear algorithm
-      arma::rowvec first_row(coeffs_list_input.n_cols, arma::fill::zeros);
+      arma::rowvec first_row(coeffs_list.n_cols, arma::fill::zeros);
       first_row[0] = 1.0;
-      Weights stacked(coeffs_list_input.n_rows + 1, coeffs_list_input.n_cols);
+      Weights stacked(coeffs_list.n_rows + 1, coeffs_list.n_cols);
       stacked.row(0) = first_row;
-      stacked.rows(1, coeffs_list_input.n_rows) = coeffs_list_input;
-      coeffs_list_output = arma::trans(layers[current_layer - 1]) * stacked;
+      stacked.rows(1, coeffs_list.n_rows) = coeffs_list;
+      coeffs_list = arma::trans(layers[current_layer - 1]) * stacked;
 
       /////// New  version alg linear END  ----------------------------------
 
       // Save results from this layer:
-      results[2 * current_layer - 2] = WeightsList{labels_output, coeffs_list_output};
+      results[2 * current_layer - 2] = WeightsList{labels_list, coeffs_list};
 
       // Stop if last layer and the last layer is linear
       if (current_layer == L && last_linear)
@@ -297,10 +292,6 @@ List nn2poly_algorithm(const Layers& layers,
     ////////// Non linear case //////////
     // The output dimension remains the same as in the previous linear case,
     // because the same number of neurons is considered
-
-    // Treat the previous coeff output as input
-    const Weights coeffs_list_input = coeffs_list_output;
-    const Terms labels_input = labels_output;
 
     // In the non linear case the polynomial order increases (unless max_order is
     // reached), so the new labels need to be computed. However, the previous
@@ -313,6 +304,11 @@ List nn2poly_algorithm(const Layers& layers,
     // If a max_order value is used, its taken as the minimum between both.
     new_order = std::min(previous_order * taylor[current_layer - 1], max_order);
 
+    // Update map with new labels, if any
+    for (size_t i = labels_map.size(); i < labels_list.size(); i++)
+      labels_map[labels_list[i]] = i;
+    NN2POLY_DEBUG_LOG(2, "[layer", current_layer, "][in] ", DTAG(labels_list));
+
     // If the order has increased, create new needed labels.
     // If not, max_order has been reached and no new labels are needed.
     if (previous_order != new_order) {
@@ -322,18 +318,17 @@ List nn2poly_algorithm(const Layers& layers,
 
         // update labels with the new ones
         for (const Term& term : comb)
-          labels_output.push_back(term);
+          labels_list.push_back(term);
       }
     }
+    NN2POLY_DEBUG_LOG(2, "[layer", current_layer, "][out]", DTAG(labels_list));
 
-    NN2POLY_DEBUG_LOG(2, "[layer", current_layer, "]", DTAG(labels_input));
-    NN2POLY_DEBUG_LOG(2, "[layer", current_layer, "]", DTAG(labels_output));
     // The output index is already computed in the linear case
     // but not for l=1 #REVISETHISLATER
-    coeffs_list_output = alg_non_linear_impl(
-      coeffs_list_input,
-      labels_input,
-      labels_output,
+    coeffs_list = alg_non_linear_impl(
+      coeffs_list,
+      labels_map,
+      labels_list,
       taylor,
       current_layer,
       af_derivatives_list[current_layer - 1],
@@ -342,7 +337,7 @@ List nn2poly_algorithm(const Layers& layers,
     NN2POLY_DEBUG_LOG(2, "[layer", current_layer, "]", pcache.debug(true));
 
     // Save results from this layer:
-    results[2 * current_layer - 1] = WeightsList{labels_output, coeffs_list_output};
+    results[2 * current_layer - 1] = WeightsList{labels_list, coeffs_list};
 
     // Check if this is the last layer and if the last layer is not linear
     if (current_layer == L && !last_linear)
