@@ -106,18 +106,13 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
         NN2POLY_DEBUG_LOG(5, "[layer", current_layer, "]", DTAG(term_summary));
 
         Term mult(term_summary.unique_terms.size() + 1, 0);
+        mult[0] = difference;
         for (size_t i = 0; i < term_summary.unique_terms.size(); i++) {
           auto it = term_summary.counts.find(term_summary.unique_terms[i]);
           if (it == term_summary.counts.end())
             stop("Internal error while counting partition terms.");
           mult[i + 1] = it->second;
         }
-        mult[0] = difference;
-
-        // Compute the multinomial coefficient
-        double m_coef = std::tgamma(static_cast<double>(n) + 1.0);
-        for (int m : mult)
-          m_coef /= std::tgamma(static_cast<double>(m) + 1.0);
 
         // Now we need to use the labels to get the needed coefficients:
         const auto idx = in_terms_positions(labels_input_map, term_summary);
@@ -125,8 +120,8 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
 
         // Finally compute the product of coefficients according to multinomial
         // theorem and add it to the summatory
-        nn2poly::linalg::accumulate_partition(
-          summatory, coeffs_input, idx, mult, difference, m_coef);
+        summatory += nn2poly::linalg::accumulate_partition(
+          coeffs_input, idx, mult, n);
       }
       // After the summatory over the partitions has been computed, we need to
       // get its result and multiply by the correspondent derivative value, and
@@ -255,7 +250,8 @@ List nn2poly_algorithm(const Layers& layers,
       // Only the matrix of $values will change its number of rows
 
       // apply the linear algorithm
-      nn2poly::linalg::alg_linear(coeffs_list, layers[current_layer - 1]);
+      coeffs_list = nn2poly::linalg::alg_linear(
+        coeffs_list, layers[current_layer - 1]);
 
       // Save results from this layer:
       results[2 * current_layer - 2] = WeightsList{labels_list, coeffs_list};

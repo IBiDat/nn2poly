@@ -11,6 +11,15 @@ namespace linalg {
 using Weights = arma::mat;
 using Vector = arma::vec;
 
+constexpr std::array<double, 171> precompute_factorials() {
+  std::array<double, 171> f{};
+  f[0] = 1.0;
+  for (size_t i = 1; i < f.size(); ++i)
+    f[i] = f[i - 1] * static_cast<double>(i);
+  return f;
+}
+inline constexpr std::array<double, 171> factorials = precompute_factorials();
+
 inline int n_rows(const Weights& m) { return m.n_rows; }
 
 inline Weights zeros(int rows, int cols) {
@@ -25,10 +34,10 @@ inline Weights trans(const Weights& mat) {
   return arma::trans(mat);
 }
 
-inline void alg_linear(Weights& coeffs_list, const Weights& layer) {
+inline Weights alg_linear(Weights& coeffs_list, const Weights& layer) {
   arma::rowvec intercept = arma::zeros<arma::rowvec>(coeffs_list.n_cols);
   intercept[0] = 1.0;
-  coeffs_list = arma::trans(layer) * arma::join_cols(intercept, coeffs_list);
+  return arma::trans(layer) * arma::join_cols(intercept, coeffs_list);
 }
 
 inline void add_partition(Weights& mat, int i, double scalar, const Vector& vec) {
@@ -46,12 +55,9 @@ inline void add_poly_eval(Weights& mat, int i,
   mat.col(i) += result;
 }
 
-inline void accumulate_partition(Vector& acc,
-                                 const Weights& coeffs_input,
+inline auto accumulate_partition(const Weights& coeffs_input,
                                  const std::vector<size_t>& idx,
-                                 const Term& mult,
-                                 int diff,
-                                 double m_coef) {
+                                 const Term& mult, int n) {
   if (idx.empty()) stop("empty idx in accumulate_partition");
 
   Weights needed = coeffs_input.cols(arma::conv_to<arma::uvec>::from(idx));
@@ -60,7 +66,12 @@ inline void accumulate_partition(Vector& acc,
   for (unsigned int i = 0; i < needed.n_cols; ++i)
     needed.col(i) = arma::pow(needed.col(i), exponents[i]);
 
-  acc += m_coef * (arma::prod(needed, 1) % arma::pow(coeffs_input.col(0), diff));
+  // Compute the multinomial coefficient
+  double m_coef = factorials[n];
+  for (int m : mult) if (m > 1)
+    m_coef /= factorials[m];
+
+  return m_coef * (arma::prod(needed, 1) % arma::pow(coeffs_input.col(0), mult[0]));
 }
 
 } // namespace linalg
