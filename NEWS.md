@@ -1,3 +1,8 @@
+# nn2poly devel
+
+- Implement print method for nn2poly objects.
+- Add missing registration for internal S3 methods.
+
 # nn2poly 0.1.3
 
 - Add URLs for source repo and BugReports in DESCRIPTION file.

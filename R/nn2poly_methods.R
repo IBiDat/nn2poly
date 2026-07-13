@@ -170,6 +170,39 @@ predict.nn2poly <- function(object,
 
 }
 
+#' @export
+print.nn2poly <- function(x, ...) {
+  # we're going to print just the output for all layers
+  layers <- if (is.null(x$labels))
+    lapply(x, "[[", "output") else list(layer_1=x)
+
+  # get info for later
+  labels <- layers[[length(layers)]]$labels
+  n_var <- max(labels[[length(labels)]])
+  n_order <- length(labels[[length(labels)]])
+  n_coeff <- length(labels)
+
+  # a data.frame for each layer's output, with labels and values
+  layers <- lapply(layers, function(x) {
+    labels <- sapply(x$labels, paste, collapse = " ")
+    cbind(data.frame(labels, stringsAsFactors = FALSE), x$values)
+  })
+
+  # remove all the labels column except for the first layer (all the same)
+  for (i in seq_along(layers)[-1])
+    layers[[i]]$labels <- NULL
+
+  # combine all the layers, rename first and last columns
+  df <- do.call(cbind, layers)
+  names(df)[c(1, ncol(df))] <- c("Label", "Value")
+
+  # output and return the same object invisibly per generic contract
+  cat("nn2poly p=", n_var, " max_order=", n_order,
+      " (", n_coeff, " coefficients)\n", sep="")
+  print(df)
+  invisible(x)
+}
+
 #' Plot method for \code{nn2poly} objects.
 #'
 #' A function that takes a polynomial (or several ones) as given by the

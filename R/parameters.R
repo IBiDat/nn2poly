@@ -13,6 +13,7 @@ get_parameters <- function(object) {
   UseMethod("get_parameters")
 }
 
+#' @export
 get_parameters.keras.engine.training.Model <- function(object) {
   nlayers <- length(object$layers)
 
@@ -46,6 +47,7 @@ get_parameters.keras.engine.training.Model <- function(object) {
        p              = p)
 }
 
+#' @export
 get_parameters.nn_module <- function(object) {
   luz_model_sequential_check(object)
 
@@ -73,6 +75,7 @@ get_parameters.nn_module <- function(object) {
        p              = p)
 }
 
+#' @export
 get_parameters.luz_module_fitted <- function(object) {
   get_parameters(object$model)
 }

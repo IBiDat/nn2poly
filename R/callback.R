@@ -19,6 +19,7 @@ norm_order <- function(type = c("l1_norm", "l2_norm")) {
   as.numeric(substr(match.arg(type), 2, 2))
 }
 
+#' @export
 build_callback.luz_module_generator <- function(object,
                                                 type = c("l1_norm", "l2_norm")) {
   luz_callback <- luz::luz_callback(
@@ -38,6 +39,7 @@ build_callback.luz_module_generator <- function(object,
 }
 
 # Keras callback is built in Python due to performance problems if built in R
+#' @export
 build_callback.keras.engine.training.Model <- function(object,
                                                        type = c("l1_norm", "l2_norm")) {
   keras_callback <- py_load_class("KerasCallback")

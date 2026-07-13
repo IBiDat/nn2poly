@@ -1,6 +1,6 @@
 Package: nn2poly
 Title: Neural Network Weights Transformation into Polynomial Coefficients
-Version: 0.1.3
+Version: 0.1.3.9000
 Authors@R: c(
     person(given = "Pablo", family = "Morala", role = c("aut", "cre"),
            email = "moralapablo@gmail.com",
@@ -37,7 +37,7 @@ LinkingTo:
     RcppArmadillo
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
 Config/testthat/edition: 3
 URL: https://ibidat.github.io/nn2poly/, https://github.com/IBiDat/nn2poly
 BugReports: https://github.com/IBiDat/nn2poly/issues
+Config/roxygen2/version: 8.0.0
