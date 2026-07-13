@@ -65,11 +65,9 @@ inline std::vector<size_t> in_terms_positions(const TermMap& labels_map,
   needed.reserve(term_summary.unique_terms.size());
   for (const auto& term : term_summary.unique_terms) {
     auto it = labels_map.find(term);
-    if (it != labels_map.end()) {
-      needed.push_back(it->second);
-    } else {
-      stop("Internal error: term not found in labels_input.");
-    }
+    if (it == labels_map.end())
+      stop("Internal error: term not found in labels_input");
+    needed.push_back(it->second);
   }
   return needed;
 }

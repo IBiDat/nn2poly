@@ -42,8 +42,7 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
                             const TermMap& labels_input_map,
                             const Terms& labels_output,
                             const Term& taylor_orders,
-                            int current_layer,
-                            const Coeffs& g,
+                            int current_layer, const Coeffs& g,
                             PartitionCache& pcache) {
   // Extract the needed parameters and values:
   const int q_layer = taylor_orders[current_layer - 1];
@@ -128,12 +127,9 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
 }
 
 // [[Rcpp::export]]
-Weights alg_non_linear(const Weights& coeffs_input,
-                       const Terms& labels_input,
-                       const Terms& labels_output,
-                       const Term& taylor_orders,
-                       int current_layer,
-                       const Coeffs& g) {
+Weights alg_non_linear(const Weights& coeffs_input, const Terms& labels_input,
+                       const Terms& labels_output, const Term& taylor_orders,
+                       int current_layer, const Coeffs& g) {
   PartitionCache pcache;
   TermMap labels_map;
   for (size_t i = 0; i < labels_input.size(); i++)
@@ -144,8 +140,7 @@ Weights alg_non_linear(const Weights& coeffs_input,
     labels_output,
     taylor_orders,
     current_layer,
-    g,
-    pcache
+    g, pcache
   );
 }
 
@@ -157,10 +152,8 @@ inline void check_weights_dimensions(const Layers& layers) {
 }
 
 // [[Rcpp::export]]
-List nn2poly_algorithm(const Layers& layers,
-                       const Functions& af_list,
-                       int max_order,
-                       bool keep_layers,
+List nn2poly_algorithm(const Layers& layers, const Functions& af_list,
+                       int max_order, bool keep_layers,
                        const Term& taylor_orders) {
   if (layers.empty())
     stop("Argument `layers` is empty");
@@ -197,12 +190,12 @@ List nn2poly_algorithm(const Layers& layers,
   // associated with each variable from x_1 to x_p.
 
   PartitionCache pcache;
+  TermMap labels_map;
   Weights coeffs_list;
   Terms labels_list;
   labels_list.reserve(p + 1);
   for (int i = 0; i <= p; i++)
     labels_list.push_back(Term{ i });
-  TermMap labels_map;
   int new_order = 1;
 
   ////////////////// Loop over all layers ///////////////////
