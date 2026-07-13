@@ -53,13 +53,9 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
   NN2POLY_DEBUG_LOG(3, "[layer", current_layer, "]",
     DTAG(q_layer), DTAG(q_previous_layer));
 
-  // Obtain total number of terms in the polynomial from labels
+  // Number of terms, number of neurons h_l, output matrix
   const int n_poly_terms = static_cast<int>(labels_output.size());
-
-  // Obtain number of neurons
   const int h_l = nn2poly::linalg::n_rows(coeffs_input);
-
-  // We define the vector that will contain all the output coefficients
   Weights coeffs_output = nn2poly::linalg::zeros(h_l, n_poly_terms);
 
   ////////// Intercept //////////
@@ -89,15 +85,12 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
         // of the intercept term. Then we compute this diff:
         const int difference = n - static_cast<int>(terms.size());
 
-        // If this diff is <0, we skip the partition
-        // This is due to the second restriction to the allowed partitions, that
-        // depends on n
+        // If this diff is < 0, we skip the partition. This is due to the
+        // second restriction to the allowed partitions, that depends on n
         if (difference < 0)
           continue;
 
-        // We need to obtain the m_index values to compute the multinomial
-        // coefficient
-
+        // Index values to compute the multinomial coefficient
         // This is simply counting how many times each unique term appears,
         // obtaining the factorials and then doing the product. The terms that
         // do not appear dont need to be counted as they will be 0, their
@@ -178,29 +171,16 @@ List nn2poly_algorithm(const Layers& layers,
 
   check_weights_dimensions(layers);
 
-  // Obtain number of variables (dimension p)
+  // Dimension p, layers L (L-1 hidden + 1 output, input is denoted by 0)
   const int p = static_cast<int>(layers[0].n_rows) - 1;
-
-  // Obtain number of layers L (L-1 hidden + 1 output, input is denoted by 0)
   const int L = static_cast<int>(af_list.size());
-
-  // Check if the last layer is linear
   const bool last_linear = (af_list.back() == "linear");
 
   // The list with the results of coefficients at each layer,
   // depending on the last layer being linear or not
   WeightsLists results(static_cast<size_t>(last_linear ? 2 * L - 1 : 2 * L));
-
-  // Create a default taylor_orders if it is not given by the user
   const Term taylor = obtain_taylor_vector(taylor_orders, af_list);
-
-  // Obtain all the derivatives up to the desired Taylor degree at each layer
-  const CoeffsList af_derivatives_list = obtain_derivatives_list(taylor, af_list);
-
-  // Reuse partitions across non linear layers.
-  PartitionCache pcache;
-
-  ////////////////// current_layer = 1, linear ///////////////////
+  const CoeffsList af_dlist = obtain_derivatives_list(taylor, af_list);
 
   // Starting point for the algorithm: Set weights as coefficients
   // of an order 1 polynomial.
@@ -209,57 +189,37 @@ List nn2poly_algorithm(const Layers& layers,
   // same layer and non linear case will have be the same, so they can be
   // stored only once as the element `labels` of the coeffs_list,
   // so we define length h+1
+
   // For each neuron in the first hidden layer, when computing the activation
   // potentials (u_j), each column of the weight matrix represents the
   // coefficients of an order 1 polynomial for that neuron potential.
   // The first element will be the bias, and the rest the coefficient
   // associated with each variable from x_1 to x_p.
-  Weights coeffs_list = nn2poly::linalg::trans(layers[0]);
 
-  // generate and store the labels (as a list of integer vectors)
-  // In this case the integer vectors are of length 1.
+  PartitionCache pcache;
+  Weights coeffs_list;
   Terms labels_list;
   labels_list.reserve(p + 1);
   for (int i = 0; i <= p; i++)
     labels_list.push_back(Term{ i });
-  // Build a hash map for labels_input to optimize term positions lookup
   TermMap labels_map;
-
-  // Store the results
-  results[0] = WeightsList{labels_list, coeffs_list};
-
-  // Stop if last layer and the last layer is linear
   int new_order = 1;
-  if (L == 1 && last_linear)
-    goto out;
 
   ////////////////// Loop over all layers ///////////////////
-
   // Note that the loop will iterate the current layer from 1 to L
   // and compute the linear and then non linear situation.
-  // The linear case at layer 1 has been computed outside so we skip it
 
   for (int current_layer = 1; current_layer <= L; current_layer++) {
 
-    ///////////////// Linear case //////////////////
-    if (current_layer != 1) {
+    ////////// Linear case //////////
+    // Apply the weights for the first layer, or linear algorithm
+    coeffs_list = (current_layer == 1) ? nn2poly::linalg::trans(layers[0])
+      : nn2poly::linalg::alg_linear(coeffs_list, layers[current_layer - 1]);
 
-      // Note that the polynomial in this case does not increase its order
-      // from the one in the non linear previous layer, so the labels
-      // will be the same and are already stored in $labels output.
-      // Only the matrix of $values will change its number of rows
-
-      // apply the linear algorithm
-      coeffs_list = nn2poly::linalg::alg_linear(
-        coeffs_list, layers[current_layer - 1]);
-
-      // Save results from this layer:
-      results[2 * current_layer - 2] = WeightsList{labels_list, coeffs_list};
-
-      // Stop if last layer and the last layer is linear
-      if (current_layer == L && last_linear)
-        goto out;
-    }
+    // Save results and check if finished
+    results[2 * current_layer - 2] = WeightsList{labels_list, coeffs_list};
+    if (current_layer == L && last_linear)
+      goto out;
 
     ////////// Non linear case //////////
     // The output dimension remains the same as in the previous linear case,
@@ -268,12 +228,10 @@ List nn2poly_algorithm(const Layers& layers,
     // In the non linear case the polynomial order increases (unless max_order is
     // reached), so the new labels need to be computed. However, the previous
     // ones can be reused.
+
     // The new labels will be for monomials of orders between the total order
     // of the previous polynomial and the total order of the new polynomial:
     int previous_order = new_order;
-
-    // Compute the new total order with the product of taylor_orders.
-    // If a max_order value is used, its taken as the minimum between both.
     new_order = std::min(previous_order * taylor[current_layer - 1], max_order);
 
     // Update map with new labels, if any
@@ -281,37 +239,28 @@ List nn2poly_algorithm(const Layers& layers,
       labels_map[labels_list[i]] = i;
     NN2POLY_DEBUG_LOG(2, "[layer", current_layer, "][in] ", DTAG(labels_list));
 
-    // If the order has increased, create new needed labels.
-    // If not, max_order has been reached and no new labels are needed.
-    if (previous_order != new_order) {
-      // Loop over each of the new orders up to the maximum one
+    // If the order has increased, create new labels
+    if (previous_order != new_order)
       for (int order = previous_order + 1; order <= new_order; order++) {
         Terms comb = combinations_with_repetition(p, order);
-
-        // update labels with the new ones
-        for (const Term& term : comb)
-          labels_list.push_back(term);
+        for (const Term& term : comb) labels_list.push_back(term);
       }
-    }
     NN2POLY_DEBUG_LOG(2, "[layer", current_layer, "][out]", DTAG(labels_list));
 
-    // The output index is already computed in the linear case
-    // but not for l=1 #REVISETHISLATER
+    // Apply non-linear algorithm
     coeffs_list = alg_non_linear_impl(
       coeffs_list,
       labels_map,
       labels_list,
       taylor,
       current_layer,
-      af_derivatives_list[current_layer - 1],
+      af_dlist[current_layer - 1],
       pcache
     );
     NN2POLY_DEBUG_LOG(2, "[layer", current_layer, "]", pcache.debug(true));
 
-    // Save results from this layer:
+    // Save results and check if finished
     results[2 * current_layer - 1] = WeightsList{labels_list, coeffs_list};
-
-    // Check if this is the last layer and if the last layer is not linear
     if (current_layer == L && !last_linear)
       goto out;
   }
