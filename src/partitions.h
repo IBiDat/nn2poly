@@ -41,13 +41,6 @@ inline TermEquivalence summarize_label_equivalence(const Term& label) {
   return {signature, canonical_order};
 }
 
-inline arma::uvec to_arma_indices(const std::vector<size_t>& positions) {
-  arma::uvec indices(positions.size());
-  for (size_t i = 0; i < positions.size(); i++)
-    indices[i] = positions[i];
-  return indices;
-}
-
 inline TermSummary summarize_terms(const Terms& terms) {
   TermSummary out;
   out.unique_terms.reserve(terms.size());

@@ -62,17 +62,15 @@ struct TermEquivalence {
 };
 
 #include "debug.h"
-using PartitionCache = nn2poly::PartitionCache;
 
+using PartitionCache = nn2poly::PartitionCache;
 using Coeffs = std::vector<double>;
 using CoeffsList = std::vector<Coeffs>;
 
-// [[Rcpp::depends(RcppArmadillo)]]
-#include <RcppArmadillo.h>
-using namespace Rcpp;
+#include "linalg.h"
 
-using Weights = arma::mat;
-using Layers = std::vector<arma::mat>;
+using Weights = nn2poly::linalg::Weights;
+using Layers = std::vector<Weights>;
 using Functions = std::vector<std::string>;
 
 struct WeightsList {

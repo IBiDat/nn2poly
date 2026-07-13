@@ -57,18 +57,14 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
   const int n_poly_terms = static_cast<int>(labels_output.size());
 
   // Obtain number of neurons
-  const int h_l = static_cast<int>(coeffs_input.n_rows);
+  const int h_l = nn2poly::linalg::n_rows(coeffs_input);
 
   // We define the vector that will contain all the output coefficients
-  Weights coeffs_output(h_l, n_poly_terms, arma::fill::zeros);
+  Weights coeffs_output = nn2poly::linalg::zeros(h_l, n_poly_terms);
 
   ////////// Intercept //////////
 
-  for (int n = 0; n <= q_layer; n++) {
-    coeffs_output.col(0) = coeffs_output.col(0) + g[n] * arma::pow(coeffs_input.col(0), n);
-    // we have to use g[n] to obtain g^(n)/n!,
-    // because the function taylor already includes the term 1/n!
-  }
+  nn2poly::linalg::add_poly_eval(coeffs_output, 0, coeffs_input, g, q_layer);
 
   ////////// Rest of the coefficients //////////
 
@@ -83,7 +79,7 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
 
     // Now, use the correctly renamed partitions
     for (int n = 1; n <= q_layer; n++) {
-      arma::vec summatory(h_l, arma::fill::zeros);
+      auto summatory = nn2poly::linalg::zeros(h_l);
 
       for (const Terms& terms : allowed_terms) {
         // We now need to check that each partition does not exceed n elements
@@ -119,36 +115,24 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
         mult[0] = difference;
 
         // Compute the multinomial coefficient
-        double multinomial_coef = std::tgamma(static_cast<double>(n) + 1.0);
+        double m_coef = std::tgamma(static_cast<double>(n) + 1.0);
         for (int m : mult)
-          multinomial_coef /= std::tgamma(static_cast<double>(m) + 1.0);
+          m_coef /= std::tgamma(static_cast<double>(m) + 1.0);
 
         // Now we need to use the labels to get the needed coefficients:
-        const std::vector<size_t> idx = in_terms_positions(labels_input_map, term_summary);
+        const auto idx = in_terms_positions(labels_input_map, term_summary);
         NN2POLY_DEBUG_LOG(5, "[layer", current_layer, "]", DTAG(mult), DTAG(idx));
-
-        Weights coeffs_input_needed(h_l, idx.size());
-        if (!idx.empty()) {
-          coeffs_input_needed = coeffs_input.cols(to_arma_indices(idx));
-          for (unsigned int i = 0; i < coeffs_input_needed.n_cols; i++)
-            coeffs_input_needed.col(i) = arma::pow(coeffs_input_needed.col(i), mult[i + 1]);
-        }
 
         // Finally compute the product of coefficients according to multinomial
         // theorem and add it to the summatory
-        // For the product, it is sufficient to call prod(coeffs_input_needed)
-        // without including the exponent m, as this vector will contain
-        // each coefficient as many times as its exponent would indicate.
-        // REVISETHISLATER esto debería poder hacerse sin bucle con row product
-        summatory += multinomial_coef *
-          arma::prod(coeffs_input_needed, 1) % arma::pow(coeffs_input.col(0), difference);
-        // Note that coeffs_input[0] is the intercept
+        nn2poly::linalg::accumulate_partition(
+          summatory, coeffs_input, idx, mult, difference, m_coef);
       }
       // After the summatory over the partitions has been computed, we need to
       // get its result and multiply by the correspondent derivative value, and
       // add to the already stored values, here we are computing the summatory
       // over n.
-      coeffs_output.col(coeff_index) = coeffs_output.col(coeff_index) + g[n] * summatory;
+      nn2poly::linalg::add_partition(coeffs_output, coeff_index, g[n], summatory);
     }
   }
 
@@ -235,7 +219,7 @@ List nn2poly_algorithm(const Layers& layers,
   // coefficients of an order 1 polynomial for that neuron potential.
   // The first element will be the bias, and the rest the coefficient
   // associated with each variable from x_1 to x_p.
-  Weights coeffs_list = arma::trans(layers[0]);
+  Weights coeffs_list = nn2poly::linalg::trans(layers[0]);
 
   // generate and store the labels (as a list of integer vectors)
   // In this case the integer vectors are of length 1.
@@ -270,16 +254,8 @@ List nn2poly_algorithm(const Layers& layers,
       // will be the same and are already stored in $labels output.
       // Only the matrix of $values will change its number of rows
 
-      /////// New  version alg linear START  ----------------------------------
       // apply the linear algorithm
-      arma::rowvec first_row(coeffs_list.n_cols, arma::fill::zeros);
-      first_row[0] = 1.0;
-      Weights stacked(coeffs_list.n_rows + 1, coeffs_list.n_cols);
-      stacked.row(0) = first_row;
-      stacked.rows(1, coeffs_list.n_rows) = coeffs_list;
-      coeffs_list = arma::trans(layers[current_layer - 1]) * stacked;
-
-      /////// New  version alg linear END  ----------------------------------
+      nn2poly::linalg::alg_linear(coeffs_list, layers[current_layer - 1]);
 
       // Save results from this layer:
       results[2 * current_layer - 2] = WeightsList{labels_list, coeffs_list};

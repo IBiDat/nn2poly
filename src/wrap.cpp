@@ -13,7 +13,7 @@ List wrap(const WeightsList& data) {
   return List::create(
     _["labels"] = data.labels,
     // Transpose to have polynomials as columns
-    _["values"] = arma::trans(data.values)
+    _["values"] = nn2poly::linalg::trans(data.values)
   );
 }
 
