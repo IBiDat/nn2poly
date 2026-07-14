@@ -19,8 +19,8 @@ NN2POLY_DEFINE_DEBUG_VAR(NN2POLY_DEBUG_VECTOR_DEPTH, debug_vector_depth, 10)
 #define NN2POLY_DEBUG_LOG(level, ...) \
   do { \
     if ((level) <= ::nn2poly::detail::debug_level) { \
-      ::nn2poly::detail::debug_log( \
-        "[nn2poly][DEBUG", (level), "][", __FILE__, ":", __LINE__, "]", \
+      ::nn2poly::detail::debug_log("[nn2poly][DEBUG", (level), "][", \
+        __FILE__, ":", __LINE__, "][", __func__, "]", \
         __VA_ARGS__); \
     } \
   } while(0)
@@ -136,22 +136,14 @@ public:
   // Shadow the non-const find
   typename Base::iterator find(const Key& key) {
     auto it = Base::find(key);
-    if (it != this->end()) {
-      hits++;
-    } else {
-      misses++;
-    }
+    if (it != this->end()) { hits++; } else { misses++; }
     return it;
   }
 
   // Shadow the const find
   typename Base::const_iterator find(const Key& key) const {
     auto it = Base::find(key);
-    if (it != this->end()) {
-      hits++;
-    } else {
-      misses++;
-    }
+    if (it != this->end()) { hits++; } else { misses++; }
     return it;
   }
 

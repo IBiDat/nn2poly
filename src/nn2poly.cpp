@@ -49,8 +49,8 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
   int q_previous_layer = 1;
   if (current_layer != 1)
     q_previous_layer = taylor_orders[current_layer - 2];
-  NN2POLY_DEBUG_LOG(3, "[layer", current_layer, "]",
-    DTAG(q_layer), DTAG(q_previous_layer));
+  NN2POLY_DEBUG_LOG(2, "[layer", current_layer, "]",
+    DTAG(q_layer), DTAG(q_previous_layer), DTAG(labels_output));
 
   // Number of terms, number of neurons h_l, output matrix
   const int n_poly_terms = static_cast<int>(labels_output.size());
@@ -66,10 +66,8 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
   // As we already have all the coefficient labels, we can loop over them
   // Note that the intercept has to be skipped so start at 1
   for (int coeff_index = 1; coeff_index < n_poly_terms; coeff_index++) {
-    const Term& label = labels_output[coeff_index];
-    NN2POLY_DEBUG_LOG(3, "[layer", current_layer, "]", DTAG(label));
-
-    Partition allowed_terms = build_allowed_terms(label, q_previous_layer, pcache);
+    Partition allowed_terms = build_allowed_terms(
+      labels_output[coeff_index], q_previous_layer, pcache);
     NN2POLY_DEBUG_LOG(4, "[layer", current_layer, "]", DTAG(allowed_terms));
 
     // Now, use the correctly renamed partitions
@@ -95,8 +93,6 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
         // do not appear dont need to be counted as they will be 0, their
         // factorial 1 and at the end will, not affect the total product.
         TermSummary term_summary = summarize_terms(terms);
-        NN2POLY_DEBUG_LOG(5, "[layer", current_layer, "]", DTAG(term_summary));
-
         Term mult(term_summary.unique_terms.size() + 1, 0);
         mult[0] = difference;
         for (size_t i = 0; i < term_summary.unique_terms.size(); i++) {
@@ -108,7 +104,8 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
 
         // Now we need to use the labels to get the needed coefficients:
         const auto idx = in_terms_positions(labels_input_map, term_summary);
-        NN2POLY_DEBUG_LOG(5, "[layer", current_layer, "]", DTAG(mult), DTAG(idx));
+        NN2POLY_DEBUG_LOG(5, "[layer", current_layer, "]",
+          DTAG(term_summary), DTAG(mult), DTAG(idx));
 
         // Finally compute the product of coefficients according to multinomial
         // theorem and add it to the summatory
@@ -230,7 +227,6 @@ List nn2poly_algorithm(const Layers& layers, const Functions& af_list,
     // Update map with new labels, if any
     for (size_t i = labels_map.size(); i < labels_list.size(); i++)
       labels_map[labels_list[i]] = i;
-    NN2POLY_DEBUG_LOG(2, "[layer", current_layer, "][in] ", DTAG(labels_list));
 
     // If the order has increased, create new labels
     if (previous_order != new_order)
@@ -238,7 +234,6 @@ List nn2poly_algorithm(const Layers& layers, const Functions& af_list,
         Terms comb = combinations_with_repetition(p, order);
         for (const Term& term : comb) labels_list.push_back(term);
       }
-    NN2POLY_DEBUG_LOG(2, "[layer", current_layer, "][out]", DTAG(labels_list));
 
     // Apply non-linear algorithm
     coeffs_list = alg_non_linear_impl(
@@ -250,7 +245,7 @@ List nn2poly_algorithm(const Layers& layers, const Functions& af_list,
       af_dlist[current_layer - 1],
       pcache
     );
-    NN2POLY_DEBUG_LOG(2, "[layer", current_layer, "]", pcache.debug(true));
+    NN2POLY_DEBUG_LOG(1, "[layer", current_layer, "]", pcache.debug(true));
 
     // Save results and check if finished
     results[2 * current_layer - 1] = WeightsList{labels_list, coeffs_list};
