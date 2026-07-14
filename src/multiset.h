@@ -43,11 +43,7 @@ public:
     explicit operator bool() const { return !done; }
     value_type operator*() { return get(); }
 
-    iterator& operator++() {
-      done = next();
-      Rcpp::checkUserInterrupt();
-      return *this;
-    }
+    iterator& operator++() { done = next(); return *this; }
     iterator operator++(int) { auto it = *this; ++*this; return it; }
 
     friend bool operator==(const iterator& lhs, const iterator& rhs) {

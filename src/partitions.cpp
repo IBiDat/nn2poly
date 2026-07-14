@@ -70,7 +70,7 @@ Partition build_allowed_terms(const Term& label,
 
       sig_it = pcache.signature.emplace(eq.signature, std::move(sig_parts)).first;
     }
-    NN2POLY_DEBUG_LOG(4, DTAG(sig_it->second));
+    NN2POLY_DEBUG_LOG(5, DTAG(sig_it->second));
 
     // Filtering
     Partition filt_parts;

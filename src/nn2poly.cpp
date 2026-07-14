@@ -50,7 +50,7 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
   if (current_layer != 1)
     q_previous_layer = taylor_orders[current_layer - 2];
   NN2POLY_DEBUG_LOG(2, "[layer", current_layer, "]",
-    DTAG(q_layer), DTAG(q_previous_layer), DTAG(labels_output));
+    DTAG(q_layer), DTAG(q_previous_layer), DTAG(labels_output.size()));
 
   // Number of terms, number of neurons h_l, output matrix
   const int n_poly_terms = static_cast<int>(labels_output.size());
@@ -118,6 +118,7 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
       // over n.
       nn2poly::linalg::add_partition(coeffs_output, coeff_index, g[n], summatory);
     }
+    CHECK_INTERRUPT();
   }
 
   return coeffs_output;
