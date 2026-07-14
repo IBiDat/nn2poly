@@ -15,7 +15,8 @@ Term obtain_taylor_vector(const Term& taylor_orders,
   }
 
   if (taylor_orders.size() != af_string_list.size())
-    throw std::invalid_argument("`taylor_orders` length does not match provided number of layers");
+    throw std::invalid_argument(
+      "`taylor_orders` length does not match provided number of layers");
 
   return taylor_orders;
 }
@@ -24,7 +25,8 @@ Term obtain_taylor_vector(const Term& taylor_orders,
 CoeffsList obtain_derivatives_list(const Term& taylor_orders,
                                    const Functions& af_string_list) {
   if (taylor_orders.size() != af_string_list.size())
-    throw std::invalid_argument("`taylor_orders` length does not match provided number of layers");
+    throw std::invalid_argument(
+      "`taylor_orders` length does not match provided number of layers");
 
   CoeffsList out(af_string_list.size());
   for (size_t i = 0; i < af_string_list.size(); i++) {
@@ -145,7 +147,9 @@ Weights alg_non_linear(const Weights& coeffs_input, const Terms& labels_input,
 inline void check_weights_dimensions(const Layers& layers) {
   for (size_t i = 1; i < layers.size(); i++) {
     if (layers[i].n_rows != layers[i - 1].n_cols + 1)
-      throw std::invalid_argument("the list of weights has incorrect dimensions. Please, check the right dimmensions in the documentation.");
+      throw std::invalid_argument(
+        "the list of weights has incorrect dimensions, "
+        "please check the right dimmensions in the documentation");
   }
 }
 
@@ -216,8 +220,8 @@ List nn2poly_algorithm(const Layers& layers, const Functions& af_list,
     // The output dimension remains the same as in the previous linear case,
     // because the same number of neurons is considered
 
-    // In the non linear case the polynomial order increases (unless max_order is
-    // reached), so the new labels need to be computed. However, the previous
+    // In the non linear case the polynomial order increases (unless max_order
+    // is reached), so the new labels need to be computed. However, the previous
     // ones can be reused.
 
     // The new labels will be for monomials of orders between the total order

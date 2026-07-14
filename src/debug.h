@@ -98,11 +98,11 @@ std::ostream& operator<<(std::ostream& os, const Printable<std::vector<T>>& p) {
 } // namespace detail
 } // namespace nn2poly
 
-#define NN2POLY_DEFINE_PRINTABLE_STRUCT_2(StructName, Member1, Member2) \
-  inline std::ostream& operator<<(std::ostream& os, const StructName& s) { \
+#define NN2POLY_DEFINE_PRINTABLE_STRUCT_2(Type, M1, M2) \
+  inline std::ostream& operator<<(std::ostream& os, const Type& s) { \
     return os << "{" \
-      << #Member1 ": " << nn2poly::detail::Printable<decltype(s.Member1)>{s.Member1, 0} << ", " \
-      << #Member2 ": " << nn2poly::detail::Printable<decltype(s.Member2)>{s.Member2, 0} \
+      << #M1 ": " << nn2poly::detail::Printable<decltype(s.M1)>{s.M1, 0} << ", " \
+      << #M2 ": " << nn2poly::detail::Printable<decltype(s.M2)>{s.M2, 0} \
       << "}"; \
   }
 NN2POLY_DEFINE_PRINTABLE_STRUCT_2(TermSummary, unique_terms, counts)

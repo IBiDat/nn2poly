@@ -4,8 +4,8 @@
 
 // [[Rcpp::export]]
 Terms combinations_with_repetition(int n, int k) {
-  if (n <= 0 || k < 0)
-    throw std::invalid_argument("arguments `n` and `k` must satisfy n > 0 and k >= 0");
+  if (n <= 0 || k < 0) throw std::invalid_argument(
+    "arguments `n` and `k` must satisfy n > 0 and k >= 0");
 
   Terms out;
   if (k == 0) {
