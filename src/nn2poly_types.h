@@ -80,6 +80,10 @@ struct WeightsList {
 
 using WeightsLists = std::vector<WeightsList>;
 
+#include <Rcpp.h>
+
+using List = Rcpp::List;
+
 namespace Rcpp {
 List wrap(const PartitionsList& data);
 List wrap(const WeightsList& data);

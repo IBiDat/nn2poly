@@ -15,7 +15,7 @@ Term obtain_taylor_vector(const Term& taylor_orders,
   }
 
   if (taylor_orders.size() != af_string_list.size())
-    stop("Argument `taylor_orders` length does not match provided number of layers");
+    throw std::invalid_argument("`taylor_orders` length does not match provided number of layers");
 
   return taylor_orders;
 }
@@ -24,12 +24,12 @@ Term obtain_taylor_vector(const Term& taylor_orders,
 CoeffsList obtain_derivatives_list(const Term& taylor_orders,
                                    const Functions& af_string_list) {
   if (taylor_orders.size() != af_string_list.size())
-    stop("Argument `taylor_orders` length does not match provided number of layers");
+    throw std::invalid_argument("`taylor_orders` length does not match provided number of layers");
 
   CoeffsList out(af_string_list.size());
   for (size_t i = 0; i < af_string_list.size(); i++) {
     if (taylor_orders[i] < 0)
-      stop("Argument `taylor_orders` must be non-negative");
+      throw std::invalid_argument("`taylor_orders` must be non-negative");
     // Obtain the vector with the derivatives of the activation function up to
     // the given degree centered at 0
     out[i] = coeffs_taylor(af_string_list[i], taylor_orders[i]);
@@ -102,7 +102,7 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
         for (size_t i = 0; i < term_summary.unique_terms.size(); i++) {
           auto it = term_summary.counts.find(term_summary.unique_terms[i]);
           if (it == term_summary.counts.end())
-            stop("Internal error while counting partition terms.");
+            throw std::runtime_error("unique term not found in counts map");
           mult[i + 1] = it->second;
         }
 
@@ -147,7 +147,7 @@ Weights alg_non_linear(const Weights& coeffs_input, const Terms& labels_input,
 inline void check_weights_dimensions(const Layers& layers) {
   for (size_t i = 1; i < layers.size(); i++) {
     if (layers[i].n_rows != layers[i - 1].n_cols + 1)
-      stop("The list of weights has incorrect dimensions. Please, check the right dimmensions in the documentation.");
+      throw std::invalid_argument("the list of weights has incorrect dimensions. Please, check the right dimmensions in the documentation.");
   }
 }
 
@@ -156,11 +156,11 @@ List nn2poly_algorithm(const Layers& layers, const Functions& af_list,
                        int max_order, bool keep_layers,
                        const Term& taylor_orders) {
   if (layers.empty())
-    stop("Argument `layers` is empty");
+    throw std::invalid_argument("`layers` is empty");
   if (af_list.empty())
-    stop("Activation functions are missing in `af_list`");
+    throw std::invalid_argument("activation functions are missing in `af_list`");
   if (layers.size() != af_list.size())
-    stop("`layers` and `af_list` must have the same length");
+    throw std::invalid_argument("`layers` and `af_list` must have the same length");
 
   check_weights_dimensions(layers);
 
@@ -261,6 +261,6 @@ List nn2poly_algorithm(const Layers& layers, const Functions& af_list,
 out:
   NN2POLY_DEBUG_LOG(1, pcache.debug());
   if (keep_layers)
-    return wrap(results);
-  return wrap(results.back());
+    return Rcpp::wrap(results);
+  return Rcpp::wrap(results.back());
 }
