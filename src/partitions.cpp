@@ -41,15 +41,13 @@ Partition build_allowed_terms(const Term& label,
   TermQ renamed_key{label, q_previous_layer};
   auto ren_it = pcache.renamed.find(renamed_key);
 
-  if (ren_it != pcache.renamed.end()) {
-    NN2POLY_DEBUG_LOG(4, DTAG(ren_it->second));
+  if (ren_it != pcache.renamed.end())
     return ren_it->second;
-  }
 
   // Find the equivalence between label and the ones needed for the
   // reduced partitions list
   const TermEquivalence eq = summarize_label_equivalence(label);
-  NN2POLY_DEBUG_LOG(4, DTAG(eq));
+  NN2POLY_DEBUG_LOG(3, DTAG(eq));
 
   // ---------------------------------------------------------
   // LEVEL 2: filtered cache (filtered structural matches)
@@ -114,6 +112,5 @@ Partition build_allowed_terms(const Term& label,
 
   ren_it = pcache.renamed.emplace(renamed_key, std::move(ren_parts)).first;
 
-  NN2POLY_DEBUG_LOG(4, DTAG(ren_it->second));
   return ren_it->second;
 }

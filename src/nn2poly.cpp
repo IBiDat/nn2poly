@@ -70,7 +70,7 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
     NN2POLY_DEBUG_LOG(3, "[layer", current_layer, "]", DTAG(label));
 
     Partition allowed_terms = build_allowed_terms(label, q_previous_layer, pcache);
-    NN2POLY_DEBUG_LOG(3, "[layer", current_layer, "]", DTAG(allowed_terms));
+    NN2POLY_DEBUG_LOG(4, "[layer", current_layer, "]", DTAG(allowed_terms));
 
     // Now, use the correctly renamed partitions
     for (int n = 1; n <= q_layer; n++) {

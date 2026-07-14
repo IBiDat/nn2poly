@@ -1,26 +1,29 @@
 #ifndef nn2poly__debug_h
 #define nn2poly__debug_h
 
-#ifndef NN2POLY_DEBUG
-#define NN2POLY_DEBUG 0
-#endif
+namespace nn2poly {
+namespace detail {
+
+#ifdef NN2POLY_DEBUG
+
+#define NN2POLY_DEFINE_DEBUG_VAR(env_name, var_name, default_value) \
+  inline const int var_name = []() { \
+    if (const char* i = std::getenv(#env_name)) \
+      return std::atoi(i); \
+    return default_value; \
+  }();
+NN2POLY_DEFINE_DEBUG_VAR(NN2POLY_DEBUG_LEVEL, debug_level, 0)
+NN2POLY_DEFINE_DEBUG_VAR(NN2POLY_DEBUG_VECTOR_DEPTH, debug_vector_depth, 10)
 
 #define DTAG(x) " " #x "=", x
-
-namespace nn2poly {
-
-#if NN2POLY_DEBUG >= 1
-
 #define NN2POLY_DEBUG_LOG(level, ...) \
   do { \
-    if constexpr ((level) <= NN2POLY_DEBUG) { \
-      ::nn2poly::detail::log_debug( \
+    if ((level) <= ::nn2poly::detail::debug_level) { \
+      ::nn2poly::detail::debug_log( \
         "[nn2poly][DEBUG", (level), "][", __FILE__, ":", __LINE__, "]", \
         __VA_ARGS__); \
     } \
   } while(0)
-
-namespace detail {
 
 // Helper
 template <typename T>
@@ -30,7 +33,7 @@ struct Printable {
 };
 
 template <typename... Args>
-void log_debug(Args&&... args) {
+void debug_log(Args&&... args) {
   (std::cerr << ... << Printable<std::decay_t<Args>>{args}) << '\n';
 }
 
@@ -66,12 +69,12 @@ operator<<(std::ostream& os, const Printable<T>& p) {
 template <typename T> struct vector_depth { static constexpr size_t value = 0; };
 template <typename T, typename A> struct vector_depth<std::vector<T, A>> {
   static constexpr size_t value = 1 + vector_depth<T>::value; };
-template <typename T> inline constexpr bool vector_depth_v = vector_depth<T>::value;
+template <typename T> inline constexpr size_t vector_depth_v = vector_depth<T>::value;
 
 // Vectors and nested vectors
 template <typename T>
 std::ostream& operator<<(std::ostream& os, const Printable<std::vector<T>>& p) {
-  if constexpr (vector_depth_v<T> > 1) {
+  if (static_cast<int>(vector_depth_v<T>) + 1 >= debug_vector_depth) {
     std::string current_indent(p.indent, ' ');
     std::string next_indent(p.indent + 2, ' ');
     os << "[\n";
@@ -188,8 +191,6 @@ public:
   }
 };
 
-} // namespace detail
-
 template <
   typename Key, typename T,
   typename Hash = std::hash<Key>,
@@ -212,12 +213,14 @@ using unordered_map = std::unordered_map<Key, T, Hash, KeyEqual, Allocator>;
 
 #endif
 
-struct PartitionCache {
-  unordered_map<Term, Partition, TermHash> signature;
-  unordered_map<TermQ, Partition, TermQHash> filtered;
-  unordered_map<TermQ, Partition, TermQHash> renamed;
+} // namespace detail
 
-#if NN2POLY_DEBUG >= 1
+struct PartitionCache {
+  detail::unordered_map<Term, Partition, TermHash> signature;
+  detail::unordered_map<TermQ, Partition, TermQHash> filtered;
+  detail::unordered_map<TermQ, Partition, TermQHash> renamed;
+
+#ifdef NN2POLY_DEBUG
   struct DebugProxy {
     const PartitionCache* pcache;
     bool delta;
