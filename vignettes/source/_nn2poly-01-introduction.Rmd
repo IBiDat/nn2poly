@@ -258,7 +258,7 @@ length(prediction_poly)==nrow(test_x)
 
 ```
 
-Another option available is to evaluate the monomials of the obtained polynomial separately, which may be useful when trying to analyze the contribution of each term to the final output of the model, specially when comparing interactions of variables. This can be done by passing the option `monomials=TRUE` to the `predict()` function.
+Another available option is to evaluate the monomials of the obtained polynomial separately, which may be useful when trying to analyze the contribution of each term to the final output of the model, specially when comparing interactions of variables. This can be done by passing the option `monomials=TRUE` to the `predict()` function.
 
 
 ```{r reg-monomial-prediction}
@@ -280,15 +280,21 @@ dim(prediction_monomials)
 
 > *Note*: Once again note that, in order to avoid asymptotic behavior of the method, it is important to impose some kind of constraints when training the neural network weights, something which we are not doing here to simplify this first example. Details on how to do this depend on the chosen deep learning framework and are covered in the next vignettes.
 
-It is advisable to always check that the predictions obtained with the new polynomial are close to the original NN predictions (and in case they differ, we can also try to find why by checking the Taylor expansions). To help with that, a couple of functions are included that allow us to plot the results.
+It is advisable to always check that the predictions obtained with the new polynomial are close to the original NN predictions (and in case they differ, we can also try to find why by checking the Taylor expansions). To help with that, some functions are included that allow us to plot the results.
+
+### Diagonal plot
 
 A simple plot comparing the polynomial and NN predictions can be obtained with `nn2poly:::plot_diagonal()`, where the red diagonal line represents where a perfect relationship between the NN and the polynomial predictions would be obtained. In this example, as the theoretical weight constraints have not been imposed, we can observe how the approximation is not perfect.
+
+> *Note*: This plot is left as an internal function so it can be used as a quick check of the polynomial behavior, but might be removed later on. Any simple scatter plot comparing NN predictions with Polynomial predictions can be used for this purpose.
 
 
 ```{r reg-comparison-polynomial-nn}
 
 nn2poly:::plot_diagonal(x_axis =  prediction_NN, y_axis =  prediction_poly, xlab = "NN prediction", ylab = "Polynomial prediction")
 ```
+
+### Polynomial Coefficients Barplot
 
 We can also plot the $n$ most important coefficients in absolute value to compare which variables or interactions are more relevant in the polynomial. Note that, as data should be scaled to the $[-1,1]$ interval, interactions of order 2 or higher would usually need a higher absolute value than lower order coefficients to have a comparable impact.
 
@@ -302,11 +308,17 @@ feature_names <- paste0("x", seq_len(p))
 plot(final_poly, n = 8, type = "bar", variable_names = feature_names)
 ```
 
+### 2nd Order Coefficients Heatmap
+
 The heatmap focuses on second-order coefficients. Diagonal cells correspond to squared terms such as $x_1^2$, while off-diagonal cells correspond to pairwise interactions such as $x_2x_3$.
 
 ```{r reg-coefficient-heatmap}
 plot(final_poly, type = "heatmap", variable_names = feature_names)
 ```
+
+### Monomials: 
+
+
 
 The monomial predictions computed above give an exact decomposition of each polynomial prediction into its evaluated terms. The local contribution plot redistributes each evaluated term across the variables that appear in it, proportionally to their multiplicity in the term. This is useful as a feature-level summary for one observation, while keeping in mind that interaction terms are shared by construction.
 
