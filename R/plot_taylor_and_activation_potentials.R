@@ -64,10 +64,10 @@ plot_taylor_and_activation_potentials.list <- function(object,
   # }
 
   # Create a default taylor_orders if it is not given by the user (as in nn2poly)
-  taylor_orders <- obtain_taylor_vector(
-    taylor_orders = taylor_orders,
-    af_string_list = af_string_list
-  )
+  taylor_orders <- obtain_taylor_vector(taylor_orders, af_string_list)
+
+  # Obtain all the derivatives up to the desired Taylor degree at each layer
+  af_derivatives_list <- obtain_derivatives_list(taylor_orders, af_string_list)
 
   # The number of plots that we want to obtain is the number of hidden layers
   # (L-1) plus the output layer (L in total).
@@ -81,7 +81,6 @@ plot_taylor_and_activation_potentials.list <- function(object,
 
   # get the AF as R functions:
   af_function_list <- string_to_function(af_string_list)
-
 
   # We have to store the output of each layer to use it as input in the next one
   # and use it to compute the activation potentials.
@@ -136,8 +135,9 @@ plot_taylor_and_activation_potentials.list <- function(object,
     # compute the true function
     yf <- fun(x)
     # compute the Taylor approximation
-    pol <- pracma::taylor(fun, 0, min(taylor_orders[k],max_order))
-    yp <- pracma::polyval(pol, x)
+    q <- min(taylor_orders[[k]], max_order)
+    pol <- af_derivatives_list[[k]][1:(q + 1)]
+    yp <- as.vector(outer(x, 0:(length(pol) - 1), "^") %*% pol)
     # compute the error as the absolute value of the difference
     error <- abs(yf - yp)
 

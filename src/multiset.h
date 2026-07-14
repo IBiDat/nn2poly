@@ -8,15 +8,12 @@
 #include <algorithm>
 
 template <typename T>
-using Partition = std::vector<std::vector<T>>;
-
-template <typename T>
 class MultisetPartitions {
   std::vector<T> comp;
   std::vector<int> mult;
 
 public:
-  using value_type = Partition<T>;
+  using value_type = std::vector<std::vector<T>>;
   using pointer = value_type*;
   using reference = value_type&;
 
@@ -45,9 +42,12 @@ public:
 
     explicit operator bool() const { return !done; }
     value_type operator*() { return get(); }
-    pointer operator->() const { return &get(); }
 
-    iterator& operator++() { done = next(); return *this; }
+    iterator& operator++() {
+      done = next();
+      Rcpp::checkUserInterrupt();
+      return *this;
+    }
     iterator operator++(int) { auto it = *this; ++*this; return it; }
 
     friend bool operator==(const iterator& lhs, const iterator& rhs) {
@@ -142,14 +142,13 @@ public:
 
     value_type get() {
       value_type partition;
+      partition.reserve(l + 1);
       for (int i = 0; i <= l; i++) {
         std::vector<T> part;
-        for (int j = f[i]; j < f[i + 1]; j++) {
+        for (int j = f[i]; j < f[i + 1]; j++)
           for (int k = 0; k < v[j]; k++)
             part.push_back(obj->comp[c[j]]);
-          Rcpp::checkUserInterrupt();
-        }
-        partition.push_back(part);
+        partition.push_back(std::move(part));
       }
       return partition;
     }

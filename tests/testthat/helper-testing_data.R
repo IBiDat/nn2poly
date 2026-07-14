@@ -8,7 +8,7 @@ testing_helper_1 <- function(){
   testing_data_1$weights_list[[1]] <- matrix(1,3,2)
   testing_data_1$weights_list[[2]] <- matrix(1,3,2)
   testing_data_1$weights_list[[3]] <- matrix(1,3,1)
-  testing_data_1$af_string_list <- list("softplus", "softplus", "linear")
+  testing_data_1$af_string_list <- c("softplus", "softplus", "linear")
   testing_data_1$taylor_orders <- c(2, 2, 1)
   return(testing_data_1)
 }

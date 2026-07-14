@@ -47,13 +47,6 @@ NULL
 #'
 #' @param ... Ignored.
 #'
-#' @param all_partitions Optional argument containing the needed multipartitions
-#' as list of lists of lists. If set to \code{NULL}, nn2poly will compute said
-#' multipartitions. This step can be computationally expensive when the chosen
-#' polynomial order or the dimension are too high. In such cases, it is
-#' encouraged that the multipartitions are stored and reused when possible.
-#' Default set to \code{NULL}.
-#'
 #' @return Returns an object of class `nn2poly`.
 #'
 #' If \code{keep_layers = FALSE} (default case), it returns a list with two
@@ -121,49 +114,18 @@ nn2poly <- function(object,
                     max_order = 2,
                     keep_layers = FALSE,
                     taylor_orders = 8,
-                    ...,
-                    all_partitions = NULL
-                    ) {
+                    ...) {
   UseMethod("nn2poly")
 }
 
 #' @export
-nn2poly.list <- function(object, ...) {
-  result_raw <- nn2poly_algorithm(object, names(object), ...)
-
-  # Check if object is a single polynomial or a list of polynomials.
-  # This is controlled by keep_layers.
-  bool_layers = is.null(result_raw$labels)
-
-  if(bool_layers){
-    n_items <- length(result_raw)
-    n_layers <- ceiling(n_items/2)
-    result <- list()
-    for (i in 1:n_layers){
-      layer_name <- paste0("layer_", i)
-      result[[layer_name]] <- list()
-      result[[layer_name]][["input"]] <- result_raw[[(2*i-1)]]
-      # Transpose to have polynomials as columns
-      result[[layer_name]][["input"]][["values"]] <-
-        t(result[[layer_name]][["input"]][["values"]])
-      if (2*i <= n_items){
-        result[[layer_name]][["output"]] <- result_raw[[(2*i)]]
-        # Transpose to have polynomials as columns
-        result[[layer_name]][["output"]][["values"]] <-
-          t(result[[layer_name]][["output"]][["values"]])
-      } else {
-        # If there is a linear output, i.e. single polynomial in final layer
-        # and odd number of items, then we repeat the input as the output, as
-        # the activation functions takes no effect on the polynomial
-        result[[layer_name]][["output"]] <- result[[layer_name]][["input"]]
-      }
-    }
-
-  } else {
-    result_raw$values <- t(result_raw$values)
-    result = result_raw
-  }
-
+nn2poly.list <- function(object,
+                         max_order = 2,
+                         keep_layers = FALSE,
+                         taylor_orders = 8,
+                         ...) {
+  result <- nn2poly_algorithm(object, names(object),
+                              max_order, keep_layers, taylor_orders)
   class(result) <- "nn2poly"
   result
 }

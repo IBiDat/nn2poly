@@ -4,14 +4,7 @@
 \alias{nn2poly}
 \title{Obtain polynomial representation}
 \usage{
-nn2poly(
-  object,
-  max_order = 2,
-  keep_layers = FALSE,
-  taylor_orders = 8,
-  ...,
-  all_partitions = NULL
-)
+nn2poly(object, max_order = 2, keep_layers = FALSE, taylor_orders = 8, ...)
 }
 \arguments{
 \item{object}{An object for which the computation of the NN2Poly algorithm is
@@ -51,13 +44,6 @@ value is used, that value is set for each non linear layer and 1 for linear
 at each layer activation function. Default set to \code{8}.}
 
 \item{...}{Ignored.}
-
-\item{all_partitions}{Optional argument containing the needed multipartitions
-as list of lists of lists. If set to \code{NULL}, nn2poly will compute said
-multipartitions. This step can be computationally expensive when the chosen
-polynomial order or the dimension are too high. In such cases, it is
-encouraged that the multipartitions are stored and reused when possible.
-Default set to \code{NULL}.}
 }
 \value{
 Returns an object of class \code{nn2poly}.

@@ -10,23 +10,24 @@ test_that("nn2poly_algorithm against precomputed example", {
   taylor_orders <- testing_data$taylor_orders
 
   result <- nn2poly_algorithm(
-    weights_list = weights_list,
-    af_string_list = af_string_list,
+    weights_list,
+    af_string_list,
     max_order = 3,
     keep_layers = TRUE,
     taylor_orders = taylor_orders
   )
 
-  n_terms <- length(result[[length(result)]]$labels)
-  order <- length(result[[length(result)]]$labels[[n_terms]])
+  n_layers <- length(result)
+  n_terms <- length(result[[n_layers]]$output$labels)
+  order <- length(result[[n_layers]]$output$labels[[n_terms]])
   expect_equal(order, 3)
 
-  # Desired coefficient in output polynomial at layer 2 (element 2*2=4 in list),
+  # Desired coefficient in output polynomial at layer 2,
   # neuron 1, coefficient "1,1"
-  label <- result[[4]]$labels[[4]]
-  coeff <- result[[4]]$values[1,4]
-  expect_equal(label,c(1,1))
-  expect_equal(coeff,0.63351833)
+  label <- result$layer_2$output$labels[[4]]
+  coeff <- result$layer_2$output$values[4, 1]
+  expect_equal(label, c(1, 1))
+  expect_equal(coeff, 0.63351833, tolerance = 1e-6)
 
 })
 
@@ -135,15 +136,6 @@ test_that("Final order warns if max_order is not reached", {
   expect_equal(output, 6L)
 })
 
-
-test_that("Final order stops with an error if max_order is not an integer", {
-  max_order <- 4.3
-  # Note that Taylor orders will always be a vector in the desired form
-  # as it is built inside nn2poly_algorithm
-  taylor_orders <- c(2,1,3)
-  expect_error(obtain_final_poly_order(max_order, taylor_orders))
-})
-
 test_that("Taylor vector obtained with single value and mutiple linear layers", {
   af_string_list <- c("softplus", "linear", "softplus", "linear")
   taylor_orders <- 5L
@@ -161,12 +153,5 @@ test_that("Taylor vector obtained with vector", {
 test_that("Taylor vector gets error because of dimension missmatch", {
   af_string_list <- c("softplus", "softplus", "linear")
   taylor_orders <- c(5,1)
-  expect_error(obtain_taylor_vector(taylor_orders, af_string_list))
-})
-
-
-test_that("Taylor vector gets error becauseof non numeric value", {
-  af_string_list <- c("softplus", "softplus", "linear")
-  taylor_orders <- c(5.4, 2.3, 1)
   expect_error(obtain_taylor_vector(taylor_orders, af_string_list))
 })

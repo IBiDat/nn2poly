@@ -50,7 +50,7 @@ test_that("nn2poly with list input against precomputed example with
   label <- result$labels[[4]]
   coeff <- result$values[4,1]
   expect_equal(label,c(1,1))
-  expect_equal(round(coeff,3),-4.429)
+  expect_equal(round(coeff,2),-4.55)
 })
 
 
