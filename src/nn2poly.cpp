@@ -68,51 +68,33 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
   // As we already have all the coefficient labels, we can loop over them
   // Note that the intercept has to be skipped so start at 1
   for (int coeff_index = 1; coeff_index < n_poly_terms; coeff_index++) {
-    Partition allowed_terms = build_allowed_terms(
-      labels_output[coeff_index], q_previous_layer, pcache);
-    NN2POLY_DEBUG_LOG(4, "[layer", current_layer, "]", DTAG(allowed_terms));
+    const PartitionCounts& pcounts = build_partition_counts(
+      labels_output[coeff_index], q_previous_layer, labels_input_map, pcache);
 
     // Now, use the correctly renamed partitions
     for (int n = 1; n <= q_layer; n++) {
       auto summatory = nn2poly::linalg::zeros(h_l);
 
-      for (const Terms& terms : allowed_terms) {
+      for (const auto& pcount : pcounts) {
         // We now need to check that each partition does not exceed n elements
         // so we have the condition m_0 + ... + m_C = n satisfied.
         // We also need the difference between the n_terms_in_partition
         // with respect to n, so we can add that difference as the exponent
         // of the intercept term. Then we compute this diff:
-        const int difference = n - static_cast<int>(terms.size());
+        const int diff = n - static_cast<int>(pcount.size);
 
         // If this diff is < 0, we skip the partition. This is due to the
         // second restriction to the allowed partitions, that depends on n
-        if (difference < 0)
+        if (diff < 0)
           continue;
 
-        // Index values to compute the multinomial coefficient
-        // This is simply counting how many times each unique term appears,
-        // obtaining the factorials and then doing the product. The terms that
-        // do not appear dont need to be counted as they will be 0, their
-        // factorial 1 and at the end will, not affect the total product.
-        TermSummary term_summary = summarize_terms(terms);
-        Term mult(term_summary.unique_terms.size() + 1, 0);
-        mult[0] = difference;
-        for (size_t i = 0; i < term_summary.unique_terms.size(); i++) {
-          auto it = term_summary.counts.find(term_summary.unique_terms[i]);
-          if (it == term_summary.counts.end())
-            throw std::runtime_error("unique term not found in counts map");
-          mult[i + 1] = it->second;
-        }
-
-        // Now we need to use the labels to get the needed coefficients:
-        const auto idx = in_terms_positions(labels_input_map, term_summary);
         NN2POLY_DEBUG_LOG(5, "[layer", current_layer, "]",
-          DTAG(term_summary), DTAG(mult), DTAG(idx));
+          DTAG(n), DTAG(diff), DTAG(pcount));
 
         // Finally compute the product of coefficients according to multinomial
         // theorem and add it to the summatory
         summatory += nn2poly::linalg::accumulate_partition(
-          coeffs_input, idx, mult, n);
+          coeffs_input, n, diff, pcount.idx, pcount.counts);
       }
       // After the summatory over the partitions has been computed, we need to
       // get its result and multiply by the correspondent derivative value, and

@@ -51,10 +51,13 @@ struct TermQHash {
 
 using TermMap = std::unordered_map<Term, size_t, TermHash>;
 
-struct TermSummary {
-  Terms unique_terms;
-  TermMap counts;
+struct PartitionCount {
+  Term idx;
+  Term counts;
+  size_t size;
 };
+
+using PartitionCounts = std::vector<PartitionCount>;
 
 struct TermEquivalence {
   Term signature;

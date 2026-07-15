@@ -105,7 +105,7 @@ std::ostream& operator<<(std::ostream& os, const Printable<std::vector<T>>& p) {
       << #M2 ": " << nn2poly::detail::Printable<decltype(s.M2)>{s.M2, 0} \
       << "}"; \
   }
-NN2POLY_DEFINE_PRINTABLE_STRUCT_2(TermSummary, unique_terms, counts)
+NN2POLY_DEFINE_PRINTABLE_STRUCT_2(PartitionCount, idx, counts)
 NN2POLY_DEFINE_PRINTABLE_STRUCT_2(TermEquivalence, signature, canonical_order)
 
 namespace nn2poly {
@@ -210,7 +210,7 @@ using unordered_map = std::unordered_map<Key, T, Hash, KeyEqual, Allocator>;
 struct PartitionCache {
   detail::unordered_map<Term, Partition, TermHash> signature;
   detail::unordered_map<TermQ, Partition, TermQHash> filtered;
-  detail::unordered_map<TermQ, Partition, TermQHash> renamed;
+  detail::unordered_map<TermQ, PartitionCounts, TermQHash> pcounts;
 
 #ifdef NN2POLY_DEBUG
   struct DebugProxy {
@@ -221,12 +221,12 @@ struct PartitionCache {
       os << "[cache]";
       if (proxy.delta) {
         os << "[delta]"
-          << " renamed " << proxy.pcache->renamed.delta()
+          << " pcounts " << proxy.pcache->pcounts.delta()
           << " filtered " << proxy.pcache->filtered.delta()
           << " signature " << proxy.pcache->signature.delta();
       } else {
         os << "[total]"
-          << " renamed " << proxy.pcache->renamed.total()
+          << " pcounts " << proxy.pcache->pcounts.total()
           << " filtered " << proxy.pcache->filtered.total()
           << " signature " << proxy.pcache->signature.total();
       }

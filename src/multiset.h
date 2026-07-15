@@ -17,12 +17,15 @@ public:
   using pointer = value_type*;
   using reference = value_type&;
 
-  MultisetPartitions(std::multiset<T>& mset) {
+  MultisetPartitions(const std::multiset<T>& mset) {
     for (auto i: std::set<T>(mset.begin(), mset.end())) {
       comp.push_back(i);
       mult.push_back(mset.count(i));
     }
   }
+
+  MultisetPartitions(const std::vector<T>& vec)
+    : MultisetPartitions(std::multiset<T>(vec.begin(), vec.end())) {}
 
   struct iterator;
   iterator begin() { return iterator(this); }
@@ -152,8 +155,8 @@ public:
 };
 
 template <typename T>
-MultisetPartitions<T> multiset_partitions(std::multiset<T>& mset) {
-  return MultisetPartitions<T>(mset);
+MultisetPartitions<T> multiset_partitions(const std::vector<T>& vec) {
+  return MultisetPartitions<T>(vec);
 }
 
 #endif
