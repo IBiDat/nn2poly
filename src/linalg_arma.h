@@ -11,6 +11,7 @@ using Weights = arma::mat;
 using Vector = arma::vec;
 
 inline int n_rows(const Weights& m) { return m.n_rows; }
+inline int n_cols(const Weights& m) { return m.n_cols; }
 
 inline Weights zeros(int rows, int cols) {
   return arma::zeros<Weights>(rows, cols);
@@ -36,7 +37,7 @@ inline void add_partition(Weights& mat, int i, double scalar, const Vector& vec)
 
 inline void add_poly_eval(Weights& mat, int i,
                           const Weights& in, const Coeffs& g, int q) {
-  if (q < 0) throw std::invalid_argument("negative q in add_peval");
+  if (q < 0) throw std::invalid_argument("negative q in add_poly_eval");
 
   // Horner's method: work backwards down to the constant term
   Vector result(in.n_rows, arma::fill::value(g[q]));
@@ -45,19 +46,14 @@ inline void add_poly_eval(Weights& mat, int i,
   mat.col(i) += result;
 }
 
-inline Vector accumulate_partition(const Weights& coeffs_input, int n, int d,
+inline Vector accumulate_partition(const Weights& coeffs_input, int d,
                                    const Term& idx, const Term& mult) {
   if (idx.empty()) throw std::invalid_argument("empty idx in accumulate_partition");
 
   Weights needed = coeffs_input.cols(arma::conv_to<arma::uvec>::from(idx));
   for (unsigned int i = 0; i < needed.n_cols; ++i)
     needed.col(i) = arma::pow(needed.col(i), mult[i]);
-
-  // Compute the multinomial coefficient
-  double m_coef = factorials[n] / factorials[d];
-  for (int m : mult) m_coef /= factorials[m];
-
-  return m_coef * (arma::prod(needed, 1) % arma::pow(coeffs_input.col(0), d));
+  return arma::prod(needed, 1) % arma::pow(coeffs_input.col(0), d);
 }
 
 } // namespace linalg

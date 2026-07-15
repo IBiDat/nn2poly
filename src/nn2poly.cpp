@@ -1,6 +1,7 @@
 #include "partitions.h"
 #include "multiset.h"
 #include "taylor.h"
+using namespace nn2poly::linalg;
 
 // [[Rcpp::export]]
 Term obtain_taylor_vector(const Term& taylor_orders,
@@ -56,12 +57,12 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
 
   // Number of terms, number of neurons h_l, output matrix
   const int n_poly_terms = static_cast<int>(labels_output.size());
-  const int h_l = nn2poly::linalg::n_rows(coeffs_input);
-  Weights coeffs_output = nn2poly::linalg::zeros(h_l, n_poly_terms);
+  const int h_l = n_rows(coeffs_input);
+  Weights coeffs_output = zeros(h_l, n_poly_terms);
 
   ////////// Intercept //////////
 
-  nn2poly::linalg::add_poly_eval(coeffs_output, 0, coeffs_input, g, q_layer);
+  add_poly_eval(coeffs_output, 0, coeffs_input, g, q_layer);
 
   ////////// Rest of the coefficients //////////
 
@@ -73,7 +74,7 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
 
     // Now, use the correctly renamed partitions
     for (int n = 1; n <= q_layer; n++) {
-      auto summatory = nn2poly::linalg::zeros(h_l);
+      auto summatory = zeros(h_l);
 
       for (const auto& pcount : pcounts) {
         // We now need to check that each partition does not exceed n elements
@@ -93,14 +94,17 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
 
         // Finally compute the product of coefficients according to multinomial
         // theorem and add it to the summatory
-        summatory += nn2poly::linalg::accumulate_partition(
-          coeffs_input, n, diff, pcount.idx, pcount.counts);
+        double m_coef = factorials[n] / factorials[diff];
+        for (int m : pcount.counts) m_coef /= factorials[m];
+
+        summatory += m_coef * accumulate_partition(
+          coeffs_input, diff, pcount.idx, pcount.counts);
       }
       // After the summatory over the partitions has been computed, we need to
       // get its result and multiply by the correspondent derivative value, and
       // add to the already stored values, here we are computing the summatory
       // over n.
-      nn2poly::linalg::add_partition(coeffs_output, coeff_index, g[n], summatory);
+      add_partition(coeffs_output, coeff_index, g[n], summatory);
     }
     CHECK_INTERRUPT();
   }
@@ -128,7 +132,7 @@ Weights alg_non_linear(const Weights& coeffs_input, const Terms& labels_input,
 
 inline void check_weights_dimensions(const Layers& layers) {
   for (size_t i = 1; i < layers.size(); i++) {
-    if (layers[i].n_rows != layers[i - 1].n_cols + 1)
+    if (n_rows(layers[i]) != n_cols(layers[i - 1]) + 1)
       throw std::invalid_argument(
         "the list of weights has incorrect dimensions, "
         "please check the right dimmensions in the documentation");
@@ -149,7 +153,7 @@ List nn2poly_algorithm(const Layers& layers, const Functions& af_list,
   check_weights_dimensions(layers);
 
   // Dimension p, layers L (L-1 hidden + 1 output, input is denoted by 0)
-  const int p = static_cast<int>(layers[0].n_rows) - 1;
+  const int p = static_cast<int>(n_rows(layers[0])) - 1;
   const int L = static_cast<int>(af_list.size());
   const bool last_linear = (af_list.back() == "linear");
 
@@ -190,8 +194,8 @@ List nn2poly_algorithm(const Layers& layers, const Functions& af_list,
 
     ////////// Linear case //////////
     // Apply the weights for the first layer, or linear algorithm
-    coeffs_list = (current_layer == 1) ? nn2poly::linalg::trans(layers[0])
-      : nn2poly::linalg::alg_linear(coeffs_list, layers[current_layer - 1]);
+    coeffs_list = (current_layer == 1) ? trans(layers[0])
+      : alg_linear(coeffs_list, layers[current_layer - 1]);
 
     // Save results and check if finished
     results[2 * current_layer - 2] = WeightsList{labels_list, coeffs_list};
