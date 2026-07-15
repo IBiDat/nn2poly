@@ -280,7 +280,5 @@ multiply_variables <- function(label, newdata){
 
   # Perform the product of al values involved in the monomial determined by the
   # label
-  var_prod <- matrixStats::rowProds(M)
-
-  return(var_prod)
+  apply(M, 1, prod)
 }
