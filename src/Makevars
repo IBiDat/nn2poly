@@ -1,1 +1,4 @@
 PKG_LIBS = $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
+# LIBTORCH = $(wildcard $(TORCH_HOME))
+# PKG_LIBS += -L$(LIBTORCH)/lib -Wl,-rpath,$(LIBTORCH)/lib -ltorch -ltorch_cpu -lc10
+# PKG_CPPFLAGS += -I$(LIBTORCH)/include -I$(LIBTORCH)/include/torch/csrc/api/include

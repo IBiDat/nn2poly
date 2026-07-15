@@ -18,6 +18,12 @@ inline constexpr std::array<double, 171> factorials = precompute_factorials();
 } // namespace linalg
 } // namespace nn2poly
 
-#include "linalg_arma.h"
+// [[Rcpp::depends(RcppArmadillo)]]
+#include <RcppArmadillo.h>
+#ifndef NN2POLY_USE_TORCH
+  #include "linalg_arma.h"
+#else
+  #include "linalg_torch.h"
+#endif
 
 #endif

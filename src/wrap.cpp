@@ -12,7 +12,7 @@ List wrap(const PartitionsList& data) {
 List wrap(const WeightsList& data) {
   return List::create(
     _["labels"] = data.labels,
-    _["values"] = nn2poly::linalg::trans(data.values)
+    _["values"] = wrap(nn2poly::linalg::trans(data.values))
     // Transpose to have polynomials as columns
   );
 }
@@ -44,5 +44,27 @@ List wrap(const WeightsLists& data) {
   out.attr("names") = out_names;
   return out;
 }
+
+#ifdef TORCH_VERSION
+
+template <>
+torch::Tensor as(SEXP x) {
+  NumericMatrix data(x);
+  return torch::from_blob(const_cast<double*>(data.begin()),
+    {data.nrow(), data.ncol()}, {1, data.nrow()}, torch::kFloat64
+  ).clone();
+}
+
+NumericMatrix wrap(const torch::Tensor& data) {
+  torch::Tensor cpu_t = data.to(torch::kCPU).to(torch::kFloat64).contiguous();
+  int rows = cpu_t.size(0);
+  int cols = cpu_t.size(1);
+  NumericMatrix r_mat(rows, cols);
+  double* src_ptr = cpu_t.data_ptr<double>();
+  std::copy(src_ptr, src_ptr + (rows * cols), r_mat.begin());
+  return r_mat;
+}
+
+#endif
 
 }

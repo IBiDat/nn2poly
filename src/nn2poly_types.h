@@ -83,8 +83,6 @@ struct WeightsList {
 
 using WeightsLists = std::vector<WeightsList>;
 
-#include <Rcpp.h>
-
 #define CHECK_INTERRUPT() Rcpp::checkUserInterrupt()
 using List = Rcpp::List;
 

@@ -1,9 +1,6 @@
 #ifndef nn2poly__linalg_arma_h
 #define nn2poly__linalg_arma_h
 
-// [[Rcpp::depends(RcppArmadillo)]]
-#include <RcppArmadillo.h>
-
 namespace nn2poly {
 namespace linalg {
 

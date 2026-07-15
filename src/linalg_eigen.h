@@ -1,9 +1,6 @@
 #ifndef nn2poly__linalg_eigen_h
 #define nn2poly__linalg_eigen_h
 
-// [[Rcpp::depends(RcppEigen)]]
-#include <RcppEigen.h>
-
 namespace nn2poly {
 namespace linalg {
 
