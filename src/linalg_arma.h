@@ -50,9 +50,8 @@ inline Vector accumulate_partition(const Weights& coeffs_input, int n, int d,
   if (idx.empty()) throw std::invalid_argument("empty idx in accumulate_partition");
 
   Weights needed = coeffs_input.cols(arma::conv_to<arma::uvec>::from(idx));
-  Term exponents(mult.begin(), mult.end());
   for (unsigned int i = 0; i < needed.n_cols; ++i)
-    needed.col(i) = arma::pow(needed.col(i), exponents[i]);
+    needed.col(i) = arma::pow(needed.col(i), mult[i]);
 
   // Compute the multinomial coefficient
   double m_coef = factorials[n] / factorials[d];
