@@ -69,7 +69,7 @@ add_constraints <- function(object, type = c("l1_norm", "l2_norm"), ...) {
 
 .add_constraints <- function(object, type = c("l1_norm", "l2_norm"), ...) {
   attr(object, "constraint") <- match.arg(type)
-  class(object) <- c("nn2poly", class(object))
+  class(object) <- c("nn2poly_constrained", class(object))
   object
 }
 
