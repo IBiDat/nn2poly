@@ -65,6 +65,7 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
 
     // Now, use the correctly renamed partitions
     for (int n = 1; n <= q_layer; n++) {
+      if (g[n] == 0) continue;
       auto summatory = zeros(h_l);
 
       for (const auto& pcount : pcounts) {
@@ -80,7 +81,7 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
         if (diff < 0)
           continue;
 
-        NN2POLY_DEBUG_LOG(5, DTAG(n), DTAG(diff), DTAG(pcount));
+        NN2POLY_DEBUG_LOG(5, DTAG(n), DTAG(diff), DTAG(g[n]), DTAG(pcount));
 
         // Finally compute the product of coefficients according to multinomial
         // theorem and add it to the summatory

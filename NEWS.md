@@ -2,7 +2,7 @@
 
 - Implement print method for nn2poly objects.
 - Add missing registration for internal S3 methods.
-- New optimized algorithm in C++(#77, #79, addressing #8, #9, #15, #47, #50):
+- New optimized algorithm in C++(#77, #79, #81 addressing #8, #9, #15, #47, #50):
   - New integrated way to generate, filter, rename and count partitions.
   - New transparent 3-level cache for partitions.
   - New comprehensive debugging system.
