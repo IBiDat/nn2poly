@@ -44,17 +44,8 @@ CoeffsList obtain_derivatives_list(const Term& taylor_orders,
 Weights alg_non_linear_impl(const Weights& coeffs_input,
                             const TermMap& labels_input_map,
                             const Terms& labels_output,
-                            const Term& taylor_orders,
-                            int current_layer, const Coeffs& g,
-                            PartitionCache& pcache) {
-  // Extract the needed parameters and values:
-  const int q_layer = taylor_orders[current_layer - 1];
-  int q_previous_layer = 1;
-  if (current_layer != 1)
-    q_previous_layer = taylor_orders[current_layer - 2];
-  NN2POLY_DEBUG_LOG(2, "[layer", current_layer, "]",
-    DTAG(q_layer), DTAG(q_previous_layer), DTAG(labels_output.size()));
-
+                            const int previous_order, const int q_layer,
+                            const Coeffs& g, PartitionCache& pcache) {
   // Number of terms, number of neurons h_l, output matrix
   const int n_poly_terms = static_cast<int>(labels_output.size());
   const int h_l = n_rows(coeffs_input);
@@ -70,7 +61,7 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
   // Note that the intercept has to be skipped so start at 1
   for (int coeff_index = 1; coeff_index < n_poly_terms; coeff_index++) {
     const PartitionCounts& pcounts = build_partition_counts(
-      labels_output[coeff_index], q_previous_layer, labels_input_map, pcache);
+      labels_output[coeff_index], previous_order, labels_input_map, pcache);
 
     // Now, use the correctly renamed partitions
     for (int n = 1; n <= q_layer; n++) {
@@ -89,8 +80,7 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
         if (diff < 0)
           continue;
 
-        NN2POLY_DEBUG_LOG(5, "[layer", current_layer, "]",
-          DTAG(n), DTAG(diff), DTAG(pcount));
+        NN2POLY_DEBUG_LOG(5, DTAG(n), DTAG(diff), DTAG(pcount));
 
         // Finally compute the product of coefficients according to multinomial
         // theorem and add it to the summatory
@@ -113,9 +103,11 @@ Weights alg_non_linear_impl(const Weights& coeffs_input,
 }
 
 // [[Rcpp::export]]
-Weights alg_non_linear(const Weights& coeffs_input, const Terms& labels_input,
-                       const Terms& labels_output, const Term& taylor_orders,
-                       int current_layer, const Coeffs& g) {
+Weights alg_non_linear(const Weights& coeffs_input,
+                       const Terms& labels_input,
+                       const Terms& labels_output,
+                       const int previous_order, const int q_layer,
+                       const Coeffs& g) {
   PartitionCache pcache;
   TermMap labels_map;
   for (size_t i = 0; i < labels_input.size(); i++)
@@ -124,8 +116,8 @@ Weights alg_non_linear(const Weights& coeffs_input, const Terms& labels_input,
     coeffs_input,
     labels_map,
     labels_output,
-    taylor_orders,
-    current_layer,
+    previous_order,
+    q_layer,
     g, pcache
   );
 }
@@ -190,16 +182,16 @@ List nn2poly_algorithm(const Layers& layers, const Functions& af_list,
   // Note that the loop will iterate the current layer from 1 to L
   // and compute the linear and then non linear situation.
 
-  for (int current_layer = 1; current_layer <= L; current_layer++) {
+  for (int l = 1; l <= L; l++) {
 
     ////////// Linear case //////////
     // Apply the weights for the first layer, or linear algorithm
-    coeffs_list = (current_layer == 1) ? trans(layers[0])
-      : alg_linear(coeffs_list, layers[current_layer - 1]);
+    coeffs_list = (l == 1) ? trans(layers[0])
+      : alg_linear(coeffs_list, layers[l - 1]);
 
     // Save results and check if finished
-    results[2 * current_layer - 2] = WeightsList{labels_list, coeffs_list};
-    if (current_layer == L && last_linear)
+    results[2 * l - 2] = WeightsList{labels_list, coeffs_list};
+    if (l == L && last_linear)
       goto out;
 
     ////////// Non linear case //////////
@@ -213,7 +205,8 @@ List nn2poly_algorithm(const Layers& layers, const Functions& af_list,
     // The new labels will be for monomials of orders between the total order
     // of the previous polynomial and the total order of the new polynomial:
     int previous_order = new_order;
-    new_order = std::min(previous_order * taylor[current_layer - 1], max_order);
+    int q_layer = taylor[l - 1];
+    new_order = std::min(previous_order * q_layer, max_order);
 
     // Update map with new labels, if any
     for (size_t i = labels_map.size(); i < labels_list.size(); i++)
@@ -226,21 +219,23 @@ List nn2poly_algorithm(const Layers& layers, const Functions& af_list,
         for (const Term& term : comb) labels_list.push_back(term);
       }
 
+    NN2POLY_DEBUG_LOG(2, "[layer", l, "]",
+      DTAG(previous_order), DTAG(q_layer), DTAG(labels_list.size()));
     // Apply non-linear algorithm
     coeffs_list = alg_non_linear_impl(
       coeffs_list,
       labels_map,
       labels_list,
-      taylor,
-      current_layer,
-      af_dlist[current_layer - 1],
+      previous_order,
+      q_layer,
+      af_dlist[l - 1],
       pcache
     );
-    NN2POLY_DEBUG_LOG(1, "[layer", current_layer, "]", pcache.debug(true));
+    NN2POLY_DEBUG_LOG(2, "[layer", l, "]", pcache.debug(true));
 
     // Save results and check if finished
-    results[2 * current_layer - 1] = WeightsList{labels_list, coeffs_list};
-    if (current_layer == L && !last_linear)
+    results[2 * l - 1] = WeightsList{labels_list, coeffs_list};
+    if (l == L && !last_linear)
       goto out;
   }
 
