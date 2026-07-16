@@ -189,7 +189,7 @@ print.nn2poly <- function(x, ...) {
   for (i in seq_along(layers)[-length(layers)]) {
     layers[[i]]$labels <- NULL
     z <- matrix(0, nrow = n_coeff - nrow(layers[[i]]), ncol = ncol(layers[[i]]))
-    z <- setNames(as.data.frame(z), names(layers[[i]]))
+    z <- stats::setNames(as.data.frame(z), names(layers[[i]]))
     layers[[i]] <- rbind(layers[[i]], z)
   }
   # move the labels to the first layer
