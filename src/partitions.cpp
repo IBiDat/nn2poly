@@ -152,7 +152,7 @@ PartitionCounts parts_counting(const TermEquivalence& eq, int q,
     ren_terms.reserve(terms.size());
     for (const Term& term : terms) {
       Term ren_term;
-      ren_terms.reserve(term.size());
+      ren_term.reserve(term.size());
       for (int rank : term)
         ren_term.push_back(eq.canonical_order[rank - 1]);
       std::sort(ren_term.begin(), ren_term.end());
