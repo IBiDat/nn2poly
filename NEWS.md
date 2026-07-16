@@ -10,6 +10,7 @@
   - Fixes a long-standing bug in label-to-column matching for indexing
     which caused wrong results in some high-order monomials.
   - Rename class for constrained NN objects to avoid method collision.
+- Fix order propagation across layers (#80 addressing #78).
 
 # nn2poly 0.1.3
 

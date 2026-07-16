@@ -37,18 +37,18 @@ BEGIN_RCPP
 END_RCPP
 }
 // alg_non_linear
-Weights alg_non_linear(const Weights& coeffs_input, const Terms& labels_input, const Terms& labels_output, const Term& taylor_orders, int current_layer, const Coeffs& g);
-RcppExport SEXP _nn2poly_alg_non_linear(SEXP coeffs_inputSEXP, SEXP labels_inputSEXP, SEXP labels_outputSEXP, SEXP taylor_ordersSEXP, SEXP current_layerSEXP, SEXP gSEXP) {
+Weights alg_non_linear(const Weights& coeffs_input, const Terms& labels_input, const Terms& labels_output, const int previous_order, const int q_layer, const Coeffs& g);
+RcppExport SEXP _nn2poly_alg_non_linear(SEXP coeffs_inputSEXP, SEXP labels_inputSEXP, SEXP labels_outputSEXP, SEXP previous_orderSEXP, SEXP q_layerSEXP, SEXP gSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Weights& >::type coeffs_input(coeffs_inputSEXP);
     Rcpp::traits::input_parameter< const Terms& >::type labels_input(labels_inputSEXP);
     Rcpp::traits::input_parameter< const Terms& >::type labels_output(labels_outputSEXP);
-    Rcpp::traits::input_parameter< const Term& >::type taylor_orders(taylor_ordersSEXP);
-    Rcpp::traits::input_parameter< int >::type current_layer(current_layerSEXP);
+    Rcpp::traits::input_parameter< const int >::type previous_order(previous_orderSEXP);
+    Rcpp::traits::input_parameter< const int >::type q_layer(q_layerSEXP);
     Rcpp::traits::input_parameter< const Coeffs& >::type g(gSEXP);
-    rcpp_result_gen = Rcpp::wrap(alg_non_linear(coeffs_input, labels_input, labels_output, taylor_orders, current_layer, g));
+    rcpp_result_gen = Rcpp::wrap(alg_non_linear(coeffs_input, labels_input, labels_output, previous_order, q_layer, g));
     return rcpp_result_gen;
 END_RCPP
 }

@@ -111,3 +111,17 @@ test_that("nn2poly error when wrong dimensions are given in weights", {
 
   expect_error(nn2poly(object = object))
 })
+
+test_that("order of the output polynomials increase across layers", {
+  set.seed(1234)
+  result <- nn2poly(list(
+    "tanh" = matrix(rnorm(6, sd=0.1), nrow = 3, ncol = 2),
+    "softplus" = matrix(rnorm(6, sd=0.1), nrow = 3, ncol = 2),
+    "tanh" = matrix(rnorm(6, sd=0.1), nrow = 3, ncol = 2),
+    "softplus" = matrix(rnorm(6, sd=0.1), nrow = 3, ncol = 2),
+    "softplus" = matrix(rnorm(6, sd=0.1), nrow = 3, ncol = 2),
+    "linear" = matrix(rnorm(3, sd=0.1), nrow = 3, ncol = 1)
+  ), max_order = 10, taylor_orders = 3, keep_layers = TRUE)
+
+  expect_true(tail(result$layer_6$output$values, 1) != 0)
+})
