@@ -112,9 +112,6 @@ predict.nn2poly <- function(object,
                             monomials = FALSE,
                             layers = NULL,
                             ...) {
-  if (length(class(object)) > 1)
-    return(NextMethod())
-
   # Check if object is a single polynomial or a list of polynomials.
   # If we get only the output layer, then it has to be a list with 2 elements,
   # values and labels. We check one of them:
@@ -192,7 +189,7 @@ print.nn2poly <- function(x, ...) {
   for (i in seq_along(layers)[-length(layers)]) {
     layers[[i]]$labels <- NULL
     z <- matrix(0, nrow = n_coeff - nrow(layers[[i]]), ncol = ncol(layers[[i]]))
-    z <- setNames(as.data.frame(z), names(layers[[i]]))
+    z <- stats::setNames(as.data.frame(z), names(layers[[i]]))
     layers[[i]] <- rbind(layers[[i]], z)
   }
   # move the labels to the first layer
@@ -280,32 +277,22 @@ print.nn2poly <- function(x, ...) {
 #'
 #' @export
 plot.nn2poly <- function(x, ..., n=NULL) {
-  if (length(class(x)) > 1)
-    return(NextMethod())
-
-  if (!requireNamespace("ggplot2", quietly = TRUE)) {
+  if (!requireNamespace("ggplot2", quietly = TRUE))
     stop("package 'ggplot2' is required for this functionality", call. = FALSE)
-  }
-
-  if (!requireNamespace("patchwork", quietly = TRUE)) {
+  if (!requireNamespace("patchwork", quietly = TRUE))
     stop("package 'patchwork' is required for this functionality", call. = FALSE)
-  }
 
   # a special case is needed for the case in which the polynomial was generated
   # with `keep_layers = TRUE`
-
-  if (is.null(x$values)) {
+  if (is.null(x$values))
     x <- x[[length(x)]][["output"]]
-  }
 
   # Check if x$values is a vector and transform it into a column matrix
-  if (is.vector(x$values)){
+  if (is.vector(x$values))
     x$values <- matrix(x$values, ncol = 1)
-  }
 
-  if (is.null(n)) {
+  if (is.null(n))
     n <- dim(x$values)[1]
-  }
 
   # Transpose values to be polynomials as rows instead of columns
   # Needed to work as in previous nn2poly output format
@@ -342,11 +329,8 @@ plot.nn2poly <- function(x, ..., n=NULL) {
     all_df <- rbind(all_df, df)
   }
   # If a coefficient is exactly 0, assign it to positive
-  if (any(all_df$sign == 0)){
+  if (any(all_df$sign == 0))
     all_df$sign[which(all_df$sign==0)] = 1
-  }
-
-
 
   # Define different scale for multiple or single sign cases.
   if (all(levels(all_df$sign) == c("-1", "1"))){
@@ -378,9 +362,8 @@ plot.nn2poly <- function(x, ..., n=NULL) {
     ggplot2::geom_bar(stat = "identity", colour = "black", alpha = 1) +
     ggplot2::scale_x_discrete(labels = reorder_func)
 
-  if (n_polys >1){
+  if (n_polys >1)
     plot_all <- plot_all + ggplot2::facet_wrap(~type, scales = "free_x")
-  }
 
   plot_all <- plot_all +
     cowplot::theme_half_open() +

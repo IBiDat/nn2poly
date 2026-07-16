@@ -23,8 +23,7 @@ Encoding: UTF-8
 Depends: R (>= 3.5.0)
 Imports:
     Rcpp,
-    generics,
-    matrixStats
+    generics
 Suggests:
     keras, tensorflow, reticulate,
     luz, torch,

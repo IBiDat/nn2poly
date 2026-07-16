@@ -54,7 +54,7 @@ Coeffs coeffs_taylor(const std::string& af, int order) {
     return coeffs_taylor_softplus(order);
   if (af == "linear")
     return coeffs_taylor_linear(order);
-  throw std::invalid_argument("Function '" + af + "' not supported");
+  throw std::invalid_argument("function '" + af + "' not supported");
 }
 
 #endif
