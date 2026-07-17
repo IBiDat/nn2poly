@@ -12,8 +12,8 @@ jobs:
       matrix:
         tf:     ['2.15']
         config:
-        #- {os: macOS-latest, r: 'release', arch: 'x86'}
-        #- {os: macOS-latest, r: 'release', arch: 'arm64'}
+        - {os: macOS-latest, r: 'release', arch: 'x86'}
+        - {os: macOS-latest, r: 'release', arch: 'arm64'}
         - {os: windows-latest, r: 'release'}
         - {os: ubuntu-latest, r: 'devel', http-user-agent: 'release'}
         - {os: ubuntu-latest, r: 'release', covr: 'yes'}
@@ -40,7 +40,7 @@ jobs:
     - name: Miniconda + Tensorflow + Keras + Torch installation
       run: |
         reticulate::install_miniconda()
-        keras::install_keras(tensorflow = '${{ matrix.tf }}-cpu')
+        keras::install_keras(tensorflow = '${{ matrix.tf }}')
         torch::install_torch()
       shell: Rscript {0}
 
