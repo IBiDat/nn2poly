@@ -23,9 +23,9 @@ inline Weights trans(const Weights& mat) {
 }
 
 inline Weights alg_linear(Weights& coeffs_list, const Weights& layer) {
-  arma::rowvec intercept = arma::zeros<arma::rowvec>(coeffs_list.n_cols);
-  intercept[0] = 1.0;
-  return arma::trans(layer) * arma::join_cols(intercept, coeffs_list);
+  Weights mat = layer.rows(1, layer.n_rows - 1).t() * coeffs_list;
+  mat.col(0) += layer.row(0).t();
+  return mat;
 }
 
 inline void add_partition(Weights& mat, int i, double scalar, const Vector& vec) {

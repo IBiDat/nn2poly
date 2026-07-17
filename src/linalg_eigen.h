@@ -11,11 +11,11 @@ inline int n_rows(const Weights& m) { return m.rows(); }
 inline int n_cols(const Weights& m) { return m.cols(); }
 
 inline Weights zeros(int rows, int cols) {
-  return Eigen::MatrixXd::Zero(rows, cols);
+  return Weights::Zero(rows, cols);
 }
 
 inline Vector zeros(int size) {
-  return Eigen::VectorXd::Zero(size);
+  return Vector::Zero(size);
 }
 
 inline Weights trans(const Weights& mat) {
@@ -23,11 +23,9 @@ inline Weights trans(const Weights& mat) {
 }
 
 inline Weights alg_linear(const Weights& coeffs_list, const Weights& layer) {
-  Weights joined(coeffs_list.rows() + 1, coeffs_list.cols());
-  joined.row(0).setZero();
-  joined(0, 0) = 1.0;
-  joined.bottomRows(coeffs_list.rows()) = coeffs_list;
-  return layer.transpose() * joined;
+  Weights mat = layer.bottomRows(layer.rows() - 1).transpose() * coeffs_list;
+  mat.col(0) += layer.row(0).transpose();
+  return mat;
 }
 
 inline void add_partition(Weights& mat, int i, double scalar, const Vector& vec) {
