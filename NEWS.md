@@ -1,3 +1,7 @@
+# nn2poly 1.0.1
+
+- Fix UB in hash implementation (#84).
+
 # nn2poly 1.0.0
 
 - Implement print method for nn2poly objects.
