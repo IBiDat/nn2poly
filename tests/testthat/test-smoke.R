@@ -12,7 +12,7 @@ smoke_test_data <- function() {
 # This script computes every coefficient explicitly. It intentionally does
 # not use nn2poly, symbolic algebra, loops, or a generic polynomial product.
 
-smoke_test_manual <- function(data) {
+smoke_test_manual <- function(data, taylor_center=0) {
 
   # Network weights ---------------------------------------------------------
   # The first value in each weight vector is the bias.
@@ -35,55 +35,169 @@ smoke_test_manual <- function(data) {
   w2 <- c(bias = b0, x1 = b1, x2 = b2, x3 = b3)
   w3 <- c(bias = w30, c = w31, d = w32)
 
-  # Taylor approximation and polynomial truncation -------------------------
+  # Fifth-order Taylor expansion of tanh at z = taylor_center ---------------
   #
-  #   T5(z) = z - z^3 / 3 + 2*z^5 / 15.
+  # tanh(z) is approximated by
   #
-  # Only monomials in x1, x2, x3 of total degree at most 4 are retained.
-  # The factors 3 and 6 below come from the expansion of p^3. The factors
-  # 5, 10, 20, 30 and 60 come from the expansion of p^5.
+  #   tau0 + tau1*q + tau2*q^2 + tau3*q^3 + tau4*q^4 + tau5*q^5,
+  #
+  # where q = z - taylor_center and tau_k = tanh^(k)(taylor_center) / k!.
 
-  # Hidden neuron 1: c = T5(a), retaining degree <= 4 ----------------------
+  tanh_center <- tanh(taylor_center)
 
-  c0 <- a0 - a0^3 / 3 + (2 * a0^5) / 15
+  tau0 <- tanh_center
+  tau1 <- 1 - tanh_center^2
+  tau2 <- (-2 * tanh_center + 2 * tanh_center^3) / 2
+  tau3 <- (-2 + 8 * tanh_center^2 - 6 * tanh_center^4) / 6
+  tau4 <- (
+    16 * tanh_center - 40 * tanh_center^3 + 24 * tanh_center^5
+  ) / 24
+  tau5 <- (
+    16 - 136 * tanh_center^2 + 240 * tanh_center^4 -
+      120 * tanh_center^6
+  ) / 120
 
-  c1 <- a1 - (3 * a0^2 * a1) / 3 + (2 * 5 * a0^4 * a1) / 15
-  c2 <- a2 - (3 * a0^2 * a2) / 3 + (2 * 5 * a0^4 * a2) / 15
-  c3 <- a3 - (3 * a0^2 * a3) / 3 + (2 * 5 * a0^4 * a3) / 15
+  taylor_coefficients <- c(
+    order_0 = tau0,
+    order_1 = tau1,
+    order_2 = tau2,
+    order_3 = tau3,
+    order_4 = tau4,
+    order_5 = tau5
+  )
 
-  c11 <- -(3 * a0 * a1^2) / 3 + (2 * 10 * a0^3 * a1^2) / 15
-  c12 <- -(6 * a0 * a1 * a2) / 3 + (2 * 20 * a0^3 * a1 * a2) / 15
-  c13 <- -(6 * a0 * a1 * a3) / 3 + (2 * 20 * a0^3 * a1 * a3) / 15
-  c22 <- -(3 * a0 * a2^2) / 3 + (2 * 10 * a0^3 * a2^2) / 15
-  c23 <- -(6 * a0 * a2 * a3) / 3 + (2 * 20 * a0^3 * a2 * a3) / 15
-  c33 <- -(3 * a0 * a3^2) / 3 + (2 * 10 * a0^3 * a3^2) / 15
+  # Shifted intercepts used only in q = z - taylor_center.
 
-  c111 <- -a1^3 / 3 + (2 * 10 * a0^2 * a1^3) / 15
-  c112 <- -(3 * a1^2 * a2) / 3 + (2 * 30 * a0^2 * a1^2 * a2) / 15
-  c113 <- -(3 * a1^2 * a3) / 3 + (2 * 30 * a0^2 * a1^2 * a3) / 15
-  c122 <- -(3 * a1 * a2^2) / 3 + (2 * 30 * a0^2 * a1 * a2^2) / 15
-  c123 <- -(6 * a1 * a2 * a3) / 3 + (2 * 60 * a0^2 * a1 * a2 * a3) / 15
-  c133 <- -(3 * a1 * a3^2) / 3 + (2 * 30 * a0^2 * a1 * a3^2) / 15
-  c222 <- -a2^3 / 3 + (2 * 10 * a0^2 * a2^3) / 15
-  c223 <- -(3 * a2^2 * a3) / 3 + (2 * 30 * a0^2 * a2^2 * a3) / 15
-  c233 <- -(3 * a2 * a3^2) / 3 + (2 * 30 * a0^2 * a2 * a3^2) / 15
-  c333 <- -a3^3 / 3 + (2 * 10 * a0^2 * a3^3) / 15
+  a0_centered <- a0 - taylor_center
+  b0_centered <- b0 - taylor_center
 
-  c1111 <- (2 * 5 * a0 * a1^4) / 15
-  c1112 <- (2 * 20 * a0 * a1^3 * a2) / 15
-  c1113 <- (2 * 20 * a0 * a1^3 * a3) / 15
-  c1122 <- (2 * 30 * a0 * a1^2 * a2^2) / 15
-  c1123 <- (2 * 60 * a0 * a1^2 * a2 * a3) / 15
-  c1133 <- (2 * 30 * a0 * a1^2 * a3^2) / 15
-  c1222 <- (2 * 20 * a0 * a1 * a2^3) / 15
-  c1223 <- (2 * 60 * a0 * a1 * a2^2 * a3) / 15
-  c1233 <- (2 * 60 * a0 * a1 * a2 * a3^2) / 15
-  c1333 <- (2 * 20 * a0 * a1 * a3^3) / 15
-  c2222 <- (2 * 5 * a0 * a2^4) / 15
-  c2223 <- (2 * 20 * a0 * a2^3 * a3) / 15
-  c2233 <- (2 * 30 * a0 * a2^2 * a3^2) / 15
-  c2333 <- (2 * 20 * a0 * a2 * a3^3) / 15
-  c3333 <- (2 * 5 * a0 * a3^4) / 15
+  # Hidden neuron 1: c -----------------------------------------------------
+
+  # Degree 0.
+
+  c0 <- tau0 +
+    tau1 * a0_centered +
+    tau2 * a0_centered^2 +
+    tau3 * a0_centered^3 +
+    tau4 * a0_centered^4 +
+    tau5 * a0_centered^5
+
+  # Degree 1. Multiplicities in q^1,...,q^5: 1, 2, 3, 4, 5.
+
+  c1 <- tau1 * a1 +
+    tau2 * (2 * a0_centered * a1) +
+    tau3 * (3 * a0_centered^2 * a1) +
+    tau4 * (4 * a0_centered^3 * a1) +
+    tau5 * (5 * a0_centered^4 * a1)
+  c2 <- tau1 * a2 +
+    tau2 * (2 * a0_centered * a2) +
+    tau3 * (3 * a0_centered^2 * a2) +
+    tau4 * (4 * a0_centered^3 * a2) +
+    tau5 * (5 * a0_centered^4 * a2)
+  c3 <- tau1 * a3 +
+    tau2 * (2 * a0_centered * a3) +
+    tau3 * (3 * a0_centered^2 * a3) +
+    tau4 * (4 * a0_centered^3 * a3) +
+    tau5 * (5 * a0_centered^4 * a3)
+
+  # Degree 2.
+  # Repeated variable (ii): 1, 3, 6, 10 in q^2,...,q^5.
+  # Distinct variables (ij): 2, 6, 12, 20 in q^2,...,q^5.
+
+  c11 <- tau2 * a1^2 +
+    tau3 * (3 * a0_centered * a1^2) +
+    tau4 * (6 * a0_centered^2 * a1^2) +
+    tau5 * (10 * a0_centered^3 * a1^2)
+  c12 <- tau2 * (2 * a1 * a2) +
+    tau3 * (6 * a0_centered * a1 * a2) +
+    tau4 * (12 * a0_centered^2 * a1 * a2) +
+    tau5 * (20 * a0_centered^3 * a1 * a2)
+  c13 <- tau2 * (2 * a1 * a3) +
+    tau3 * (6 * a0_centered * a1 * a3) +
+    tau4 * (12 * a0_centered^2 * a1 * a3) +
+    tau5 * (20 * a0_centered^3 * a1 * a3)
+  c22 <- tau2 * a2^2 +
+    tau3 * (3 * a0_centered * a2^2) +
+    tau4 * (6 * a0_centered^2 * a2^2) +
+    tau5 * (10 * a0_centered^3 * a2^2)
+  c23 <- tau2 * (2 * a2 * a3) +
+    tau3 * (6 * a0_centered * a2 * a3) +
+    tau4 * (12 * a0_centered^2 * a2 * a3) +
+    tau5 * (20 * a0_centered^3 * a2 * a3)
+  c33 <- tau2 * a3^2 +
+    tau3 * (3 * a0_centered * a3^2) +
+    tau4 * (6 * a0_centered^2 * a3^2) +
+    tau5 * (10 * a0_centered^3 * a3^2)
+
+  # Degree 3.
+  # Patterns iii, iij and ijk have multiplicities (1,4,10), (3,12,30)
+  # and (6,24,60), respectively, in q^3, q^4 and q^5.
+
+  c111 <- tau3 * a1^3 +
+    tau4 * (4 * a0_centered * a1^3) +
+    tau5 * (10 * a0_centered^2 * a1^3)
+  c112 <- tau3 * (3 * a1^2 * a2) +
+    tau4 * (12 * a0_centered * a1^2 * a2) +
+    tau5 * (30 * a0_centered^2 * a1^2 * a2)
+  c113 <- tau3 * (3 * a1^2 * a3) +
+    tau4 * (12 * a0_centered * a1^2 * a3) +
+    tau5 * (30 * a0_centered^2 * a1^2 * a3)
+  c122 <- tau3 * (3 * a1 * a2^2) +
+    tau4 * (12 * a0_centered * a1 * a2^2) +
+    tau5 * (30 * a0_centered^2 * a1 * a2^2)
+  c123 <- tau3 * (6 * a1 * a2 * a3) +
+    tau4 * (24 * a0_centered * a1 * a2 * a3) +
+    tau5 * (60 * a0_centered^2 * a1 * a2 * a3)
+  c133 <- tau3 * (3 * a1 * a3^2) +
+    tau4 * (12 * a0_centered * a1 * a3^2) +
+    tau5 * (30 * a0_centered^2 * a1 * a3^2)
+  c222 <- tau3 * a2^3 +
+    tau4 * (4 * a0_centered * a2^3) +
+    tau5 * (10 * a0_centered^2 * a2^3)
+  c223 <- tau3 * (3 * a2^2 * a3) +
+    tau4 * (12 * a0_centered * a2^2 * a3) +
+    tau5 * (30 * a0_centered^2 * a2^2 * a3)
+  c233 <- tau3 * (3 * a2 * a3^2) +
+    tau4 * (12 * a0_centered * a2 * a3^2) +
+    tau5 * (30 * a0_centered^2 * a2 * a3^2)
+  c333 <- tau3 * a3^3 +
+    tau4 * (4 * a0_centered * a3^3) +
+    tau5 * (10 * a0_centered^2 * a3^3)
+
+  # Degree 4.
+  # Patterns iiii, iiij, iijj and iijk have multiplicities (1,5), (4,20),
+  # (6,30) and (12,60), respectively, in q^4 and q^5.
+
+  c1111 <- tau4 * a1^4 +
+    tau5 * (5 * a0_centered * a1^4)
+  c1112 <- tau4 * (4 * a1^3 * a2) +
+    tau5 * (20 * a0_centered * a1^3 * a2)
+  c1113 <- tau4 * (4 * a1^3 * a3) +
+    tau5 * (20 * a0_centered * a1^3 * a3)
+  c1122 <- tau4 * (6 * a1^2 * a2^2) +
+    tau5 * (30 * a0_centered * a1^2 * a2^2)
+  c1123 <- tau4 * (12 * a1^2 * a2 * a3) +
+    tau5 * (60 * a0_centered * a1^2 * a2 * a3)
+  c1133 <- tau4 * (6 * a1^2 * a3^2) +
+    tau5 * (30 * a0_centered * a1^2 * a3^2)
+  c1222 <- tau4 * (4 * a1 * a2^3) +
+    tau5 * (20 * a0_centered * a1 * a2^3)
+  c1223 <- tau4 * (12 * a1 * a2^2 * a3) +
+    tau5 * (60 * a0_centered * a1 * a2^2 * a3)
+  c1233 <- tau4 * (12 * a1 * a2 * a3^2) +
+    tau5 * (60 * a0_centered * a1 * a2 * a3^2)
+  c1333 <- tau4 * (4 * a1 * a3^3) +
+    tau5 * (20 * a0_centered * a1 * a3^3)
+  c2222 <- tau4 * a2^4 +
+    tau5 * (5 * a0_centered * a2^4)
+  c2223 <- tau4 * (4 * a2^3 * a3) +
+    tau5 * (20 * a0_centered * a2^3 * a3)
+  c2233 <- tau4 * (6 * a2^2 * a3^2) +
+    tau5 * (30 * a0_centered * a2^2 * a3^2)
+  c2333 <- tau4 * (4 * a2 * a3^3) +
+    tau5 * (20 * a0_centered * a2 * a3^3)
+  c3333 <- tau4 * a3^4 +
+    tau5 * (5 * a0_centered * a3^4)
 
   coefficients_c <- c(
     "0" = c0,
@@ -101,47 +215,127 @@ smoke_test_manual <- function(data) {
     "2233" = c2233, "2333" = c2333, "3333" = c3333
   )
 
-  # Hidden neuron 2: d = T5(b), retaining degree <= 4 ----------------------
+  # Hidden neuron 2: d -----------------------------------------------------
 
-  d0 <- b0 - b0^3 / 3 + (2 * b0^5) / 15
+  # Degree 0.
 
-  d1 <- b1 - (3 * b0^2 * b1) / 3 + (2 * 5 * b0^4 * b1) / 15
-  d2 <- b2 - (3 * b0^2 * b2) / 3 + (2 * 5 * b0^4 * b2) / 15
-  d3 <- b3 - (3 * b0^2 * b3) / 3 + (2 * 5 * b0^4 * b3) / 15
+  d0 <- tau0 +
+    tau1 * b0_centered +
+    tau2 * b0_centered^2 +
+    tau3 * b0_centered^3 +
+    tau4 * b0_centered^4 +
+    tau5 * b0_centered^5
 
-  d11 <- -(3 * b0 * b1^2) / 3 + (2 * 10 * b0^3 * b1^2) / 15
-  d12 <- -(6 * b0 * b1 * b2) / 3 + (2 * 20 * b0^3 * b1 * b2) / 15
-  d13 <- -(6 * b0 * b1 * b3) / 3 + (2 * 20 * b0^3 * b1 * b3) / 15
-  d22 <- -(3 * b0 * b2^2) / 3 + (2 * 10 * b0^3 * b2^2) / 15
-  d23 <- -(6 * b0 * b2 * b3) / 3 + (2 * 20 * b0^3 * b2 * b3) / 15
-  d33 <- -(3 * b0 * b3^2) / 3 + (2 * 10 * b0^3 * b3^2) / 15
+  # Degree 1. Multiplicities in q^1,...,q^5: 1, 2, 3, 4, 5.
 
-  d111 <- -b1^3 / 3 + (2 * 10 * b0^2 * b1^3) / 15
-  d112 <- -(3 * b1^2 * b2) / 3 + (2 * 30 * b0^2 * b1^2 * b2) / 15
-  d113 <- -(3 * b1^2 * b3) / 3 + (2 * 30 * b0^2 * b1^2 * b3) / 15
-  d122 <- -(3 * b1 * b2^2) / 3 + (2 * 30 * b0^2 * b1 * b2^2) / 15
-  d123 <- -(6 * b1 * b2 * b3) / 3 + (2 * 60 * b0^2 * b1 * b2 * b3) / 15
-  d133 <- -(3 * b1 * b3^2) / 3 + (2 * 30 * b0^2 * b1 * b3^2) / 15
-  d222 <- -b2^3 / 3 + (2 * 10 * b0^2 * b2^3) / 15
-  d223 <- -(3 * b2^2 * b3) / 3 + (2 * 30 * b0^2 * b2^2 * b3) / 15
-  d233 <- -(3 * b2 * b3^2) / 3 + (2 * 30 * b0^2 * b2 * b3^2) / 15
-  d333 <- -b3^3 / 3 + (2 * 10 * b0^2 * b3^3) / 15
+  d1 <- tau1 * b1 +
+    tau2 * (2 * b0_centered * b1) +
+    tau3 * (3 * b0_centered^2 * b1) +
+    tau4 * (4 * b0_centered^3 * b1) +
+    tau5 * (5 * b0_centered^4 * b1)
+  d2 <- tau1 * b2 +
+    tau2 * (2 * b0_centered * b2) +
+    tau3 * (3 * b0_centered^2 * b2) +
+    tau4 * (4 * b0_centered^3 * b2) +
+    tau5 * (5 * b0_centered^4 * b2)
+  d3 <- tau1 * b3 +
+    tau2 * (2 * b0_centered * b3) +
+    tau3 * (3 * b0_centered^2 * b3) +
+    tau4 * (4 * b0_centered^3 * b3) +
+    tau5 * (5 * b0_centered^4 * b3)
 
-  d1111 <- (2 * 5 * b0 * b1^4) / 15
-  d1112 <- (2 * 20 * b0 * b1^3 * b2) / 15
-  d1113 <- (2 * 20 * b0 * b1^3 * b3) / 15
-  d1122 <- (2 * 30 * b0 * b1^2 * b2^2) / 15
-  d1123 <- (2 * 60 * b0 * b1^2 * b2 * b3) / 15
-  d1133 <- (2 * 30 * b0 * b1^2 * b3^2) / 15
-  d1222 <- (2 * 20 * b0 * b1 * b2^3) / 15
-  d1223 <- (2 * 60 * b0 * b1 * b2^2 * b3) / 15
-  d1233 <- (2 * 60 * b0 * b1 * b2 * b3^2) / 15
-  d1333 <- (2 * 20 * b0 * b1 * b3^3) / 15
-  d2222 <- (2 * 5 * b0 * b2^4) / 15
-  d2223 <- (2 * 20 * b0 * b2^3 * b3) / 15
-  d2233 <- (2 * 30 * b0 * b2^2 * b3^2) / 15
-  d2333 <- (2 * 20 * b0 * b2 * b3^3) / 15
-  d3333 <- (2 * 5 * b0 * b3^4) / 15
+  # Degree 2.
+
+  d11 <- tau2 * b1^2 +
+    tau3 * (3 * b0_centered * b1^2) +
+    tau4 * (6 * b0_centered^2 * b1^2) +
+    tau5 * (10 * b0_centered^3 * b1^2)
+  d12 <- tau2 * (2 * b1 * b2) +
+    tau3 * (6 * b0_centered * b1 * b2) +
+    tau4 * (12 * b0_centered^2 * b1 * b2) +
+    tau5 * (20 * b0_centered^3 * b1 * b2)
+  d13 <- tau2 * (2 * b1 * b3) +
+    tau3 * (6 * b0_centered * b1 * b3) +
+    tau4 * (12 * b0_centered^2 * b1 * b3) +
+    tau5 * (20 * b0_centered^3 * b1 * b3)
+  d22 <- tau2 * b2^2 +
+    tau3 * (3 * b0_centered * b2^2) +
+    tau4 * (6 * b0_centered^2 * b2^2) +
+    tau5 * (10 * b0_centered^3 * b2^2)
+  d23 <- tau2 * (2 * b2 * b3) +
+    tau3 * (6 * b0_centered * b2 * b3) +
+    tau4 * (12 * b0_centered^2 * b2 * b3) +
+    tau5 * (20 * b0_centered^3 * b2 * b3)
+  d33 <- tau2 * b3^2 +
+    tau3 * (3 * b0_centered * b3^2) +
+    tau4 * (6 * b0_centered^2 * b3^2) +
+    tau5 * (10 * b0_centered^3 * b3^2)
+
+  # Degree 3.
+
+  d111 <- tau3 * b1^3 +
+    tau4 * (4 * b0_centered * b1^3) +
+    tau5 * (10 * b0_centered^2 * b1^3)
+  d112 <- tau3 * (3 * b1^2 * b2) +
+    tau4 * (12 * b0_centered * b1^2 * b2) +
+    tau5 * (30 * b0_centered^2 * b1^2 * b2)
+  d113 <- tau3 * (3 * b1^2 * b3) +
+    tau4 * (12 * b0_centered * b1^2 * b3) +
+    tau5 * (30 * b0_centered^2 * b1^2 * b3)
+  d122 <- tau3 * (3 * b1 * b2^2) +
+    tau4 * (12 * b0_centered * b1 * b2^2) +
+    tau5 * (30 * b0_centered^2 * b1 * b2^2)
+  d123 <- tau3 * (6 * b1 * b2 * b3) +
+    tau4 * (24 * b0_centered * b1 * b2 * b3) +
+    tau5 * (60 * b0_centered^2 * b1 * b2 * b3)
+  d133 <- tau3 * (3 * b1 * b3^2) +
+    tau4 * (12 * b0_centered * b1 * b3^2) +
+    tau5 * (30 * b0_centered^2 * b1 * b3^2)
+  d222 <- tau3 * b2^3 +
+    tau4 * (4 * b0_centered * b2^3) +
+    tau5 * (10 * b0_centered^2 * b2^3)
+  d223 <- tau3 * (3 * b2^2 * b3) +
+    tau4 * (12 * b0_centered * b2^2 * b3) +
+    tau5 * (30 * b0_centered^2 * b2^2 * b3)
+  d233 <- tau3 * (3 * b2 * b3^2) +
+    tau4 * (12 * b0_centered * b2 * b3^2) +
+    tau5 * (30 * b0_centered^2 * b2 * b3^2)
+  d333 <- tau3 * b3^3 +
+    tau4 * (4 * b0_centered * b3^3) +
+    tau5 * (10 * b0_centered^2 * b3^3)
+
+  # Degree 4.
+
+  d1111 <- tau4 * b1^4 +
+    tau5 * (5 * b0_centered * b1^4)
+  d1112 <- tau4 * (4 * b1^3 * b2) +
+    tau5 * (20 * b0_centered * b1^3 * b2)
+  d1113 <- tau4 * (4 * b1^3 * b3) +
+    tau5 * (20 * b0_centered * b1^3 * b3)
+  d1122 <- tau4 * (6 * b1^2 * b2^2) +
+    tau5 * (30 * b0_centered * b1^2 * b2^2)
+  d1123 <- tau4 * (12 * b1^2 * b2 * b3) +
+    tau5 * (60 * b0_centered * b1^2 * b2 * b3)
+  d1133 <- tau4 * (6 * b1^2 * b3^2) +
+    tau5 * (30 * b0_centered * b1^2 * b3^2)
+  d1222 <- tau4 * (4 * b1 * b2^3) +
+    tau5 * (20 * b0_centered * b1 * b2^3)
+  d1223 <- tau4 * (12 * b1 * b2^2 * b3) +
+    tau5 * (60 * b0_centered * b1 * b2^2 * b3)
+  d1233 <- tau4 * (12 * b1 * b2 * b3^2) +
+    tau5 * (60 * b0_centered * b1 * b2 * b3^2)
+  d1333 <- tau4 * (4 * b1 * b3^3) +
+    tau5 * (20 * b0_centered * b1 * b3^3)
+  d2222 <- tau4 * b2^4 +
+    tau5 * (5 * b0_centered * b2^4)
+  d2223 <- tau4 * (4 * b2^3 * b3) +
+    tau5 * (20 * b0_centered * b2^3 * b3)
+  d2233 <- tau4 * (6 * b2^2 * b3^2) +
+    tau5 * (30 * b0_centered * b2^2 * b3^2)
+  d2333 <- tau4 * (4 * b2 * b3^3) +
+    tau5 * (20 * b0_centered * b2 * b3^3)
+  d3333 <- tau4 * b3^4 +
+    tau5 * (5 * b0_centered * b3^4)
 
   coefficients_d <- c(
     "0" = d0,
@@ -159,7 +353,7 @@ smoke_test_manual <- function(data) {
     "2233" = d2233, "2333" = d2333, "3333" = d3333
   )
 
-  # Linear output: e = w30 + w31*c + w32*d -------------------------------
+  # Linear output: e -------------------------------------------------------
 
   e0 <- w30 + w31 * c0 + w32 * d0
 
@@ -217,27 +411,72 @@ smoke_test_manual <- function(data) {
     "2233" = e2233, "2333" = e2333, "3333" = e3333
   )
 
-  # Final results -----------------------------------------------------------
+  # NN2Poly keep_layers structure -----------------------------------------
+  # Labels are integer vectors, matching the representation used by nn2poly.
+
+  input_labels <- list(0L, 1L, 2L, 3L)
+
+  polynomial_labels <- list(
+    0L,
+    1L, 2L, 3L,
+    c(1L, 1L), c(1L, 2L), c(1L, 3L),
+    c(2L, 2L), c(2L, 3L), c(3L, 3L),
+    c(1L, 1L, 1L), c(1L, 1L, 2L), c(1L, 1L, 3L),
+    c(1L, 2L, 2L), c(1L, 2L, 3L), c(1L, 3L, 3L),
+    c(2L, 2L, 2L), c(2L, 2L, 3L), c(2L, 3L, 3L),
+    c(3L, 3L, 3L),
+    c(1L, 1L, 1L, 1L), c(1L, 1L, 1L, 2L),
+    c(1L, 1L, 1L, 3L), c(1L, 1L, 2L, 2L),
+    c(1L, 1L, 2L, 3L), c(1L, 1L, 3L, 3L),
+    c(1L, 2L, 2L, 2L), c(1L, 2L, 2L, 3L),
+    c(1L, 2L, 3L, 3L), c(1L, 3L, 3L, 3L),
+    c(2L, 2L, 2L, 2L), c(2L, 2L, 2L, 3L),
+    c(2L, 2L, 3L, 3L), c(2L, 3L, 3L, 3L),
+    c(3L, 3L, 3L, 3L)
+  )
+
+  layer_1_input_values <- matrix(
+    c(a0, a1, a2, a3, b0, b1, b2, b3),
+    nrow = 4L,
+    ncol = 2L,
+    dimnames = NULL
+  )
+
+  layer_1_output_values <- matrix(
+    c(unname(coefficients_c), unname(coefficients_d)),
+    nrow = length(polynomial_labels),
+    ncol = 2L,
+    dimnames = NULL
+  )
+
+  layer_2_values <- matrix(
+    unname(coefficients_e),
+    nrow = length(polynomial_labels),
+    ncol = 1L,
+    dimnames = NULL
+  )
+
+  layer_2_polynomial <- list(
+    labels = polynomial_labels,
+    values = layer_2_values
+  )
 
   obj <- list(
     layer_1 = list(
       input = list(
-        labels = list(0, 1, 2, 3),
-        values = data$tanh
+        labels = input_labels,
+        values = layer_1_input_values
       ),
       output = list(
-        labels = sapply(strsplit(names(coefficients_c), ""), as.numeric),
-        values = cbind(unname(coefficients_c), unname(coefficients_d))
+        labels = polynomial_labels,
+        values = layer_1_output_values
       )
     ),
     layer_2 = list(
-      input = list(
-        labels = sapply(strsplit(names(coefficients_e), ""), as.numeric),
-        values = cbind(unname(coefficients_e))
-      )
+      input = layer_2_polynomial,
+      output = layer_2_polynomial
     )
   )
-  obj$layer_2$output <- obj$layer_2$input
   class(obj) <- "nn2poly"
   obj
 }
