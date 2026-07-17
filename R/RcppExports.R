@@ -13,8 +13,8 @@ alg_non_linear <- function(coeffs_input, labels_input, labels_output, previous_o
     .Call(`_nn2poly_alg_non_linear`, coeffs_input, labels_input, labels_output, previous_order, q_layer, g)
 }
 
-nn2poly_algorithm <- function(layers, af_list, max_order, keep_layers, taylor_orders) {
-    .Call(`_nn2poly_nn2poly_algorithm`, layers, af_list, max_order, keep_layers, taylor_orders)
+nn2poly_algorithm <- function(layers, af_list, max_order, keep_layers, taylor_orders, a = 0.0) {
+    .Call(`_nn2poly_nn2poly_algorithm`, layers, af_list, max_order, keep_layers, taylor_orders, a)
 }
 
 combinations_with_repetition <- function(n, k) {

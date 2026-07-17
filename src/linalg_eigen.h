@@ -30,6 +30,10 @@ inline Weights alg_linear(const Weights& coeffs_list, const Weights& layer) {
   return layer.transpose() * joined;
 }
 
+inline void sub_scalar(Weights& mat, int i, double scalar) {
+  mat.col(i) -= scalar;
+}
+
 inline void add_partition(Weights& mat, int i, double scalar, const Vector& vec) {
   mat.col(i) += scalar * vec;
 }

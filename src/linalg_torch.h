@@ -31,6 +31,10 @@ inline Weights alg_linear(Weights& coeffs_list, const Weights& layer) {
   return torch::matmul(layer.t(), joined);
 }
 
+inline void sub_scalar(Weights& mat, int i, double scalar) {
+  mat.select(1, i).sub_(scalar);
+}
+
 inline void add_partition(Weights& mat, int i, double scalar, const Vector& vec) {
   mat.select(1, i).add_(vec * scalar);
 }

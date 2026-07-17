@@ -137,7 +137,7 @@ inline void check_weights_dimensions(const Layers& layers) {
 // [[Rcpp::export]]
 List nn2poly_algorithm(const Layers& layers, const Functions& af_list,
                        int max_order, bool keep_layers,
-                       const Term& taylor_orders) {
+                       const Term& taylor_orders, double a = 0.0) {
   if (layers.empty())
     throw std::invalid_argument("`layers` is empty");
   if (af_list.empty())
@@ -156,7 +156,7 @@ List nn2poly_algorithm(const Layers& layers, const Functions& af_list,
   // depending on the last layer being linear or not
   WeightsLists results(static_cast<size_t>(last_linear ? 2 * L - 1 : 2 * L));
   const Term taylor = obtain_taylor_vector(taylor_orders, af_list);
-  const CoeffsList af_dlist = obtain_derivatives_list(taylor, af_list);
+  const CoeffsList af_dlist = obtain_derivatives_list(taylor, af_list, a);
 
   // Starting point for the algorithm: Set weights as coefficients
   // of an order 1 polynomial.
@@ -224,6 +224,9 @@ List nn2poly_algorithm(const Layers& layers, const Functions& af_list,
 
     NN2POLY_DEBUG_LOG(2, "[layer", l, "]",
       DTAG(previous_order), DTAG(q_layer), DTAG(labels_list.size()));
+
+    // Subtract the center from the intercept
+    if (a) sub_scalar(coeffs_list, 0, a);
     // Apply non-linear algorithm
     coeffs_list = alg_non_linear_impl(
       coeffs_list,

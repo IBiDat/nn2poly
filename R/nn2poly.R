@@ -45,6 +45,9 @@ NULL
 #  layers. If a vector is used, each value corresponds to the Taylor order used
 #' at each layer activation function. Default set to \code{8}.
 #'
+#' @param a \code{numeric} value that sets the point at which the Taylor expansion
+#' is computed. Default set to \code{0}.
+#'
 #' @param ... Ignored.
 #'
 #' @return Returns an object of class `nn2poly`.
@@ -114,6 +117,7 @@ nn2poly <- function(object,
                     max_order = 2,
                     keep_layers = FALSE,
                     taylor_orders = 8,
+                    a = 0.0,
                     ...) {
   UseMethod("nn2poly")
 }
@@ -123,9 +127,10 @@ nn2poly.list <- function(object,
                          max_order = 2,
                          keep_layers = FALSE,
                          taylor_orders = 8,
+                         a = 0.0,
                          ...) {
   result <- nn2poly_algorithm(object, names(object),
-                              max_order, keep_layers, taylor_orders)
+                              max_order, keep_layers, taylor_orders, a)
   class(result) <- "nn2poly"
   result
 }
