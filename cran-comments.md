@@ -1,6 +1,6 @@
-## Release 1.0.0
+## Release 1.0.1
 
-- This release marks version 1.0.0 of the package. It includes the changes and improvements documented in NEWS.md, with significant performance improvements.
+Fixes UB in hash implementation as reported in M1-SAN machine.
 
 ## Test environments
 

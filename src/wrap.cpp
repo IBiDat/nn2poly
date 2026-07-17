@@ -48,15 +48,15 @@ List wrap(const WeightsLists& data) {
 #ifdef TORCH_VERSION
 
 template <>
-torch::Tensor as(SEXP x) {
+Weights as(SEXP x) {
   NumericMatrix data(x);
   return torch::from_blob(const_cast<double*>(data.begin()),
     {data.nrow(), data.ncol()}, {1, data.nrow()}, torch::kFloat64
   ).clone();
 }
 
-NumericMatrix wrap(const torch::Tensor& data) {
-  torch::Tensor cpu_t = data.to(torch::kCPU).to(torch::kFloat64).contiguous();
+NumericMatrix wrap(const Weights& data) {
+  Weights cpu_t = data.to(torch::kCPU).to(torch::kFloat64).contiguous();
   int rows = cpu_t.size(0);
   int cols = cpu_t.size(1);
   NumericMatrix r_mat(rows, cols);
