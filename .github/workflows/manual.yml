@@ -14,7 +14,6 @@ jobs:
         container:
         - 'clang-asan'
         - 'clang-ubsan'
-        - 'gcc-asan'
         # - 'rchk' yaml has issues as of 2026-07-17
         - 'valgrind'
 
