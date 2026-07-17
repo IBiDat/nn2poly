@@ -30,13 +30,15 @@ and solve later the same regression problem with the different deep
 learning frameworks. Refer to that vignette for more details.
 
 ``` r
+
 library(nn2poly)
 set.seed(42)
 ```
 
-Create the polynomial $4x_{1} - 3x_{2}x_{3}$:
+Create the polynomial $`4x_1 - 3 x_2x_3`$:
 
 ``` r
+
 
 polynomial <- list()
 polynomial$labels <- list(c(1), c(2,3))
@@ -46,6 +48,7 @@ polynomial$values <- c(4,-3)
 Generate the data:
 
 ``` r
+
 # Define number of variables and sample size
 p <- 3
 n_sample <- 500
@@ -72,10 +75,11 @@ head(data)
 #> 6 -0.1061245 -0.198124330 -0.5974829 -0.7455793
 ```
 
-Scale the data to have everything in the $\lbrack - 1,1\rbrack$ interval
-and divide it in train and test.
+Scale the data to have everything in the $`[-1,1]`$ interval and divide
+it in train and test.
 
 ``` r
+
 # Data scaling to [-1,1]
 maxs <- apply(data, 2, max)
 mins <- apply(data, 2, min)
@@ -108,6 +112,7 @@ In this section we will show how to use `nn2poly` with a `keras` neural
 network and how to impose the needed weight constraints during training.
 
 ``` r
+
 library(nn2poly)
 library(keras)
 
@@ -123,6 +128,7 @@ create both the constrained and unconstrained neural networks in the
 `keras` example.
 
 ``` r
+
 
 keras_model <- function() {
   tensorflow::set_random_seed(42)
@@ -144,8 +150,8 @@ and then train it as usually. The constraints currently accept two
 possible types, `"l1_norm"` and `"l2_norm"`. In both cases, the norm for
 each weight vector (including the bias) incident on a neuron will be
 constrained to be less or equal than 1. Using data scaled to the
-$\lbrack - 1,1\rbrack$ interval, the l1-norm is the one that guarantees
-best results.
+$`[-1,1]`$ interval, the l1-norm is the one that guarantees best
+results.
 
 Also, it is important to note that the weight constraints are imposed on
 all layers except for the last one, which is expected to be linear and
@@ -158,6 +164,7 @@ not need a Taylor expansion.
 > callback that is applied at the end of each batch.
 
 ``` r
+
 nn_uncon <- keras_model()
 
 nn_con <- keras_model()
@@ -171,6 +178,7 @@ approach. Note that we have to increase the number of needed epochs with
 the constrained NN to learn properly.
 
 ``` r
+
 compile(nn_uncon,
         loss = "mse",
         optimizer = optimizer_adam(),
@@ -191,6 +199,7 @@ plot(history1)
 ![](includes/nn2poly-02-keras-nn_uncon-train-1.png)
 
 ``` r
+
 compile(nn_con,
         loss = "mse",
         optimizer = optimizer_adam(),
@@ -217,9 +226,10 @@ neural networks and observe how both of them provide accurate
 predictions (the values fall near the “perfect” diagonal red line).
 
 ``` r
+
 # Obtain the predicted values with the NN to compare them
 prediction_nn_uncon <- predict(nn_uncon, test_x)
-#> 4/4 - 0s - 48ms/epoch - 12ms/step
+#> 4/4 - 0s - 103ms/epoch - 26ms/step
 
 # Diagonal plot implemented in the package to quickly visualize and compare predictions
 nn2poly:::plot_diagonal(x_axis =  prediction_nn_uncon, y_axis =  test_y, xlab = "Unconstrained NN prediction", ylab = "Original Y")
@@ -228,9 +238,10 @@ nn2poly:::plot_diagonal(x_axis =  prediction_nn_uncon, y_axis =  test_y, xlab = 
 ![](includes/nn2poly-02-keras-comparison-y-nn_uncon-1.png)
 
 ``` r
+
 # Obtain the predicted values with the NN to compare them
 prediction_nn_con <- predict(nn_con, test_x)
-#> 4/4 - 0s - 91ms/epoch - 23ms/step
+#> 4/4 - 0s - 105ms/epoch - 26ms/step
 
 # Diagonal plot implemented in the package to quickly visualize and compare predictions
 nn2poly:::plot_diagonal(x_axis =  prediction_nn_con, y_axis =  test_y, xlab = "Constrained NN prediction", ylab = "Original Y")
@@ -244,6 +255,7 @@ After the NNs have been trained, we can directly call `nn2poly` on the
 `keras` model.
 
 ``` r
+
 # Polynomial for nn_uncon
 final_poly_uncon <- nn2poly(object = nn_uncon,
                       max_order = 3)
@@ -257,6 +269,7 @@ We can visualize the polynomial predictions versus NN predictions
 
 ``` r
 
+
 # Obtain the predicted values for the test data with our two polynomials
 prediction_poly_uncon <- predict(object = final_poly_uncon, newdata = test_x)
 prediction_poly_con <- predict(object = final_poly_con, newdata = test_x)
@@ -267,6 +280,7 @@ nn2poly:::plot_diagonal(x_axis =  prediction_nn_uncon, y_axis =  prediction_poly
 ![](includes/nn2poly-02-keras-polynomial-prediction-1.png)
 
 ``` r
+
 
 nn2poly:::plot_diagonal(x_axis =  prediction_nn_con, y_axis =  prediction_poly_con, xlab = "NN prediction", ylab = "Polynomial prediction") + ggplot2::ggtitle("Polynomial for nn_con")
 ```
@@ -284,17 +298,19 @@ sign as the original polynomial while the rest are close to 0.
 > *Note*: The coefficients values are not in the same scale as the
 > original polynomial due to the fact that we have scaled all the data
 > before training, even the response variable Y. Furthermore, as data
-> has been scaled to the $\lbrack - 1,1\rbrack$ interval, interactions
-> of order 2 or higher would usually need a higher absolute value than
-> the lower order coefficients to be more relevant
+> has been scaled to the $`[-1,1]`$ interval, interactions of order 2 or
+> higher would usually need a higher absolute value than the lower order
+> coefficients to be more relevant
 
 ``` r
+
 plot(final_poly_uncon, n = 8)
 ```
 
 ![](includes/nn2poly-02-keras-n-important-1.png)
 
 ``` r
+
 plot(final_poly_con, n = 8)
 ```
 
@@ -311,6 +327,7 @@ a helper needed to create a `torch` model in an adequate manner so that
 it can be easily recognized by `nn2poly`.
 
 ``` r
+
 library(torch)
 library(luz)
 
@@ -325,6 +342,7 @@ intro only train and validation matrices and using
 [`luz::as_dataloader()`](https://mlverse.github.io/luz/reference/as_dataloader.html)
 
 ``` r
+
 # Divide in only train and validation
 all_indices   <- 1:nrow(train_x)
 only_train_indices <- sample(all_indices, size = round(nrow(train_x)) * 0.8)
@@ -362,6 +380,7 @@ unconstrained neural networks in the `torch` example.
 
 ``` r
 
+
 luz_nn <- function() {
   torch::torch_manual_seed(42)
 
@@ -384,6 +403,7 @@ approach as in `luz` documentation. However, the use of
 is analogous.
 
 ``` r
+
 nn_uncon <- luz_nn()
 nn_con <- luz_nn()
 ```
@@ -393,6 +413,7 @@ nn_con <- luz_nn()
 First we train the unconstrained NN using ans standard `luz` approach.
 
 ``` r
+
 fitted_uncon <- nn_uncon %>%
     luz::setup(
       loss = torch::nn_mse_loss(),
@@ -414,8 +435,8 @@ before calling [`fit()`](https://generics.r-lib.org/reference/fit.html).
 The constraints currently accept two possible types, `"l1_norm"` and
 `"l2_norm"`. In both cases, the norm for each weight vector (including
 the bias) incident on a neuron will be constrained to be less or equal
-than 1. Using data scaled to the $\lbrack - 1,1\rbrack$ interval, the
-l1-norm is the one that guarantees best results.
+than 1. Using data scaled to the $`[-1,1]`$ interval, the l1-norm is the
+one that guarantees best results.
 
 Also, it is important to note that the weight constraints are imposed on
 all layers except for the last one, which is expected to be linear and
@@ -425,6 +446,7 @@ Note that we have to increase the number of needed epochs with the
 constrained NN to learn properly.
 
 ``` r
+
 fitted_con <- nn_con %>%
   luz::setup(
     loss = torch::nn_mse_loss(),
@@ -448,6 +470,7 @@ neural networks and observe how both of them provide accurate
 predictions (the values fall near the “perfect” diagonal red line).
 
 ``` r
+
 # Obtain the predicted values with the NN to compare them
 prediction_NN_uncon <- as.array(predict(fitted_uncon, test_x))
 
@@ -458,6 +481,7 @@ nn2poly:::plot_diagonal(x_axis =  prediction_NN_uncon, y_axis =  test_y, xlab = 
 ![](includes/nn2poly-02-torch-comparison-y-nn_uncon-1.png)
 
 ``` r
+
 # Obtain the predicted values with the NN to compare them
 prediction_NN_con <- as.array(predict(fitted_con, test_x))
 
@@ -473,6 +497,7 @@ After the NNs have been trained, we can directly call `nn2poly` on the
 `luz` model.
 
 ``` r
+
 # Polynomial for nn_uncon
 final_poly_uncon <- nn2poly(object = fitted_uncon,
                       max_order = 3)
@@ -486,6 +511,7 @@ We can visualize the polynomial predictions versus NN predictions
 
 ``` r
 
+
 # Obtain the predicted values for the test data with our two polynomials
 prediction_poly_uncon <- predict(object = final_poly_uncon, newdata = test_x)
 prediction_poly_con <- predict(object = final_poly_con, newdata = test_x)
@@ -496,6 +522,7 @@ nn2poly:::plot_diagonal(x_axis =  prediction_nn_uncon, y_axis =  prediction_poly
 ![](includes/nn2poly-02-reg-polynomial-prediction-1.png)
 
 ``` r
+
 
 nn2poly:::plot_diagonal(x_axis =  prediction_nn_con, y_axis =  prediction_poly_con, xlab = "NN prediction", ylab = "Polynomial prediction") + ggplot2::ggtitle("Polynomial for nn_con")
 ```
@@ -513,17 +540,19 @@ sign as the original polynomial while the rest are close to 0.
 > *Note*: The coefficients values are not in the same scale as the
 > original polynomial due to the fact that we have scaled all the data
 > before training, even the response variable Y. Furthermore, as data
-> has been scaled to the $\lbrack - 1,1\rbrack$ interval, interactions
-> of order 2 or higher would usually need a higher absolute value than
-> the lower order coefficients to be more relevant
+> has been scaled to the $`[-1,1]`$ interval, interactions of order 2 or
+> higher would usually need a higher absolute value than the lower order
+> coefficients to be more relevant
 
 ``` r
+
 plot(final_poly_uncon, n = 8)
 ```
 
 ![](includes/nn2poly-02-reg-n-important-1.png)
 
 ``` r
+
 plot(final_poly_con, n = 8)
 ```
 

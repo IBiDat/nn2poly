@@ -16,6 +16,7 @@ support for it in `nn2poly` as we saw in
 [`vignette("nn2poly-02-supported-DL-frameworks")`](https://ibidat.github.io/nn2poly/articles/nn2poly-02-supported-DL-frameworks.md).
 
 ``` r
+
 library(nn2poly)
 library(keras)
 
@@ -25,10 +26,11 @@ tensorflow::set_random_seed(42)
 
 ### Data preparation
 
-First we load the `iris` dataset and scale the data to the
-$\lbrack - 1,1\rbrack$ interval:
+First we load the `iris` dataset and scale the data to the $`[-1,1]`$
+interval:
 
 ``` r
+
 # Load the data
 data(iris)
 
@@ -47,6 +49,7 @@ iris[,(p+1)] <- iris[,(p+1)] - 1
 ```
 
 ``` r
+
 # Scale the data in the [-1,1] interval and separate train and test
 # Only the predictor variables are scaled, not the response as those will be
 # the different classes.
@@ -80,6 +83,7 @@ First, we build the model.
 
 ``` r
 
+
 keras_model <- function() {
   tensorflow::set_random_seed(42)
 
@@ -95,18 +99,18 @@ nn <- keras_model()
 # Impose weight constraints provided by nn2poly package
 nn <- add_constraints(nn, constraint_type = "l1_norm")
 nn
-#> Model: "sequential"
-#> ________________________________________________________________________________
-#>  Layer (type)                       Output Shape                    Param #     
-#> ================================================================================
-#>  dense (Dense)                      (None, 100)                     500         
-#>  dense_1 (Dense)                    (None, 100)                     10100       
-#>  dense_2 (Dense)                    (None, 3)                       303         
-#> ================================================================================
+#> Model: "sequential_3"
+#> ________________________________________________________________________________________________________________________
+#>  Layer (type)                                         Output Shape                                    Param #           
+#> ========================================================================================================================
+#>  dense_11 (Dense)                                     (None, 100)                                     500               
+#>  dense_12 (Dense)                                     (None, 100)                                     10100             
+#>  dense_13 (Dense)                                     (None, 3)                                       303               
+#> ========================================================================================================================
 #> Total params: 10903 (42.59 KB)
 #> Trainable params: 10903 (42.59 KB)
 #> Non-trainable params: 0 (0.00 Byte)
-#> ________________________________________________________________________________
+#> ________________________________________________________________________________________________________________________
 ```
 
 > *Note*: In this case the NN has a *linear* output with the same number
@@ -122,6 +126,7 @@ Then we compile and train the model, using a categorical crossentropy
 loss and accuracy as the chosen metric.
 
 ``` r
+
 compile(nn,
         loss = loss_sparse_categorical_crossentropy(from_logits = TRUE),
         optimizer = optimizer_adam(),
@@ -148,6 +153,7 @@ output into a probability, which we will do by using
 and then choosing the class with highest probability with `k_argmax`.
 
 ``` r
+
 # Define the model probability model using our previously trained nn
 probability_model <- keras_model_sequential() %>%
   nn() %>%
@@ -156,7 +162,7 @@ probability_model <- keras_model_sequential() %>%
 
 # Obtain the predicted classes with the NN to compare them
 prediction_NN_class <- predict(probability_model, test_x)
-#> 2/2 - 0s - 70ms/epoch - 35ms/step
+#> 2/2 - 1s - 537ms/epoch - 268ms/step
 ```
 
 > *Note*: As said before,
@@ -170,9 +176,10 @@ to a probability) and store it to compare with the polynomial output
 later.
 
 ``` r
+
 # Also, the linear output can be predicted before the probability model
 prediction_NN <- predict(nn, test_x)
-#> 2/2 - 0s - 40ms/epoch - 20ms/step
+#> 2/2 - 0s - 70ms/epoch - 35ms/step
 ```
 
 Finally We can use here a confusion matrix to visualize the results,
@@ -180,6 +187,7 @@ where we can see that that the NN correctly predicts almost all of the
 classes in the test data:
 
 ``` r
+
 # Create a confusion matrix
 cm <- caret::confusionMatrix(as.factor(prediction_NN_class), as.factor(test_y))
 cm
@@ -232,157 +240,49 @@ the values will be a matrix with 3 rows, where each row will be the
 polynomial obtained for each output neuron.
 
 ``` r
+
 # Polynomial for nn
 final_poly <- nn2poly(object = nn,
                       max_order = 3)
 final_poly
-#> $labels
-#> $labels[[1]]
-#> [1] 0
+#> nn2poly p=4 max_order=3 (35 coefficients)
 #> 
-#> $labels[[2]]
-#> [1] 1
-#> 
-#> $labels[[3]]
-#> [1] 2
-#> 
-#> $labels[[4]]
-#> [1] 3
-#> 
-#> $labels[[5]]
-#> [1] 4
-#> 
-#> $labels[[6]]
-#> [1] 1 1
-#> 
-#> $labels[[7]]
-#> [1] 1 2
-#> 
-#> $labels[[8]]
-#> [1] 1 3
-#> 
-#> $labels[[9]]
-#> [1] 1 4
-#> 
-#> $labels[[10]]
-#> [1] 2 2
-#> 
-#> $labels[[11]]
-#> [1] 2 3
-#> 
-#> $labels[[12]]
-#> [1] 2 4
-#> 
-#> $labels[[13]]
-#> [1] 3 3
-#> 
-#> $labels[[14]]
-#> [1] 3 4
-#> 
-#> $labels[[15]]
-#> [1] 4 4
-#> 
-#> $labels[[16]]
-#> [1] 1 1 1
-#> 
-#> $labels[[17]]
-#> [1] 1 1 2
-#> 
-#> $labels[[18]]
-#> [1] 1 1 3
-#> 
-#> $labels[[19]]
-#> [1] 1 1 4
-#> 
-#> $labels[[20]]
-#> [1] 1 2 2
-#> 
-#> $labels[[21]]
-#> [1] 1 2 3
-#> 
-#> $labels[[22]]
-#> [1] 1 2 4
-#> 
-#> $labels[[23]]
-#> [1] 1 3 3
-#> 
-#> $labels[[24]]
-#> [1] 1 3 4
-#> 
-#> $labels[[25]]
-#> [1] 1 4 4
-#> 
-#> $labels[[26]]
-#> [1] 2 2 2
-#> 
-#> $labels[[27]]
-#> [1] 2 2 3
-#> 
-#> $labels[[28]]
-#> [1] 2 2 4
-#> 
-#> $labels[[29]]
-#> [1] 2 3 3
-#> 
-#> $labels[[30]]
-#> [1] 2 3 4
-#> 
-#> $labels[[31]]
-#> [1] 2 4 4
-#> 
-#> $labels[[32]]
-#> [1] 3 3 3
-#> 
-#> $labels[[33]]
-#> [1] 3 3 4
-#> 
-#> $labels[[34]]
-#> [1] 3 4 4
-#> 
-#> $labels[[35]]
-#> [1] 4 4 4
-#> 
-#> 
-#> $values
-#>              [,1]         [,2]         [,3]
-#>  [1,]  0.04067109  2.838697004 -2.366766912
-#>  [2,] -1.01692952  0.922284435  0.306762048
-#>  [3,]  3.82618130 -1.532152815 -2.683000514
-#>  [4,] -4.86343269 -0.367029700  5.201883882
-#>  [5,] -6.05908248 -2.026009803  7.701675045
-#>  [6,]  0.02216647 -0.068650500  0.031318449
-#>  [7,] -0.09821698  0.115922745  0.007638440
-#>  [8,]  0.08146315 -0.072443601 -0.025525980
-#>  [9,]  0.04337399 -0.019371395 -0.029198248
-#> [10,]  0.08763212 -0.122314949  0.007196786
-#> [11,] -0.13090934  0.160297202  0.008898167
-#> [12,] -0.03982065  0.118363240 -0.047742059
-#> [13,] -0.03990296 -0.186114002  0.182448046
-#> [14,] -0.22518863 -0.383706458  0.517483976
-#> [15,] -0.21539519 -0.340739130  0.476053215
-#> [16,]  0.01640856 -0.015861053 -0.004179781
-#> [17,] -0.08649215  0.054035395  0.045407899
-#> [18,]  0.08657797 -0.020808458 -0.071458194
-#> [19,]  0.10626455  0.016833308 -0.120917295
-#> [20,] -0.09226002  0.058721711  0.047211597
-#> [21,] -0.12782353  0.099224893  0.053681832
-#> [22,] -0.14300636  0.061378209  0.099556359
-#> [23,]  0.08681554 -0.019495659 -0.072698532
-#> [24,]  0.07906020 -0.071096510 -0.027609755
-#> [25,]  0.10751970  0.019949727 -0.124596164
-#> [26,] -0.12832404  0.057077780  0.086244551
-#> [27,]  0.31410761 -0.112571487 -0.233324113
-#> [28,]  0.39822386 -0.072171099 -0.351003640
-#> [29,]  0.32366110 -0.115551628 -0.240170974
-#> [30,] -0.64179985  0.150429244  0.539640723
-#> [31,]  0.40593582 -0.069258417 -0.360602426
-#> [32,]  0.17561230  0.009076263 -0.185280705
-#> [33,]  0.51767960  0.109300583 -0.609898697
-#> [34,]  0.51398607  0.101899652 -0.600694175
-#> [35,]  0.34526975  0.146409617 -0.461815984
-#> 
-#> attr(,"class")
-#> [1] "nn2poly"
+#>    Label   layer_1.1    layer_1.2        Value
+#> 1      0  0.04067110  2.838696843 -2.366766781
+#> 2      1 -1.01692941  0.922284418  0.306761949
+#> 3      2  3.82618116 -1.532152710 -2.683000363
+#> 4      3 -4.86343231 -0.367029543  5.201883302
+#> 5      4 -6.05908192 -2.026009687  7.701674287
+#> 6    1 1  0.02216651 -0.068650520  0.031318424
+#> 7    1 2 -0.09821704  0.115922790  0.007638464
+#> 8    1 3  0.08146321 -0.072443687 -0.025525971
+#> 9    1 4  0.04337401 -0.019371435 -0.029198241
+#> 10   2 2  0.08763214 -0.122314949  0.007196768
+#> 11   2 3 -0.13090939  0.160297255  0.008898178
+#> 12   2 4 -0.03982067  0.118363267 -0.047742066
+#> 13   3 3 -0.03990281 -0.186113959  0.182447863
+#> 14   3 4 -0.22518835 -0.383706217  0.517483516
+#> 15   4 4 -0.21539498 -0.340738887  0.476052813
+#> 16 1 1 1  0.01640874 -0.015861276 -0.004179789
+#> 17 1 1 2 -0.08649263  0.054035970  0.045407945
+#> 18 1 1 3  0.08657836 -0.020808952 -0.071458205
+#> 19 1 1 4  0.10626469  0.016833176 -0.120917330
+#> 20 1 2 2  0.08459576 -0.071715667 -0.029934108
+#> 21 1 2 3 -0.12782438  0.099225772  0.053682008
+#> 22 1 2 4 -0.14300672  0.061378474  0.099556507
+#> 23 1 3 3  0.06399315 -0.058123074 -0.020400644
+#> 24 1 3 4  0.07906045 -0.071096688 -0.027609865
+#> 25 1 4 4  0.07534905 -0.054539678 -0.035542528
+#> 26 2 2 2 -0.12832426  0.057078039  0.086244566
+#> 27 2 2 3  0.31410803 -0.112572013 -0.233324120
+#> 28 2 2 4  0.39822396 -0.072171273 -0.351003593
+#> 29 2 3 3 -0.30494053  0.117239273  0.220625579
+#> 30 2 3 4 -0.64179975  0.150429652  0.539640298
+#> 31 2 4 4 -0.48146100  0.078259568  0.429785817
+#> 32 3 3 3  0.17561246  0.009075899 -0.185280585
+#> 33 3 3 4  0.51767933  0.109300146 -0.609898095
+#> 34 3 4 4  0.65067978  0.186264474 -0.802660943
+#> 35 4 4 4  0.34526955  0.146409430 -0.461815650
 ```
 
 #### Obtaining polynomial predictions
@@ -399,6 +299,7 @@ at the same time:
 
 ``` r
 
+
 # Obtain the predicted values for the test data with our Polynomial Regression
 prediction_poly_matrix <- predict(object = final_poly, newdata = test_x)
 
@@ -410,7 +311,7 @@ probability_poly <- keras_model_sequential() %>%
 # Class prediction with the polynomial outputs
 prediction_poly_class <- predict(probability_poly,
                                  prediction_poly_matrix)
-#> 2/2 - 0s - 121ms/epoch - 60ms/step
+#> 2/2 - 2s - 2s/epoch - 1s/step
 ```
 
 #### Visualizing the results
@@ -427,6 +328,7 @@ predicts.
 First, let’s observe the confusion matrix for the assigned classes:
 
 ``` r
+
 
 # Confussion matrix between NN class prediction and polynomial class prediction
 cm_poly <- caret::confusionMatrix(as.factor(prediction_NN_class), as.factor(prediction_poly_class))
@@ -466,9 +368,10 @@ cm_poly
 The polynomials obtain the same results as the original NN.
 
 Then, we can extract a diagonal plot for each of the polynomials
-obtained, in total $3$ diagonal plots.
+obtained, in total $`3`$ diagonal plots.
 
 ``` r
+
 for (i in 1:3){
   print(
     nn2poly:::plot_diagonal(x_axis =  prediction_NN[,i],
@@ -484,7 +387,7 @@ for (i in 1:3){
 We can observe how all the polynomials obtain quite similar predictions
 to their equivalent NN predictions.
 
-We can also plot the $n$ most important coefficients in absolute value
+We can also plot the $`n`$ most important coefficients in absolute value
 to compare which variables or interactions are more relevant in each
 polynomial. In this case, we will have 3 plots for each NN again, one
 per polynomial at each output neuron. In this case, the obtained
@@ -492,6 +395,7 @@ coefficients will represent the most important variables when assigning
 the probability to be in each class.
 
 ``` r
+
 plot(final_poly, n = 8)
 ```
 
@@ -500,9 +404,9 @@ plot(final_poly, n = 8)
 > *Note*: The coefficients values are not in the same scale as the
 > original polynomial due to the fact that we have scaled all the data
 > before training, even the response variable Y. Furthermore, as data
-> has been scaled to the $\lbrack - 1,1\rbrack$ interval, interactions
-> of order 2 or higher would usually need a higher absolute value than
-> the lower order coefficients to be more relevant
+> has been scaled to the $`[-1,1]`$ interval, interactions of order 2 or
+> higher would usually need a higher absolute value than the lower order
+> coefficients to be more relevant
 
 Finally, the problem with Taylor expansion can be checked with the
 following plots, where each layer is represented with their activation
@@ -515,6 +419,7 @@ that it is kept close to zero, thus having an accurate Taylor expansion
 around zero at each hidden layer.
 
 ``` r
+
 nn2poly:::plot_taylor_and_activation_potentials(object = nn,
                                                 data = train,
                                                 max_order = 3,

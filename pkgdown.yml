@@ -1,11 +1,11 @@
-pandoc: 3.1.11
-pkgdown: 2.2.0
+pandoc: 3.8.3
+pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
   nn2poly-01-introduction: nn2poly-01-introduction.html
   nn2poly-02-supported-DL-frameworks: nn2poly-02-supported-DL-frameworks.html
   nn2poly-03-classification-example: nn2poly-03-classification-example.html
-last_built: 2025-12-15T09:27Z
+last_built: 2026-07-17T17:26Z
 urls:
   reference: https://ibidat.github.io/nn2poly/reference
   article: https://ibidat.github.io/nn2poly/articles

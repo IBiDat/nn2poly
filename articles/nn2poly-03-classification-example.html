@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Classification example using tensorflow • nn2poly</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Classification example using tensorflow">
 </head>
@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">nn2poly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,9 +62,9 @@
                         <h4 data-toc-skip class="author">Pablo
 Morala</h4>
             
-            <h4 data-toc-skip class="date">2024-01-17</h4>
+            <h4 data-toc-skip class="date">2026-07-16</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/IBiDat/nn2poly/blob/v0.1.3/vignettes/nn2poly-03-classification-example.Rmd" class="external-link"><code>vignettes/nn2poly-03-classification-example.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/IBiDat/nn2poly/blob/v1.0.0/vignettes/nn2poly-03-classification-example.Rmd" class="external-link"><code>vignettes/nn2poly-03-classification-example.Rmd</code></a></small>
       <div class="d-none name"><code>nn2poly-03-classification-example.Rmd</code></div>
     </div>
 
@@ -93,7 +93,7 @@ saw in <code><a href="../articles/nn2poly-02-supported-DL-frameworks.html">vigne
 <h3 id="data-preparation">Data preparation<a class="anchor" aria-label="anchor" href="#data-preparation"></a>
 </h3>
 <p>First we load the <code>iris</code> dataset and scale the data to the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">[</mo><mo>−</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[-1,1]</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">[</mo><mi>−</mi><mn>1</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[-1,1]</annotation></semantics></math>
 interval:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Load the data</span></span>
@@ -159,18 +159,18 @@ constraints) our original neural network that will be later explained by
 <span><span class="co"># Impose weight constraints provided by nn2poly package</span></span>
 <span><span class="va">nn</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_constraints.html">add_constraints</a></span><span class="op">(</span><span class="va">nn</span>, constraint_type <span class="op">=</span> <span class="st">"l1_norm"</span><span class="op">)</span></span>
 <span><span class="va">nn</span></span>
-<span><span class="co">#&gt; Model: "sequential"</span></span>
-<span><span class="co">#&gt; ________________________________________________________________________________</span></span>
-<span><span class="co">#&gt;  Layer (type)                       Output Shape                    Param #     </span></span>
-<span><span class="co">#&gt; ================================================================================</span></span>
-<span><span class="co">#&gt;  dense (Dense)                      (None, 100)                     500         </span></span>
-<span><span class="co">#&gt;  dense_1 (Dense)                    (None, 100)                     10100       </span></span>
-<span><span class="co">#&gt;  dense_2 (Dense)                    (None, 3)                       303         </span></span>
-<span><span class="co">#&gt; ================================================================================</span></span>
+<span><span class="co">#&gt; Model: "sequential_3"</span></span>
+<span><span class="co">#&gt; ________________________________________________________________________________________________________________________</span></span>
+<span><span class="co">#&gt;  Layer (type)                                         Output Shape                                    Param #           </span></span>
+<span><span class="co">#&gt; ========================================================================================================================</span></span>
+<span><span class="co">#&gt;  dense_11 (Dense)                                     (None, 100)                                     500               </span></span>
+<span><span class="co">#&gt;  dense_12 (Dense)                                     (None, 100)                                     10100             </span></span>
+<span><span class="co">#&gt;  dense_13 (Dense)                                     (None, 3)                                       303               </span></span>
+<span><span class="co">#&gt; ========================================================================================================================</span></span>
 <span><span class="co">#&gt; Total params: 10903 (42.59 KB)</span></span>
 <span><span class="co">#&gt; Trainable params: 10903 (42.59 KB)</span></span>
 <span><span class="co">#&gt; Non-trainable params: 0 (0.00 Byte)</span></span>
-<span><span class="co">#&gt; ________________________________________________________________________________</span></span></code></pre></div>
+<span><span class="co">#&gt; ________________________________________________________________________________________________________________________</span></span></code></pre></div>
 <blockquote>
 <p><em>Note</em>: In this case the NN has a <em>linear</em> output with
 the same number of neurons as the number of classes to predict (3
@@ -216,7 +216,7 @@ highest probability with <code>k_argmax</code>.</p>
 <span></span>
 <span><span class="co"># Obtain the predicted classes with the NN to compare them</span></span>
 <span><span class="va">prediction_NN_class</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">probability_model</span>, <span class="va">test_x</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2/2 - 0s - 70ms/epoch - 35ms/step</span></span></code></pre></div>
+<span><span class="co">#&gt; 2/2 - 1s - 537ms/epoch - 268ms/step</span></span></code></pre></div>
 <blockquote>
 <p><em>Note</em>: As said before, <code><a href="../reference/nn2poly.html">nn2poly()</a></code> will
 approximate the linear output of the neural network, so we will need to
@@ -229,7 +229,7 @@ later.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Also, the linear output can be predicted before the probability model</span></span>
 <span><span class="va">prediction_NN</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">nn</span>, <span class="va">test_x</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2/2 - 0s - 40ms/epoch - 20ms/step</span></span></code></pre></div>
+<span><span class="co">#&gt; 2/2 - 0s - 70ms/epoch - 35ms/step</span></span></code></pre></div>
 <p>Finally We can use here a confusion matrix to visualize the results,
 where we can see that that the NN correctly predicts almost all of the
 classes in the test data:</p>
@@ -290,153 +290,44 @@ polynomial obtained for each output neuron.</p>
 <span><span class="va">final_poly</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nn2poly.html">nn2poly</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">nn</span>,</span>
 <span>                      max_order <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="va">final_poly</span></span>
-<span><span class="co">#&gt; $labels</span></span>
-<span><span class="co">#&gt; $labels[[1]]</span></span>
-<span><span class="co">#&gt; [1] 0</span></span>
+<span><span class="co">#&gt; nn2poly p=4 max_order=3 (35 coefficients)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[2]]</span></span>
-<span><span class="co">#&gt; [1] 1</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[3]]</span></span>
-<span><span class="co">#&gt; [1] 2</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[4]]</span></span>
-<span><span class="co">#&gt; [1] 3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[5]]</span></span>
-<span><span class="co">#&gt; [1] 4</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[6]]</span></span>
-<span><span class="co">#&gt; [1] 1 1</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[7]]</span></span>
-<span><span class="co">#&gt; [1] 1 2</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[8]]</span></span>
-<span><span class="co">#&gt; [1] 1 3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[9]]</span></span>
-<span><span class="co">#&gt; [1] 1 4</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[10]]</span></span>
-<span><span class="co">#&gt; [1] 2 2</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[11]]</span></span>
-<span><span class="co">#&gt; [1] 2 3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[12]]</span></span>
-<span><span class="co">#&gt; [1] 2 4</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[13]]</span></span>
-<span><span class="co">#&gt; [1] 3 3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[14]]</span></span>
-<span><span class="co">#&gt; [1] 3 4</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[15]]</span></span>
-<span><span class="co">#&gt; [1] 4 4</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[16]]</span></span>
-<span><span class="co">#&gt; [1] 1 1 1</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[17]]</span></span>
-<span><span class="co">#&gt; [1] 1 1 2</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[18]]</span></span>
-<span><span class="co">#&gt; [1] 1 1 3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[19]]</span></span>
-<span><span class="co">#&gt; [1] 1 1 4</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[20]]</span></span>
-<span><span class="co">#&gt; [1] 1 2 2</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[21]]</span></span>
-<span><span class="co">#&gt; [1] 1 2 3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[22]]</span></span>
-<span><span class="co">#&gt; [1] 1 2 4</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[23]]</span></span>
-<span><span class="co">#&gt; [1] 1 3 3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[24]]</span></span>
-<span><span class="co">#&gt; [1] 1 3 4</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[25]]</span></span>
-<span><span class="co">#&gt; [1] 1 4 4</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[26]]</span></span>
-<span><span class="co">#&gt; [1] 2 2 2</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[27]]</span></span>
-<span><span class="co">#&gt; [1] 2 2 3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[28]]</span></span>
-<span><span class="co">#&gt; [1] 2 2 4</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[29]]</span></span>
-<span><span class="co">#&gt; [1] 2 3 3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[30]]</span></span>
-<span><span class="co">#&gt; [1] 2 3 4</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[31]]</span></span>
-<span><span class="co">#&gt; [1] 2 4 4</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[32]]</span></span>
-<span><span class="co">#&gt; [1] 3 3 3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[33]]</span></span>
-<span><span class="co">#&gt; [1] 3 3 4</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[34]]</span></span>
-<span><span class="co">#&gt; [1] 3 4 4</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[35]]</span></span>
-<span><span class="co">#&gt; [1] 4 4 4</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $values</span></span>
-<span><span class="co">#&gt;              [,1]         [,2]         [,3]</span></span>
-<span><span class="co">#&gt;  [1,]  0.04067109  2.838697004 -2.366766912</span></span>
-<span><span class="co">#&gt;  [2,] -1.01692952  0.922284435  0.306762048</span></span>
-<span><span class="co">#&gt;  [3,]  3.82618130 -1.532152815 -2.683000514</span></span>
-<span><span class="co">#&gt;  [4,] -4.86343269 -0.367029700  5.201883882</span></span>
-<span><span class="co">#&gt;  [5,] -6.05908248 -2.026009803  7.701675045</span></span>
-<span><span class="co">#&gt;  [6,]  0.02216647 -0.068650500  0.031318449</span></span>
-<span><span class="co">#&gt;  [7,] -0.09821698  0.115922745  0.007638440</span></span>
-<span><span class="co">#&gt;  [8,]  0.08146315 -0.072443601 -0.025525980</span></span>
-<span><span class="co">#&gt;  [9,]  0.04337399 -0.019371395 -0.029198248</span></span>
-<span><span class="co">#&gt; [10,]  0.08763212 -0.122314949  0.007196786</span></span>
-<span><span class="co">#&gt; [11,] -0.13090934  0.160297202  0.008898167</span></span>
-<span><span class="co">#&gt; [12,] -0.03982065  0.118363240 -0.047742059</span></span>
-<span><span class="co">#&gt; [13,] -0.03990296 -0.186114002  0.182448046</span></span>
-<span><span class="co">#&gt; [14,] -0.22518863 -0.383706458  0.517483976</span></span>
-<span><span class="co">#&gt; [15,] -0.21539519 -0.340739130  0.476053215</span></span>
-<span><span class="co">#&gt; [16,]  0.01640856 -0.015861053 -0.004179781</span></span>
-<span><span class="co">#&gt; [17,] -0.08649215  0.054035395  0.045407899</span></span>
-<span><span class="co">#&gt; [18,]  0.08657797 -0.020808458 -0.071458194</span></span>
-<span><span class="co">#&gt; [19,]  0.10626455  0.016833308 -0.120917295</span></span>
-<span><span class="co">#&gt; [20,] -0.09226002  0.058721711  0.047211597</span></span>
-<span><span class="co">#&gt; [21,] -0.12782353  0.099224893  0.053681832</span></span>
-<span><span class="co">#&gt; [22,] -0.14300636  0.061378209  0.099556359</span></span>
-<span><span class="co">#&gt; [23,]  0.08681554 -0.019495659 -0.072698532</span></span>
-<span><span class="co">#&gt; [24,]  0.07906020 -0.071096510 -0.027609755</span></span>
-<span><span class="co">#&gt; [25,]  0.10751970  0.019949727 -0.124596164</span></span>
-<span><span class="co">#&gt; [26,] -0.12832404  0.057077780  0.086244551</span></span>
-<span><span class="co">#&gt; [27,]  0.31410761 -0.112571487 -0.233324113</span></span>
-<span><span class="co">#&gt; [28,]  0.39822386 -0.072171099 -0.351003640</span></span>
-<span><span class="co">#&gt; [29,]  0.32366110 -0.115551628 -0.240170974</span></span>
-<span><span class="co">#&gt; [30,] -0.64179985  0.150429244  0.539640723</span></span>
-<span><span class="co">#&gt; [31,]  0.40593582 -0.069258417 -0.360602426</span></span>
-<span><span class="co">#&gt; [32,]  0.17561230  0.009076263 -0.185280705</span></span>
-<span><span class="co">#&gt; [33,]  0.51767960  0.109300583 -0.609898697</span></span>
-<span><span class="co">#&gt; [34,]  0.51398607  0.101899652 -0.600694175</span></span>
-<span><span class="co">#&gt; [35,]  0.34526975  0.146409617 -0.461815984</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; attr(,"class")</span></span>
-<span><span class="co">#&gt; [1] "nn2poly"</span></span></code></pre></div>
+<span><span class="co">#&gt;    Label   layer_1.1    layer_1.2        Value</span></span>
+<span><span class="co">#&gt; 1      0  0.04067110  2.838696843 -2.366766781</span></span>
+<span><span class="co">#&gt; 2      1 -1.01692941  0.922284418  0.306761949</span></span>
+<span><span class="co">#&gt; 3      2  3.82618116 -1.532152710 -2.683000363</span></span>
+<span><span class="co">#&gt; 4      3 -4.86343231 -0.367029543  5.201883302</span></span>
+<span><span class="co">#&gt; 5      4 -6.05908192 -2.026009687  7.701674287</span></span>
+<span><span class="co">#&gt; 6    1 1  0.02216651 -0.068650520  0.031318424</span></span>
+<span><span class="co">#&gt; 7    1 2 -0.09821704  0.115922790  0.007638464</span></span>
+<span><span class="co">#&gt; 8    1 3  0.08146321 -0.072443687 -0.025525971</span></span>
+<span><span class="co">#&gt; 9    1 4  0.04337401 -0.019371435 -0.029198241</span></span>
+<span><span class="co">#&gt; 10   2 2  0.08763214 -0.122314949  0.007196768</span></span>
+<span><span class="co">#&gt; 11   2 3 -0.13090939  0.160297255  0.008898178</span></span>
+<span><span class="co">#&gt; 12   2 4 -0.03982067  0.118363267 -0.047742066</span></span>
+<span><span class="co">#&gt; 13   3 3 -0.03990281 -0.186113959  0.182447863</span></span>
+<span><span class="co">#&gt; 14   3 4 -0.22518835 -0.383706217  0.517483516</span></span>
+<span><span class="co">#&gt; 15   4 4 -0.21539498 -0.340738887  0.476052813</span></span>
+<span><span class="co">#&gt; 16 1 1 1  0.01640874 -0.015861276 -0.004179789</span></span>
+<span><span class="co">#&gt; 17 1 1 2 -0.08649263  0.054035970  0.045407945</span></span>
+<span><span class="co">#&gt; 18 1 1 3  0.08657836 -0.020808952 -0.071458205</span></span>
+<span><span class="co">#&gt; 19 1 1 4  0.10626469  0.016833176 -0.120917330</span></span>
+<span><span class="co">#&gt; 20 1 2 2  0.08459576 -0.071715667 -0.029934108</span></span>
+<span><span class="co">#&gt; 21 1 2 3 -0.12782438  0.099225772  0.053682008</span></span>
+<span><span class="co">#&gt; 22 1 2 4 -0.14300672  0.061378474  0.099556507</span></span>
+<span><span class="co">#&gt; 23 1 3 3  0.06399315 -0.058123074 -0.020400644</span></span>
+<span><span class="co">#&gt; 24 1 3 4  0.07906045 -0.071096688 -0.027609865</span></span>
+<span><span class="co">#&gt; 25 1 4 4  0.07534905 -0.054539678 -0.035542528</span></span>
+<span><span class="co">#&gt; 26 2 2 2 -0.12832426  0.057078039  0.086244566</span></span>
+<span><span class="co">#&gt; 27 2 2 3  0.31410803 -0.112572013 -0.233324120</span></span>
+<span><span class="co">#&gt; 28 2 2 4  0.39822396 -0.072171273 -0.351003593</span></span>
+<span><span class="co">#&gt; 29 2 3 3 -0.30494053  0.117239273  0.220625579</span></span>
+<span><span class="co">#&gt; 30 2 3 4 -0.64179975  0.150429652  0.539640298</span></span>
+<span><span class="co">#&gt; 31 2 4 4 -0.48146100  0.078259568  0.429785817</span></span>
+<span><span class="co">#&gt; 32 3 3 3  0.17561246  0.009075899 -0.185280585</span></span>
+<span><span class="co">#&gt; 33 3 3 4  0.51767933  0.109300146 -0.609898095</span></span>
+<span><span class="co">#&gt; 34 3 4 4  0.65067978  0.186264474 -0.802660943</span></span>
+<span><span class="co">#&gt; 35 4 4 4  0.34526955  0.146409430 -0.461815650</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="obtaining-polynomial-predictions">Obtaining polynomial predictions<a class="anchor" aria-label="anchor" href="#obtaining-polynomial-predictions"></a>
@@ -461,7 +352,7 @@ polynomials are evaluated at the same time:</p>
 <span><span class="co"># Class prediction with the polynomial outputs</span></span>
 <span><span class="va">prediction_poly_class</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">probability_poly</span>,</span>
 <span>                                 <span class="va">prediction_poly_matrix</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2/2 - 0s - 121ms/epoch - 60ms/step</span></span></code></pre></div>
+<span><span class="co">#&gt; 2/2 - 2s - 2s/epoch - 1s/step</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="visualizing-the-results">Visualizing the results<a class="anchor" aria-label="anchor" href="#visualizing-the-results"></a>
@@ -544,7 +435,7 @@ class.</p>
 the original polynomial due to the fact that we have scaled all the data
 before training, even the response variable Y. Furthermore, as data has
 been scaled to the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">[</mo><mo>−</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[-1,1]</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">[</mo><mi>−</mi><mn>1</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[-1,1]</annotation></semantics></math>
 interval, interactions of order 2 or higher would usually need a higher
 absolute value than the lower order coefficients to be more relevant</p>
 </blockquote>
@@ -583,7 +474,7 @@ expansion around zero at each hidden layer.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

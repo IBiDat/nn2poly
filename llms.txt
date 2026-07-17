@@ -27,6 +27,7 @@ interpretability or eXplainable Artificial Intelligence (XAI).
 The latest release version available in CRAN can be installed as:
 
 ``` r
+
 install.packages("nn2poly")
 ```
 
@@ -34,6 +35,7 @@ The installation from GitHub requires the
 [remotes](https://cran.r-project.org/package=remotes) package.
 
 ``` r
+
 # install.packages("remotes")
 remotes::install_github("IBiDat/nn2poly")
 ```

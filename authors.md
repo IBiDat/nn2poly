@@ -12,7 +12,7 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/IBiDat/nn2poly/blob/v0.1.3/inst/CITATION)
+[`inst/CITATION`](https://github.com/IBiDat/nn2poly/blob/v1.0.0/inst/CITATION)
 
 Morala P, Cifuentes J, Lillo R, Ucar I (2021). “Towards a mathematical
 framework to inform neural network modelling via polynomial regression.”

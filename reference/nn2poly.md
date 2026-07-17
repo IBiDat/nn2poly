@@ -7,14 +7,7 @@ expansion of its activation functions.
 ## Usage
 
 ``` r
-nn2poly(
-  object,
-  max_order = 2,
-  keep_layers = FALSE,
-  taylor_orders = 8,
-  ...,
-  all_partitions = NULL
-)
+nn2poly(object, max_order = 2, keep_layers = FALSE, taylor_orders = 8, ...)
 ```
 
 ## Arguments
@@ -67,15 +60,6 @@ nn2poly(
 - ...:
 
   Ignored.
-
-- all_partitions:
-
-  Optional argument containing the needed multipartitions as list of
-  lists of lists. If set to `NULL`, nn2poly will compute said
-  multipartitions. This step can be computationally expensive when the
-  chosen polynomial order or the dimension are too high. In such cases,
-  it is encouraged that the multipartitions are stored and reused when
-  possible. Default set to `NULL`.
 
 ## Value
 

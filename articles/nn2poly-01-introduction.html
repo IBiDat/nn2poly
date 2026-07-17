@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Introduction to nn2poly • nn2poly</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Introduction to nn2poly">
 </head>
@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">nn2poly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -63,7 +63,7 @@
 Morala</h4>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/IBiDat/nn2poly/blob/v0.1.3/vignettes/nn2poly-01-introduction.Rmd" class="external-link"><code>vignettes/nn2poly-01-introduction.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/IBiDat/nn2poly/blob/v1.0.0/vignettes/nn2poly-01-introduction.Rmd" class="external-link"><code>vignettes/nn2poly-01-introduction.Rmd</code></a></small>
       <div class="d-none name"><code>nn2poly-01-introduction.Rmd</code></div>
     </div>
 
@@ -213,7 +213,7 @@ will be generated as:
 <span><span class="co">#&gt; 5  0.4042683 -0.720153545 -0.9959334 -0.6141076</span></span>
 <span><span class="co">#&gt; 6 -0.1061245 -0.198124330 -0.5974829 -0.7455793</span></span></code></pre></div>
 <p>Then we will scale the data to have everything in the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">[</mo><mo>−</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[-1,1]</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">[</mo><mi>−</mi><mn>1</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[-1,1]</annotation></semantics></math>
 interval and divide it in train and test.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Data scaling to [-1,1]</span></span>
@@ -272,18 +272,18 @@ to <code><a href="../articles/nn2poly-02-supported-DL-frameworks.html">vignette(
 <span>                  activation <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">nn</span></span>
-<span><span class="co">#&gt; Model: "sequential_9"</span></span>
-<span><span class="co">#&gt; ________________________________________________________________________________________________________________________________________________________</span></span>
-<span><span class="co">#&gt;  Layer (type)                                                       Output Shape                                                 Param #                </span></span>
-<span><span class="co">#&gt; ========================================================================================================================================================</span></span>
-<span><span class="co">#&gt;  dense_27 (Dense)                                                   (None, 10)                                                   40                     </span></span>
-<span><span class="co">#&gt;  dense_28 (Dense)                                                   (None, 10)                                                   110                    </span></span>
-<span><span class="co">#&gt;  dense_29 (Dense)                                                   (None, 1)                                                    11                     </span></span>
-<span><span class="co">#&gt; ========================================================================================================================================================</span></span>
-<span><span class="co">#&gt; Total params: 161</span></span>
-<span><span class="co">#&gt; Trainable params: 161</span></span>
-<span><span class="co">#&gt; Non-trainable params: 0</span></span>
-<span><span class="co">#&gt; ________________________________________________________________________________________________________________________________________________________</span></span></code></pre></div>
+<span><span class="co">#&gt; Model: "sequential"</span></span>
+<span><span class="co">#&gt; ________________________________________________________________________________________________________________________</span></span>
+<span><span class="co">#&gt;  Layer (type)                                         Output Shape                                    Param #           </span></span>
+<span><span class="co">#&gt; ========================================================================================================================</span></span>
+<span><span class="co">#&gt;  dense (Dense)                                        (None, 10)                                      40                </span></span>
+<span><span class="co">#&gt;  dense_1 (Dense)                                      (None, 10)                                      110               </span></span>
+<span><span class="co">#&gt;  dense_2 (Dense)                                      (None, 1)                                       11                </span></span>
+<span><span class="co">#&gt; ========================================================================================================================</span></span>
+<span><span class="co">#&gt; Total params: 161 (644.00 Byte)</span></span>
+<span><span class="co">#&gt; Trainable params: 161 (644.00 Byte)</span></span>
+<span><span class="co">#&gt; Non-trainable params: 0 (0.00 Byte)</span></span>
+<span><span class="co">#&gt; ________________________________________________________________________________________________________________________</span></span></code></pre></div>
 <p>Compile the model:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://generics.r-lib.org/reference/compile.html" class="external-link">compile</a></span><span class="op">(</span><span class="va">nn</span>,</span>
@@ -308,7 +308,7 @@ values.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Obtain the predicted values with the NN to compare them</span></span>
 <span><span class="va">prediction_NN</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">nn</span>, <span class="va">test_x</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 4/4 - 0s - 71ms/epoch - 18ms/step</span></span>
+<span><span class="co">#&gt; 4/4 - 0s - 144ms/epoch - 36ms/step</span></span>
 <span></span>
 <span><span class="co"># Diagonal plot implemented in the package to quickly visualize and compare predictions</span></span>
 <span><span class="fu">nn2poly</span><span class="fu">:::</span><span class="fu"><a href="../reference/plot_diagonal.html">plot_diagonal</a></span><span class="op">(</span>x_axis <span class="op">=</span>  <span class="va">prediction_NN</span>, y_axis <span class="op">=</span>  <span class="va">test_y</span>, xlab <span class="op">=</span> <span class="st">"NN prediction"</span>, ylab <span class="op">=</span> <span class="st">"Original Y"</span><span class="op">)</span></span></code></pre></div>
@@ -330,7 +330,7 @@ expected input form. This should be a list of matrices such that:</p>
 <ul>
 <li>There is a weight matrix per layer. The weights matrices should be
 of dimension
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>+</mo><mi>i</mi><mi>n</mi><mi>p</mi><mi>u</mi><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>*</mo><mi>o</mi><mi>u</mi><mi>t</mi><mi>p</mi><mi>u</mi><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">((1+input) * output)</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>+</mo><mi>i</mi><mi>n</mi><mi>p</mi><mi>u</mi><mi>t</mi><mo stretchy="false" form="postfix">)</mo><mo>*</mo><mi>o</mi><mi>u</mi><mi>t</mi><mi>p</mi><mi>u</mi><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">((1+input) * output)</annotation></semantics></math>
 where the first row corresponds to the bias vector, and the rest of the
 rows correspond to each of the ordered vector weights associated to each
 neuron input.</li>
@@ -373,39 +373,51 @@ on the supported frameworks refer to
 <span></span>
 <span><span class="va">weights_object</span></span>
 <span><span class="co">#&gt; $tanh</span></span>
-<span><span class="co">#&gt;            [,1]       [,2]      [,3]       [,4]        [,5]       [,6]       [,7]        [,8]        [,9]        [,10]</span></span>
-<span><span class="co">#&gt; [1,]  0.2468006 -0.1615576 0.4128721 -0.2022066  0.04867206 -0.3397017 -0.1973533 -0.08864177 -0.06979843 -0.359030366</span></span>
-<span><span class="co">#&gt; [2,]  0.2653632  0.1291278 0.1464561  0.5171605 -0.47153816  0.1952459  0.6991890 -0.34414759 -0.01077842  0.006373413</span></span>
-<span><span class="co">#&gt; [3,] -0.7783106 -0.1182964 0.8215331  0.0756740  0.06914742  0.7492308 -0.8363205 -0.46379340  0.04437404 -0.698476076</span></span>
-<span><span class="co">#&gt; [4,] -0.7159964  0.5072741 0.6033612 -0.4585148  0.49232438 -0.7474106  0.1091831  0.34101799  0.04305385 -0.571668506</span></span>
+<span><span class="co">#&gt;            [,1]       [,2]      [,3]        [,4]        [,5]       [,6]       [,7]        [,8]        [,9]        [,10]</span></span>
+<span><span class="co">#&gt; [1,]  0.2468006 -0.1615576 0.4128713 -0.20220654  0.04867205 -0.3397018 -0.1973532 -0.08864179 -0.06979840 -0.359030485</span></span>
+<span><span class="co">#&gt; [2,]  0.2653633  0.1291279 0.1464556  0.51716059 -0.47153831  0.1952457  0.6991889 -0.34414756 -0.01077837  0.006373301</span></span>
+<span><span class="co">#&gt; [3,] -0.7783106 -0.1182961 0.8215325  0.07567399  0.06914735  0.7492309 -0.8363206 -0.46379334  0.04437395 -0.698476136</span></span>
+<span><span class="co">#&gt; [4,] -0.7159963  0.5072740 0.6033602 -0.45851484  0.49232417 -0.7474104  0.1091831  0.34101796  0.04305388 -0.571668625</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $tanh</span></span>
-<span><span class="co">#&gt;              [,1]          [,2]        [,3]        [,4]        [,5]       [,6]        [,7]        [,8]        [,9]        [,10]</span></span>
-<span><span class="co">#&gt;  [1,] -0.06682093  1.354177e-02  0.41062176  0.06204464  0.08612972  0.2199472  0.07406761  0.16231309  0.08528626  0.074458212</span></span>
-<span><span class="co">#&gt;  [2,]  0.61209673 -1.587261e-01  0.33286688  0.16685191  0.25638032 -0.2960541  0.06451954 -0.04405669 -0.57139808 -0.314788640</span></span>
-<span><span class="co">#&gt;  [3,] -0.24969149 -5.748887e-02 -0.46696794  0.12622431 -0.03608320 -0.3931088  0.28291187  0.24243380 -0.47687724 -0.002060457</span></span>
-<span><span class="co">#&gt;  [4,]  0.38323382  4.771161e-01  0.11585876  0.44199020  0.16203447  0.6357560  0.01491554 -0.29491946  0.09033196 -0.017912282</span></span>
-<span><span class="co">#&gt;  [5,] -0.24755152  6.043483e-06  0.41534948  0.27495798 -0.46539015 -0.3829005 -0.53592098 -0.42729110 -0.48928314 -0.197884247</span></span>
-<span><span class="co">#&gt;  [6,] -0.26591998  5.250556e-01 -0.10562975  0.37414369  0.26212201  0.4499114 -0.41681677 -0.25272584 -0.28060704 -0.249755934</span></span>
-<span><span class="co">#&gt;  [7,]  0.49481559  1.359816e-01  0.67004895 -0.15929574  0.16280667  0.4475754 -0.20691858  0.40582910 -0.11089712 -0.387193263</span></span>
-<span><span class="co">#&gt;  [8,]  0.40330765 -4.343324e-01 -0.92225003 -0.15942611  0.01812540  0.2977643 -0.04585903 -0.37514219  0.24891976 -0.395170867</span></span>
-<span><span class="co">#&gt;  [9,]  0.51166564  1.184353e-01 -0.82071930 -0.02945352  0.31787610  0.2762571  0.48814669 -0.39470875  0.01584071 -0.538033605</span></span>
-<span><span class="co">#&gt; [10,]  0.27744713 -1.118216e-01  0.02931483  0.35466376  0.24984393 -0.1250943 -0.32097501  0.09834206 -0.06148605 -0.403377086</span></span>
-<span><span class="co">#&gt; [11,] -0.50523925  4.479433e-01 -0.55034703  0.48515356 -0.03854835 -0.8001245  0.15069254 -0.20994137  0.23820342  0.375222772</span></span>
+<span><span class="co">#&gt;              [,1]          [,2]        [,3]        [,4]        [,5]       [,6]        [,7]        [,8]        [,9]</span></span>
+<span><span class="co">#&gt;  [1,] -0.06682089  1.354172e-02  0.41062164  0.06204460  0.08612972  0.2199472  0.07406754  0.16231298  0.08528623</span></span>
+<span><span class="co">#&gt;  [2,]  0.61209673 -1.587262e-01  0.33286676  0.16685182  0.25638020 -0.2960541  0.06451947 -0.04405661 -0.57139808</span></span>
+<span><span class="co">#&gt;  [3,] -0.24969155 -5.748881e-02 -0.46696773  0.12622425 -0.03608327 -0.3931087  0.28291160  0.24243358 -0.47687712</span></span>
+<span><span class="co">#&gt;  [4,]  0.38323367  4.771163e-01  0.11585877  0.44199026  0.16203457  0.6357555  0.01491562 -0.29491952  0.09033217</span></span>
+<span><span class="co">#&gt;  [5,] -0.24755144  6.061164e-06  0.41534948  0.27495801 -0.46539021 -0.3829005 -0.53592080 -0.42729107 -0.48928317</span></span>
+<span><span class="co">#&gt;  [6,] -0.26592004  5.250555e-01 -0.10562965  0.37414378  0.26212201  0.4499112 -0.41681677 -0.25272587 -0.28060722</span></span>
+<span><span class="co">#&gt;  [7,]  0.49481562  1.359813e-01  0.67004883 -0.15929586  0.16280666  0.4475756 -0.20691857  0.40582907 -0.11089722</span></span>
+<span><span class="co">#&gt;  [8,]  0.40330768 -4.343323e-01 -0.92224991 -0.15942615  0.01812538  0.2977643 -0.04585909 -0.37514216  0.24891976</span></span>
+<span><span class="co">#&gt;  [9,]  0.51166564  1.184353e-01 -0.82071894 -0.02945357  0.31787601  0.2762574  0.48814657 -0.39470866  0.01584072</span></span>
+<span><span class="co">#&gt; [10,]  0.27744731 -1.118216e-01  0.02931478  0.35466370  0.24984398 -0.1250943 -0.32097501  0.09834207 -0.06148596</span></span>
+<span><span class="co">#&gt; [11,] -0.50523943  4.479434e-01 -0.55034673  0.48515370 -0.03854827 -0.8001247  0.15069266 -0.20994125  0.23820356</span></span>
+<span><span class="co">#&gt;              [,10]</span></span>
+<span><span class="co">#&gt;  [1,]  0.074458130</span></span>
+<span><span class="co">#&gt;  [2,] -0.314788610</span></span>
+<span><span class="co">#&gt;  [3,] -0.002060459</span></span>
+<span><span class="co">#&gt;  [4,] -0.017912110</span></span>
+<span><span class="co">#&gt;  [5,] -0.197884262</span></span>
+<span><span class="co">#&gt;  [6,] -0.249755993</span></span>
+<span><span class="co">#&gt;  [7,] -0.387193352</span></span>
+<span><span class="co">#&gt;  [8,] -0.395170897</span></span>
+<span><span class="co">#&gt;  [9,] -0.538033485</span></span>
+<span><span class="co">#&gt; [10,] -0.403377146</span></span>
+<span><span class="co">#&gt; [11,]  0.375223100</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $linear</span></span>
 <span><span class="co">#&gt;              [,1]</span></span>
-<span><span class="co">#&gt;  [1,] -0.07325488</span></span>
-<span><span class="co">#&gt;  [2,]  0.92378414</span></span>
-<span><span class="co">#&gt;  [3,] -0.08239315</span></span>
-<span><span class="co">#&gt;  [4,] -0.32572412</span></span>
-<span><span class="co">#&gt;  [5,] -0.43841833</span></span>
-<span><span class="co">#&gt;  [6,] -0.08093655</span></span>
-<span><span class="co">#&gt;  [7,]  0.59904134</span></span>
-<span><span class="co">#&gt;  [8,] -0.65850627</span></span>
-<span><span class="co">#&gt;  [9,] -0.04606140</span></span>
-<span><span class="co">#&gt; [10,] -0.79061949</span></span>
-<span><span class="co">#&gt; [11,] -0.89735550</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1,] -0.07325495</span></span>
+<span><span class="co">#&gt;  [2,]  0.92378408</span></span>
+<span><span class="co">#&gt;  [3,] -0.08239322</span></span>
+<span><span class="co">#&gt;  [4,] -0.32572401</span></span>
+<span><span class="co">#&gt;  [5,] -0.43841884</span></span>
+<span><span class="co">#&gt;  [6,] -0.08093645</span></span>
+<span><span class="co">#&gt;  [7,]  0.59904140</span></span>
+<span><span class="co">#&gt;  [8,] -0.65850633</span></span>
+<span><span class="co">#&gt;  [9,] -0.04606128</span></span>
+<span><span class="co">#&gt; [10,] -0.79061973</span></span>
+<span><span class="co">#&gt; [11,] -0.89735556</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="polynomial-obtained-with-nn2poly-from-weights-and-activation-functions">Polynomial obtained with <code>nn2poly</code> from weights and
@@ -432,93 +444,29 @@ polynomial that generated the data, as a list with labels and values. In
 this case, the obtained polynomial is up to order 3.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">final_poly</span></span>
-<span><span class="co">#&gt; $labels</span></span>
-<span><span class="co">#&gt; $labels[[1]]</span></span>
-<span><span class="co">#&gt; [1] 0</span></span>
+<span><span class="co">#&gt; nn2poly p=3 max_order=3 (20 coefficients)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[2]]</span></span>
-<span><span class="co">#&gt; [1] 1</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[3]]</span></span>
-<span><span class="co">#&gt; [1] 2</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[4]]</span></span>
-<span><span class="co">#&gt; [1] 3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[5]]</span></span>
-<span><span class="co">#&gt; [1] 1 1</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[6]]</span></span>
-<span><span class="co">#&gt; [1] 1 2</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[7]]</span></span>
-<span><span class="co">#&gt; [1] 1 3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[8]]</span></span>
-<span><span class="co">#&gt; [1] 2 2</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[9]]</span></span>
-<span><span class="co">#&gt; [1] 2 3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[10]]</span></span>
-<span><span class="co">#&gt; [1] 3 3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[11]]</span></span>
-<span><span class="co">#&gt; [1] 1 1 1</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[12]]</span></span>
-<span><span class="co">#&gt; [1] 1 1 2</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[13]]</span></span>
-<span><span class="co">#&gt; [1] 1 1 3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[14]]</span></span>
-<span><span class="co">#&gt; [1] 1 2 2</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[15]]</span></span>
-<span><span class="co">#&gt; [1] 1 2 3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[16]]</span></span>
-<span><span class="co">#&gt; [1] 1 3 3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[17]]</span></span>
-<span><span class="co">#&gt; [1] 2 2 2</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[18]]</span></span>
-<span><span class="co">#&gt; [1] 2 2 3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[19]]</span></span>
-<span><span class="co">#&gt; [1] 2 3 3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $labels[[20]]</span></span>
-<span><span class="co">#&gt; [1] 3 3 3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $values</span></span>
-<span><span class="co">#&gt;               [,1]</span></span>
-<span><span class="co">#&gt;  [1,] -0.152201327</span></span>
-<span><span class="co">#&gt;  [2,]  0.750790396</span></span>
-<span><span class="co">#&gt;  [3,]  0.096754449</span></span>
-<span><span class="co">#&gt;  [4,] -0.055312169</span></span>
-<span><span class="co">#&gt;  [5,]  0.087070907</span></span>
-<span><span class="co">#&gt;  [6,]  0.184542875</span></span>
-<span><span class="co">#&gt;  [7,]  0.056719718</span></span>
-<span><span class="co">#&gt;  [8,]  0.117868180</span></span>
-<span><span class="co">#&gt;  [9,] -2.316887421</span></span>
-<span><span class="co">#&gt; [10,] -0.111600389</span></span>
-<span><span class="co">#&gt; [11,] -0.106978125</span></span>
-<span><span class="co">#&gt; [12,]  0.335722744</span></span>
-<span><span class="co">#&gt; [13,]  0.007464716</span></span>
-<span><span class="co">#&gt; [14,]  0.580397844</span></span>
-<span><span class="co">#&gt; [15,] -0.072672555</span></span>
-<span><span class="co">#&gt; [16,]  0.064910409</span></span>
-<span><span class="co">#&gt; [17,]  0.274290026</span></span>
-<span><span class="co">#&gt; [18,] -0.474785464</span></span>
-<span><span class="co">#&gt; [19,] -0.242252638</span></span>
-<span><span class="co">#&gt; [20,]  0.013870973</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; attr(,"class")</span></span>
-<span><span class="co">#&gt; [1] "nn2poly"</span></span></code></pre></div>
+<span><span class="co">#&gt;    Label        Value</span></span>
+<span><span class="co">#&gt; 1      0 -0.152198512</span></span>
+<span><span class="co">#&gt; 2      1  0.750800858</span></span>
+<span><span class="co">#&gt; 3      2  0.096814075</span></span>
+<span><span class="co">#&gt; 4      3 -0.055398675</span></span>
+<span><span class="co">#&gt; 5    1 1  0.087057891</span></span>
+<span><span class="co">#&gt; 6    1 2  0.184700760</span></span>
+<span><span class="co">#&gt; 7    1 3  0.056751302</span></span>
+<span><span class="co">#&gt; 8    2 2  0.118384860</span></span>
+<span><span class="co">#&gt; 9    2 3 -2.318157289</span></span>
+<span><span class="co">#&gt; 10   3 3 -0.111433571</span></span>
+<span><span class="co">#&gt; 11 1 1 1 -0.106970411</span></span>
+<span><span class="co">#&gt; 12 1 1 2  0.335554148</span></span>
+<span><span class="co">#&gt; 13 1 1 3  0.007415232</span></span>
+<span><span class="co">#&gt; 14 1 2 2 -0.329499832</span></span>
+<span><span class="co">#&gt; 15 1 2 3 -0.072605868</span></span>
+<span><span class="co">#&gt; 16 1 3 3 -0.052390733</span></span>
+<span><span class="co">#&gt; 17 2 2 2  0.276542943</span></span>
+<span><span class="co">#&gt; 18 2 2 3 -0.482213515</span></span>
+<span><span class="co">#&gt; 19 2 3 3  0.404022648</span></span>
+<span><span class="co">#&gt; 20 3 3 3  0.012746235</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="predictions-using-the-obtained-polynomial">Predictions using the obtained polynomial<a class="anchor" aria-label="anchor" href="#predictions-using-the-obtained-polynomial"></a>
@@ -592,7 +540,7 @@ the approximation is not perfect.</p>
 most important coefficients in absolute value to compare which variables
 or interactions are more relevant in the polynomial. Note that, as data
 should be scaled to the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">[</mo><mo>−</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[-1,1]</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">[</mo><mi>−</mi><mn>1</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[-1,1]</annotation></semantics></math>
 interval, interactions of order 2 or higher would usually need a higher
 absolute value than the lower order coefficients to be more
 relevant.</p>
@@ -640,7 +588,7 @@ activation potentials are not strictly centered around zero.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

@@ -5,4 +5,4 @@ to see their documentation.
 
 - generics:
 
-  [`fit`](https://generics.r-lib.org/reference/fit.html)
+  [`fit()`](https://generics.r-lib.org/reference/fit.html)
