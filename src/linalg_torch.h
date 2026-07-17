@@ -25,10 +25,9 @@ inline Weights trans(const Weights& mat) {
 }
 
 inline Weights alg_linear(Weights& coeffs_list, const Weights& layer) {
-  auto intercept = torch::zeros({1, coeffs_list.size(1)}, coeffs_list.options());
-  intercept[0][0] = 1.0;
-  auto joined = torch::cat({intercept, coeffs_list}, /*dim=*/0);
-  return torch::matmul(layer.t(), joined);
+  Weights mat = torch::matmul(layer.slice(0, 1, layer.size(0)).t(), coeffs_list);
+  mat.select(1, 0).add_(layer[0]);
+  return mat;
 }
 
 inline void sub_scalar(Weights& mat, int i, double scalar) {
@@ -69,8 +68,8 @@ inline Vector accumulate_partition(const Weights& coeffs_input, int d,
 #include <Rcpp.h>
 
 namespace Rcpp {
-template <> torch::Tensor as(SEXP x);
-NumericMatrix wrap(const torch::Tensor& data);
+template <> nn2poly::linalg::Weights as(SEXP x);
+NumericMatrix wrap(const nn2poly::linalg::Weights& data);
 }
 
 #endif

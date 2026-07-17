@@ -6,6 +6,7 @@
 #include <vector>
 #include <iostream>
 #include <string>
+#include <cstdint>
 
 using Term = std::vector<int>;
 using Terms = std::vector<Term>;
@@ -20,7 +21,8 @@ struct PartitionsList {
 struct TermHash {
   std::size_t operator()(Term const& key) const noexcept {
     std::size_t seed = key.size();
-    for(auto x : key) {
+    for(auto item : key) {
+      uint32_t x = static_cast<uint32_t>(item);
       x = ((x >> 16) ^ x) * 0x45d9f3b;
       x = ((x >> 16) ^ x) * 0x45d9f3b;
       x = (x >> 16) ^ x;
