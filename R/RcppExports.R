@@ -5,8 +5,8 @@ obtain_taylor_vector <- function(taylor_orders, af_string_list) {
     .Call(`_nn2poly_obtain_taylor_vector`, taylor_orders, af_string_list)
 }
 
-obtain_derivatives_list <- function(taylor_orders, af_string_list) {
-    .Call(`_nn2poly_obtain_derivatives_list`, taylor_orders, af_string_list)
+obtain_derivatives_list <- function(taylor_orders, af_string_list, a = 0.0) {
+    .Call(`_nn2poly_obtain_derivatives_list`, taylor_orders, af_string_list, a)
 }
 
 alg_non_linear <- function(coeffs_input, labels_input, labels_output, previous_order, q_layer, g) {

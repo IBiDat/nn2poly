@@ -24,7 +24,8 @@ Term obtain_taylor_vector(const Term& taylor_orders,
 
 // [[Rcpp::export]]
 CoeffsList obtain_derivatives_list(const Term& taylor_orders,
-                                   const Functions& af_string_list) {
+                                   const Functions& af_string_list,
+                                   double a = 0.0) {
   if (taylor_orders.size() != af_string_list.size())
     throw std::invalid_argument(
       "`taylor_orders` length does not match provided number of layers");
@@ -35,7 +36,8 @@ CoeffsList obtain_derivatives_list(const Term& taylor_orders,
       throw std::invalid_argument("`taylor_orders` must be non-negative");
     // Obtain the vector with the derivatives of the activation function up to
     // the given degree centered at 0
-    out[i] = coeffs_taylor(af_string_list[i], taylor_orders[i]);
+    out[i].resize(static_cast<size_t>(taylor_orders[i] + 1));
+    coeffs_taylor(af_string_list[i], out[i], a);
   }
 
   return out;

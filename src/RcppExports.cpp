@@ -25,14 +25,15 @@ BEGIN_RCPP
 END_RCPP
 }
 // obtain_derivatives_list
-CoeffsList obtain_derivatives_list(const Term& taylor_orders, const Functions& af_string_list);
-RcppExport SEXP _nn2poly_obtain_derivatives_list(SEXP taylor_ordersSEXP, SEXP af_string_listSEXP) {
+CoeffsList obtain_derivatives_list(const Term& taylor_orders, const Functions& af_string_list, double a);
+RcppExport SEXP _nn2poly_obtain_derivatives_list(SEXP taylor_ordersSEXP, SEXP af_string_listSEXP, SEXP aSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Term& >::type taylor_orders(taylor_ordersSEXP);
     Rcpp::traits::input_parameter< const Functions& >::type af_string_list(af_string_listSEXP);
-    rcpp_result_gen = Rcpp::wrap(obtain_derivatives_list(taylor_orders, af_string_list));
+    Rcpp::traits::input_parameter< double >::type a(aSEXP);
+    rcpp_result_gen = Rcpp::wrap(obtain_derivatives_list(taylor_orders, af_string_list, a));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -82,7 +83,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_nn2poly_obtain_taylor_vector", (DL_FUNC) &_nn2poly_obtain_taylor_vector, 2},
-    {"_nn2poly_obtain_derivatives_list", (DL_FUNC) &_nn2poly_obtain_derivatives_list, 2},
+    {"_nn2poly_obtain_derivatives_list", (DL_FUNC) &_nn2poly_obtain_derivatives_list, 3},
     {"_nn2poly_alg_non_linear", (DL_FUNC) &_nn2poly_alg_non_linear, 6},
     {"_nn2poly_nn2poly_algorithm", (DL_FUNC) &_nn2poly_nn2poly_algorithm, 5},
     {"_nn2poly_combinations_with_repetition", (DL_FUNC) &_nn2poly_combinations_with_repetition, 2},
