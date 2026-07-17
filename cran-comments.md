@@ -1,6 +1,6 @@
-## Patch release
+## Release 1.0.0
 
-- Drop C++14 specification, as requested by CRAN.
+- This release marks version 1.0.0 of the package. It includes the changes and improvements documented in NEWS.md, with significant performance improvements.
 
 ## Test environments
 
