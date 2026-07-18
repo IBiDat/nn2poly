@@ -1,5 +1,12 @@
 # Changelog
 
+## nn2poly 1.0.1
+
+CRAN release: 2026-07-17
+
+- Fix UB in hash implementation
+  ([\#84](https://github.com/IBiDat/nn2poly/issues/84)).
+
 ## nn2poly 1.0.0
 
 CRAN release: 2026-07-17
