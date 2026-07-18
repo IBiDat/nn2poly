@@ -1,6 +1,6 @@
 #include "partitions.h"
 #include "multiset.h"
-#include "taylor.h"
+#include "approx.h"
 using namespace nn2poly::linalg;
 
 // [[Rcpp::export]]
@@ -37,7 +37,7 @@ CoeffsList obtain_derivatives_list(const Term& taylor_orders,
     // Obtain the vector with the derivatives of the activation function up to
     // the given degree centered at a
     out[i].resize(static_cast<size_t>(taylor_orders[i] + 1));
-    coeffs_taylor(af_string_list[i], out[i], a);
+    coeffs("taylor", af_string_list[i], out[i], a);
   }
 
   return out;
