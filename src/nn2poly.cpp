@@ -25,7 +25,7 @@ Term obtain_taylor_vector(const Term& taylor_orders,
 // [[Rcpp::export]]
 CoeffsList obtain_derivatives_list(const Term& taylor_orders,
                                    const Functions& af_string_list,
-                                   double a = 0.0) {
+                                   double taylor_center = 0.0) {
   if (taylor_orders.size() != af_string_list.size())
     throw std::invalid_argument(
       "`taylor_orders` length does not match provided number of layers");
@@ -35,9 +35,9 @@ CoeffsList obtain_derivatives_list(const Term& taylor_orders,
     if (taylor_orders[i] < 0)
       throw std::invalid_argument("`taylor_orders` must be non-negative");
     // Obtain the vector with the derivatives of the activation function up to
-    // the given degree centered at a
+    // the given degree centered at taylor_center
     out[i].resize(static_cast<size_t>(taylor_orders[i] + 1));
-    coeffs("taylor", af_string_list[i], out[i], a);
+    coeffs("taylor", af_string_list[i], out[i], taylor_center);
   }
 
   return out;
@@ -137,7 +137,7 @@ inline void check_weights_dimensions(const Layers& layers) {
 // [[Rcpp::export]]
 List nn2poly_algorithm(const Layers& layers, const Functions& af_list,
                        int max_order, bool keep_layers,
-                       const Term& taylor_orders, double a = 0.0) {
+                       const Term& taylor_orders, double taylor_center = 0.0) {
   if (layers.empty())
     throw std::invalid_argument("`layers` is empty");
   if (af_list.empty())
@@ -156,7 +156,7 @@ List nn2poly_algorithm(const Layers& layers, const Functions& af_list,
   // depending on the last layer being linear or not
   WeightsLists results(static_cast<size_t>(last_linear ? 2 * L - 1 : 2 * L));
   const Term taylor = obtain_taylor_vector(taylor_orders, af_list);
-  const CoeffsList af_dlist = obtain_derivatives_list(taylor, af_list, a);
+  const CoeffsList af_dlist = obtain_derivatives_list(taylor, af_list, taylor_center);
 
   // Starting point for the algorithm: Set weights as coefficients
   // of an order 1 polynomial.
@@ -226,7 +226,7 @@ List nn2poly_algorithm(const Layers& layers, const Functions& af_list,
       DTAG(previous_order), DTAG(q_layer), DTAG(labels_list.size()));
 
     // Subtract the center from the intercept
-    if (a) sub_scalar(coeffs_list, 0, a);
+    if (taylor_center) sub_scalar(coeffs_list, 0, taylor_center);
     // Apply non-linear algorithm
     coeffs_list = alg_non_linear_impl(
       coeffs_list,

@@ -1,3 +1,7 @@
+# nn2poly 1.0.1.9000
+
+- Implement Taylor expansion at any given point (#85 addressing #82).
+
 # nn2poly 1.0.1
 
 - Fix UB in hash implementation (#84).

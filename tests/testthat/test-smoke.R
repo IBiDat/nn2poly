@@ -485,10 +485,11 @@ test_that("manual example passes", {
   data <- smoke_test_data()
 
   x <- smoke_test_manual(data)
-  y <- nn2poly(data, max_order = 4, taylor = 5, keep_layers = TRUE)
+  y <- nn2poly(data, max_order = 4, keep_layers = TRUE, taylor_orders = 5)
   expect_equal(x, y)
 
   x <- smoke_test_manual(data, 0.5)
-  y <- nn2poly(data, max_order = 4, taylor = 5, keep_layers = TRUE, a = 0.5)
+  y <- nn2poly(data, max_order = 4, keep_layers = TRUE,
+               taylor_orders = 5, taylor_center = 0.5)
   expect_equal(x, y)
 })
