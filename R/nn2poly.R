@@ -117,7 +117,7 @@ nn2poly <- function(object,
                     max_order = 2,
                     keep_layers = FALSE,
                     taylor_orders = 8,
-                    a = 0.0,
+                    taylor_center = 0.0,
                     ...) {
   UseMethod("nn2poly")
 }
