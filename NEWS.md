@@ -1,6 +1,6 @@
 # nn2poly 1.0.1.9000
 
-- Implement Taylor expansion at any given point (#85 addressing #82).
+- Implement Taylor expansion at any given `taylor_center` (#85 addressing #82).
 
 # nn2poly 1.0.1
 
