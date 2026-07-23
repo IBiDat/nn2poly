@@ -5,16 +5,16 @@ obtain_taylor_vector <- function(taylor_orders, af_string_list) {
     .Call(`_nn2poly_obtain_taylor_vector`, taylor_orders, af_string_list)
 }
 
-obtain_derivatives_list <- function(taylor_orders, af_string_list) {
-    .Call(`_nn2poly_obtain_derivatives_list`, taylor_orders, af_string_list)
+obtain_derivatives_list <- function(taylor_orders, af_string_list, taylor_center = 0.0) {
+    .Call(`_nn2poly_obtain_derivatives_list`, taylor_orders, af_string_list, taylor_center)
 }
 
 alg_non_linear <- function(coeffs_input, labels_input, labels_output, previous_order, q_layer, g) {
     .Call(`_nn2poly_alg_non_linear`, coeffs_input, labels_input, labels_output, previous_order, q_layer, g)
 }
 
-nn2poly_algorithm <- function(layers, af_list, max_order, keep_layers, taylor_orders) {
-    .Call(`_nn2poly_nn2poly_algorithm`, layers, af_list, max_order, keep_layers, taylor_orders)
+nn2poly_algorithm <- function(layers, af_list, max_order, keep_layers, taylor_orders, taylor_center = 0.0) {
+    .Call(`_nn2poly_nn2poly_algorithm`, layers, af_list, max_order, keep_layers, taylor_orders, taylor_center)
 }
 
 combinations_with_repetition <- function(n, k) {

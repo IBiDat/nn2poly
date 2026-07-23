@@ -4,7 +4,14 @@
 \alias{nn2poly}
 \title{Obtain polynomial representation}
 \usage{
-nn2poly(object, max_order = 2, keep_layers = FALSE, taylor_orders = 8, ...)
+nn2poly(
+  object,
+  max_order = 2,
+  keep_layers = FALSE,
+  taylor_orders = 8,
+  taylor_center = 0,
+  ...
+)
 }
 \arguments{
 \item{object}{An object for which the computation of the NN2Poly algorithm is
@@ -42,6 +49,9 @@ Default set to \code{FALSE}.}
 degree at which Taylor expansion is truncated at each layer. If a single
 value is used, that value is set for each non linear layer and 1 for linear
 at each layer activation function. Default set to \code{8}.}
+
+\item{taylor_center}{\code{numeric} value that sets the point at which the
+Taylor expansion is computed. Default set to \code{0}.}
 
 \item{...}{Ignored.}
 }
