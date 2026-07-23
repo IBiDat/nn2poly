@@ -3,11 +3,14 @@
 
 #include "nn2poly_types.h"
 #include "approx_taylor.h"
+#include "approx_chebyshev.h"
 
 template <typename... Args>
 void coeffs(const std::string& type, const std::string& af, Coeffs& c, Args&&... args) {
   if (type == "taylor") if constexpr (sizeof...(Args) < 2)
     return nn2poly::detail::coeffs_taylor(af, c, std::forward<Args>(args)...);
+  if (type == "chebyshev") if constexpr (sizeof...(Args) < 3)
+    return nn2poly::detail::coeffs_chebyshev(af, c, std::forward<Args>(args)...);
   throw std::invalid_argument("approximation type '" + type + "' not supported");
 }
 
